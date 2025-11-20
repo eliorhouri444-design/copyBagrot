@@ -664,6 +664,24 @@ export default function TopicPracticeNewPage() {
   }
 
   if (showSummary) {
+    const totalQuestions = currentSetQuestions?.length || 0;
+    if (totalQuestions === 0) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+            <p className="text-gray-600">לא נמצאו שאלות</p>
+            <Button onClick={() => navigate(createPageUrl("Practice"))} className="mt-4">
+              חזור לתרגול
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const correctCount = Object.values(results).filter(r => r.isCorrect).length;
+    const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -683,11 +701,11 @@ export default function TopicPracticeNewPage() {
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
               <div className="text-center mb-4">
                 <div className="text-5xl font-bold text-blue-600">
-                  {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
+                  {correctCount} / {totalQuestions}
                 </div>
                 <div className="text-sm text-gray-600 mt-2">תשובות נכונות</div>
                 <div className="text-3xl font-bold text-gray-900 mt-3">
-                  {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
+                  {percentage}%
                 </div>
               </div>
             </div>
@@ -827,8 +845,22 @@ export default function TopicPracticeNewPage() {
     );
   }
 
-  const currentQuestion = currentSetQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
+  const currentQuestion = currentSetQuestions?.[currentQuestionIndex];
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+          <p className="text-gray-600">לא נמצאה שאלה נוכחית</p>
+          <Button onClick={() => navigate(createPageUrl("Practice"))} className="mt-4">
+            חזור לתרגול
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  const progress = ((currentQuestionIndex + 1) / (currentSetQuestions?.length || 1)) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
   const displayUnits = user?.selected_units || 3; // Moved displayUnits to a higher scope
 
@@ -985,7 +1017,7 @@ export default function TopicPracticeNewPage() {
 
           <div className="text-center flex-1">
             <h1 className="text-base sm:text-xl font-bold">{topicName}</h1>
-            <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
+            <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions?.length || 0}</p>
           </div>
 
           {readingText && (
@@ -1148,7 +1180,7 @@ export default function TopicPracticeNewPage() {
                   disabled={!hasAnswered || isSubmitting}
                   className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
                 >
-                  {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
+                  {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
                   <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 </Button>
               </div>
