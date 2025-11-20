@@ -1111,6 +1111,12 @@ export default function ExamModuleBPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            {!exam?.grammar_questions || exam.grammar_questions.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+                <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+                <p className="text-gray-600">לא נמצאו שאלות דקדוק במבחן זה</p>
+              </div>
+            ) : (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentQuestion}
