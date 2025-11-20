@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
+import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -510,22 +511,13 @@ export default function TopicPracticeNewPage() {
           }
         }
 
-        // Normalize user answer - remove punctuation and extra spaces
-        const normalizedUserAnswer = userAnswer.toLowerCase().replace(/[.,!?;:\s]+/g, ' ').trim();
+        // Simple normalization - just lowercase and trim
+        const normalizedUserAnswer = userAnswer.toLowerCase().trim();
 
-        // Check if user answer matches any acceptable answer
+        // Check exact match first
         isCorrect = allAcceptableAnswers.some(acceptableAns => {
-          const normalized = String(acceptableAns).toLowerCase().replace(/[.,!?;:\s]+/g, ' ').trim();
-
-          // Exact match
-          if (normalized === normalizedUserAnswer) return true;
-
-          // Check if one contains the other (for partial matches)
-          if (normalized.length > 3 && normalizedUserAnswer.length > 3) {
-            return normalized.includes(normalizedUserAnswer) || normalizedUserAnswer.includes(normalized);
-          }
-
-          return false;
+          const normalized = String(acceptableAns).toLowerCase().trim();
+          return normalized === normalizedUserAnswer;
         });
 
         status = isCorrect ? "correct" : "incorrect";
