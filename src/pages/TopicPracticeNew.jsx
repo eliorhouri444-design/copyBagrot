@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -220,13 +221,9 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    
-    // Get the actual answer value - if it's an object, extract the text
-    let rawAnswer = providedAnswer || answers[currentQuestion.question_id] || "";
-    if (typeof rawAnswer === 'object' && rawAnswer !== null) {
-      rawAnswer = rawAnswer.text || rawAnswer.value || JSON.stringify(rawAnswer);
-    }
-    const userAnswer = String(rawAnswer);
+    const userAnswer = (typeof providedAnswer === 'object' && providedAnswer !== null && 'text' in providedAnswer) 
+      ? String(providedAnswer.text) 
+      : String(providedAnswer || answers[currentQuestion.question_id] || "");
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
@@ -797,7 +794,7 @@ export default function TopicPracticeNewPage() {
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
                               <div className="text-sm font-semibold text-red-700" dir="ltr">
-                                {typeof result?.userAnswer === 'object' ? JSON.stringify(result?.userAnswer) : (result?.userAnswer || "לא נענה")}
+                                {result?.userAnswer || "לא נענה"}
                               </div>
                             </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
@@ -1115,10 +1112,11 @@ export default function TopicPracticeNewPage() {
           {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
             <div className="space-y-2">
               {currentQuestion.options.map((option, idx) => {
-                const optionText = typeof option === 'object' ? (option.text || option.value || option) : option;
+                const optionText = (typeof option === 'object' && option !== null && 'text' in option) 
+                  ? option.text 
+                  : String(option);
                 const currentAnswer = answers[currentQuestion.question_id];
-                const currentAnswerText = typeof currentAnswer === 'object' ? (currentAnswer.text || currentAnswer.value || currentAnswer) : currentAnswer;
-                const isSelected = currentAnswerText === optionText;
+                const isSelected = String(currentAnswer) === optionText;
                 
                 return (
                   <button
