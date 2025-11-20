@@ -566,20 +566,17 @@ export default function TopicPracticeNewPage() {
 
     const isPremium = user?.is_premium;
     
-    if (!isPremium && setNumber >= FREE_USER_MAX_SETS) {
-      setShowAdDialog(true);
-      return;
-    }
-
-    if (!isPremium) {
-      setShowAdConfirmDialog(true);
-    } else {
-      // Reset state and navigate
+    if (isPremium) {
+      // Premium users go directly to next set
       setAnswers({});
       setResults({});
       setCurrentQuestionIndex(0);
       setShowReadingText(true);
+      setShowListeningIntro(isListeningTopic && listeningText);
       window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
+    } else {
+      // Free users see ad confirmation
+      setShowAdConfirmDialog(true);
     }
   };
 
@@ -595,6 +592,7 @@ export default function TopicPracticeNewPage() {
     setResults({});
     setCurrentQuestionIndex(0);
     setShowReadingText(true);
+    setShowListeningIntro(isListeningTopic && listeningText);
     window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
   };
 
