@@ -65,7 +65,54 @@ Deno.serve(async (req) => {
     console.log(`🎯 Selected structure: ${examStructure.structure_name}`);
 
     // יצירת מבחן חדש בהתבסס על המבנה
-    const generationPrompt = `
+    const isEnglishExam = examStructure.subject === 'אנגלית';
+    
+    const generationPrompt = isEnglishExam ? `
+You are an expert at creating Israeli high school English bagrut (matriculation) exams.
+Create a completely NEW exam based on the following structure.
+
+**CRITICAL: THIS IS AN ENGLISH EXAM - ALL CONTENT MUST BE IN ENGLISH ONLY**
+
+📋 **General Information:**
+- Subject: ${examStructure.subject}
+- Level: ${examStructure.unit_level} units
+- Module: ${examStructure.module_id}
+- Duration: ${examStructure.duration_minutes} minutes
+- Total Points: ${examStructure.total_points}
+
+📝 **Exam Structure:**
+${JSON.stringify(examStructure.question_structure, null, 2)}
+
+🎯 **REQUIREMENTS:**
+
+1. **LANGUAGE - ABSOLUTELY CRITICAL:**
+   - Write EVERYTHING in English (questions, answers, explanations)
+   - NO Hebrew translations or Hebrew text in questions
+   - Create authentic English reading comprehension passages
+   - Use proper English grammar and vocabulary
+   - Follow Israeli bagrut English exam format
+
+2. **For each question:**
+   - Full question text IN ENGLISH
+   - Multiple choice options (A, B, C, D) IN ENGLISH  
+   - Correct answer IN ENGLISH
+   - Detailed explanation IN ENGLISH
+   - Points allocation
+   
+3. **Question Types (in English):**
+   - Reading Comprehension (passage + questions)
+   - Vocabulary (context-based)
+   - Grammar (practical usage)
+   - Writing tasks (with clear instructions in English)
+
+4. **Quality:**
+   - Challenging but fair questions
+   - Variety of topics (culture, science, society, technology)
+   - Real-world relevance
+   - Appropriate for ${examStructure.unit_level} units level
+
+Return JSON with the complete exam including all questions, answers, and solutions IN ENGLISH.
+` : `
 אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
 📋 **מידע כללי:**
@@ -94,12 +141,18 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
    - הסבר מפורט
    - רובריקת ניקוד
 
-3. **שפת המבחן - חשוב מאוד:**
+3. **שפת המבחן - CRITICAL:**
    ${examStructure.subject === 'אנגלית' 
-     ? `- זהו מבחן **אנגלית** - כל השאלות, התשובות וההסברים חייבים להיות **באנגלית בלבד**
-   - **אסור בהחלט לתרגם לעברית!**
-   - רק הוראות כלליות למורה יכולות להיות בעברית
-   - סיפורי קריאה, שאלות, תשובות והסברים - הכל באנגלית`
+     ? `**THIS IS AN ENGLISH EXAM - EVERYTHING MUST BE IN ENGLISH ONLY**
+   - ALL questions text: English
+   - ALL answer options: English  
+   - ALL correct answers: English
+   - ALL explanations: English
+   - Reading passages: English
+   - ABSOLUTELY NO HEBREW anywhere in questions/answers
+   - Create authentic English bagrut exam questions
+   - Use proper English grammar and vocabulary appropriate for level ${examStructure.unit_level} units
+   - Follow Israeli Ministry of Education English bagrut exam format`
      : `- שפה ברורה ומדויקת
    - עברית תקנית
    - מושגים מקצועיים נכונים`
@@ -112,6 +165,12 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
    - קשר למציאות (אם רלוונטי)
 
 החזר JSON עם המבחן המלא הכולל את כל השאלות, תשובות ופתרונות.
+${!isEnglishExam ? `
+
+4. **איכות:**
+   - שאלות מאתגרות אך הוגנות
+   - מגוון נושאים
+   - קשר למציאות (אם רלוונטי)` : ''}
 `;
 
     console.log('🤖 Step 5: Generating exam with AI...');
