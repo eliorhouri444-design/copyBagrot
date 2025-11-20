@@ -138,18 +138,6 @@ export default function TopicPracticeNewPage() {
 
       setCurrentSetQuestions(setQuestions);
 
-      // Check if this is reading comprehension and get reading text
-      const isReadingComprehension = topicId.toLowerCase().includes('reading') || 
-                                     topicId.toLowerCase().includes('הבנת הנקרא');
-      
-      if (isReadingComprehension && setQuestions[0]?.reading_text) {
-        setReadingText(setQuestions[0].reading_text);
-        setShowReadingText(true);
-      } else {
-        setReadingText("");
-        setShowReadingText(false);
-      }
-
       // Check if this is listening comprehension
       const isListeningComprehension = topicId.toLowerCase().includes('listening') || 
                                        topicId.toLowerCase().includes('האזנה');
@@ -157,7 +145,21 @@ export default function TopicPracticeNewPage() {
       if (isListeningComprehension && setQuestions[0]?.reading_text) {
         setListeningText(setQuestions[0].reading_text);
         setShowListeningIntro(true);
+        // Don't set reading text for listening topics
+        setReadingText("");
+        setShowReadingText(false);
       } else {
+        // Check if this is reading comprehension and get reading text
+        const isReadingComprehension = topicId.toLowerCase().includes('reading') || 
+                                       topicId.toLowerCase().includes('הבנת הנקרא');
+        
+        if (isReadingComprehension && setQuestions[0]?.reading_text) {
+          setReadingText(setQuestions[0].reading_text);
+          setShowReadingText(true);
+        } else {
+          setReadingText("");
+          setShowReadingText(false);
+        }
         setListeningText("");
         setShowListeningIntro(false);
       }
