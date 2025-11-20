@@ -592,7 +592,7 @@ export default function ExamModuleCPage() {
     setCurrentQuestion(0);
     setTimeLeft(exam?.duration_minutes * 60 || 3600);
     setExamMode('exam'); // Default to exam mode when starting fresh
-    setDisplayMode('normal'); // Default to normal display mode
+    setDisplayMode('carousel'); // Default to carousel display mode
     setShowResumeDialog(false);
     if (user?.skip_exam_intro) {
       setShowModeSelectionDialog(true);
