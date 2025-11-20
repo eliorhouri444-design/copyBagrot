@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { CheckCircle, Crown, X, Upload, Settings, ChevronDown, ChevronUp, ChevronLeft, Lock, Target, Edit2, Trash2, Loader2, FileCheck, Save } from "lucide-react";
+import { BookOpen, CheckCircle, Award, Clock, Play, Crown, X, Upload, Settings, Trophy, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Accessibility, Shield, TrendingDown, Lock, Target, TrendingUp, Edit2, Trash2, Loader2, BookCheck, FileCheck, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -533,11 +533,11 @@ export default function ExamsPage() {
 
     const targetPath = createPageUrl(targetPage);
     const fullPath = `${targetPath}?examId=${encodeURIComponent(exam.id)}`;
-    
+
     console.log('📍 Navigating to:', fullPath);
     console.log('📍 examId being passed:', exam.id);
-    
-    window.location.href = fullPath;
+
+    navigate(fullPath);
   };
 
   const handleRandomExam = (moduleId) => {
