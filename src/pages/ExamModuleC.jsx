@@ -829,49 +829,12 @@ export default function ExamModuleCPage() {
           </DialogHeader>
 
           <div className="grid md:grid-cols-2 gap-4 py-6">
-            {/* Exam Mode (Normal Display) */}
+            {/* Carousel Mode - NOW DEFAULT */}
             <motion.button
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('exam', 'normal')} // Changed call
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1 text-right">
-                  <h3 className="text-xl font-bold text-gray-900">מצב בגרות רגיל</h3>
-                  <p className="text-sm text-blue-700 font-medium">📄 כמו בבחינה אמיתית</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>סיפור בצד, כל השאלות בצד</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>גלילה חופשית</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>טיימר מלא של {exam?.duration_minutes || 90} דקות</span>
-                </div>
-              </div>
-
-              <div className="mt-4 bg-blue-200 rounded-lg p-3 text-center">
-                <span className="text-sm font-bold text-blue-900">מומלץ להכנה לבגרות</span>
-              </div>
-            </motion.button>
-
-            {/* Carousel Mode */}
-            <motion.button
-              whileHover={{ scale: 1.02, y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('exam', 'carousel')} // Changed call
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
+              onClick={() => handleStartExam('exam', 'carousel')}
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-400 hover:border-purple-600 transition-all text-right shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
@@ -899,7 +862,44 @@ export default function ExamModuleCPage() {
               </div>
 
               <div className="mt-4 bg-purple-200 rounded-lg p-3 text-center">
-                <span className="text-sm font-bold text-purple-900">לתרגול ממוקד</span>
+                <span className="text-sm font-bold text-purple-900">🌟 מומלץ ובררת מחדל</span>
+              </div>
+            </motion.button>
+
+            {/* Normal Mode */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStartExam('exam', 'normal')}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב רגיל</h3>
+                  <p className="text-sm text-blue-700 font-medium">📄 כל השאלות ביחד</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>סיפור למעלה, שאלות למטה</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>גלילה חופשית בין השאלות</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>טיימר מלא של {exam?.duration_minutes || 90} דקות</span>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-blue-200 rounded-lg p-3 text-center">
+                <span className="text-sm font-bold text-blue-900">למי שמעדיף רשימה</span>
               </div>
             </motion.button>
           </div>
