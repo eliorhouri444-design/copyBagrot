@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -205,7 +206,7 @@ export default function TopicPracticeNewPage() {
         });
       }
     } catch (error) {
-      console.error("Error saving draft:", error);
+              console.error("Error saving draft:", error);
     } finally {
       setIsSavingDraft(false);
     }
@@ -448,68 +449,67 @@ export default function TopicPracticeNewPage() {
         let status = "incorrect";
         let correctAnswer = "";
         let explanation = "";
+        let allAcceptableAnswers = [];
 
         if (solutions.length > 0) {
           const solution = solutions[0];
-          const correctAnswers = solution.final_answers || [];
+          const finalAnswers = solution.final_answers || [];
           const acceptableVariants = solution.acceptable_variants || [];
           explanation = solution.explanation || currentQuestion.explanation || "";
 
-          // Get correct answer as string - handle all formats
-          if (correctAnswers.length > 0) {
-            const firstAnswer = correctAnswers[0];
-            correctAnswer = typeof firstAnswer === 'string' ? firstAnswer : (firstAnswer?.value || "");
-          } else if (currentQuestion.acceptable_answers?.length > 0) {
-            correctAnswer = String(currentQuestion.acceptable_answers[0]);
-          } else if (currentQuestion.correct_answer) {
-            correctAnswer = String(currentQuestion.correct_answer);
-          }
-
-          const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/[.,!?;]/g, '');
-
-          // Check against solution bank answers
-          isCorrect = correctAnswers.some(ans => {
-            const answerValue = typeof ans === 'string' ? ans : (ans?.value || "");
-            if (!answerValue) return false;
-            const normalized = String(answerValue).toLowerCase().replace(/[.,!?;]/g, '');
-            return normalized === normalizedUserAnswer || 
-                   normalizedUserAnswer.includes(normalized) ||
-                   normalized.includes(normalizedUserAnswer);
-          }) || acceptableVariants.some(variant => {
-            const variantValue = typeof variant === 'string' ? variant : (variant?.value || "");
-            if (!variantValue) return false;
-            const normalized = String(variantValue).toLowerCase().replace(/[.,!?;]/g, '');
-            return normalized === normalizedUserAnswer ||
-                   normalizedUserAnswer.includes(normalized) ||
-                   normalized.includes(normalizedUserAnswer);
+          // Extract all acceptable answers from final_answers
+          finalAnswers.forEach(ans => {
+            if (typeof ans === 'string') {
+              allAcceptableAnswers.push(ans);
+            } else if (ans?.value) {
+              allAcceptableAnswers.push(String(ans.value));
+              if (ans.variants && Array.isArray(ans.variants)) {
+                ans.variants.forEach(v => allAcceptableAnswers.push(String(v)));
+              }
+            }
           });
+
+          // Add acceptable_variants
+          acceptableVariants.forEach(variant => {
+            if (typeof variant === 'string') {
+              allAcceptableAnswers.push(variant);
+            } else if (variant?.value) {
+              allAcceptableAnswers.push(String(variant.value));
+            }
+          });
+
+          // Set first answer as the display answer
+          if (allAcceptableAnswers.length > 0) {
+            correctAnswer = allAcceptableAnswers[0];
+          }
         }
 
-        // Also check question's acceptable_answers array
-        if (!isCorrect && currentQuestion.acceptable_answers?.length > 0) {
-          isCorrect = currentQuestion.acceptable_answers.some(ans => {
-            const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
-            return normalized === normalizedUserAnswer ||
-                   normalizedUserAnswer.includes(normalized) ||
-                   normalized.includes(normalizedUserAnswer);
+        // Add from question's acceptable_answers
+        if (currentQuestion.acceptable_answers?.length > 0) {
+          currentQuestion.acceptable_answers.forEach(ans => {
+            allAcceptableAnswers.push(String(ans));
           });
-          
-          if (!correctAnswer && currentQuestion.acceptable_answers.length > 0) {
+          if (!correctAnswer) {
             correctAnswer = String(currentQuestion.acceptable_answers[0]);
           }
         }
-        
-        // Check question's correct_answer field
-        if (!isCorrect && currentQuestion.correct_answer) {
-          const normalized = String(currentQuestion.correct_answer).toLowerCase().replace(/[.,!?;]/g, '');
-          isCorrect = normalized === normalizedUserAnswer ||
-                     normalizedUserAnswer.includes(normalized) ||
-                     normalized.includes(normalizedUserAnswer);
-          
+
+        // Add from question's correct_answer
+        if (currentQuestion.correct_answer) {
+          allAcceptableAnswers.push(String(currentQuestion.correct_answer));
           if (!correctAnswer) {
             correctAnswer = String(currentQuestion.correct_answer);
           }
         }
+
+        // Normalize user answer
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+
+        // Check if user answer matches any acceptable answer
+        isCorrect = allAcceptableAnswers.some(acceptableAns => {
+          const normalized = String(acceptableAns).trim().toLowerCase();
+          return normalized === normalizedUserAnswer;
+        });
 
         status = isCorrect ? "correct" : "incorrect";
 
@@ -774,7 +774,7 @@ export default function TopicPracticeNewPage() {
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
                         <div className="text-sm text-gray-700 mb-2">
-                          {typeof q.question_text === 'string' ? q.question_text.substring(0, 80) : (q.question_text?.text || 'שאלה').substring(0, 80)}...
+                          {(typeof q.question_text === 'string' ? q.question_text : q.question_text?.text || 'שאלה').substring(0, 80)}...
                         </div>
 
                         {q.question_type === "writing" && result?.writingEvaluation ? (
@@ -852,15 +852,15 @@ export default function TopicPracticeNewPage() {
                         ) : !result?.isCorrect && q.question_type !== "writing" && (
                           <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
-                              <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                              <div className="text-sm font-semibold text-red-700" dir="ltr">
-                                {typeof result?.userAnswer === 'string' ? result.userAnswer : (result?.userAnswer?.text || "לא נענה")}
-                              </div>
-                            </div>
+                                  <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
+                                  <div className="text-sm font-semibold text-red-700" dir="ltr">
+                                    {result?.userAnswer || "לא נענה"}
+                                  </div>
+                                </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
                               <div className="text-sm font-semibold text-green-700" dir="ltr">
-                                {String(result?.correctAnswer || "לא ידוע")}
+                                {result?.correctAnswer || "לא ידוע"}
                               </div>
                             </div>
                           </div>
@@ -1285,7 +1285,7 @@ export default function TopicPracticeNewPage() {
                     )}
                     <span className="font-semibold text-gray-900">שאלה {idx + 1}</span>
                   </div>
-                  <p className="text-sm text-gray-700 mt-1">{q.question_text.substring(0, 80)}...</p>
+                  <p className="text-sm text-gray-700 mt-1">{(typeof q.question_text === 'string' ? q.question_text : q.question_text?.text || 'שאלה').substring(0, 80)}...</p>
                 </div>
               );
             })}
