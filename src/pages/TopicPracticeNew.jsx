@@ -995,7 +995,7 @@ export default function TopicPracticeNewPage() {
   if (readingText && showReadingText) {
     return (
       <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-[2rem] p-4 shadow-xl">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-3xl p-4 shadow-xl">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -1007,7 +1007,7 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg font-bold">{topicName}</h1>
+              <h1 className="text-base font-bold">{topicName}</h1>
               <p className="text-xs opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
             </div>
 
@@ -1015,7 +1015,7 @@ export default function TopicPracticeNewPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1027,8 +1027,8 @@ export default function TopicPracticeNewPage() {
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">קרא את הטקסט</h2>
-                  <p className="text-xs text-gray-600">לאחר מכן תענה על 10 שאלות</p>
+                  <h2 className="text-base font-bold text-gray-900">קרא את הטקסט</h2>
+                  <p className="text-xs text-gray-600">לאחר מכן תענה על {currentSetQuestions.length} שאלות</p>
                 </div>
               </div>
             </div>
@@ -1049,13 +1049,13 @@ export default function TopicPracticeNewPage() {
           </motion.div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 pb-6 shadow-2xl">
+        <div className="bg-white border-t-2 border-gray-200 p-4 shadow-2xl">
           <div className="max-w-2xl mx-auto">
             <Button
               onClick={() => setShowReadingText(false)}
               className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl shadow-md"
             >
-              יאללה לקרוא - המשך לשאלות
+              התחל לענות על השאלות
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
           </div>
@@ -1066,7 +1066,7 @@ export default function TopicPracticeNewPage() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
-      <div className="bg-blue-600 rounded-b-[2rem] p-4 shadow-xl">
+      <div className="bg-blue-600 rounded-b-3xl p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
@@ -1104,7 +1104,29 @@ export default function TopicPracticeNewPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24">
+      {/* Split screen layout: Reading text on top, questions on bottom */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {readingText && (
+          <div className="h-1/2 overflow-y-auto px-4 pt-3 pb-2">
+            <div className="bg-white rounded-xl shadow-lg p-4 max-w-2xl mx-auto h-full overflow-y-auto">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-gray-900">טקסט הקריאה</h3>
+              </div>
+              <div 
+                className="text-sm leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                style={{ 
+                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+                  direction: 'ltr'
+                }}
+              >
+                {readingText}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={`${readingText ? 'h-1/2' : 'flex-1'} overflow-y-auto px-4 pb-20`}>
         {/* Story panel on the right (if exists) */}
         <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
           <DialogContent dir="rtl" className="sm:max-w-screen-md max-h-[90vh] overflow-y-auto">
@@ -1285,9 +1307,11 @@ export default function TopicPracticeNewPage() {
         </motion.div>
       </div>
 
-      {/* Fixed bottom button */}
+      </div>
+
+      {/* Fixed bottom button - elevated above bottom navigation */}
       {currentQuestion.question_type !== "writing" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 pb-6">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3">
           <div className="max-w-2xl mx-auto">
             <Button
               onClick={handleSubmitAnswer}
