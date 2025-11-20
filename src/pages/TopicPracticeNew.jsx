@@ -455,10 +455,14 @@ export default function TopicPracticeNewPage() {
           const acceptableVariants = solution.acceptable_variants || [];
           explanation = solution.explanation || currentQuestion.explanation || "";
 
+          // Get correct answer as string (first acceptable answer or from question)
           if (correctAnswers.length > 0) {
-            // Handle both string and object formats
             const firstAnswer = correctAnswers[0];
             correctAnswer = typeof firstAnswer === 'string' ? firstAnswer : (firstAnswer?.value || "");
+          } else if (currentQuestion.acceptable_answers?.length > 0) {
+            correctAnswer = currentQuestion.acceptable_answers[0];
+          } else if (currentQuestion.answer) {
+            correctAnswer = currentQuestion.answer;
           }
 
           const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/[.,!?;]/g, '');
@@ -480,11 +484,28 @@ export default function TopicPracticeNewPage() {
           // Also check if question has acceptable_answers array
           if (!isCorrect && currentQuestion.acceptable_answers?.length > 0) {
             isCorrect = currentQuestion.acceptable_answers.some(ans => {
-              const normalized = ans.toLowerCase().replace(/[.,!?;]/g, '');
+              const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
               return normalized === normalizedUserAnswer ||
                      normalizedUserAnswer.includes(normalized) ||
                      normalized.includes(normalizedUserAnswer);
             });
+            
+            // If still no correctAnswer set, use from question
+            if (!correctAnswer && currentQuestion.acceptable_answers.length > 0) {
+              correctAnswer = String(currentQuestion.acceptable_answers[0]);
+            }
+          }
+          
+          // Fallback to question.answer if no correct answer found
+          if (!correctAnswer && currentQuestion.answer) {
+            correctAnswer = String(currentQuestion.answer);
+            // Also check against it
+            if (!isCorrect) {
+              const normalized = String(currentQuestion.answer).toLowerCase().replace(/[.,!?;]/g, '');
+              isCorrect = normalized === normalizedUserAnswer ||
+                         normalizedUserAnswer.includes(normalized) ||
+                         normalized.includes(normalizedUserAnswer);
+            }
           }
 
           status = isCorrect ? "correct" : "incorrect";
