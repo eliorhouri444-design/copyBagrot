@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -217,7 +216,16 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    const userAnswer = String(providedAnswer || answers[currentQuestion.question_id] || "");
+    
+    // Extract the actual answer value
+    let userAnswerRaw = providedAnswer || answers[currentQuestion.question_id] || "";
+    
+    // If it's an object (from multiple choice), get the text value
+    if (typeof userAnswerRaw === 'object' && userAnswerRaw !== null) {
+      userAnswerRaw = userAnswerRaw.text || userAnswerRaw.value || userAnswerRaw.answer || String(userAnswerRaw);
+    }
+    
+    const userAnswer = String(userAnswerRaw).trim();
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
@@ -502,13 +510,22 @@ export default function TopicPracticeNewPage() {
           }
         }
 
-        // Normalize user answer
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+        // Normalize user answer - remove punctuation and extra spaces
+        const normalizedUserAnswer = userAnswer.toLowerCase().replace(/[.,!?;:\s]+/g, ' ').trim();
 
         // Check if user answer matches any acceptable answer
         isCorrect = allAcceptableAnswers.some(acceptableAns => {
-          const normalized = String(acceptableAns).trim().toLowerCase();
-          return normalized === normalizedUserAnswer;
+          const normalized = String(acceptableAns).toLowerCase().replace(/[.,!?;:\s]+/g, ' ').trim();
+
+          // Exact match
+          if (normalized === normalizedUserAnswer) return true;
+
+          // Check if one contains the other (for partial matches)
+          if (normalized.length > 3 && normalizedUserAnswer.length > 3) {
+            return normalized.includes(normalizedUserAnswer) || normalizedUserAnswer.includes(normalized);
+          }
+
+          return false;
         });
 
         status = isCorrect ? "correct" : "incorrect";
@@ -852,16 +869,16 @@ export default function TopicPracticeNewPage() {
                         ) : !result?.isCorrect && q.question_type !== "writing" && (
                           <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
-                                  <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                                  <div className="text-sm font-semibold text-red-700" dir="ltr">
-                                    {result?.userAnswer || "לא נענה"}
-                                  </div>
-                                </div>
+                            <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
+                            <div className="text-sm font-semibold text-red-700" dir="ltr">
+                            {String(result?.userAnswer || "לא נענה")}
+                            </div>
+                            </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
-                              <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                              <div className="text-sm font-semibold text-green-700" dir="ltr">
-                                {result?.correctAnswer || "לא ידוע"}
-                              </div>
+                            <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
+                            <div className="text-sm font-semibold text-green-700" dir="ltr">
+                            {String(result?.correctAnswer || "לא ידוע")}
+                            </div>
                             </div>
                           </div>
                         )}
@@ -1179,31 +1196,36 @@ export default function TopicPracticeNewPage() {
 
               {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
                 <div className="space-y-3">
-                  {currentQuestion.options.map((option, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                        answers[currentQuestion.question_id] === option
-                          ? 'border-blue-500 bg-blue-100'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                      dir="ltr"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                          answers[currentQuestion.question_id] === option
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
-                        }`}>
-                          {answers[currentQuestion.question_id] === option && (
-                            <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                          )}
+                  {currentQuestion.options.map((option, idx) => {
+                    const optionText = typeof option === 'string' ? option : (option?.text || option?.value || String(option));
+                    const isSelected = answers[currentQuestion.question_id] === optionText;
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                          isSelected
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-200 hover:border-blue-300'
+                        }`}
+                        dir="ltr"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                            isSelected
+                              ? 'border-blue-500 bg-blue-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {isSelected && (
+                              <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <span className="text-base font-medium text-gray-900">{optionText}</span>
                         </div>
-                        <span className="text-base font-medium text-gray-900">{option}</span>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <Input
