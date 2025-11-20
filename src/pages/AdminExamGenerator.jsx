@@ -71,6 +71,24 @@ export default function AdminExamGeneratorPage() {
     refetchOnWindowFocus: false
   });
 
+  const { data: moduleAExams = [] } = useQuery({
+    queryKey: ['module-a-all'],
+    queryFn: () => base44.entities.ModuleAExam.list(),
+    enabled: !!user
+  });
+
+  const { data: moduleBExams = [] } = useQuery({
+    queryKey: ['module-b-all'],
+    queryFn: () => base44.entities.ModuleBExam.list(),
+    enabled: !!user
+  });
+
+  const { data: moduleCExams = [] } = useQuery({
+    queryKey: ['module-c-all'],
+    queryFn: () => base44.entities.ModuleCExam.list(),
+    enabled: !!user
+  });
+
   const organizedData = React.useMemo(() => {
     const organized = {};
     
