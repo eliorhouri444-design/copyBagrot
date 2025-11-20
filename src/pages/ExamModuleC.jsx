@@ -869,13 +869,13 @@ export default function ExamModuleCPage() {
 
           <DialogFooter className="flex flex-col gap-2">
             <Button
-              onClick={() => handleStartExam('exam', 'carousel')}
+              onClick={() => handleStartExam('exam')}
               className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold"
             >
-              התחל מבחן מתוזמן (מומלץ)
+              התחל מבחן מתוזמן
             </Button>
             <Button
-              onClick={() => handleStartExam('practice', 'carousel')}
+              onClick={() => handleStartExam('practice')}
               variant="outline"
               className="w-full h-12"
             >
