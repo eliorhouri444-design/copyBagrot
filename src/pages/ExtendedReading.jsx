@@ -425,17 +425,13 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-5 shadow-xl mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pb-20">
+        <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-5 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white mb-3">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => {
-                if (confirm("לחזור לטקסט? התקדמות השאלות תישמר")) {
-                  setCurrentScreen("reading");
-                }
-              }}
+              onClick={() => navigate(createPageUrl("Practice"))}
               className="text-white hover:bg-white/20 h-9 w-9"
             >
               <ChevronRight className="w-5 h-5" />
@@ -450,12 +446,11 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
 
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => setCurrentScreen("reading")}
-              className="text-white hover:bg-white/20 h-9 px-3"
+              className="text-white hover:bg-white/20 h-9 w-9"
             >
-              <BookOpen className="w-4 h-4 mr-1" />
-              <span className="text-xs">טקסט</span>
+              <BookOpen className="w-5 h-5" />
             </Button>
           </div>
 
@@ -469,7 +464,7 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
           <motion.div
             key={currentQuestion.question_number}
             initial={{ opacity: 0, y: 20 }}
@@ -478,60 +473,66 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
           >
             <div className="mb-6">
               <div className="flex items-start gap-3 mb-1">
-                <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="font-bold text-white text-lg">{currentQuestion.question_number}</span>
                 </div>
-                <div className="bg-indigo-100 px-3 py-1 rounded-full">
-                  <span className="text-sm font-bold text-indigo-600">{currentQuestion.points || 2} נק'</span>
+                <div className="bg-blue-100 px-3 py-1 rounded-full">
+                  <span className="text-sm font-bold text-blue-600">{currentQuestion.points || 2} נק'</span>
                 </div>
               </div>
 
               <div className="mt-4">
-                <div className="text-xs text-indigo-600 mb-2 font-semibold">{currentQuestion.question_type}</div>
-                <p className="text-lg sm:text-xl text-gray-900 leading-relaxed" dir="ltr">
+                <p className="text-lg sm:text-xl text-gray-900 leading-relaxed" dir="ltr" style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
                   {currentQuestion.question_text}
                 </p>
               </div>
             </div>
 
             <div className="space-y-3 mb-6">
-              {currentQuestion.options.map((option, optIdx) => {
-                const letter = String.fromCharCode(65 + optIdx);
-                const isSelected = userAnswers[currentQuestion.question_number] === letter;
+              {currentQuestion.options && currentQuestion.options.length > 0 ? (
+                currentQuestion.options.map((option, optIdx) => {
+                  const letter = String.fromCharCode(65 + optIdx);
+                  const isSelected = userAnswers[currentQuestion.question_number] === letter;
 
-                return (
-                  <button
-                    key={optIdx}
-                    onClick={() => setUserAnswers(prev => ({ 
-                      ...prev, 
-                      [currentQuestion.question_number]: letter 
-                    }))}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                      isSelected
-                        ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  return (
+                    <button
+                      key={optIdx}
+                      onClick={() => setUserAnswers(prev => ({ 
+                        ...prev, 
+                        [currentQuestion.question_number]: letter 
+                      }))}
+                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                         isSelected
-                          ? 'border-indigo-500 bg-indigo-500'
-                          : 'border-gray-300'
-                      }`}>
-                        {isSelected && (
-                          <div className="w-3 h-3 bg-white rounded-full" />
-                        )}
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          isSelected
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <div className="w-3 h-3 bg-white rounded-full" />
+                          )}
+                        </div>
+                        <span 
+                          className="text-base font-medium text-gray-900"
+                          dir="ltr"
+                          style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                        >
+                          {option}
+                        </span>
                       </div>
-                      <span 
-                        className="text-base font-medium text-gray-900 flex-1"
-                        dir="ltr"
-                      >
-                        {option}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  No options available for this question
+                </div>
+              )}
             </div>
 
             <Button
