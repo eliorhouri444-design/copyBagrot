@@ -67,113 +67,115 @@ Deno.serve(async (req) => {
     // יצירת מבחן חדש בהתבסס על המבנה
     const isEnglishExam = examStructure.subject === 'אנגלית';
     
+    // 📚 Extract example questions from scanned exams (if available)
+    let exampleQuestions = '';
+    if (examStructure.metadata?.full_questions && examStructure.metadata.full_questions.length > 0) {
+      exampleQuestions = `\n**EXAMPLE QUESTIONS FROM ORIGINAL EXAMS (for reference - create SIMILAR but NEW questions):**\n${JSON.stringify(examStructure.metadata.full_questions.slice(0, 3), null, 2)}`;
+    }
+    
     const generationPrompt = isEnglishExam ? `
 You are an expert at creating Israeli high school English bagrut (matriculation) exams.
-Create a completely NEW exam based on the following structure.
 
-**CRITICAL: THIS IS AN ENGLISH EXAM - ALL CONTENT MUST BE IN ENGLISH ONLY**
+**🚨 CRITICAL LANGUAGE RULE - NO EXCEPTIONS:**
+THIS IS AN ENGLISH EXAM - EVERY SINGLE WORD IN QUESTIONS AND ANSWERS MUST BE IN ENGLISH.
+DO NOT WRITE ANYTHING IN HEBREW EXCEPT IN THE explanation FIELD.
 
-📋 **General Information:**
-- Subject: ${examStructure.subject}
+📋 **Exam Specifications:**
+- Subject: English (${examStructure.subject})
 - Level: ${examStructure.unit_level} units
 - Module: ${examStructure.module_id}
 - Duration: ${examStructure.duration_minutes} minutes
 - Total Points: ${examStructure.total_points}
 
-📝 **Exam Structure:**
+📝 **Question Structure to Follow:**
 ${JSON.stringify(examStructure.question_structure, null, 2)}
+${exampleQuestions}
 
-🎯 **REQUIREMENTS:**
+🎯 **MANDATORY REQUIREMENTS:**
 
-1. **LANGUAGE - ABSOLUTELY CRITICAL:**
-   - Write EVERYTHING in English (questions, answers, explanations)
-   - NO Hebrew translations or Hebrew text in questions
-   - Create authentic English reading comprehension passages
-   - Use proper English grammar and vocabulary
-   - Follow Israeli bagrut English exam format
-
-2. **For each question:**
-   - Full question text IN ENGLISH
-   - Multiple choice options (A, B, C, D) IN ENGLISH  
-   - Correct answer IN ENGLISH
-   - Detailed explanation IN ENGLISH
-   - Points allocation
+1. **LANGUAGE (ABSOLUTELY CRITICAL):**
+   ✅ question_text: ENGLISH ONLY
+   ✅ options: ENGLISH ONLY (["Option A", "Option B", "Option C", "Option D"])
+   ✅ correct_answer: ENGLISH ONLY
+   ✅ reading_text: ENGLISH ONLY (if reading comprehension)
+   ✅ instructions: ENGLISH ONLY
+   ❌ NO HEBREW in any of the above fields
    
-3. **Question Types (in English):**
-   - Reading Comprehension (passage + questions)
-   - Vocabulary (context-based)
-   - Grammar (practical usage)
-   - Writing tasks (with clear instructions in English)
+   The ONLY Hebrew allowed is in "explanation" field for teacher reference.
 
-4. **Quality:**
-   - Challenging but fair questions
-   - Variety of topics (culture, science, society, technology)
-   - Real-world relevance
-   - Appropriate for ${examStructure.unit_level} units level
+2. **Content:**
+   - Create a NEW authentic English reading passage (250-400 words)
+   - Topics: technology, environment, science, society, culture, education
+   - Advanced vocabulary for ${examStructure.unit_level} units level
+   - Natural, fluent English writing
 
-Return JSON with the complete exam including all questions, answers, and solutions IN ENGLISH.
+3. **Question Types:**
+   - Reading Comprehension: questions about the passage
+   - Multiple Choice: 4 clear options in English
+   - Short Answer: clear prompts in English
+   - Writing Task: clear topic/instructions in English
+
+4. **Example Question (CORRECT FORMAT):**
+{
+  "question_number": 1,
+  "question_text": "What is the main idea of paragraph II?",
+  "question_type": "multiple_choice",
+  "options": ["Technology is advancing rapidly", "Space exploration is becoming safer", "Robots are replacing humans", "The future of AI is uncertain"],
+  "correct_answer": "Technology is advancing rapidly",
+  "explanation": "הפסקה השנייה דנה בהתקדמות הטכנולוגית",
+  "points": 6,
+  "topic": "Reading Comprehension"
+}
+
+5. **WRONG Example (DO NOT DO THIS):**
+{
+  "question_text": "מה הרעיון המרכזי של הפסקה?",  ❌ WRONG - THIS IS HEBREW
+  "options": ["טכנולוגיה", "חלל"],  ❌ WRONG - THIS IS HEBREW
+}
+
+**FINAL CHECK BEFORE RETURNING:**
+- Are ALL question_text fields in English? ✓
+- Are ALL options in English? ✓
+- Is reading_text in English? ✓
+- Are instructions in English? ✓
+
+Return complete JSON with exam in ENGLISH.
 ` : `
-אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
+אתה מומחה ליצירת מבחני בגרות ב${examStructure.subject}.
 
-📋 **מידע כללי:**
+📋 **פרטי המבחן:**
 - מקצוע: ${examStructure.subject}
 - רמה: ${examStructure.unit_level} יחידות
 - שאלון: ${examStructure.module_id}
 - משך: ${examStructure.duration_minutes} דקות
 - נקודות: ${examStructure.total_points}
 
-📝 **מבנה המבחן:**
+📝 **מבנה השאלות:**
 ${JSON.stringify(examStructure.question_structure, null, 2)}
 
 🎯 **דרישות:**
 
-1. **תוכן חדש לגמרי:**
-   - אל תעתיק שום שאלה מהמבחן המקורי
-   - צור תוכן מקורי ומגוון
-   - שמור על רמת קושי זהה
-   - שמור על אותו מבנה בדיוק
+1. **תוכן מקורי:**
+   - צור מבחן חדש לגמרי (לא להעתיק)
+   - שמור על מבנה זהה
+   - רמת קושי דומה
 
 2. **לכל שאלה:**
-   - טקסט השאלה המלא
-   - אם צריך דיאגרמה - תאר אותה בפירוט
-   - אם יש סעיפים - צור את כולם
-   - תשובות נכונות
+   - טקסט מלא
+   - תשובה נכונה
    - הסבר מפורט
-   - רובריקת ניקוד
+   - נקודות
 
-3. **שפת המבחן - CRITICAL:**
-   ${examStructure.subject === 'אנגלית' 
-     ? `**THIS IS AN ENGLISH EXAM - EVERYTHING MUST BE IN ENGLISH ONLY**
-   - ALL questions text: English
-   - ALL answer options: English  
-   - ALL correct answers: English
-   - ALL explanations: English
-   - Reading passages: English
-   - ABSOLUTELY NO HEBREW anywhere in questions/answers
-   - Create authentic English bagrut exam questions
-   - Use proper English grammar and vocabulary appropriate for level ${examStructure.unit_level} units
-   - Follow Israeli Ministry of Education English bagrut exam format`
-     : `- שפה ברורה ומדויקת
-   - עברית תקנית
-   - מושגים מקצועיים נכונים`
-   }
-   - התאמה לתכנית הלימודים
-
-4. **איכות:**
-   - שאלות מאתגרות אך הוגנות
+3. **איכות:**
+   - שאלות מאתגרות
+   - התאמה לתכנית לימודים
    - מגוון נושאים
-   - קשר למציאות (אם רלוונטי)
 
-החזר JSON עם המבחן המלא הכולל את כל השאלות, תשובות ופתרונות.
-${!isEnglishExam ? `
-
-4. **איכות:**
-   - שאלות מאתגרות אך הוגנות
-   - מגוון נושאים
-   - קשר למציאות (אם רלוונטי)` : ''}
+החזר JSON מלא.
 `;
 
     console.log('🤖 Step 5: Generating exam with AI...');
+    console.log(`🌍 Language mode: ${isEnglishExam ? 'ENGLISH ONLY' : 'Hebrew'}`);
     const generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: generationPrompt,
       response_json_schema: {
