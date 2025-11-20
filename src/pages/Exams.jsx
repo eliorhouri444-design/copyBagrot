@@ -168,30 +168,49 @@ export default function ExamsPage() {
 
   const currentModules = useMemo(() => {
     const defaultMods = defaultModulesStructure[displaySubject]?.[displayUnits] || [];
+    const modulesMap = new Map();
 
-    if (customModules.length === 0) {
-      return defaultMods;
-    }
+    // Add default modules
+    defaultMods.forEach(mod => {
+      modulesMap.set(mod.id, mod);
+    });
 
-    return defaultMods.map(defaultMod => {
-      const customMod = customModules.find(cm => cm.module_id === defaultMod.id);
-      if (customMod) {
-        return {
-          ...defaultMod,
+    // Override with custom modules and add new ones
+    customModules.forEach(customMod => {
+      const existing = modulesMap.get(customMod.module_id);
+      if (existing) {
+        // Update existing default module
+        modulesMap.set(customMod.module_id, {
+          ...existing,
           id: customMod.module_id,
-          title: customMod.title || defaultMod.title,
-          description: customMod.description || defaultMod.description,
-          details: customMod.details || defaultMod.details,
-          duration: customMod.duration || defaultMod.duration,
-          points: customMod.points || defaultMod.points,
-          parts: customMod.parts || defaultMod.parts,
-          color: customMod.color || defaultMod.color,
-          entity: customMod.entity || defaultMod.entity,
-          order: customMod.order || defaultMod.order
-        };
+          title: customMod.title || existing.title,
+          description: customMod.description || existing.description,
+          details: customMod.details || existing.details,
+          duration: customMod.duration || existing.duration,
+          points: customMod.points || existing.points,
+          parts: customMod.parts || existing.parts,
+          color: customMod.color || existing.color,
+          entity: customMod.entity || existing.entity,
+          order: customMod.order ?? existing.order
+        });
+      } else {
+        // Add new custom module
+        modulesMap.set(customMod.module_id, {
+          id: customMod.module_id,
+          title: customMod.title,
+          description: customMod.description || '',
+          details: customMod.details || '',
+          duration: customMod.duration || 90,
+          points: customMod.points || '100',
+          parts: customMod.parts || [],
+          color: customMod.color || 'from-blue-500 to-indigo-600',
+          entity: customMod.entity || 'GenericExam',
+          order: customMod.order ?? 999
+        });
       }
-      return defaultMod;
-    }).sort((modA, modB) => (modA.order || 0) - (modB.order || 0));
+    });
+
+    return Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
   }, [displaySubject, displayUnits, customModules]);
 
   const [moduleOrder, setModuleOrder] = useState([]);
