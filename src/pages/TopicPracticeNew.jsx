@@ -447,11 +447,13 @@ export default function TopicPracticeNewPage() {
         let isCorrect = false;
         let status = "incorrect";
         let correctAnswer = "";
+        let explanation = "";
 
         if (solutions.length > 0) {
           const solution = solutions[0];
           const correctAnswers = solution.final_answers || [];
           const acceptableVariants = solution.acceptable_variants || [];
+          explanation = solution.explanation || currentQuestion.explanation || "";
 
           if (correctAnswers.length > 0) {
             correctAnswer = correctAnswers[0].value || "";
@@ -500,7 +502,7 @@ export default function TopicPracticeNewPage() {
 
         setResults(prev => ({
           ...prev,
-          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer }
+          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer, explanation }
         }));
       }
 
