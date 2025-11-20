@@ -13,7 +13,7 @@ export default function TakeExamPage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get("examid");
-  const module = urlParams.get("module"); // A, B, C, or Generic
+  const module = urlParams.get("module");
 
   const [user, setUser] = useState(null);
   const [exam, setExam] = useState(null);
@@ -25,6 +25,7 @@ export default function TakeExamPage() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [showReadingPanel, setShowReadingPanel] = useState(false);
   const [examStarted, setExamStarted] = useState(false);
+  const [showReadingFirst, setShowReadingFirst] = useState(false);
 
   useEffect(() => {
     loadUserAndExam();
@@ -83,6 +84,9 @@ export default function TakeExamPage() {
 
   const handleStartExam = () => {
     setExamStarted(true);
+    if (exam?.reading_text) {
+      setShowReadingFirst(true);
+    }
   };
 
   const handleAnswerChange = (questionId, answer) => {
@@ -104,23 +108,29 @@ export default function TakeExamPage() {
       let isCorrect = false;
       let correctAnswer = "";
 
-      // Get correct answer
       if (q.correct_answer) {
         correctAnswer = String(q.correct_answer);
       } else if (q.acceptable_answers?.length > 0) {
         correctAnswer = String(q.acceptable_answers[0]);
+      } else if (q.correct_answers?.length > 0) {
+        correctAnswer = String(q.correct_answers[0]);
       }
 
-      // Check answer
       const normalizedUser = String(userAnswer).trim().toLowerCase().replace(/[.,!?;]/g, '');
       const normalizedCorrect = String(correctAnswer).trim().toLowerCase().replace(/[.,!?;]/g, '');
 
       if (q.question_type === "multiple_choice" || q.question_type === "multi_choice") {
         isCorrect = normalizedUser === normalizedCorrect;
       } else {
-        // For open questions - fuzzy match
         if (q.acceptable_answers?.length > 0) {
           isCorrect = q.acceptable_answers.some(ans => {
+            const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
+            return normalized === normalizedUser ||
+                   normalizedUser.includes(normalized) ||
+                   normalized.includes(normalizedUser);
+          });
+        } else if (q.correct_answers?.length > 0) {
+          isCorrect = q.correct_answers.some(ans => {
             const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
             return normalized === normalizedUser ||
                    normalizedUser.includes(normalized) ||
@@ -222,7 +232,6 @@ export default function TakeExamPage() {
             <p className="text-gray-600">{exam.subject} • {exam.unit_level} יחידות</p>
           </div>
 
-          {/* Exam Details */}
           <div className="space-y-3 mb-6">
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
               <div className="flex items-center justify-between">
@@ -244,13 +253,12 @@ export default function TakeExamPage() {
             </div>
           </div>
 
-          {/* Instructions */}
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border-2 border-amber-200 mb-6">
             <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
               <span className="text-2xl">📋</span>
               הוראות המבחן
             </h3>
-            <ul className="space-y-2 text-gray-700">
+            <ul className="space-y-2 text-gray-700 text-sm">
               {readingText && (
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
@@ -272,7 +280,6 @@ export default function TakeExamPage() {
             </ul>
           </div>
 
-          {/* Module Specific Info */}
           {module === "A" && (
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-6">
               <h4 className="font-bold text-blue-900 mb-2">מבנה מודול A:</h4>
@@ -310,12 +317,83 @@ export default function TakeExamPage() {
     );
   }
 
+  const getQuestions = () => {
+    if (!exam) return [];
+
+    if (module === "A") {
+      return [...(exam.reading_questions || []), ...(exam.listening_questions || [])];
+    } else if (module === "B") {
+      return exam.grammar_questions || [];
+    } else if (module === "C") {
+      return exam.questions || [];
+    } else {
+      return exam.questions || [];
+    }
+  };
+
+  const questions = getQuestions();
+  const currentQuestion = questions[currentQuestionIndex];
+  const readingText = exam?.reading_text || "";
+
+  // Show reading text first if exists
+  if (showReadingFirst && readingText) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl mb-4">
+          <div className="flex items-center justify-between text-white mb-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Exams"))}
+              className="text-white hover:bg-white/20"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+            <h1 className="text-xl font-bold">טקסט הקריאה</h1>
+            <div className="w-9" />
+          </div>
+        </div>
+
+        <div className="px-4 max-w-2xl mx-auto pb-24">
+          <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 mb-5">
+              <h3 className="font-bold text-blue-900 mb-2 text-lg">📖 קרא בעיון!</h3>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                קרא את הטקסט הבא בעיון. לאחר מכן תענה על {questions.length} שאלות על הטקסט.
+                <br />תוכל לחזור לטקסט בכל שלב באמצעות כפתור 📖 בראש המסך.
+              </p>
+            </div>
+
+            <div
+              className="text-base leading-relaxed text-gray-900 whitespace-pre-wrap bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-5 border border-gray-200"
+              dir="ltr"
+              style={{ fontFamily: "'Segoe UI', -apple-system, sans-serif" }}
+            >
+              {readingText}
+            </div>
+          </div>
+
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 shadow-2xl z-50">
+            <div className="max-w-2xl mx-auto">
+              <Button
+                onClick={() => setShowReadingFirst(false)}
+                className="w-full h-14 bg-green-600 hover:bg-green-700 text-lg font-bold"
+              >
+                סיימתי לקרוא - המשך לשאלות
+                <ChevronLeft className="w-5 h-5 mr-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pb-4">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl mb-4">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
@@ -351,7 +429,7 @@ export default function TakeExamPage() {
         </div>
 
         <div>
-          <h1 className="text-xl font-bold text-center mb-2">{exam.title}</h1>
+          <h1 className="text-lg font-bold text-center mb-2">{exam.title}</h1>
           <div className="bg-white/20 rounded-full h-2">
             <motion.div
               initial={{ width: 0 }}
@@ -365,51 +443,48 @@ export default function TakeExamPage() {
         </div>
       </div>
 
-      {/* Question */}
-      <div className="px-4 max-w-2xl mx-auto">
+      <div className="px-4 max-w-2xl mx-auto pb-24">
         <ExamQuestion
           question={currentQuestion}
           questionNumber={currentQuestionIndex + 1}
           userAnswer={answers[`q_${currentQuestionIndex}`]}
           onAnswerChange={(answer) => handleAnswerChange(`q_${currentQuestionIndex}`, answer)}
         />
+      </div>
 
-        {/* Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 shadow-2xl">
-          <div className="max-w-2xl mx-auto flex gap-3">
-            {currentQuestionIndex > 0 && (
-              <Button
-                onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-                variant="outline"
-                className="flex-1"
-              >
-                <ChevronRight className="w-5 h-5 ml-2" />
-                שאלה קודמת
-              </Button>
-            )}
-            
-            {currentQuestionIndex < questions.length - 1 ? (
-              <Button
-                onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-              >
-                שאלה הבאה
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleFinishExam}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-              >
-                <CheckCircle className="w-5 h-5 ml-2" />
-                סיים מבחן
-              </Button>
-            )}
-          </div>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 shadow-2xl z-50">
+        <div className="max-w-2xl mx-auto flex gap-3">
+          {currentQuestionIndex > 0 && (
+            <Button
+              onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+              variant="outline"
+              className="flex-1 h-12 font-bold"
+            >
+              <ChevronRight className="w-5 h-5 ml-2" />
+              קודמת
+            </Button>
+          )}
+          
+          {currentQuestionIndex < questions.length - 1 ? (
+            <Button
+              onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
+              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 font-bold text-base"
+            >
+              הבאה
+              <ChevronLeft className="w-5 h-5 mr-2" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleFinishExam}
+              className="flex-1 h-12 bg-green-600 hover:bg-green-700 font-bold text-base"
+            >
+              סיים מבחן
+              <CheckCircle className="w-5 h-5 mr-2" />
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Reading Text Panel */}
       {readingText && (
         <ReadingTextPanel
           text={readingText}
