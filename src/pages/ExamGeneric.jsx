@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +30,8 @@ export default function ExamGenericPage() {
   const [score, setScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [displayMode, setDisplayMode] = useState('carousel');
+  const [displayMode, setDisplayMode] = useState('carousel'); // 'carousel' or 'normal'
+  const [showModeDialog, setShowModeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
 
@@ -168,13 +169,16 @@ export default function ExamGenericPage() {
 
   const handleStartFresh = async () => {
     if (savedProgress?.id) {
+      // Delete existing progress if starting fresh
       await base44.entities.ExamProgress.delete(savedProgress.id);
     }
-    setSavedProgress(null);
-    setExamStarted(true);
+    setSavedProgress(null); // Clear saved progress state
+    setShowModeDialog(true); // Open mode selection dialog
   };
 
-  const handleStartExam = () => {
+  const handleStartExam = (mode) => {
+    setDisplayMode(mode);
+    setShowModeDialog(false);
     setExamStarted(true);
   };
 
@@ -257,7 +261,7 @@ export default function ExamGenericPage() {
         }
       };
 
-      for (const questionItem of (exam.questions || [])) {
+      for (const questionItem of exam.questions) {
         const userAnswer = userAnswers[questionItem.question_number];
         let isCorrect = false;
         let pointsAwarded = 0;
@@ -550,7 +554,7 @@ export default function ExamGenericPage() {
   }
 
   // Saved Progress Dialog
-  if (savedProgress && !examStarted) {
+  if (savedProgress && !examStarted && !showModeDialog) { // Add !showModeDialog to prevent showing both
     return (
       <Dialog open={true} onOpenChange={() => {}}>
         <DialogContent dir="rtl" className="sm:max-w-md">
@@ -561,7 +565,7 @@ export default function ExamGenericPage() {
 
           <div className="bg-blue-50 rounded-xl p-4">
             <p className="text-sm text-gray-700">
-              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.questions?.length || 0}
+              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.questions.length}
             </p>
             <p className="text-sm text-gray-700">
               <strong>זמן נותר:</strong> {Math.floor(savedProgress.time_left / 60)} דקות
@@ -576,6 +580,80 @@ export default function ExamGenericPage() {
               התחל מחדש
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Display Mode Selection Dialog
+  if (showModeDialog && !examStarted) {
+    return (
+      <Dialog open={showModeDialog} onOpenChange={() => {}}>
+        <DialogContent dir="rtl" className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">בחר מצב בחינה</DialogTitle>
+            <DialogDescription className="text-center">
+              {exam.reading_text ? 'הסיפור יופיע בכל המצבים' : 'בחר איך תרצה לראות את השאלות'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid md:grid-cols-2 gap-4 py-6">
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStartExam('normal')}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב רגיל</h3>
+                  <p className="text-sm text-blue-700 font-medium">📄 כמו בבגרות אמיתית</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>כל השאלות ביחד</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>גלילה חופשית</span>
+                </div>
+              </div>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStartExam('carousel')}
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב קרוסלה</h3>
+                  <p className="text-sm text-purple-700 font-medium">⚡ שאלה אחרי שאלה</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>התמקדות בשאלה אחת</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>הסיפור תמיד מול העיניים</span>
+                </div>
+              </div>
+            </motion.button>
+          </div>
         </DialogContent>
       </Dialog>
     );
@@ -606,7 +684,7 @@ export default function ExamGenericPage() {
               </div>
               <div className="bg-purple-50 rounded-xl p-4 text-center">
                 <CheckCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900">{exam.questions?.length || 0}</div>
+                <div className="text-2xl font-bold text-gray-900">{exam.questions.length}</div>
                 <div className="text-sm text-gray-600">שאלות</div>
               </div>
             </div>
@@ -630,7 +708,7 @@ export default function ExamGenericPage() {
 
                 <div className="bg-white rounded-lg p-3 border border-blue-100">
                   <div className="font-semibold text-gray-900 mb-1">📊 מבנה הניקוד</div>
-                  <p>סה"כ {exam.questions?.length || 0} שאלות • {exam.total_points} נקודות • ציון עובר: {exam.passing_grade}</p>
+                  <p>סה"כ {exam.questions.length} שאלות • {exam.total_points} נקודות • ציון עובר: {exam.passing_grade}</p>
                 </div>
 
                 {exam.reading_text && (
@@ -650,7 +728,7 @@ export default function ExamGenericPage() {
             </div>
 
             <Button
-              onClick={handleStartExam}
+              onClick={() => setShowModeDialog(true)}
               className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold"
             >
               התחל מבחן
@@ -742,21 +820,6 @@ export default function ExamGenericPage() {
     );
   }
 
-  if (!exam.questions || exam.questions.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50">
-        <div className="text-center bg-white rounded-2xl shadow-xl p-8">
-          <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">לא נמצאו שאלות</h2>
-          <p className="text-gray-600 mb-4">אין שאלות במבחן זה</p>
-          <Button onClick={() => navigate(createPageUrl("Exams"))} className="bg-blue-600">
-            חזור למבחנים
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const question = exam.questions[currentQuestion];
   const progress = ((currentQuestion + 1) / exam.questions.length) * 100;
 
@@ -806,17 +869,12 @@ export default function ExamGenericPage() {
         <h1 className="text-xl font-bold text-white text-center mb-2">{exam.title}</h1>
         <Progress value={progress} className="h-2 bg-white/20" />
         <div className="flex justify-between text-white text-xs mt-2">
-          <span>שאלה {currentQuestion + 1} מתוך {exam.questions?.length || 0}</span>
+          <span>שאלה {currentQuestion + 1} מתוך {exam.questions.length}</span>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pb-6">
-        {!exam?.questions || exam.questions.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-            <p className="text-gray-600">לא נמצאו שאלות במבחן זה</p>
-          </div>
-        ) : (
+        {displayMode === 'carousel' ? (
           <div className="grid lg:grid-cols-5 gap-4">
             {exam.reading_text && (
               <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
@@ -908,7 +966,7 @@ export default function ExamGenericPage() {
                       הקודם
                     </Button>
 
-                    {currentQuestion === (exam.questions?.length || 1) - 1 ? (
+                    {currentQuestion === exam.questions.length - 1 ? (
                       <Button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
@@ -918,7 +976,7 @@ export default function ExamGenericPage() {
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => setCurrentQuestion(prev => Math.min((exam.questions?.length || 1) - 1, prev + 1))}
+                        onClick={() => setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1))}
                         className="flex-1 h-12 bg-blue-600"
                       >
                         הבא
@@ -928,6 +986,88 @@ export default function ExamGenericPage() {
                   </div>
                 </motion.div>
               </AnimatePresence>
+            </div>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-5 gap-4">
+            {exam.reading_text && (
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                </h3>
+                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                  {exam.reading_text}
+                </div>
+              </div>
+            )}
+
+            <div className={exam.reading_text ? "lg:col-span-3" : "lg:col-span-5"}>
+              <div className="bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto">
+                {exam.questions.map((questionItem, qIdx) => (
+                  <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
+                      </h3>
+                      <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
+                        {questionItem.points} נק'
+                      </span>
+                    </div>
+
+                    <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                      {questionItem.question_text}
+                    </p>
+
+                    {questionItem.question_type === 'multiple_choice' && questionItem.options && (
+                      <div className="space-y-2">
+                        {questionItem.options.map((optionValue, optionIndex) => (
+                          <button
+                            key={optionIndex}
+                            onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
+                            className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
+                              userAnswers[questionItem.question_number] === optionValue
+                                ? 'bg-blue-100 border-blue-500'
+                                : 'bg-white border-gray-200 hover:border-blue-300'
+                            }`}
+                            dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                          >
+                            {optionValue}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {questionItem.question_type === 'short_answer' && (
+                      <Input
+                        value={userAnswers[questionItem.question_number] || ''}
+                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                        placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
+                        className="w-full h-12"
+                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                      />
+                    )}
+
+                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && (
+                      <Textarea
+                        value={userAnswers[questionItem.question_number] || ''}
+                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
+                        className="w-full h-32"
+                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                      />
+                    )}
+                  </div>
+                ))}
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="w-full h-14 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold"
+                >
+                  {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
+                </Button>
+              </div>
             </div>
           </div>
         )}

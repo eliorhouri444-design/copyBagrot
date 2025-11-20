@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Upload, CheckCircle, AlertCircle, FileText, Copy, Eye, Download, Trash2, Sparkles, Edit2, Save } from "lucide-react";
+import { ArrowLeft, Upload, CheckCircle, Copy, Eye, Trash2, Edit2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -237,16 +237,13 @@ export default function AdminBulkImportPage() {
       title: "פורמט פשוט",
       example: `What is 2+2? | 4
 The capital of France? | Paris
-Replace with synonym: 'big' | large; huge; massive; giant
-Complete: I ___ to school | go; walk; drive`
+תרגם: שלום | Hello`
     },
     {
       title: "עם סיפור",
-      example: `Story: Tom went to the park yesterday. He played football with his friends and had a great time. They stayed until sunset.
+      example: `Story: Tom went to the park yesterday.
 Q: Where did Tom go? | To the park
-Q: When did Tom go? | Yesterday
-Q: What did he play? | Football
-Q: Who did he play with? | His friends`
+Q: When did Tom go? | Yesterday`
     },
     {
       title: "שאלות כתיבה",
@@ -406,19 +403,8 @@ What happened after a few weeks? | Students felt more energetic
             📖 סיפור/טקסט קריאה (אופציונלי)
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            אם כל השאלות מבוססות על אותו טקסט - הדבק כאן. אם לא, השתמש ב-Story: בתוך הטקסט
+            עבור vocabulary & grammar ב-4/5 יחידות - הדבק כאן את הסיפור שכל השאלות מבוססות עליו
           </p>
-          
-          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 mb-4">
-            <div className="text-sm text-gray-700">
-              <strong>💡 טיפים לייבוא:</strong>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>תשובות מרובות: <code className="bg-white px-2 py-1 rounded">Question | answer1; answer2; answer3</code></li>
-                <li>עם Story: <code className="bg-white px-2 py-1 rounded">Story: text...\nQ: question | answer</code></li>
-                <li>המערכת תבדוק fuzzy match (לא exact)</li>
-              </ul>
-            </div>
-          </div>
 
           <Textarea
             value={readingStory}

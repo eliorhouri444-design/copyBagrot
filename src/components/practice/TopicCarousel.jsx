@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus } from "lucide-react";
@@ -213,7 +213,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
               <div className="text-center">
                 <div className="text-4xl mb-2">{currentTopic.icon}</div>
                 <h2 className="text-2xl font-bold mb-1">{currentTopic.name}</h2>
-                <p className="text-xs opacity-90">{currentTopic.stats.uniqueAnswered} מתוך {currentTopic.actualQuestionCount} שאלות נענו</p>
+                <p className="text-xs opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
               </div>
               {onEditTopic && (
                 <Button

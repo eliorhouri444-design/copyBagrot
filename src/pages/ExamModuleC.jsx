@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -43,7 +43,7 @@ export default function ExamModuleCPage() {
   const [showResumeDialog, setShowResumeDialog] = useState(false);
 
   const [examMode, setExamMode] = useState('exam');
-  const [displayMode, setDisplayMode] = useState('carousel'); // Default to carousel mode
+  const [displayMode, setDisplayMode] = useState('normal'); // Changed from 'exam' to 'normal'
   const [showModeSelectionDialog, setShowModeSelectionDialog] = useState(false);
   
   const [isEditMode, setIsEditMode] = useState(false);
@@ -98,9 +98,13 @@ export default function ExamModuleCPage() {
           setSavedProgress(savedAttempts[0]);
           setShowResumeDialog(true);
         } else {
-          // Always show intro, no mode selection needed
-          setShowIntroDialog(true);
-          setShowModeSelectionDialog(false);
+          if (user?.skip_exam_intro) {
+            setShowModeSelectionDialog(true);
+            setShowIntroDialog(false);
+          } else {
+            setShowIntroDialog(true);
+            setShowModeSelectionDialog(false);
+          }
           setHasStarted(false);
         }
       }
@@ -587,17 +591,22 @@ export default function ExamModuleCPage() {
     setCurrentSection("reading");
     setCurrentQuestion(0);
     setTimeLeft(exam?.duration_minutes * 60 || 3600);
-    setExamMode('exam');
-    setDisplayMode('carousel');
+    setExamMode('exam'); // Default to exam mode when starting fresh
+    setDisplayMode('normal'); // Default to normal display mode
     setShowResumeDialog(false);
-    setShowIntroDialog(true);
-    setShowModeSelectionDialog(false);
+    if (user?.skip_exam_intro) {
+      setShowModeSelectionDialog(true);
+      setShowIntroDialog(false);
+    } else {
+      setShowIntroDialog(true);
+      setShowModeSelectionDialog(false);
+    }
     setHasStarted(false);
   };
 
-  const handleStartExam = (mode) => {
+  const handleStartExam = (mode, display) => { // Modified signature
     setExamMode(mode);
-    setDisplayMode('carousel'); // Always use carousel
+    setDisplayMode(display); // Set display mode explicitly
     setShowIntroDialog(false);
     setShowModeSelectionDialog(false);
     setHasStarted(true);
@@ -612,11 +621,11 @@ export default function ExamModuleCPage() {
       await base44.auth.updateMe({ skip_exam_intro: true });
       setUser(prev => ({ ...prev, skip_exam_intro: true }));
       setShowIntroDialog(false);
-      handleStartExam('exam'); // Start directly
+      setShowModeSelectionDialog(true);
     } catch (error) {
       console.error("Error updating user settings:", error);
       setShowIntroDialog(false);
-      handleStartExam('exam');
+      setShowModeSelectionDialog(true);
     }
   };
 
@@ -806,7 +815,98 @@ export default function ExamModuleCPage() {
     );
   }
 
-  // Mode selection dialog removed - always use carousel mode
+  if (showModeSelectionDialog && !hasStarted) {
+    return (
+      <Dialog open={showModeSelectionDialog} onOpenChange={() => {}}>
+        <DialogContent dir="rtl" className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-2">
+              בחר מצב בחינה
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-500">
+              שני המצבים כוללים טיימר מלא של {exam?.duration_minutes || 90} דקות
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid md:grid-cols-2 gap-4 py-6">
+            {/* Exam Mode (Normal Display) */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStartExam('exam', 'normal')} // Changed call
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב בגרות רגיל</h3>
+                  <p className="text-sm text-blue-700 font-medium">📄 כמו בבחינה אמיתית</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>סיפור בצד, כל השאלות בצד</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>גלילה חופשית</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>טיימר מלא של {exam?.duration_minutes || 90} דקות</span>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-blue-200 rounded-lg p-3 text-center">
+                <span className="text-sm font-bold text-blue-900">מומלץ להכנה לבגרות</span>
+              </div>
+            </motion.button>
+
+            {/* Carousel Mode */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStartExam('exam', 'carousel')} // Changed call
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב קרוסלה</h3>
+                  <p className="text-sm text-purple-700 font-medium">⚡ שאלה אחרי שאלה</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>סיפור תמיד מול העיניים</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>שאלה אחת בכל פעם</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>טיימר מלא של {exam?.duration_minutes || 90} דקות</span>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-purple-200 rounded-lg p-3 text-center">
+                <span className="text-sm font-bold text-purple-900">לתרגול ממוקד</span>
+              </div>
+            </motion.button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   if (showIntroDialog && !hasStarted) {
     return (
@@ -860,13 +960,13 @@ export default function ExamModuleCPage() {
 
           <DialogFooter className="flex flex-col gap-2">
             <Button
-              onClick={() => handleStartExam('exam')}
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold"
+              onClick={() => handleStartExam('exam', 'normal')}
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold"
             >
               התחל מבחן מתוזמן
             </Button>
             <Button
-              onClick={() => handleStartExam('practice')}
+              onClick={() => handleStartExam('practice', 'normal')}
               variant="outline"
               className="w-full h-12"
             >
@@ -1195,7 +1295,7 @@ export default function ExamModuleCPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            {/* Always carousel mode */}
+            {displayMode === 'carousel' ? (
               <div className="space-y-4 lg:grid lg:grid-cols-5 lg:gap-4 lg:space-y-0">
                 {exam.reading_text && (
                   <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 lg:max-h-[calc(100vh-240px)] lg:overflow-y-auto lg:sticky lg:top-4">
@@ -1293,6 +1393,81 @@ export default function ExamModuleCPage() {
                   </AnimatePresence>
                 </div>
               </div>
+            ) : ( // Normal display mode
+              <div className="space-y-4">
+                {exam.reading_text && (
+                  <div className="bg-white rounded-xl shadow-lg p-4 sticky top-4 z-10 max-h-[50vh] overflow-y-auto">
+                    <div className="flex items-center justify-between mb-2 sticky top-0 bg-white pb-2">
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-blue-600" />
+                        <h3 className="text-base font-bold text-gray-900">Reading Text</h3>
+                      </div>
+                      <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">📖 Story</span>
+                    </div>
+                    <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap bg-gray-50 rounded-lg p-3" dir="ltr">
+                      {exam.reading_text}
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6 sticky top-0 bg-white py-2 z-10 flex items-center gap-2">
+                    <span>Questions</span>
+                    <span className="text-sm font-normal text-gray-500">({exam.questions.length})</span>
+                  </h3>
+                  
+                  <div className="space-y-6 sm:space-y-8">
+                    {exam.questions.map((questionItem) => (
+                      <div key={questionItem.question_number} className="pb-6 border-b last:border-b-0">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900">Question {questionItem.question_number}</h3>
+                          <span className="bg-blue-100 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-blue-600 flex-shrink-0">
+                            {questionItem.points} נק'
+                          </span>
+                        </div>
+
+                        <div className="text-gray-700 mb-4 text-sm sm:text-base leading-relaxed whitespace-pre-wrap" dir="ltr">
+                          {questionItem.question_text}
+                        </div>
+
+                        {questionItem.question_type === 'multiple_choice' && questionItem.options && (
+                          <div className="space-y-2 sm:space-y-3">
+                            {questionItem.options.map((optionValue, optionIndex) => (
+                              <button
+                                key={optionIndex}
+                                onClick={() => handleReadingAnswer(questionItem.question_number, optionValue)}
+                                className={`w-full p-3 sm:p-4 rounded-xl border-2 text-left transition-all ${
+                                  readingAnswers[questionItem.question_number] === optionValue
+                                    ? 'bg-blue-100 border-blue-500'
+                                    : 'bg-white border-gray-200 hover:border-blue-300'
+                                }`}
+                                dir="ltr"
+                              >
+                                <div className="text-sm sm:text-base">{optionValue}</div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {questionItem.question_type === 'short_answer' && (
+                          <Input
+                            value={readingAnswers[questionItem.question_number] || ''}
+                            onChange={(e) => handleReadingAnswer(questionItem.question_number, e.target.value)}
+                            placeholder="Type answer..."
+                            className="w-full h-11 sm:h-12 text-sm sm:text-base"
+                            dir="ltr"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button onClick={handleContinueToWriting} className="w-full h-12 sm:h-14 bg-purple-600 hover:bg-purple-700 mt-6 text-base sm:text-lg font-bold">
+                    המשך לחלק הכתיבה
+                  </Button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 

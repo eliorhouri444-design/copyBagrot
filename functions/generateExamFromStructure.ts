@@ -65,117 +65,50 @@ Deno.serve(async (req) => {
     console.log(`🎯 Selected structure: ${examStructure.structure_name}`);
 
     // יצירת מבחן חדש בהתבסס על המבנה
-    const isEnglishExam = examStructure.subject === 'אנגלית';
-    
-    // 📚 Extract example questions from scanned exams (if available)
-    let exampleQuestions = '';
-    if (examStructure.metadata?.full_questions && examStructure.metadata.full_questions.length > 0) {
-      exampleQuestions = `\n**EXAMPLE QUESTIONS FROM ORIGINAL EXAMS (for reference - create SIMILAR but NEW questions):**\n${JSON.stringify(examStructure.metadata.full_questions.slice(0, 3), null, 2)}`;
-    }
-    
-    const generationPrompt = isEnglishExam ? `
-You are an expert at creating Israeli high school English bagrut (matriculation) exams.
+    const generationPrompt = `
+אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
-**🚨 CRITICAL LANGUAGE RULE - NO EXCEPTIONS:**
-THIS IS AN ENGLISH EXAM - EVERY SINGLE WORD IN QUESTIONS AND ANSWERS MUST BE IN ENGLISH.
-DO NOT WRITE ANYTHING IN HEBREW EXCEPT IN THE explanation FIELD.
-
-📋 **Exam Specifications:**
-- Subject: English (${examStructure.subject})
-- Level: ${examStructure.unit_level} units
-- Module: ${examStructure.module_id}
-- Duration: ${examStructure.duration_minutes} minutes
-- Total Points: ${examStructure.total_points}
-
-📝 **Question Structure to Follow:**
-${JSON.stringify(examStructure.question_structure, null, 2)}
-${exampleQuestions}
-
-🎯 **MANDATORY REQUIREMENTS:**
-
-1. **LANGUAGE (ABSOLUTELY CRITICAL):**
-   ✅ question_text: ENGLISH ONLY
-   ✅ options: ENGLISH ONLY (["Option A", "Option B", "Option C", "Option D"])
-   ✅ correct_answer: ENGLISH ONLY
-   ✅ reading_text: ENGLISH ONLY (if reading comprehension)
-   ✅ instructions: ENGLISH ONLY
-   ❌ NO HEBREW in any of the above fields
-   
-   The ONLY Hebrew allowed is in "explanation" field for teacher reference.
-
-2. **Content:**
-   - Create a NEW authentic English reading passage (250-400 words)
-   - Topics: technology, environment, science, society, culture, education
-   - Advanced vocabulary for ${examStructure.unit_level} units level
-   - Natural, fluent English writing
-
-3. **Question Types:**
-   - Reading Comprehension: questions about the passage
-   - Multiple Choice: 4 clear options in English
-   - Short Answer: clear prompts in English
-   - Writing Task: clear topic/instructions in English
-
-4. **Example Question (CORRECT FORMAT):**
-{
-  "question_number": 1,
-  "question_text": "What is the main idea of paragraph II?",
-  "question_type": "multiple_choice",
-  "options": ["Technology is advancing rapidly", "Space exploration is becoming safer", "Robots are replacing humans", "The future of AI is uncertain"],
-  "correct_answer": "Technology is advancing rapidly",
-  "explanation": "הפסקה השנייה דנה בהתקדמות הטכנולוגית",
-  "points": 6,
-  "topic": "Reading Comprehension"
-}
-
-5. **WRONG Example (DO NOT DO THIS):**
-{
-  "question_text": "מה הרעיון המרכזי של הפסקה?",  ❌ WRONG - THIS IS HEBREW
-  "options": ["טכנולוגיה", "חלל"],  ❌ WRONG - THIS IS HEBREW
-}
-
-**FINAL CHECK BEFORE RETURNING:**
-- Are ALL question_text fields in English? ✓
-- Are ALL options in English? ✓
-- Is reading_text in English? ✓
-- Are instructions in English? ✓
-
-Return complete JSON with exam in ENGLISH.
-` : `
-אתה מומחה ליצירת מבחני בגרות ב${examStructure.subject}.
-
-📋 **פרטי המבחן:**
+📋 **מידע כללי:**
 - מקצוע: ${examStructure.subject}
 - רמה: ${examStructure.unit_level} יחידות
 - שאלון: ${examStructure.module_id}
 - משך: ${examStructure.duration_minutes} דקות
 - נקודות: ${examStructure.total_points}
 
-📝 **מבנה השאלות:**
+📝 **מבנה המבחן:**
 ${JSON.stringify(examStructure.question_structure, null, 2)}
 
 🎯 **דרישות:**
 
-1. **תוכן מקורי:**
-   - צור מבחן חדש לגמרי (לא להעתיק)
-   - שמור על מבנה זהה
-   - רמת קושי דומה
+1. **תוכן חדש לגמרי:**
+   - אל תעתיק שום שאלה מהמבחן המקורי
+   - צור תוכן מקורי ומגוון
+   - שמור על רמת קושי זהה
+   - שמור על אותו מבנה בדיוק
 
 2. **לכל שאלה:**
-   - טקסט מלא
-   - תשובה נכונה
+   - טקסט השאלה המלא
+   - אם צריך דיאגרמה - תאר אותה בפירוט
+   - אם יש סעיפים - צור את כולם
+   - תשובות נכונות
    - הסבר מפורט
-   - נקודות
+   - רובריקת ניקוד
 
-3. **איכות:**
-   - שאלות מאתגרות
-   - התאמה לתכנית לימודים
+3. **שמירה על סטנדרטים:**
+   - שפה ברורה ומדויקת
+   - עברית תקנית
+   - מושגים מקצועיים נכונים
+   - התאמה לתכנית הלימודים
+
+4. **איכות:**
+   - שאלות מאתגרות אך הוגנות
    - מגוון נושאים
+   - קשר למציאות (אם רלוונטי)
 
-החזר JSON מלא.
+החזר JSON עם המבחן המלא הכולל את כל השאלות, תשובות ופתרונות.
 `;
 
     console.log('🤖 Step 5: Generating exam with AI...');
-    console.log(`🌍 Language mode: ${isEnglishExam ? 'ENGLISH ONLY' : 'Hebrew'}`);
     const generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: generationPrompt,
       response_json_schema: {
@@ -188,7 +121,6 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
           description: { type: "string" },
           duration_minutes: { type: "integer" },
           total_points: { type: "integer" },
-          reading_text: { type: "string", description: "Full reading passage in original language" },
           instructions: { type: "string" },
           questions: {
             type: "array",
@@ -196,12 +128,11 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
               type: "object",
               properties: {
                 question_number: { type: "integer" },
-                question_text: { type: "string", description: "Question in ORIGINAL language - English for English exams" },
+                question_text: { type: "string" },
                 question_type: { type: "string" },
                 question_image_url: { type: "string" },
                 topic: { type: "string" },
                 points: { type: "integer" },
-                options: { type: "array", items: { type: "string" }, description: "All options in ORIGINAL language" },
                 parts: {
                   type: "array",
                   items: {
@@ -213,7 +144,7 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
                     }
                   }
                 },
-                correct_answer: { type: "string", description: "Correct answer in ORIGINAL language" },
+                correct_answer: { type: "string" },
                 explanation: { type: "string" },
                 solution_steps: { type: "array", items: { type: "string" } },
                 rubric: {
@@ -244,8 +175,7 @@ ${JSON.stringify(examStructure.question_structure, null, 2)}
       description: generatedExam.description,
       duration_minutes: examStructure.duration_minutes,
       total_points: examStructure.total_points,
-      reading_text: generatedExam.reading_text || '',
-      instructions: generatedExam.instructions || '',
+      instructions: generatedExam.instructions,
       questions: generatedExam.questions,
       is_generated: true,
       is_copyright_free: true

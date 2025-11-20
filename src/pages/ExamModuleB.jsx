@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2, Edit3, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -109,9 +109,11 @@ export default function ExamModuleBPage() {
   const [showDetailedExplanations, setShowDetailedExplanations] = useState(false);
   const [showAdForExplanations, setShowAdForExplanations] = useState(false);
 
+  // New state for intro and mode selection
   const [showIntroDialog, setShowIntroDialog] = useState(false);
-  const [displayMode, setDisplayMode] = useState('exam');
-  const [hasStarted, setHasStarted] = useState(false);
+  const [showModeSelection, setShowModeSelection] = useState(false);
+  const [displayMode, setDisplayMode] = useState(null); // "exam", "practice", or "interactive"
+  const [hasStarted, setHasStarted] = useState(false); // True after mode selection
 
   // New states for persistent progress and interactive grammar
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -174,9 +176,14 @@ export default function ExamModuleBPage() {
 
             if (progressList.length > 0) {
               setSavedProgress(progressList[0]);
-              setShowResumeDialog(true);
+              setShowResumeDialog(true); // Show dialog to resume or start fresh
             } else {
-              setShowIntroDialog(true);
+              // No saved progress, proceed with initial flow
+              if (user?.skip_exam_intro) {
+                setShowModeSelection(true); // Skip intro, go straight to mode selection
+              } else {
+                setShowIntroDialog(true); // Show intro dialog
+              }
             }
           }
         } catch (error) {
@@ -259,8 +266,9 @@ export default function ExamModuleBPage() {
       setGrammarAnswers(savedProgress.reading_answers || {});
       setWritingText(savedProgress.writing_text || "");
       setTimeLeft(savedProgress.time_left || 2700);
+      setDisplayMode(savedProgress.display_mode || 'exam'); // Default to 'exam' if not saved
       setShowResumeDialog(false);
-      setHasStarted(true);
+      setHasStarted(true); // Officially starts the exam/practice
     }
   };
 
@@ -276,7 +284,12 @@ export default function ExamModuleBPage() {
     }
 
     setShowResumeDialog(false);
-    setShowIntroDialog(true);
+    // After clearing progress, determine whether to show intro or mode selection
+    if (user?.skip_exam_intro) {
+      setShowModeSelection(true);
+    } else {
+      setShowIntroDialog(true);
+    }
   };
 
   const formatTime = (seconds) => {
@@ -543,21 +556,29 @@ export default function ExamModuleBPage() {
     setShowDetailedExplanations(true);
   };
 
+  // New handlers for intro and mode selection
   const handleStartExam = () => {
     setShowIntroDialog(false);
-    setHasStarted(true);
+    setShowModeSelection(true);
   };
 
   const handleSkipIntroForever = async () => {
     try {
       await base44.auth.updateMe({ skip_exam_intro: true });
       setShowIntroDialog(false);
-      setHasStarted(true);
+      setShowModeSelection(true);
     } catch (error) {
       console.error("Error updating user settings:", error);
+      // Fallback: proceed without saving preference if API fails
       setShowIntroDialog(false);
-      setHasStarted(true);
+      setShowModeSelection(true);
     }
+  };
+
+  const handleModeSelect = (mode) => {
+    setDisplayMode(mode);
+    setShowModeSelection(false);
+    setHasStarted(true); // This officially starts the exam/practice
   };
 
   // Handlers for exit dialog
@@ -574,17 +595,29 @@ export default function ExamModuleBPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Handlers for interactive grammar section navigation
   const handleNextQuestion = () => {
-    if (isSubmitting || !exam?.grammar_questions) return;
+    if (isSubmitting) return;
     setIsSubmitting(true);
+    
+    const currentQ = exam.grammar_questions[currentQuestion];
+    const hasAnswer = grammarAnswers[currentQ.question_number];
 
+    // Validate if the current question has been answered
+    if (!hasAnswer || (typeof hasAnswer === 'string' && hasAnswer.trim() === '')) {
+      alert('יש לענות על השאלה לפני המעבר לשאלה הבאה');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Move to the next question or to the writing section
     if (currentQuestion < exam.grammar_questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
-      setTimeout(() => setIsSubmitting(false), 300);
     } else {
       setCurrentSection("writing");
-      setTimeout(() => setIsSubmitting(false), 300);
     }
+    
+    setTimeout(() => setIsSubmitting(false), 300);
   };
 
   const handlePrevQuestion = () => {
@@ -800,7 +833,99 @@ export default function ExamModuleBPage() {
     );
   }
 
+  // Mode Selection Dialog
+  if (showModeSelection && !hasStarted) {
+    return (
+      <Dialog open={showModeSelection} onOpenChange={() => { }}>
+        <DialogContent dir="rtl" className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-2">
+              בחר מצב בחינה
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-500">
+              שני המצבים כוללים טיימר מלא של 45 דקות
+            </DialogDescription>
+          </DialogHeader>
 
+          <div className="grid md:grid-cols-2 gap-4 py-6">
+            {/* Exam Mode */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleModeSelect('exam')}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FileText className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב בגרות רגיל</h3>
+                  <p className="text-sm text-blue-700 font-medium">📄 כמו בבחינה אמיתית</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>סיפור בצד, שאלות בצד</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>ראייה נוחה יותר</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>טיימר מלא של 45 דקות</span>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-blue-200 rounded-lg p-3 text-center">
+                <span className="text-sm font-bold text-blue-900">מומלץ להכנה לבגרות</span>
+              </div>
+            </motion.button>
+
+            {/* Interactive Mode */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleModeSelect('interactive')}
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-xl font-bold text-gray-900">מצב אינטראקטיבי</h3>
+                  <p className="text-sm text-purple-700 font-medium">⚡ חוויה מתקדמת</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>סיפור בצד, שאלה אחת בצד</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>מעבר בין שאלות בקלות</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>טיימר מלא של 45 דקות</span>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-purple-200 rounded-lg p-3 text-center">
+                <span className="text-sm font-bold text-purple-900">לתרגול יעיל</span>
+              </div>
+            </motion.button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
 
   // Loading state for AI grading after finishing exam
@@ -1027,8 +1152,8 @@ export default function ExamModuleBPage() {
 
   // Calculate progress for the progress bar
   const progress = currentSection === "grammar"
-    ? ((exam?.grammar_questions?.length || 0) > 0 ? (currentQuestion / exam.grammar_questions.length) * 50 : 0)
-    : 50 + (countWords(writingText) / (exam.writing_max_words || 45)) * 50;
+    ? (currentQuestion / exam.grammar_questions.length) * 50 // Half of the progress for grammar
+    : 50 + (countWords(writingText) / (exam.writing_max_words || 45)) * 50; // Other half for writing
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
@@ -1104,42 +1229,59 @@ export default function ExamModuleBPage() {
           />
         </div>
 
-        {/* Grammar Section */}
+        {/* Grammar Section (now always interactive question-by-question) */}
         {currentSection === "grammar" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {!exam?.grammar_questions || exam.grammar_questions.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-                <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-                <p className="text-gray-600">לא נמצאו שאלות דקדוק במבחן זה</p>
-              </div>
-            ) : (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentQuestion}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
-                >
+            {displayMode === 'interactive' ? (
+              <div className="grid lg:grid-cols-5 gap-4">
+                {/* Story */}
+                <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 overflow-y-auto max-h-[calc(100vh-280px)]">
+                  <div className="mb-4 pb-3 border-b">
+                    <h3 className="text-xl font-bold text-gray-900">{exam.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">Module B - Grammar</p>
+                  </div>
+
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-wrap" dir="ltr">
+                    {`Last summer, a group of tenth-grade students from "Riverside High School" started a special project. They wanted to help elderly people who live alone in their neighborhood. Every Tuesday afternoon, the students visited their homes to talk, read to them, and help with shopping.
+
+The project began after the students learned that many elderly people feel lonely. Their English teacher, Mrs. Adams, suggested doing something useful in English class. The students decided to prepare short talks, songs, and simple stories in English to share with the seniors.
+
+At first, the students were shy, but the elderly people were happy and friendly. Soon everyone started to enjoy the meetings. Some seniors even began to learn new English words!
+
+At the end of the summer, the city mayor invited the group to city hall and thanked them for their kindness. The students felt proud and said they wanted to continue visiting even after the summer vacation ended.`}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t">
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>שאלה {currentQuestion + 1} מתוך {exam.grammar_questions.length}</span>
+                      <span>{exam.grammar_questions[currentQuestion].points} נקודות</span>
+                    </div>
+                    <Progress
+                      value={(currentQuestion / exam.grammar_questions.length) * 100}
+                      className="h-1 mt-2"
+                    />
+                  </div>
+                </div>
+
+                {/* Single Question */}
+                <div className="lg:col-span-3 bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between">
                   {(() => {
                     const question = exam.grammar_questions[currentQuestion];
-                    if (!question) return null;
+                    if (!question) return null; // Safety check
                     return (
                       <div>
-                        <div className="flex items-start justify-between mb-4">
-                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Question {question.question_number}</h2>
-                          <div className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
-                            {question.points} נק'
-                          </div>
-                        </div>
+                        <h4 className="font-bold text-gray-900 mb-3 text-lg">
+                          שאלה {question.question_number} ({question.points} נקודות)
+                        </h4>
+                        <p className="text-gray-700 mb-6 text-base text-left leading-relaxed" dir="ltr">
+                          {question.question_text}
+                        </p>
 
-                        <p className="text-gray-700 text-base sm:text-lg mb-6 whitespace-pre-wrap" dir="ltr">{question.question_text}</p>
-
-                        {question.question_type === "multiple_choice" && question.options ? (
+                        {question.question_type === "multiple_choice" ? (
                           <div className="space-y-3">
                             {question.options.map((option, index) => (
                               <button
@@ -1147,60 +1289,138 @@ export default function ExamModuleBPage() {
                                 onClick={() => handleGrammarAnswer(question.question_number, option)}
                                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                                   grammarAnswers[question.question_number] === option
-                                    ? 'bg-green-100 border-green-500'
-                                    : 'bg-white border-gray-200 hover:border-green-300'
+                                    ? 'border-green-500 bg-green-50 shadow-md'
+                                    : 'border-gray-200 hover:border-green-300'
                                 }`}
                                 dir="ltr"
                               >
-                                {option}
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                    grammarAnswers[question.question_number] === option
+                                      ? 'border-green-500 bg-green-500'
+                                      : 'border-gray-300'
+                                  }`}>
+                                    {grammarAnswers[question.question_number] === option && (
+                                      <div className="w-2 h-2 bg-white rounded-full" />
+                                    )}
+                                  </div>
+                                  <span className="text-gray-700">{option}</span>
+                                </div>
                               </button>
                             ))}
                           </div>
                         ) : (
                           <Input
-                            placeholder="Type your answer..."
+                            placeholder="Type your answer here..."
                             value={grammarAnswers[question.question_number] || ""}
                             onChange={(e) => handleGrammarAnswer(question.question_number, e.target.value)}
-                            className="h-12 text-base"
+                            className="h-14 text-base"
                             dir="ltr"
                           />
                         )}
-
-                        <div className="flex gap-3 mt-6">
-                          <Button
-                            onClick={handlePrevQuestion}
-                            disabled={currentQuestion === 0}
-                            variant="outline"
-                            className="flex-1 h-11 sm:h-12"
-                          >
-                            <ChevronRight className="w-5 h-5 ml-2" />
-                            הקודם
-                          </Button>
-
-                          {currentQuestion === exam.grammar_questions.length - 1 ? (
-                            <Button 
-                              onClick={() => setCurrentSection("writing")} 
-                              disabled={isSubmitting}
-                              className="flex-1 h-11 sm:h-12 bg-purple-600 disabled:opacity-50"
-                            >
-                              המשך לכתיבה
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={handleNextQuestion}
-                              disabled={isSubmitting}
-                              className="flex-1 h-11 sm:h-12 bg-green-600 disabled:opacity-50"
-                            >
-                              הבא
-                              <ChevronLeft className="w-5 h-5 mr-2" />
-                            </Button>
-                          )}
-                        </div>
                       </div>
                     );
                   })()}
-                </motion.div>
-              </AnimatePresence>
+
+                  <div className="flex gap-3 mt-6 pt-6 border-t">
+                    <Button
+                      onClick={handlePrevQuestion}
+                      disabled={currentQuestion === 0}
+                      variant="outline"
+                      className="flex-1 h-12"
+                    >
+                      שאלה קודמת
+                    </Button>
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={isSubmitting}
+                      className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-bold disabled:opacity-50"
+                    >
+                      {currentQuestion < exam.grammar_questions.length - 1 ? "שאלה הבאה" : "המשך לכתיבה"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-md p-6">
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{exam.title}</h3>
+                  <p className="text-sm text-gray-500">Module B - Grammar</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-6 mb-6 border-2 border-gray-100" dir="ltr">
+                  <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    {`Last summer, a group of tenth-grade students from "Riverside High School" started a special project. They wanted to help elderly people who live alone in their neighborhood. Every Tuesday afternoon, the students visited their homes to talk, read to them, and help with shopping.
+
+The project began after the students learned that many elderly people feel lonely. Their English teacher, Mrs. Adams, suggested doing something useful in English class. The students decided to prepare short talks, songs, and simple stories in English to share with the seniors.
+
+At first, the students were shy, but the elderly people were happy and friendly. Soon everyone started to enjoy the meetings. Some seniors even began to learn new English words!
+
+At the end of the summer, the city mayor invited the group to city hall and thanked them for their kindness. The students felt proud and said they wanted to continue visiting even after the summer vacation ended.`}
+                  </p>
+                </div>
+
+                <h3 className="text-lg font-bold text-gray-900 mb-4">שאלות דקדוק</h3>
+
+                <div className="space-y-6">
+                  {exam.grammar_questions.map((questionItem, questionIndex) => (
+                    <div key={questionItem.question_number} className="p-4 border rounded-lg bg-gray-50">
+                      <h4 className="font-bold text-gray-900 mb-3 text-lg">
+                        שאלה {questionItem.question_number} ({questionItem.points} נקודות)
+                      </h4>
+                      <p className="text-gray-700 mb-4 text-base text-left leading-relaxed" dir="ltr">
+                        {questionItem.question_text}
+                      </p>
+
+                      {questionItem.question_type === "multiple_choice" ? (
+                        <div className="space-y-3">
+                          {questionItem.options.map((optionValue, optionIndex) => (
+                            <button
+                              key={optionIndex}
+                              onClick={() => handleGrammarAnswer(questionItem.question_number, optionValue)}
+                              className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                                grammarAnswers[questionItem.question_number] === optionValue
+                                  ? 'border-green-500 bg-green-50 shadow-md'
+                                  : 'border-gray-200 hover:border-green-300'
+                              }`}
+                              dir="ltr"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  grammarAnswers[questionItem.question_number] === optionValue
+                                    ? 'border-green-500 bg-green-500'
+                                    : 'border-gray-300'
+                                }`}>
+                                  {grammarAnswers[questionItem.question_number] === optionValue && (
+                                    <div className="w-2 h-2 bg-white rounded-full" />
+                                  )}
+                                </div>
+                                <span className="text-gray-700">{optionValue}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <Input
+                          placeholder="Type your answer here..."
+                          value={grammarAnswers[questionItem.question_number] || ""}
+                          onChange={(e) => handleGrammarAnswer(questionItem.question_number, e.target.value)}
+                          className="h-14 text-base"
+                          dir="ltr"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={handleContinueToWriting}
+                  disabled={isSubmitting}
+                  className="w-full h-14 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-lg mt-6 disabled:opacity-50"
+                >
+                  המשך לכתיבה
+                </Button>
+              </div>
             )}
           </motion.div>
         )}

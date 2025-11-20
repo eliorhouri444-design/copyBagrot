@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react";
+import { ChevronLeft, Check, X, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import MathCalculator from "@/components/practice/MathCalculator";
@@ -67,10 +66,8 @@ export default function TopicPracticeNewPage() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error loading user:", error);
-        setIsLoading(false);
       }
     };
     loadUser();
@@ -110,21 +107,28 @@ export default function TopicPracticeNewPage() {
       const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
 
-      setAllQuestions(questionsForTopic);
+      // Ensure minimum questions per set by duplicating if needed
+      let expandedQuestions = [...questionsForTopic];
+      while (expandedQuestions.length < questionsPerSet && questionsForTopic.length > 0) {
+        const needed = questionsPerSet - expandedQuestions.length;
+        expandedQuestions = [...expandedQuestions, ...questionsForTopic.slice(0, Math.min(needed, questionsForTopic.length))];
+      }
+
+      // Now get all sets
+      const totalSets = Math.ceil(expandedQuestions.length / questionsPerSet);
+      let allSetsQuestions = [];
+      
+      for (let i = 0; i < totalSets; i++) {
+        const start = i * questionsPerSet;
+        const end = start + questionsPerSet;
+        allSetsQuestions.push(...expandedQuestions.slice(start, end));
+      }
+
+      setAllQuestions(allSetsQuestions);
 
       const startIndex = (setNumber - 1) * questionsPerSet;
       const endIndex = startIndex + questionsPerSet;
-      let setQuestions = questionsForTopic.slice(startIndex, endIndex);
-
-      // If not enough questions for a full set, repeat from the beginning
-      if (setQuestions.length < questionsPerSet && questionsForTopic.length > 0) {
-        while (setQuestions.length < questionsPerSet) {
-          const needed = questionsPerSet - setQuestions.length;
-          setQuestions = [...setQuestions, ...questionsForTopic.slice(0, needed)];
-        }
-      }
-
-      setQuestions = setQuestions.slice(0, questionsPerSet);
+      const setQuestions = allSetsQuestions.slice(startIndex, endIndex);
       
       if (setQuestions.length === 0) {
         setLoadError(`לא נמצאו שאלות לסט ${setNumber}`);
@@ -205,7 +209,7 @@ export default function TopicPracticeNewPage() {
         });
       }
     } catch (error) {
-              console.error("Error saving draft:", error);
+      console.error("Error saving draft:", error);
     } finally {
       setIsSavingDraft(false);
     }
@@ -216,20 +220,7 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    
-    // Get the raw answer from state or parameter
-    let rawAnswer = providedAnswer || answers[currentQuestion.question_id] || "";
-    
-    // Convert to plain string - handle all cases
-    let userAnswer = "";
-    if (typeof rawAnswer === 'string') {
-      userAnswer = rawAnswer.trim();
-    } else if (typeof rawAnswer === 'object' && rawAnswer !== null) {
-      // Extract text from object (from multiple choice selections)
-      userAnswer = (rawAnswer.text || rawAnswer.value || rawAnswer.label || "").trim();
-    } else {
-      userAnswer = String(rawAnswer).trim();
-    }
+    const userAnswer = String(providedAnswer || answers[currentQuestion.question_id] || "");
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
@@ -452,96 +443,60 @@ export default function TopicPracticeNewPage() {
         console.log("✅ Feedback dialog should be open now");
         return; // Stop here, don't auto-advance
       } else {
-        // NEW ANSWER CHECKING SYSTEM
-        let correctAnswer = "";
-        let allCorrectAnswers = [];
-        let explanation = "";
-
-        // 1. Get correct answers from SolutionBank
+        // Regular question handling
         const solutions = await base44.entities.SolutionBank.filter({
           question_id: currentQuestion.question_id
         });
 
+        let isCorrect = false;
+        let status = "incorrect";
+        let correctAnswer = "";
+
         if (solutions.length > 0) {
           const solution = solutions[0];
-          explanation = solution.explanation || "";
+          const correctAnswers = solution.final_answers || [];
+          const acceptableVariants = solution.acceptable_variants || [];
 
-          // Get from final_answers
-          if (solution.final_answers) {
-            solution.final_answers.forEach(ans => {
-              if (typeof ans === 'string' && ans) {
-                allCorrectAnswers.push(ans);
-              } else if (ans?.value) {
-                allCorrectAnswers.push(String(ans.value));
-              }
-            });
+          if (correctAnswers.length > 0) {
+            correctAnswer = correctAnswers[0].value || "";
           }
 
-          // Get from acceptable_variants
-          if (solution.acceptable_variants) {
-            solution.acceptable_variants.forEach(variant => {
-              if (typeof variant === 'string' && variant) {
-                allCorrectAnswers.push(variant);
-              }
-            });
-          }
+          const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+          
+          isCorrect = correctAnswers.some(ans => 
+            ans.value?.toLowerCase() === normalizedUserAnswer
+          ) || acceptableVariants.some(variant => 
+            variant.toLowerCase() === normalizedUserAnswer
+          );
+
+          status = isCorrect ? "correct" : "incorrect";
         }
 
-        // 2. Get from question itself
-        if (currentQuestion.correct_answer) {
-          allCorrectAnswers.push(String(currentQuestion.correct_answer));
-        }
-
-        if (currentQuestion.acceptable_answers) {
-          currentQuestion.acceptable_answers.forEach(ans => {
-            if (ans) allCorrectAnswers.push(String(ans));
-          });
-        }
-
-        // 3. Set display answer
-        correctAnswer = allCorrectAnswers[0] || "לא ידוע";
-
-        // 4. Check if answer is correct - EXACT MATCH ONLY
-        const userLower = userAnswer.toLowerCase().trim();
-        const isCorrect = allCorrectAnswers.some(ans => {
-          return String(ans).toLowerCase().trim() === userLower;
-        });
-
-        // 5. Save attempt
         await base44.entities.AttemptNew.create({
           question_id: currentQuestion.question_id,
           subject_id: currentQuestion.subject_id,
           topic_id: topicId,
           session_id: sessionId,
           user_answer_text: userAnswer,
-          score: isCorrect ? (currentQuestion.max_score || 1) : 0,
-          max_score: currentQuestion.max_score || 1,
+          score: isCorrect ? currentQuestion.max_score : 0,
+          max_score: currentQuestion.max_score,
           percentage: isCorrect ? 100 : 0,
-          status: isCorrect ? "correct" : "incorrect",
+          status: status,
           time_spent_seconds: 0
         });
 
-        // 6. Store results
         setResults(prev => ({
           ...prev,
-          [currentQuestion.question_id]: {
-            isCorrect,
-            status: isCorrect ? "correct" : "incorrect",
-            correctAnswer,
-            userAnswer,
-            explanation
-          }
+          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer }
         }));
       }
 
       // מעבר ישיר לשאלה הבאה או לסיכום
       if (currentQuestionIndex < currentSetQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
-        setIsSubmitting(false); // Reset submitting state after moving to next question
       } else {
         saveWeakTopicsStats();
         setShowSummary(true);
-        setIsSubmitting(false); // Reset submitting state when showing summary
       }
     } catch (error) {
       console.error("❌ Error submitting answer:", error);
@@ -708,24 +663,6 @@ export default function TopicPracticeNewPage() {
   }
 
   if (showSummary) {
-    const totalQuestions = currentSetQuestions?.length || 0;
-    if (totalQuestions === 0) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-          <div className="text-center">
-            <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-            <p className="text-gray-600">לא נמצאו שאלות</p>
-            <Button onClick={() => navigate(createPageUrl("Practice"))} className="mt-4">
-              חזור לתרגול
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    const correctCount = Object.values(results).filter(r => r.isCorrect).length;
-    const percentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -745,11 +682,11 @@ export default function TopicPracticeNewPage() {
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
               <div className="text-center mb-4">
                 <div className="text-5xl font-bold text-blue-600">
-                  {correctCount} / {totalQuestions}
+                  {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
                 </div>
                 <div className="text-sm text-gray-600 mt-2">תשובות נכונות</div>
                 <div className="text-3xl font-bold text-gray-900 mt-3">
-                  {percentage}%
+                  {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
                 </div>
               </div>
             </div>
@@ -775,9 +712,7 @@ export default function TopicPracticeNewPage() {
                       )}
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
-                        <div className="text-sm text-gray-700 mb-2">
-                          {(typeof q.question_text === 'string' ? q.question_text : q.question_text?.text || 'שאלה').substring(0, 80)}...
-                        </div>
+                        <div className="text-sm text-gray-700 mb-2">{q.question_text.substring(0, 80)}...</div>
 
                         {q.question_type === "writing" && result?.writingEvaluation ? (
                           <div className="space-y-2 mt-3">
@@ -854,28 +789,12 @@ export default function TopicPracticeNewPage() {
                         ) : !result?.isCorrect && q.question_type !== "writing" && (
                           <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
-                            <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                            <div className="text-sm font-semibold text-red-700" dir="ltr">
-                            {(() => {
-                            const ans = result?.userAnswer;
-                            if (!ans) return "לא נענה";
-                            if (typeof ans === 'string') return ans;
-                            if (typeof ans === 'object') return ans.text || ans.value || JSON.stringify(ans);
-                            return String(ans);
-                            })()}
-                            </div>
+                              <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
+                              <div className="text-sm font-semibold text-red-700">{result?.userAnswer || "לא נענה"}</div>
                             </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
-                            <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                            <div className="text-sm font-semibold text-green-700" dir="ltr">
-                            {(() => {
-                            const ans = result?.correctAnswer;
-                            if (!ans) return "לא ידוע";
-                            if (typeof ans === 'string') return ans;
-                            if (typeof ans === 'object') return ans.text || ans.value || JSON.stringify(ans);
-                            return String(ans);
-                            })()}
-                            </div>
+                              <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
+                              <div className="text-sm font-semibold text-green-700">{result?.correctAnswer}</div>
                             </div>
                           </div>
                         )}
@@ -901,22 +820,8 @@ export default function TopicPracticeNewPage() {
     );
   }
 
-  const currentQuestion = currentSetQuestions?.[currentQuestionIndex];
-  if (!currentQuestion) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-          <p className="text-gray-600">לא נמצאה שאלה נוכחית</p>
-          <Button onClick={() => navigate(createPageUrl("Practice"))} className="mt-4">
-            חזור לתרגול
-          </Button>
-        </div>
-      </div>
-    );
-  }
-  
-  const progress = ((currentQuestionIndex + 1) / (currentSetQuestions?.length || 1)) * 100;
+  const currentQuestion = currentSetQuestions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
   const displayUnits = user?.selected_units || 3; // Moved displayUnits to a higher scope
 
@@ -927,8 +832,8 @@ export default function TopicPracticeNewPage() {
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
     return (
-      <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-b-[2rem] p-4 shadow-xl">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -940,25 +845,25 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg font-bold">{topicName}</h1>
-              <p className="text-xs opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
             </div>
 
             <div className="w-9" />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
+        <div className="px-4 sm:px-6 pb-20 max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-3 max-w-2xl mx-auto"
+            className="space-y-4"
           >
             <ListeningPlayer audioText={listeningText} />
 
-            <div className="bg-white rounded-xl shadow-lg p-4">
-              <h3 className="font-bold text-gray-900 text-base mb-2">הוראות:</h3>
-              <ul className="space-y-2 text-gray-700 text-sm">
+            <div className="bg-white rounded-2xl shadow-lg p-5">
+              <h3 className="font-bold text-gray-900 text-lg mb-3">הוראות:</h3>
+              <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
                   <span>האזן לקטע השמיעה בעיון (מומלץ לפחות פעמיים)</span>
@@ -973,19 +878,15 @@ export default function TopicPracticeNewPage() {
                 </li>
               </ul>
             </div>
-          </motion.div>
-        </div>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 pb-6 shadow-2xl">
-          <div className="max-w-2xl mx-auto">
             <Button
               onClick={() => setShowListeningIntro(false)}
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl shadow-md"
+              className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
             >
               התחל לענות על השאלות
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
-          </div>
+          </motion.div>
         </div>
       </div>
     );
@@ -994,8 +895,8 @@ export default function TopicPracticeNewPage() {
   // Show reading text if exists and requested
   if (readingText && showReadingText) {
     return (
-      <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-3xl p-4 shadow-xl">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -1007,36 +908,36 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-base font-bold">{topicName}</h1>
-              <p className="text-xs opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
             </div>
 
             <div className="w-9" />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="px-4 sm:px-6 pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-full flex flex-col"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto"
           >
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b-2 border-blue-100">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-5 h-5 text-white" />
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5 border-b-2 border-blue-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-gray-900">קרא את הטקסט</h2>
-                  <p className="text-xs text-gray-600">לאחר מכן תענה על {currentSetQuestions.length} שאלות</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">קרא את הטקסט</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">לאחר מכן תענה על 10 שאלות</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-3 border border-gray-200">
+            <div className="p-5 sm:p-6">
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-4 sm:p-5 border border-gray-200">
                 <div 
-                  className="text-sm leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                  className="text-[15px] sm:text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
                   style={{ 
                     fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
                     direction: 'ltr'
@@ -1046,40 +947,38 @@ export default function TopicPracticeNewPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </div>
 
-        <div className="bg-white border-t-2 border-gray-200 p-4 shadow-2xl">
-          <div className="max-w-2xl mx-auto">
-            <Button
-              onClick={() => setShowReadingText(false)}
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl shadow-md"
-            >
-              התחל לענות על השאלות
-              <ChevronLeft className="w-5 h-5 mr-2" />
-            </Button>
-          </div>
+            <div className="p-4 sm:p-5 pt-0">
+              <Button
+                onClick={() => setShowReadingText(false)}
+                className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
+              >
+                יאללה לקרוא - המשך לשאלות
+                <ChevronLeft className="w-5 h-5 mr-2" />
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
-      <div className="bg-blue-600 rounded-b-3xl p-4 shadow-xl flex-shrink-0">
-        <div className="flex items-center justify-between text-white mb-3">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
+      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+        <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20 h-9 w-9"
+            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-base font-bold">{topicName}</h1>
-            <p className="text-xs opacity-90">שאלה {currentQuestionIndex + 1}/{currentSetQuestions?.length || 0} • סט {setNumber}</p>
+            <h1 className="text-base sm:text-xl font-bold">{topicName}</h1>
+            <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
           {readingText && (
@@ -1087,14 +986,14 @@ export default function TopicPracticeNewPage() {
               variant="ghost"
               size="icon"
               onClick={() => setShowStoryDialog(true)}
-              className="text-white hover:bg-white/20 h-9 w-9"
+              className="text-white hover:bg-white/20"
             >
               <BookOpen className="w-5 h-5" />
             </Button>
           )}
         </div>
 
-        <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+        <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -1102,31 +1001,9 @@ export default function TopicPracticeNewPage() {
             className="h-full bg-white"
           />
         </div>
-      </div>
+        </div>
 
-      {/* Split screen layout: Reading text on top, questions on bottom */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {readingText && (
-          <div className="h-1/2 overflow-y-auto px-4 pt-3 pb-2">
-            <div className="bg-white rounded-xl shadow-lg p-4 max-w-2xl mx-auto h-full overflow-y-auto">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-                <h3 className="text-sm font-bold text-gray-900">טקסט הקריאה</h3>
-              </div>
-              <div 
-                className="text-sm leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
-                style={{ 
-                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
-                  direction: 'ltr'
-                }}
-              >
-                {readingText}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className={`${readingText ? 'h-1/2' : 'flex-1'} overflow-y-auto px-4 pb-20`}>
+        <div className="flex-1 flex flex-col overflow-hidden p-2 sm:p-3">
         {/* Story panel on the right (if exists) */}
         <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
           <DialogContent dir="rtl" className="sm:max-w-screen-md max-h-[90vh] overflow-y-auto">
@@ -1169,9 +1046,9 @@ export default function TopicPracticeNewPage() {
           key={currentQuestion.question_id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-white rounded-xl shadow-xl max-w-2xl mx-auto w-full"
+          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
         >
-          <div className="p-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
@@ -1191,139 +1068,91 @@ export default function TopicPracticeNewPage() {
             />
           ) : (
             <>
-              <div className="flex items-start gap-3 mb-6">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
-                </div>
-                <div className="flex-1">
-                  {currentQuestion.hebrew_hint && (
-                    <div className="text-sm text-blue-600 font-semibold mb-2">
-                      💡 {currentQuestion.hebrew_hint}
-                    </div>
-                  )}
-                  <p
-                    className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
-                    dir={typeof currentQuestion.question_text === 'string' && currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
-                    style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
-                  >
-                    {typeof currentQuestion.question_text === 'string' ? currentQuestion.question_text : (currentQuestion.question_text?.text || 'שאלה')}
-                  </p>
-                  
-                  {currentQuestion.question_image_url && (
-                    <img
-                      src={currentQuestion.question_image_url}
-                      alt="Question"
-                      className="mt-4 rounded-lg max-w-full"
-                    />
-                  )}
-                </div>
-              </div>
-
-              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
-                <div className="space-y-3">
-                  {currentQuestion.options.map((option, idx) => {
-                    // Extract text from option - ALWAYS save as plain string
-                    let optionText = "";
-                    if (typeof option === 'string') {
-                      optionText = option;
-                    } else if (typeof option === 'object' && option !== null) {
-                      optionText = option.text || option.value || option.label || String(option);
-                    } else {
-                      optionText = String(option);
-                    }
-
-                    // Check if this option is selected
-                    const currentAnswer = answers[currentQuestion.question_id];
-                    let isSelected = false;
-                    if (typeof currentAnswer === 'string') {
-                      isSelected = currentAnswer === optionText;
-                    } else if (typeof currentAnswer === 'object' && currentAnswer !== null) {
-                      const ansText = currentAnswer.text || currentAnswer.value || currentAnswer.label || "";
-                      isSelected = ansText === optionText;
-                    }
-
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          // ALWAYS save as plain string, never as object
-                          setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }));
-                        }}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-100'
-                            : 'border-gray-200 hover:border-blue-300'
-                        }`}
-                        dir="ltr"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                            isSelected
-                              ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300'
-                          }`}>
-                            {isSelected && (
-                              <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                            )}
-                          </div>
-                          <span className="text-base font-medium text-gray-900">{optionText}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : currentQuestion.question_type === "fill_in_blank" ? (
-                <Input
-                  value={(() => {
-                    const ans = answers[currentQuestion.question_id];
-                    if (!ans) return "";
-                    if (typeof ans === 'string') return ans;
-                    if (typeof ans === 'object') return ans.text || ans.value || "";
-                    return String(ans);
-                  })()}
-                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                  placeholder="Type your answer..."
-                  className="w-full h-12 text-base"
-                  dir="ltr"
-                />
-              ) : (
-                <Input
-                  value={(() => {
-                    const ans = answers[currentQuestion.question_id];
-                    if (!ans) return "";
-                    if (typeof ans === 'string') return ans;
-                    if (typeof ans === 'object') return ans.text || ans.value || "";
-                    return String(ans);
-                  })()}
-                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                  placeholder="Type your answer..."
-                  className="w-full h-12 text-base"
-                  dir="ltr"
+          <div className="flex items-start gap-3 mb-6">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
+            </div>
+            <div className="flex-1">
+              <p
+                className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
+                dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
+                style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
+              >
+                {currentQuestion.question_text}
+              </p>
+              
+              {currentQuestion.question_image_url && (
+                <img
+                  src={currentQuestion.question_image_url}
+                  alt="Question"
+                  className="mt-4 rounded-lg max-w-full"
                 />
               )}
+            </div>
+          </div>
+
+          {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
+            <div className="space-y-2">
+              {currentQuestion.options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
+                  className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
+                    answers[currentQuestion.question_id] === option
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  } cursor-pointer`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      answers[currentQuestion.question_id] === option
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {answers[currentQuestion.question_id] === option && (
+                        <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{option}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
             </>
           )}
           </div>
+
+          {/* Answer input area - fixed at bottom */}
+          {currentQuestion.question_type !== "writing" && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
+              <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
+                {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
+                  <div className="text-center text-sm text-gray-600">
+                    בחר תשובה למעלה ↑
+                  </div>
+                ) : (
+                  <Textarea
+                    value={answers[currentQuestion.question_id] || ""}
+                    onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                    placeholder="הקלד את תשובתך כאן..."
+                    className="w-full h-28 text-base resize-none"
+                  />
+                )}
+
+                <Button
+                  onClick={handleSubmitAnswer}
+                  disabled={!hasAnswered || isSubmitting}
+                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+                >
+                  {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                </Button>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
-
-      </div>
-
-      {/* Fixed bottom button - elevated above bottom navigation */}
-      {currentQuestion.question_type !== "writing" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3">
-          <div className="max-w-2xl mx-auto">
-            <Button
-              onClick={handleSubmitAnswer}
-              disabled={!hasAnswered || isSubmitting}
-              className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
-            >
-              {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
-              <ChevronLeft className="w-5 h-5 mr-2" />
-            </Button>
-          </div>
-        </div>
-      )}
 
       {showCalculator && (
         <MathCalculator onClose={() => setShowCalculator(false)} />
@@ -1335,6 +1164,30 @@ export default function TopicPracticeNewPage() {
           questionText={currentQuestion.question_text}
         />
       )}
+
+      {/* Story Dialog */}
+      <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
+        <DialogContent dir="ltr" className="sm:max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold" dir="rtl">📖 הסיפור</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[60vh] p-4">
+            <div 
+              className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
+              style={{ 
+                fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
+              }}
+            >
+              {readingText}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
+              סגור
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Rest of the dialogs remain the same */}
       <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
@@ -1374,7 +1227,7 @@ export default function TopicPracticeNewPage() {
                     )}
                     <span className="font-semibold text-gray-900">שאלה {idx + 1}</span>
                   </div>
-                  <p className="text-sm text-gray-700 mt-1">{(typeof q.question_text === 'string' ? q.question_text : q.question_text?.text || 'שאלה').substring(0, 80)}...</p>
+                  <p className="text-sm text-gray-700 mt-1">{q.question_text.substring(0, 80)}...</p>
                 </div>
               );
             })}

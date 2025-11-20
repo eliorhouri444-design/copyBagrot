@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -14,7 +14,6 @@ export default function ExtendedReadingPage() {
   const [user, setUser] = useState(null);
   const [currentScreen, setCurrentScreen] = useState("intro");
   const [readingData, setReadingData] = useState(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +38,7 @@ export default function ExtendedReadingPage() {
 
   const displayUnits = user?.selected_units || 4;
   const targetWords = displayUnits === 5 ? 450 : 300;
-  const questionsCount = 10;
+  const questionsCount = displayUnits === 5 ? 12 : 8;
 
   const loadQuestionsFromBank = async (topicId, currentUser) => {
     setIsLoading(true);
@@ -410,149 +409,117 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
     );
   }
 
-  // Screen 3: Questions - One by One
+  // Screen 3: Questions
   if (currentScreen === "questions" && readingData) {
-    const currentQuestion = readingData.questions[currentQuestionIndex];
-    const progress = ((currentQuestionIndex + 1) / readingData.questions.length) * 100;
-    const hasAnswered = userAnswers[currentQuestion.question_number] !== undefined;
-
-    const handleNext = () => {
-      if (currentQuestionIndex < readingData.questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else {
-        handleCheckAnswers();
-      }
-    };
+    const allAnswered = readingData.questions.every(q => userAnswers[q.question_number]);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pb-20">
-        <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-5 shadow-xl mb-4">
-          <div className="flex items-center justify-between text-white mb-3">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-6 shadow-xl mb-6">
+          <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(createPageUrl("Practice"))}
-              className="text-white hover:bg-white/20 h-9 w-9"
+              onClick={() => setCurrentScreen("reading")}
+              className="text-white hover:bg-white/20"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-6 h-6" />
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg sm:text-xl font-bold">Reading Comprehension</h1>
-              <p className="text-xs sm:text-sm opacity-90">
-                שאלה {currentQuestionIndex + 1} מתוך {readingData.questions.length}
+              <h1 className="text-xl font-bold">Reading Comprehension</h1>
+              <p className="text-sm opacity-90">
+                {Object.keys(userAnswers).length} / {readingData.questions.length} נענו
               </p>
             </div>
 
             <Button
               variant="ghost"
-              size="icon"
-              onClick={() => setCurrentScreen("reading")}
-              className="text-white hover:bg-white/20 h-9 w-9"
+              size="sm"
+              onClick={() => {
+                const confirmed = confirm("לראות שוב את הטקסט?");
+                if (confirmed) setCurrentScreen("reading");
+              }}
+              className="text-white hover:bg-white/20 text-xs"
             >
-              <BookOpen className="w-5 h-5" />
+              <BookOpen className="w-4 h-4 mr-1" />
+              הטקסט
             </Button>
-          </div>
-
-          <div className="bg-white/20 rounded-full h-2 overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-              className="h-full bg-white"
-            />
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
-          <motion.div
-            key={currentQuestion.question_number}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 pb-24"
-          >
-            <div className="mb-6">
-              <div className="flex items-start gap-3 mb-1">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
+        <div className="max-w-3xl mx-auto px-6 space-y-6">
+          {readingData.questions.map((question, idx) => (
+            <motion.div
+              key={question.question_number}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="bg-white rounded-2xl shadow-lg p-6"
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="font-bold text-indigo-600">{question.question_number}</span>
                 </div>
-                <div className="bg-blue-100 px-3 py-1 rounded-full">
-                  <span className="text-sm font-bold text-blue-600">{currentQuestion.points || 10} נק'</span>
+                <div className="flex-1">
+                  <div className="text-sm text-indigo-600 mb-1">{question.question_type}</div>
+                  <p className="text-base text-gray-900 leading-relaxed" dir="ltr">
+                    {question.question_text}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <p className="text-lg sm:text-xl text-gray-900 leading-relaxed whitespace-pre-wrap" dir="ltr" style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-                  {currentQuestion.question_text}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {currentQuestion.options && currentQuestion.options.length > 0 ? (
-                currentQuestion.options.map((option, idx) => {
-                  const letter = String.fromCharCode(65 + idx);
-                  const isSelected = userAnswers[currentQuestion.question_number] === letter;
+              <div className="space-y-2">
+                {question.options.map((option, optIdx) => {
+                  const letter = String.fromCharCode(65 + optIdx);
+                  const isSelected = userAnswers[question.question_number] === letter;
 
                   return (
                     <button
-                      key={idx}
+                      key={optIdx}
                       onClick={() => setUserAnswers(prev => ({ 
                         ...prev, 
-                        [currentQuestion.question_number]: letter 
+                        [question.question_number]: letter 
                       }))}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                      className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
                         isSelected
-                          ? 'border-blue-500 bg-blue-50 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/50'
+                          ? 'border-indigo-500 bg-indigo-50'
+                          : 'border-gray-200 hover:border-indigo-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-start gap-3">
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                           isSelected
-                            ? 'border-blue-500 bg-blue-500'
+                            ? 'border-indigo-500 bg-indigo-500 text-white'
                             : 'border-gray-300'
                         }`}>
-                          {isSelected && (
-                            <div className="w-3 h-3 bg-white rounded-full" />
-                          )}
+                          <span className="text-xs font-bold">{letter}</span>
                         </div>
-                        <span 
-                          className="text-base font-medium text-gray-900"
-                          dir="ltr"
-                          style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
-                        >
-                          {option}
-                        </span>
+                        <span className="text-sm text-gray-900" dir="ltr">{option}</span>
                       </div>
                     </button>
                   );
-                })
-              ) : (
-                <div className="text-center text-gray-500 py-8">
-                  <p>No options available</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
+                })}
+              </div>
+            </motion.div>
+          ))}
 
-          {/* Fixed bottom button */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-50">
-            <div className="max-w-4xl mx-auto">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
+            <div className="max-w-3xl mx-auto">
               <Button
-                onClick={handleNext}
-                disabled={!hasAnswered}
-                className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+                onClick={handleCheckAnswers}
+                disabled={!allAnswered || isLoading}
+                className="w-full h-14 text-lg font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50"
               >
-                {currentQuestionIndex < readingData.questions.length - 1 ? (
+                {isLoading ? (
                   <>
-                    שאלה הבאה
-                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    בודק תשובות...
                   </>
                 ) : (
                   <>
-                    סיים וראה תוצאות
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    Check Answers
+                    <CheckCircle className="w-5 h-5 mr-2" />
                   </>
                 )}
               </Button>

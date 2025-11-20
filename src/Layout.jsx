@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Home, BookOpen, FileCheck, User } from "lucide-react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 
 function LayoutContent({ children, currentPageName }) {
@@ -19,8 +18,7 @@ function LayoutContent({ children, currentPageName }) {
     'ExamModuleA', 
     'ExamModuleB', 
     'ExamModuleC',
-    'TopicPracticeNew',
-    'TakeExam'
+    'TopicPracticeNew'
   ].includes(currentPageName);
   
   useEffect(() => {
