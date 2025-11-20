@@ -604,9 +604,9 @@ export default function ExamModuleCPage() {
     setHasStarted(false);
   };
 
-  const handleStartExam = (mode, display) => { // Modified signature
+  const handleStartExam = (mode) => {
     setExamMode(mode);
-    setDisplayMode(display); // Set display mode explicitly
+    setDisplayMode('carousel'); // Always use carousel
     setShowIntroDialog(false);
     setShowModeSelectionDialog(false);
     setHasStarted(true);
