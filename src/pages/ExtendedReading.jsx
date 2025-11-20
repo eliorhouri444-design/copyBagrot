@@ -419,7 +419,7 @@ export default function ExtendedReadingPage() {
             className="flex-1 flex flex-col overflow-hidden"
           >
             {/* Question Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4 pb-32">
+            <div className="flex-1 overflow-y-auto p-4 pb-4">
               <div className="flex items-start gap-3 mb-4">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
@@ -487,27 +487,25 @@ export default function ExtendedReadingPage() {
               )}
             </div>
 
-            {/* Submit Button - Fixed at Bottom */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
-              <div className="max-w-4xl mx-auto">
-                <Button
-                  onClick={handleSubmitAnswer}
-                  disabled={!hasAnswered || isSubmitting}
-                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Checking...
-                    </>
-                  ) : (
-                    <>
-                      {currentQuestionIndex < currentSetQuestions.length - 1 ? 'Next Question' : 'Finish & See Results'}
-                      <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    </>
-                  )}
-                </Button>
-              </div>
+            {/* Submit Button - Fixed at Bottom of Question Area */}
+            <div className="border-t-2 border-gray-200 bg-white p-3 sm:p-4 flex-shrink-0">
+              <Button
+                onClick={handleSubmitAnswer}
+                disabled={!hasAnswered || isSubmitting}
+                className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    {currentQuestionIndex < currentSetQuestions.length - 1 ? 'Next Question' : 'Finish & See Results'}
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  </>
+                )}
+              </Button>
             </div>
           </motion.div>
         </div>
