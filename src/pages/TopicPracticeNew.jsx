@@ -455,61 +455,63 @@ export default function TopicPracticeNewPage() {
           const acceptableVariants = solution.acceptable_variants || [];
           explanation = solution.explanation || currentQuestion.explanation || "";
 
-          // Get correct answer as string (first acceptable answer or from question)
+          // Get correct answer as string - handle all formats
           if (correctAnswers.length > 0) {
             const firstAnswer = correctAnswers[0];
             correctAnswer = typeof firstAnswer === 'string' ? firstAnswer : (firstAnswer?.value || "");
           } else if (currentQuestion.acceptable_answers?.length > 0) {
-            correctAnswer = currentQuestion.acceptable_answers[0];
-          } else if (currentQuestion.answer) {
-            correctAnswer = currentQuestion.answer;
+            correctAnswer = String(currentQuestion.acceptable_answers[0]);
+          } else if (currentQuestion.correct_answer) {
+            correctAnswer = String(currentQuestion.correct_answer);
           }
 
           const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/[.,!?;]/g, '');
 
-          // Check against all acceptable answers with fuzzy matching
+          // Check against solution bank answers
           isCorrect = correctAnswers.some(ans => {
-            const answerValue = typeof ans === 'string' ? ans : ans.value;
-            const normalized = answerValue?.toLowerCase().replace(/[.,!?;]/g, '');
+            const answerValue = typeof ans === 'string' ? ans : (ans?.value || "");
+            if (!answerValue) return false;
+            const normalized = String(answerValue).toLowerCase().replace(/[.,!?;]/g, '');
             return normalized === normalizedUserAnswer || 
                    normalizedUserAnswer.includes(normalized) ||
                    normalized.includes(normalizedUserAnswer);
           }) || acceptableVariants.some(variant => {
-            const normalized = (typeof variant === 'string' ? variant : variant.value || '').toLowerCase().replace(/[.,!?;]/g, '');
+            const variantValue = typeof variant === 'string' ? variant : (variant?.value || "");
+            if (!variantValue) return false;
+            const normalized = String(variantValue).toLowerCase().replace(/[.,!?;]/g, '');
             return normalized === normalizedUserAnswer ||
                    normalizedUserAnswer.includes(normalized) ||
                    normalized.includes(normalizedUserAnswer);
           });
+        }
 
-          // Also check if question has acceptable_answers array
-          if (!isCorrect && currentQuestion.acceptable_answers?.length > 0) {
-            isCorrect = currentQuestion.acceptable_answers.some(ans => {
-              const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
-              return normalized === normalizedUserAnswer ||
+        // Also check question's acceptable_answers array
+        if (!isCorrect && currentQuestion.acceptable_answers?.length > 0) {
+          isCorrect = currentQuestion.acceptable_answers.some(ans => {
+            const normalized = String(ans).toLowerCase().replace(/[.,!?;]/g, '');
+            return normalized === normalizedUserAnswer ||
+                   normalizedUserAnswer.includes(normalized) ||
+                   normalized.includes(normalizedUserAnswer);
+          });
+          
+          if (!correctAnswer && currentQuestion.acceptable_answers.length > 0) {
+            correctAnswer = String(currentQuestion.acceptable_answers[0]);
+          }
+        }
+        
+        // Check question's correct_answer field
+        if (!isCorrect && currentQuestion.correct_answer) {
+          const normalized = String(currentQuestion.correct_answer).toLowerCase().replace(/[.,!?;]/g, '');
+          isCorrect = normalized === normalizedUserAnswer ||
                      normalizedUserAnswer.includes(normalized) ||
                      normalized.includes(normalizedUserAnswer);
-            });
-            
-            // If still no correctAnswer set, use from question
-            if (!correctAnswer && currentQuestion.acceptable_answers.length > 0) {
-              correctAnswer = String(currentQuestion.acceptable_answers[0]);
-            }
-          }
           
-          // Fallback to question.answer if no correct answer found
-          if (!correctAnswer && currentQuestion.answer) {
-            correctAnswer = String(currentQuestion.answer);
-            // Also check against it
-            if (!isCorrect) {
-              const normalized = String(currentQuestion.answer).toLowerCase().replace(/[.,!?;]/g, '');
-              isCorrect = normalized === normalizedUserAnswer ||
-                         normalizedUserAnswer.includes(normalized) ||
-                         normalized.includes(normalizedUserAnswer);
-            }
+          if (!correctAnswer) {
+            correctAnswer = String(currentQuestion.correct_answer);
           }
-
-          status = isCorrect ? "correct" : "incorrect";
         }
+
+        status = isCorrect ? "correct" : "incorrect";
 
         await base44.entities.AttemptNew.create({
           question_id: currentQuestion.question_id,
