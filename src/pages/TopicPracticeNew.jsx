@@ -1068,6 +1068,19 @@ export default function TopicPracticeNewPage() {
             />
           ) : (
             <>
+          {/* Separator after reading text */}
+          {readingText && currentQuestionIndex === 0 && (
+            <div className="mb-6">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-center shadow-md mb-6">
+                <div className="flex items-center justify-center gap-2 text-white">
+                  <BookOpen className="w-5 h-5" />
+                  <span className="text-base font-bold">Questions About The Reading Text</span>
+                </div>
+              </div>
+              <div className="border-b-4 border-blue-200 mb-6" />
+            </div>
+          )}
+
           <div className="flex items-start gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
