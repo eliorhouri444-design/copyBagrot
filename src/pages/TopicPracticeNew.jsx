@@ -46,6 +46,7 @@ export default function TopicPracticeNewPage() {
   const [showStoryDialog, setShowStoryDialog] = useState(false);
   const [listeningText, setListeningText] = useState("");
   const [showListeningIntro, setShowListeningIntro] = useState(false);
+  const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
 
   const [showCalculator, setShowCalculator] = useState(false);
   const [showDrawingBoard, setShowDrawingBoard] = useState(false);
@@ -869,7 +870,11 @@ export default function TopicPracticeNewPage() {
               <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע מספר פעמים</p>
             </div>
 
-            <ListeningPlayer audioText={listeningText} />
+            <ListeningPlayer 
+              audioText={listeningText} 
+              maxPlays={2}
+              onMaxPlaysReached={() => setCanProceedToQuestions(true)}
+            />
 
             <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
               <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
@@ -879,25 +884,32 @@ export default function TopicPracticeNewPage() {
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start gap-3 bg-indigo-50 rounded-lg p-3">
                   <span className="text-indigo-600 font-bold text-lg flex-shrink-0">1</span>
-                  <span className="font-medium">האזן לקטע השמיעה לפחות <strong>פעמיים</strong> לפני שתתחיל לענות</span>
+                  <span className="font-medium">האזן לקטע השמיעה - <strong>ניתן לשמוע עד פעמיים בלבד!</strong></span>
                 </li>
                 <li className="flex items-start gap-3 bg-purple-50 rounded-lg p-3">
                   <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
                   <span className="font-medium">לאחר מכן תענה על <strong>{currentSetQuestions.length} שאלות</strong> על הקטע</span>
                 </li>
-                <li className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
-                  <span className="text-blue-600 font-bold text-lg flex-shrink-0">3</span>
-                  <span className="font-medium">תוכל <strong>להאזין שוב</strong> בכל שלב תוך כדי השאלות</span>
+                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3">
+                  <span className="text-red-600 font-bold text-lg flex-shrink-0">⚠️</span>
+                  <span className="font-medium"><strong>שים לב:</strong> לאחר שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
                 </li>
               </ul>
             </div>
 
             <Button
               onClick={() => setShowListeningIntro(false)}
-              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg"
+              disabled={!canProceedToQuestions && playCount === 0}
+              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              ✓ התחל לענות על השאלות
-              <ChevronLeft className="w-5 h-5 mr-2" />
+              {canProceedToQuestions || playCount > 0 ? (
+                <>
+                  ✓ התחל לענות על השאלות
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                </>
+              ) : (
+                'האזן לקטע לפחות פעם אחת כדי להמשיך'
+              )}
             </Button>
           </motion.div>
         </div>
@@ -1047,12 +1059,7 @@ export default function TopicPracticeNewPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Listening player if listening topic - always visible during questions */}
-        {isListeningTopic && listeningText && (
-          <div className="mb-3 sticky top-0 z-10">
-            <ListeningPlayer audioText={listeningText} />
-          </div>
-        )}
+        {/* No listening player during questions - listening is only in intro screen */}
 
         {/* Main question area */}
         <motion.div
