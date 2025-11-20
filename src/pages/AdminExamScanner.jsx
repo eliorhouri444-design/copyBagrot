@@ -502,54 +502,27 @@ export default function AdminExamScannerPage() {
       setStatusMessage('מזהה איורים גאומטריים ומוסיף ויזואליזציות...');
 
       // 3. Process each question - detect geometry and add visualizations
-      const processedQuestions = await Promise.all(
-        questionsData.map(async (q, idx) => {
-          // בדיקת תקינות השאלה
-          if (!q || !q.question_text || typeof q.question_text !== 'string') {
-            console.warn(`Question ${idx} has invalid question_text`);
-            return q; // החזר את השאלה כמו שהיא
-          }
+      const processedQuestions = questionsData.map((q, idx) => {
+        // בדיקת תקינות השאלה
+        if (!q || !q.question_text || typeof q.question_text !== 'string') {
+          console.warn(`Question ${idx} has invalid question_text`);
+          return q; // החזר את השאלה כמו שהיא
+        }
 
-          // זיהוי אוטומטי של ויזואליזציות
-          const vizData = detectVisualizationFromText(q.question_text);
-          
-          if (vizData) {
-            Object.assign(q, vizData);
-          }
-          
-          // Set default points
-          if (!q.points) {
-            q.points = structure.pointsPerQuestion;
-          }
+        // זיהוי אוטומטי של ויזואליזציות
+        const vizData = detectVisualizationFromText(q.question_text);
+        
+        if (vizData) {
+          Object.assign(q, vizData);
+        }
+        
+        // Set default points
+        if (!q.points) {
+          q.points = structure.pointsPerQuestion;
+        }
 
-          // Generate solution steps using AI
-          try {
-            const solutionPrompt = `
-שאלה: ${q.question_text}
-תשובה נכונה: ${q.correct_answer || 'לא זמין'}
-
-תן את שלבי הפתרון המפורטים בעברית (3-5 שלבים):
-`;
-
-            const solutionResponse = await base44.integrations.Core.InvokeLLM({
-              prompt: solutionPrompt,
-              response_json_schema: {
-                type: "object",
-                properties: {
-                  steps: { type: "array", items: { type: "string" } }
-                }
-              }
-            });
-
-            q.solution_steps = solutionResponse.steps || [];
-          } catch (err) {
-            console.log("Could not generate solution steps for question " + (idx + 1));
-            q.solution_steps = [];
-          }
-
-          return q;
-        })
-      );
+        return q;
+      });
 
       setProgress(90);
       setStatusMessage('שומר מבחן...');
