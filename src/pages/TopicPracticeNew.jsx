@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -1283,26 +1282,24 @@ export default function TopicPracticeNewPage() {
             </>
           )}
           </div>
-
-          </div>
         </motion.div>
-
-        {/* Fixed bottom button */}
-        {currentQuestion.question_type !== "writing" && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 pb-6">
-            <div className="max-w-2xl mx-auto">
-              <Button
-                onClick={handleSubmitAnswer}
-                disabled={!hasAnswered || isSubmitting}
-                className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
-              >
-                {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Fixed bottom button */}
+      {currentQuestion.question_type !== "writing" && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 pb-6">
+          <div className="max-w-2xl mx-auto">
+            <Button
+              onClick={handleSubmitAnswer}
+              disabled={!hasAnswered || isSubmitting}
+              className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+            >
+              {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
+              <ChevronLeft className="w-5 h-5 mr-2" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {showCalculator && (
         <MathCalculator onClose={() => setShowCalculator(false)} />
