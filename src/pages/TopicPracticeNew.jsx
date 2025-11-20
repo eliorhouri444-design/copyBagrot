@@ -492,6 +492,7 @@ export default function TopicPracticeNewPage() {
       }
 
       // מעבר ישיר לשאלה הבאה או לסיכום
+      setIsSubmitting(false);
       if (currentQuestionIndex < currentSetQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
