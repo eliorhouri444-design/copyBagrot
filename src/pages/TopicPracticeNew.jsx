@@ -66,8 +66,10 @@ export default function TopicPracticeNewPage() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error loading user:", error);
+        setIsLoading(false);
       }
     };
     loadUser();
