@@ -82,6 +82,20 @@ export default function TakeExamPage() {
     return () => clearInterval(timer);
   }, [examStarted, timeLeft, showResults]);
 
+  const getQuestions = () => {
+    if (!exam) return [];
+
+    if (module === "A") {
+      return [...(exam.reading_questions || []), ...(exam.listening_questions || [])];
+    } else if (module === "B") {
+      return exam.grammar_questions || [];
+    } else if (module === "C") {
+      return exam.questions || [];
+    } else {
+      return exam.questions || [];
+    }
+  };
+
   const handleStartExam = () => {
     setExamStarted(true);
     if (exam?.reading_text) {
@@ -316,20 +330,6 @@ export default function TakeExamPage() {
       </div>
     );
   }
-
-  const getQuestions = () => {
-    if (!exam) return [];
-
-    if (module === "A") {
-      return [...(exam.reading_questions || []), ...(exam.listening_questions || [])];
-    } else if (module === "B") {
-      return exam.grammar_questions || [];
-    } else if (module === "C") {
-      return exam.questions || [];
-    } else {
-      return exam.questions || [];
-    }
-  };
 
   const questions = getQuestions();
   const currentQuestion = questions[currentQuestionIndex];
