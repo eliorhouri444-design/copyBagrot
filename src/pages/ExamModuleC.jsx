@@ -98,13 +98,9 @@ export default function ExamModuleCPage() {
           setSavedProgress(savedAttempts[0]);
           setShowResumeDialog(true);
         } else {
-          if (user?.skip_exam_intro) {
-            setShowModeSelectionDialog(true);
-            setShowIntroDialog(false);
-          } else {
-            setShowIntroDialog(true);
-            setShowModeSelectionDialog(false);
-          }
+          // Always show intro, no mode selection needed
+          setShowIntroDialog(true);
+          setShowModeSelectionDialog(false);
           setHasStarted(false);
         }
       }
