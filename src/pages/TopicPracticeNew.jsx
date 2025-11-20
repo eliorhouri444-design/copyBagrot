@@ -836,8 +836,8 @@ export default function TopicPracticeNewPage() {
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -849,8 +849,8 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
-              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+              <h1 className="text-lg sm:text-xl font-bold">🎧 {topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • Listening Practice</p>
             </div>
 
             <div className="w-9" />
@@ -863,31 +863,40 @@ export default function TopicPracticeNewPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
+              <div className="text-5xl mb-3">🎧</div>
+              <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
+              <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע מספר פעמים</p>
+            </div>
+
             <ListeningPlayer audioText={listeningText} />
 
-            <div className="bg-white rounded-2xl shadow-lg p-5">
-              <h3 className="font-bold text-gray-900 text-lg mb-3">הוראות:</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">1.</span>
-                  <span>האזן לקטע השמיעה בעיון (מומלץ לפחות פעמיים)</span>
+            <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
+              <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
+                <span className="text-2xl">📝</span>
+                הוראות חשובות:
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3 bg-indigo-50 rounded-lg p-3">
+                  <span className="text-indigo-600 font-bold text-lg flex-shrink-0">1</span>
+                  <span className="font-medium">האזן לקטע השמיעה לפחות <strong>פעמיים</strong> לפני שתתחיל לענות</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">2.</span>
-                  <span>לאחר מכן תענה על {currentSetQuestions.length} שאלות</span>
+                <li className="flex items-start gap-3 bg-purple-50 rounded-lg p-3">
+                  <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
+                  <span className="font-medium">לאחר מכן תענה על <strong>{currentSetQuestions.length} שאלות</strong> על הקטע</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">3.</span>
-                  <span>תוכל להאזין שוב בכל שלב תוך כדי השאלות</span>
+                <li className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
+                  <span className="text-blue-600 font-bold text-lg flex-shrink-0">3</span>
+                  <span className="font-medium">תוכל <strong>להאזין שוב</strong> בכל שלב תוך כדי השאלות</span>
                 </li>
               </ul>
             </div>
 
             <Button
               onClick={() => setShowListeningIntro(false)}
-              className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
+              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg"
             >
-              התחל לענות על השאלות
+              ✓ התחל לענות על השאלות
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
           </motion.div>
@@ -1038,9 +1047,9 @@ export default function TopicPracticeNewPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Listening player if listening topic */}
+        {/* Listening player if listening topic - always visible during questions */}
         {isListeningTopic && listeningText && (
-          <div className="mb-3">
+          <div className="mb-3 sticky top-0 z-10">
             <ListeningPlayer audioText={listeningText} />
           </div>
         )}
