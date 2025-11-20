@@ -488,15 +488,15 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
               </div>
             </div>
 
-            <div className="space-y-3 mb-6">
-              {currentQuestion.options && currentQuestion.options.length > 0 ? (
-                currentQuestion.options.map((option, optIdx) => {
-                  const letter = String.fromCharCode(65 + optIdx);
+            <div className="mb-6">
+              <div className="space-y-3">
+                {currentQuestion.options.map((option, idx) => {
+                  const letter = String.fromCharCode(65 + idx);
                   const isSelected = userAnswers[currentQuestion.question_number] === letter;
 
                   return (
                     <button
-                      key={optIdx}
+                      key={idx}
                       onClick={() => setUserAnswers(prev => ({ 
                         ...prev, 
                         [currentQuestion.question_number]: letter 
@@ -527,12 +527,8 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
                       </div>
                     </button>
                   );
-                })
-              ) : (
-                <div className="text-center text-gray-500 py-4">
-                  No options available for this question
-                </div>
-              )}
+                })}
+              </div>
             </div>
 
             <Button
