@@ -992,7 +992,7 @@ export default function TopicPracticeNewPage() {
             <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && (
+          {readingText && !isListeningTopic && (
             <Button
               variant="ghost"
               size="icon"
