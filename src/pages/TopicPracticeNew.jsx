@@ -790,11 +790,13 @@ export default function TopicPracticeNewPage() {
                           <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                              <div className="text-sm font-semibold text-red-700">{result?.userAnswer || "לא נענה"}</div>
+                              <div className="text-sm font-semibold text-red-700" dir="ltr">
+                                {typeof result?.userAnswer === 'object' ? JSON.stringify(result?.userAnswer) : (result?.userAnswer || "לא נענה")}
+                              </div>
                             </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                              <div className="text-sm font-semibold text-green-700">{result?.correctAnswer}</div>
+                              <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
                             </div>
                           </div>
                         )}
