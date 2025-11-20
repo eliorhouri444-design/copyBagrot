@@ -61,6 +61,10 @@ Deno.serve(async (req) => {
     console.log(`🎯 Selected structure: ${examStructure.structure_name || examStructure.title}`);
 
     // יצירת מבחן חדש בהתבסס על המבנה
+    const questionStructure = examStructure.question_structure || examStructure.questions || [];
+    const durationMinutes = examStructure.duration_minutes || examStructure.duration || 90;
+    const totalPoints = examStructure.total_points || 100;
+    
     const generationPrompt = `
 אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
@@ -68,11 +72,11 @@ Deno.serve(async (req) => {
 - מקצוע: ${examStructure.subject}
 - רמה: ${examStructure.unit_level} יחידות
 - שאלון: ${examStructure.module_id}
-- משך: ${examStructure.duration_minutes} דקות
-- נקודות: ${examStructure.total_points}
+- משך: ${durationMinutes} דקות
+- נקודות: ${totalPoints}
 
 📝 **מבנה המבחן:**
-${JSON.stringify(examStructure.question_structure, null, 2)}
+${JSON.stringify(questionStructure, null, 2)}
 
 🎯 **דרישות:**
 
