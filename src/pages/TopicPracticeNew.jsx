@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -1167,7 +1166,7 @@ export default function TopicPracticeNewPage() {
                 )}
 
                 <Button
-                  onClick={handleSubmitAnswer}
+                  onClick={() => handleSubmitAnswer()}
                   disabled={!hasAnswered || isSubmitting}
                   className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
                 >
