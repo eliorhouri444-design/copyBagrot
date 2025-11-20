@@ -33,6 +33,7 @@ export default function ExamsPage() {
   const [fontSize, setFontSize] = useState("normal");
   const [highContrast, setHighContrast] = useState(false);
   const [showModuleEditDialog, setShowModuleEditDialog] = useState(false);
+  const [showAddModuleDialog, setShowAddModuleDialog] = useState(false);
   const [editingModuleData, setEditingModuleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -306,6 +307,55 @@ export default function ExamsPage() {
     } catch (error) {
       console.error('Error deleting module:', error);
       alert('שגיאה במחיקת המודול: ' + error.message);
+    }
+  };
+
+  const handleAddNewModule = () => {
+    setEditingModuleData({
+      module_id: '',
+      title: '',
+      description: '',
+      details: '',
+      parts: '',
+      duration: 90,
+      points: '100',
+      color: 'from-blue-500 to-indigo-600',
+      entity: 'GenericExam',
+      order: 999
+    });
+    setShowAddModuleDialog(true);
+  };
+
+  const handleSaveNewModule = async () => {
+    if (!editingModuleData || !editingModuleData.module_id || !editingModuleData.title) {
+      alert('חובה למלא מזהה שאלון וכותרת');
+      return;
+    }
+
+    try {
+      const moduleData = {
+        module_id: editingModuleData.module_id,
+        subject: displaySubject,
+        unit_level: displayUnits,
+        title: editingModuleData.title,
+        description: editingModuleData.description || '',
+        details: editingModuleData.details || '',
+        duration: parseInt(editingModuleData.duration) || 90,
+        points: editingModuleData.points || '100',
+        color: editingModuleData.color || 'from-blue-500 to-indigo-600',
+        parts: editingModuleData.parts ? editingModuleData.parts.split(',').map(p => p.trim()).filter(Boolean) : [],
+        entity: editingModuleData.entity || 'GenericExam',
+        order: parseInt(editingModuleData.order) || 999
+      };
+
+      await base44.entities.ModuleDefinition.create(moduleData);
+      alert('השאלון נוסף בהצלחה! ✅');
+      setShowAddModuleDialog(false);
+      setEditingModuleData(null);
+      queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
+    } catch (error) {
+      console.error('Error adding module:', error);
+      alert('שגיאה בהוספת השאלון: ' + error.message);
     }
   };
 
@@ -941,6 +991,22 @@ export default function ExamsPage() {
             transition={{ delay: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
           >
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-2 border-green-200 shadow-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-gray-900 mb-1">הוסף שאלון</h3>
+                  <p className="text-xs text-gray-600">צור שאלון חדש</p>
+                </div>
+                <Button
+                  onClick={handleAddNewModule}
+                  className="bg-green-600 hover:bg-green-700 text-white h-9 text-sm"
+                >
+                  <span>הוסף</span>
+                  <BookCheck className="w-4 h-4 mr-2" />
+                </Button>
+              </div>
+            </div>
+
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
@@ -966,22 +1032,6 @@ export default function ExamsPage() {
                 <Button
                   onClick={() => setShowModuleOrderDialog(true)}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm"
-                >
-                  <span>ערוך</span>
-                  <Settings className="w-4 h-4 mr-2" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl p-4 border-2 border-teal-200 shadow-md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-1">עורך עיצוב</h3>
-                  <p className="text-xs text-gray-600">שנה את עיצוב המערכת</p>
-                </div>
-                <Button
-                  onClick={() => navigate(createPageUrl("AdminDesign"))}
-                  className="bg-teal-600 hover:bg-teal-700 text-white h-9 text-sm"
                 >
                   <span>ערוך</span>
                   <Settings className="w-4 h-4 mr-2" />
@@ -1428,6 +1478,188 @@ export default function ExamsPage() {
             </Button>
             <Button onClick={handleSaveModuleOrder} className="bg-blue-600 hover:bg-blue-700">
               שמור סדר
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showAddModuleDialog} onOpenChange={setShowAddModuleDialog}>
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <BookCheck className="w-6 h-6 text-green-600" />
+              הוסף שאלון חדש
+            </DialogTitle>
+            <DialogDescription>
+              הוסף שאלון חדש עבור {displaySubject} - {displayUnits} יחידות
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingModuleData && (
+            <div className="space-y-4 py-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  מזהה שאלון (Module ID) *
+                </label>
+                <Input
+                  type="text"
+                  value={editingModuleData.module_id}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, module_id: e.target.value})}
+                  className="w-full"
+                  placeholder="לדוגמה: D, E, F או 807"
+                />
+                <p className="text-xs text-gray-500 mt-1">מזהה ייחודי באותיות או מספרים</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  כותרת השאלון *
+                </label>
+                <Input
+                  type="text"
+                  value={editingModuleData.title}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, title: e.target.value})}
+                  className="w-full"
+                  placeholder="לדוגמה: מודול D או שאלון 807"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  תיאור קצר
+                </label>
+                <Input
+                  type="text"
+                  value={editingModuleData.description}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, description: e.target.value})}
+                  className="w-full"
+                  placeholder="לדוגמה: כתיבה מתקדמת"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  פרטים מלאים
+                </label>
+                <Textarea
+                  value={editingModuleData.details}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, details: e.target.value})}
+                  className="w-full h-20"
+                  placeholder="פירוט מלא של מבנה השאלון"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    משך זמן (דקות)
+                  </label>
+                  <Input
+                    type="number"
+                    value={editingModuleData.duration}
+                    onChange={(e) => setEditingModuleData({...editingModuleData, duration: parseInt(e.target.value)})}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    נקודות
+                  </label>
+                  <Input
+                    type="text"
+                    value={editingModuleData.points}
+                    onChange={(e) => setEditingModuleData({...editingModuleData, points: e.target.value})}
+                    className="w-full"
+                    placeholder="100 או 70 + 30"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  חלקי השאלון (מופרדים בפסיקים)
+                </label>
+                <Input
+                  type="text"
+                  value={editingModuleData.parts}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, parts: e.target.value})}
+                  className="w-full"
+                  placeholder="לדוגמה: Reading, Writing"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Entity (סוג מבחן)
+                </label>
+                <Select
+                  value={editingModuleData.entity}
+                  onValueChange={(value) => setEditingModuleData({...editingModuleData, entity: value})}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="בחר entity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GenericExam">GenericExam (כללי)</SelectItem>
+                    <SelectItem value="ModuleAExam">ModuleAExam</SelectItem>
+                    <SelectItem value="ModuleBExam">ModuleBExam</SelectItem>
+                    <SelectItem value="ModuleCExam">ModuleCExam</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  צבע רקע (Tailwind Gradient)
+                </label>
+                <Select
+                  value={editingModuleData.color}
+                  onValueChange={(value) => setEditingModuleData({...editingModuleData, color: value})}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="בחר צבע" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="from-blue-500 to-indigo-600">כחול-אינדיגו</SelectItem>
+                    <SelectItem value="from-purple-500 to-pink-600">סגול-ורוד</SelectItem>
+                    <SelectItem value="from-green-500 to-emerald-600">ירוק-אמרלד</SelectItem>
+                    <SelectItem value="from-orange-500 to-red-600">כתום-אדום</SelectItem>
+                    <SelectItem value="from-cyan-500 to-blue-600">ציאן-כחול</SelectItem>
+                    <SelectItem value="from-amber-500 to-yellow-600">ענבר-צהוב</SelectItem>
+                    <SelectItem value="from-rose-500 to-rose-600">ורוד</SelectItem>
+                    <SelectItem value="from-teal-500 to-teal-600">טורקיז</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  סדר תצוגה
+                </label>
+                <Input
+                  type="number"
+                  value={editingModuleData.order}
+                  onChange={(e) => setEditingModuleData({...editingModuleData, order: parseInt(e.target.value)})}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                <div className="text-sm text-gray-700">
+                  <strong>💡 טיפ:</strong> לאחר שתוסיף שאלון חדש, תוכל להוסיף אליו מבחנים דרך "ניהול מבחנים"
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddModuleDialog(false)}>
+              ביטול
+            </Button>
+            <Button onClick={handleSaveNewModule} className="bg-green-600 hover:bg-green-700">
+              <BookCheck className="w-4 h-4 mr-2" />
+              הוסף שאלון
             </Button>
           </DialogFooter>
         </DialogContent>
