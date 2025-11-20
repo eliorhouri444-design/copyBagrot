@@ -323,9 +323,9 @@ export default function TakeExamPage() {
   // Show reading text first if exists
   if (showReadingFirst && readingTextInExam) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl mb-4">
-          <div className="flex items-center justify-between text-white mb-2">
+      <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl">
+          <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
               size="icon"
@@ -334,51 +334,52 @@ export default function TakeExamPage() {
             >
               <ChevronRight className="w-5 h-5" />
             </Button>
-            <h1 className="text-xl font-bold">טקסט הקריאה</h1>
+            <h1 className="text-lg font-bold">טקסט הקריאה</h1>
             <div className="w-9" />
           </div>
         </div>
 
-        <div className="px-4 max-w-2xl mx-auto pb-24">
-          <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 mb-5">
-              <h3 className="font-bold text-blue-900 mb-2 text-lg">📖 קרא בעיון!</h3>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                קרא את הטקסט הבא בעיון. לאחר מכן תענה על {questionsInExam.length} שאלות על הטקסט.
-                <br />תוכל לחזור לטקסט בכל שלב באמצעות כפתור 📖 בראש המסך.
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto">
+            <div className="bg-blue-50 p-3 border-b-2 border-blue-200">
+              <h3 className="font-bold text-blue-900 text-base">📖 קרא בעיון!</h3>
+              <p className="text-xs text-gray-700 leading-relaxed mt-1">
+                קרא את הטקסט הבא בעיון. לאחר מכן תענה על {questionsInExam.length} שאלות.
               </p>
             </div>
 
-            <div
-              className="text-base leading-relaxed text-gray-900 whitespace-pre-wrap bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-5 border border-gray-200"
-              dir="ltr"
-              style={{ fontFamily: "'Segoe UI', -apple-system, sans-serif" }}
-            >
-              {readingTextInExam}
+            <div className="p-4">
+              <div
+                className="text-sm leading-relaxed text-gray-900 whitespace-pre-wrap bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg p-3 border border-gray-200"
+                dir="ltr"
+                style={{ fontFamily: "'Segoe UI', -apple-system, sans-serif" }}
+              >
+                {readingTextInExam}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 shadow-2xl z-50">
-            <div className="max-w-2xl mx-auto">
-              <Button
-                onClick={() => setShowReadingFirst(false)}
-                className="w-full h-14 bg-green-600 hover:bg-green-700 text-lg font-bold"
-              >
-                סיימתי לקרוא - המשך לשאלות
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </Button>
-            </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 pb-6 shadow-2xl">
+          <div className="max-w-2xl mx-auto">
+            <Button
+              onClick={() => setShowReadingFirst(false)}
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl"
+            >
+              סיימתי לקרוא - המשך לשאלות
+              <ChevronLeft className="w-5 h-5 mr-2" />
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const minutes = timeLeft ? Math.floor(timeLeft / 60) : 0;
+  const seconds = timeLeft ? timeLeft % 60 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pb-20">
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl mb-4">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
@@ -394,14 +395,16 @@ export default function TakeExamPage() {
             <ChevronRight className="w-5 h-5" />
           </Button>
 
-          <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-            <Clock className="w-5 h-5" />
-            <span className="font-bold text-lg">
-              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-            </span>
-          </div>
+          {timeLeft && (
+            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+              <Clock className="w-5 h-5" />
+              <span className="font-bold text-lg">
+                {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+              </span>
+            </div>
+          )}
 
-          {readingText && (
+          {readingTextInExam && (
             <Button
               variant="ghost"
               size="icon"
