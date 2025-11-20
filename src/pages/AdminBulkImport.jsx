@@ -406,8 +406,19 @@ What happened after a few weeks? | Students felt more energetic
             📖 סיפור/טקסט קריאה (אופציונלי)
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            עבור vocabulary & grammar ב-4/5 יחידות - הדבק כאן את הסיפור שכל השאלות מבוססות עליו
+            אם כל השאלות מבוססות על אותו טקסט - הדבק כאן. אם לא, השתמש ב-Story: בתוך הטקסט
           </p>
+          
+          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 mb-4">
+            <div className="text-sm text-gray-700">
+              <strong>💡 טיפים לייבוא:</strong>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>תשובות מרובות: <code className="bg-white px-2 py-1 rounded">Question | answer1; answer2; answer3</code></li>
+                <li>עם Story: <code className="bg-white px-2 py-1 rounded">Story: text...\nQ: question | answer</code></li>
+                <li>המערכת תבדוק fuzzy match (לא exact)</li>
+              </ul>
+            </div>
+          </div>
 
           <Textarea
             value={readingStory}
