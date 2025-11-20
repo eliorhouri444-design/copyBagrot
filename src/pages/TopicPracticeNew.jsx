@@ -47,6 +47,7 @@ export default function TopicPracticeNewPage() {
   const [listeningText, setListeningText] = useState("");
   const [showListeningIntro, setShowListeningIntro] = useState(false);
   const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
+  const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
 
   const [showCalculator, setShowCalculator] = useState(false);
   const [showDrawingBoard, setShowDrawingBoard] = useState(false);
