@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter
 } from "@/components/ui/dialog";
+import AdManager from "../components/ads/AdManager";
 
 const QUESTIONS_PER_SET = 10;
 
@@ -37,6 +38,8 @@ export default function ExtendedReadingPage() {
   const [readingText, setReadingText] = useState("");
   const [showReadingText, setShowReadingText] = useState(true);
   const [showStoryDialog, setShowStoryDialog] = useState(false);
+  const [showAdDialog, setShowAdDialog] = useState(false);
+  const [showAdConfirmDialog, setShowAdConfirmDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -206,6 +209,46 @@ export default function ExtendedReadingPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleContinueToNextSet = () => {
+    const nextSet = setNumber + 1;
+    const nextSetStartIndex = (nextSet - 1) * QUESTIONS_PER_SET;
+    
+    if (nextSetStartIndex >= allQuestions.length) {
+      finishPractice();
+      return;
+    }
+
+    const isPremium = user?.is_premium;
+    
+    if (isPremium) {
+      // Premium users go directly to next set
+      setShowSummary(false);
+      setAnswers({});
+      setResults({});
+      setCurrentQuestionIndex(0);
+      setShowReadingText(true);
+      navigate(createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
+    } else {
+      // Free users see ad confirmation
+      setShowAdConfirmDialog(true);
+    }
+  };
+
+  const handleConfirmWatchAd = () => {
+    setShowAdConfirmDialog(false);
+    setShowAdDialog(true);
+  };
+
+  const handleAdComplete = () => {
+    setShowAdDialog(false);
+    const nextSet = setNumber + 1;
+    setAnswers({});
+    setResults({});
+    setCurrentQuestionIndex(0);
+    setShowReadingText(true);
+    navigate(createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
   };
 
   const finishPractice = async () => {
