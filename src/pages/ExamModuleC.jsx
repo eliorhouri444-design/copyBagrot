@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -43,7 +43,7 @@ export default function ExamModuleCPage() {
   const [showResumeDialog, setShowResumeDialog] = useState(false);
 
   const [examMode, setExamMode] = useState('exam');
-  const [displayMode, setDisplayMode] = useState('normal'); // Changed from 'exam' to 'normal'
+  const [displayMode, setDisplayMode] = useState('carousel'); // Default to carousel mode
   const [showModeSelectionDialog, setShowModeSelectionDialog] = useState(false);
   
   const [isEditMode, setIsEditMode] = useState(false);
