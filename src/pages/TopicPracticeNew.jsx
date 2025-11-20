@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -1065,8 +1066,8 @@ export default function TopicPracticeNewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-5 shadow-xl mb-4">
+    <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
+      <div className="bg-blue-600 rounded-b-[2rem] p-4 shadow-xl">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
@@ -1078,8 +1079,8 @@ export default function TopicPracticeNewPage() {
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
-            <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions?.length || 0}</p>
+            <h1 className="text-base font-bold">{topicName}</h1>
+            <p className="text-xs opacity-90">שאלה {currentQuestionIndex + 1}/{currentSetQuestions?.length || 0} • סט {setNumber}</p>
           </div>
 
           {readingText && (
@@ -1104,7 +1105,7 @@ export default function TopicPracticeNewPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
+      <div className="flex-1 overflow-y-auto px-4 pb-24">
         {/* Story panel on the right (if exists) */}
         <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
           <DialogContent dir="rtl" className="sm:max-w-screen-md max-h-[90vh] overflow-y-auto">
@@ -1147,9 +1148,9 @@ export default function TopicPracticeNewPage() {
           key={currentQuestion.question_id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
+          className="bg-white rounded-xl shadow-xl max-w-2xl mx-auto w-full"
         >
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-24">
+          <div className="p-4">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
@@ -1283,22 +1284,24 @@ export default function TopicPracticeNewPage() {
           )}
           </div>
 
-          {/* Fixed bottom button */}
-          {currentQuestion.question_type !== "writing" && (
-            <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4">
-              <div className="max-w-md mx-auto">
-                <Button
-                  onClick={handleSubmitAnswer}
-                  disabled={!hasAnswered || isSubmitting}
-                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
-                >
-                  {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                </Button>
-              </div>
-            </div>
-          )}
+          </div>
         </motion.div>
+
+        {/* Fixed bottom button */}
+        {currentQuestion.question_type !== "writing" && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 pb-6">
+            <div className="max-w-2xl mx-auto">
+              <Button
+                onClick={handleSubmitAnswer}
+                disabled={!hasAnswered || isSubmitting}
+                className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+              >
+                {currentQuestionIndex < (currentSetQuestions?.length || 0) - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
+                <ChevronLeft className="w-5 h-5 mr-2" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {showCalculator && (
