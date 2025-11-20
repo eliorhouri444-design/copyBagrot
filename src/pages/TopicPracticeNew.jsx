@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -109,13 +110,6 @@ export default function TopicPracticeNewPage() {
       // Check if this is a writing topic
       const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
-
-      // This check is redundant - already handled above
-      // if (!questionsForTopic || questionsForTopic.length === 0) {
-      //   setLoadError("לא נמצאו שאלות לנושא זה");
-      //   setIsLoading(false);
-      //   return;
-      // }
 
       setAllQuestions(questionsForTopic);
 
@@ -1007,20 +1001,20 @@ export default function TopicPracticeNewPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
-      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
-        <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-5 shadow-xl mb-4">
+        <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
+            className="text-white hover:bg-white/20 h-9 w-9"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronRight className="w-5 h-5" />
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-base sm:text-xl font-bold">{topicName}</h1>
+            <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
             <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions?.length || 0}</p>
           </div>
 
@@ -1029,14 +1023,14 @@ export default function TopicPracticeNewPage() {
               variant="ghost"
               size="icon"
               onClick={() => setShowStoryDialog(true)}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 h-9 w-9"
             >
               <BookOpen className="w-5 h-5" />
             </Button>
           )}
         </div>
 
-        <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
+        <div className="bg-white/20 rounded-full h-2 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -1044,9 +1038,9 @@ export default function TopicPracticeNewPage() {
             className="h-full bg-white"
           />
         </div>
-        </div>
+      </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden p-2 sm:p-3">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
         {/* Story panel on the right (if exists) */}
         <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
           <DialogContent dir="rtl" className="sm:max-w-screen-md max-h-[90vh] overflow-y-auto">
@@ -1203,30 +1197,6 @@ export default function TopicPracticeNewPage() {
           questionText={currentQuestion.question_text}
         />
       )}
-
-      {/* Story Dialog */}
-      <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
-        <DialogContent dir="ltr" className="sm:max-w-2xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl font-bold" dir="rtl">📖 הסיפור</DialogTitle>
-          </DialogHeader>
-          <div className="overflow-y-auto max-h-[60vh] p-4">
-            <div 
-              className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
-              style={{ 
-                fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
-              }}
-            >
-              {readingText}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
-              סגור
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Rest of the dialogs remain the same */}
       <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
