@@ -469,28 +469,28 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
             key={currentQuestion.question_number}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-xl p-5 sm:p-6"
+            className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 pb-24"
           >
             <div className="mb-6">
               <div className="flex items-start gap-3 mb-1">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-white text-lg">{currentQuestion.question_number}</span>
+                  <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
                 </div>
                 <div className="bg-blue-100 px-3 py-1 rounded-full">
-                  <span className="text-sm font-bold text-blue-600">{currentQuestion.points || 2} נק'</span>
+                  <span className="text-sm font-bold text-blue-600">{currentQuestion.points || 10} נק'</span>
                 </div>
               </div>
 
               <div className="mt-4">
-                <p className="text-lg sm:text-xl text-gray-900 leading-relaxed" dir="ltr" style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <p className="text-lg sm:text-xl text-gray-900 leading-relaxed whitespace-pre-wrap" dir="ltr" style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
                   {currentQuestion.question_text}
                 </p>
               </div>
             </div>
 
-            <div className="mb-6">
-              <div className="space-y-3">
-                {currentQuestion.options.map((option, idx) => {
+            <div className="space-y-3">
+              {currentQuestion.options && currentQuestion.options.length > 0 ? (
+                currentQuestion.options.map((option, idx) => {
                   const letter = String.fromCharCode(65 + idx);
                   const isSelected = userAnswers[currentQuestion.question_number] === letter;
 
@@ -527,28 +527,37 @@ IMPORTANT: Questions MUST follow the paragraph order!`,
                       </div>
                     </button>
                   );
-                })}
-              </div>
-            </div>
-
-            <Button
-              onClick={handleNext}
-              disabled={!hasAnswered}
-              className="w-full h-14 text-base font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg"
-            >
-              {currentQuestionIndex < readingData.questions.length - 1 ? (
-                <>
-                  שאלה הבאה
-                  <ChevronLeft className="w-5 h-5 mr-2" />
-                </>
+                })
               ) : (
-                <>
-                  סיים וראה תוצאות
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                </>
+                <div className="text-center text-gray-500 py-8">
+                  <p>No options available</p>
+                </div>
               )}
-            </Button>
+            </div>
           </motion.div>
+
+          {/* Fixed bottom button */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-50">
+            <div className="max-w-4xl mx-auto">
+              <Button
+                onClick={handleNext}
+                disabled={!hasAnswered}
+                className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+              >
+                {currentQuestionIndex < readingData.questions.length - 1 ? (
+                  <>
+                    שאלה הבאה
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  </>
+                ) : (
+                  <>
+                    סיים וראה תוצאות
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
