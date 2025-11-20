@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -563,9 +562,15 @@ export default function AdminExamScannerPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="מתמטיקה">מתמטיקה</SelectItem>
-                  <SelectItem value="פיזיקה">פיזיקה</SelectItem>
                   <SelectItem value="אנגלית">אנגלית</SelectItem>
+                  <SelectItem value="פיזיקה">פיזיקה</SelectItem>
+                  <SelectItem value="כימיה">כימיה</SelectItem>
+                  <SelectItem value="ביולוגיה">ביולוגיה</SelectItem>
+                  <SelectItem value="היסטוריה">היסטוריה</SelectItem>
                   <SelectItem value="ספרות">ספרות</SelectItem>
+                  <SelectItem value="גאוגרפיה">גאוגרפיה</SelectItem>
+                  <SelectItem value="אזרחות">אזרחות</SelectItem>
+                  <SelectItem value='תנ"ך'>תנ"ך</SelectItem>
                 </SelectContent>
               </Select>
             </div>
