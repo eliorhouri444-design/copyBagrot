@@ -1,0 +1,89 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+export default function RatingDialog({ open, onOpenChange, onSubmitRating }) {
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+
+  const handleSubmit = () => {
+    onSubmitRating(rating);
+    setRating(0);
+    setHoveredRating(0);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent dir="rtl" className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex justify-center mb-4">
+            <div className="p-4 bg-amber-100 rounded-full">
+              <Star className="w-12 h-12 text-amber-600" />
+            </div>
+          </div>
+          <DialogTitle className="text-center text-2xl">
+            דרג את Bagrut Plus
+          </DialogTitle>
+          <DialogDescription className="text-center text-base pt-2">
+            האם אתה נהנה מהאפליקציה שלנו?<br />
+            דירוג של 5 כוכבים יעניק לך שבוע חופשי מפרסומות!
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex justify-center gap-2 py-6">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <motion.button
+              key={star}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoveredRating(star)}
+              onMouseLeave={() => setHoveredRating(0)}
+              className="focus:outline-none"
+            >
+              <Star
+                className={`w-12 h-12 transition-colors ${
+                  star <= (hoveredRating || rating)
+                    ? 'fill-amber-500 text-amber-500'
+                    : 'text-gray-300'
+                }`}
+              />
+            </motion.button>
+          ))}
+        </div>
+        
+        <p className="text-center text-sm text-gray-600 mb-4">
+          {rating === 5 ? "מושלם! 🎉 תקבל שבוע חופשי מפרסומות" : 
+           rating > 0 ? "הבונוס ניתן רק לדירוג 5 כוכבים ⭐" : 
+           "בחר את דירוגך"}
+        </p>
+        
+        <DialogFooter className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="flex-1"
+          >
+            ביטול
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={rating === 0}
+            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+          >
+            שלח דירוג
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
