@@ -1126,6 +1126,11 @@ export default function TopicPracticeNewPage() {
                   <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
                 </div>
                 <div className="flex-1">
+                  {currentQuestion.hebrew_hint && (
+                    <div className="text-sm text-blue-600 font-semibold mb-2">
+                      💡 {currentQuestion.hebrew_hint}
+                    </div>
+                  )}
                   <p
                     className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
                     dir={typeof currentQuestion.question_text === 'string' && currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
