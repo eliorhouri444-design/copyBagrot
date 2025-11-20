@@ -670,13 +670,13 @@ export default function AdminExamScannerPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="מתמטיקה">מתמטיקה</SelectItem>
                   <SelectItem value="אנגלית">אנגלית</SelectItem>
+                  <SelectItem value="מתמטיקה">מתמטיקה</SelectItem>
                   <SelectItem value="פיזיקה">פיזיקה</SelectItem>
                   <SelectItem value="כימיה">כימיה</SelectItem>
                   <SelectItem value="ביולוגיה">ביולוגיה</SelectItem>
-                  <SelectItem value="היסטוריה">היסטוריה</SelectItem>
                   <SelectItem value="ספרות">ספרות</SelectItem>
+                  <SelectItem value="היסטוריה">היסטוריה</SelectItem>
                   <SelectItem value="גאוגרפיה">גאוגרפיה</SelectItem>
                   <SelectItem value="אזרחות">אזרחות</SelectItem>
                   <SelectItem value='תנ"ך'>תנ"ך</SelectItem>
