@@ -612,11 +612,11 @@ export default function ExamModuleCPage() {
       await base44.auth.updateMe({ skip_exam_intro: true });
       setUser(prev => ({ ...prev, skip_exam_intro: true }));
       setShowIntroDialog(false);
-      setShowModeSelectionDialog(true);
+      handleStartExam('exam'); // Start directly
     } catch (error) {
       console.error("Error updating user settings:", error);
       setShowIntroDialog(false);
-      setShowModeSelectionDialog(true);
+      handleStartExam('exam');
     }
   };
 
