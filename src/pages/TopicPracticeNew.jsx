@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
+import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -1048,7 +1048,7 @@ export default function TopicPracticeNewPage() {
           animate={{ opacity: 1 }}
           className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
         >
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4 pt-6 sm:pt-8">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
