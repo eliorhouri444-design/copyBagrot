@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -30,8 +30,7 @@ export default function ExamGenericPage() {
   const [score, setScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [displayMode, setDisplayMode] = useState('carousel'); // 'carousel' or 'normal'
-  const [showModeDialog, setShowModeDialog] = useState(false);
+  const [displayMode, setDisplayMode] = useState('carousel');
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
 
@@ -169,16 +168,13 @@ export default function ExamGenericPage() {
 
   const handleStartFresh = async () => {
     if (savedProgress?.id) {
-      // Delete existing progress if starting fresh
       await base44.entities.ExamProgress.delete(savedProgress.id);
     }
-    setSavedProgress(null); // Clear saved progress state
-    setShowModeDialog(true); // Open mode selection dialog
+    setSavedProgress(null);
+    setExamStarted(true);
   };
 
-  const handleStartExam = (mode) => {
-    setDisplayMode(mode);
-    setShowModeDialog(false);
+  const handleStartExam = () => {
     setExamStarted(true);
   };
 
@@ -554,7 +550,7 @@ export default function ExamGenericPage() {
   }
 
   // Saved Progress Dialog
-  if (savedProgress && !examStarted && !showModeDialog) { // Add !showModeDialog to prevent showing both
+  if (savedProgress && !examStarted) {
     return (
       <Dialog open={true} onOpenChange={() => {}}>
         <DialogContent dir="rtl" className="sm:max-w-md">
@@ -565,7 +561,7 @@ export default function ExamGenericPage() {
 
           <div className="bg-blue-50 rounded-xl p-4">
             <p className="text-sm text-gray-700">
-              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.questions.length}
+              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.grammar_questions.length}
             </p>
             <p className="text-sm text-gray-700">
               <strong>זמן נותר:</strong> {Math.floor(savedProgress.time_left / 60)} דקות
@@ -580,80 +576,6 @@ export default function ExamGenericPage() {
               התחל מחדש
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  // Display Mode Selection Dialog
-  if (showModeDialog && !examStarted) {
-    return (
-      <Dialog open={showModeDialog} onOpenChange={() => {}}>
-        <DialogContent dir="rtl" className="sm:max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">בחר מצב בחינה</DialogTitle>
-            <DialogDescription className="text-center">
-              {exam.reading_text ? 'הסיפור יופיע בכל המצבים' : 'בחר איך תרצה לראות את השאלות'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid md:grid-cols-2 gap-4 py-6">
-            <motion.button
-              whileHover={{ scale: 1.02, y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('normal')}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1 text-right">
-                  <h3 className="text-xl font-bold text-gray-900">מצב רגיל</h3>
-                  <p className="text-sm text-blue-700 font-medium">📄 כמו בבגרות אמיתית</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>כל השאלות ביחד</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>גלילה חופשית</span>
-                </div>
-              </div>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.02, y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('carousel')}
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1 text-right">
-                  <h3 className="text-xl font-bold text-gray-900">מצב קרוסלה</h3>
-                  <p className="text-sm text-purple-700 font-medium">⚡ שאלה אחרי שאלה</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>התמקדות בשאלה אחת</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>הסיפור תמיד מול העיניים</span>
-                </div>
-              </div>
-            </motion.button>
-          </div>
         </DialogContent>
       </Dialog>
     );
@@ -728,7 +650,7 @@ export default function ExamGenericPage() {
             </div>
 
             <Button
-              onClick={() => setShowModeDialog(true)}
+              onClick={handleStartExam}
               className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold"
             >
               התחל מבחן
@@ -874,7 +796,7 @@ export default function ExamGenericPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pb-6">
-        {displayMode === 'carousel' ? (
+        {/* Always carousel mode */}
           <div className="grid lg:grid-cols-5 gap-4">
             {exam.reading_text && (
               <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
@@ -988,89 +910,6 @@ export default function ExamGenericPage() {
               </AnimatePresence>
             </div>
           </div>
-        ) : (
-          <div className="grid lg:grid-cols-5 gap-4">
-            {exam.reading_text && (
-              <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
-                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-                </h3>
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                  {exam.reading_text}
-                </div>
-              </div>
-            )}
-
-            <div className={exam.reading_text ? "lg:col-span-3" : "lg:col-span-5"}>
-              <div className="bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto">
-                {exam.questions.map((questionItem, qIdx) => (
-                  <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">
-                        {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
-                      </h3>
-                      <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
-                        {questionItem.points} נק'
-                      </span>
-                    </div>
-
-                    <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                      {questionItem.question_text}
-                    </p>
-
-                    {questionItem.question_type === 'multiple_choice' && questionItem.options && (
-                      <div className="space-y-2">
-                        {questionItem.options.map((optionValue, optionIndex) => (
-                          <button
-                            key={optionIndex}
-                            onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
-                              userAnswers[questionItem.question_number] === optionValue
-                                ? 'bg-blue-100 border-blue-500'
-                                : 'bg-white border-gray-200 hover:border-blue-300'
-                            }`}
-                            dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                          >
-                            {optionValue}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {questionItem.question_type === 'short_answer' && (
-                      <Input
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                        className="w-full h-12"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-
-                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && (
-                      <Textarea
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                        className="w-full h-32"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-                  </div>
-                ))}
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold"
-                >
-                  {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

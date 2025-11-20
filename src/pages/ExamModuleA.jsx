@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, BookOpen, Zap, Loader2, Flag } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2, Home, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -125,8 +126,7 @@ export default function ExamModuleAPage() {
   const [showAdForExplanations, setShowAdForExplanations] = useState(false);
 
   const [showIntroDialog, setShowIntroDialog] = useState(false);
-  const [showModeSelection, setShowModeSelection] = useState(false);
-  const [displayMode, setDisplayMode] = useState(null);
+  const [displayMode, setDisplayMode] = useState('exam');
   const [hasStarted, setHasStarted] = useState(false);
 
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -213,11 +213,7 @@ export default function ExamModuleAPage() {
               setSavedProgress(progressList[0]);
               setShowResumeDialog(true);
             } else {
-              if (user?.skip_exam_intro) {
-                setShowModeSelection(true);
-              } else {
-                setShowIntroDialog(true);
-              }
+              setShowIntroDialog(true);
             }
           }
         } catch (error) {
@@ -313,11 +309,7 @@ export default function ExamModuleAPage() {
     }
 
     setShowResumeDialog(false);
-    if (user?.skip_exam_intro) {
-      setShowModeSelection(true);
-    } else {
-      setShowIntroDialog(true);
-    }
+    setShowIntroDialog(true);
   };
 
   const formatTime = (seconds) => {
@@ -522,25 +514,19 @@ export default function ExamModuleAPage() {
 
   const handleStartExam = () => {
     setShowIntroDialog(false);
-    setShowModeSelection(true);
+    setHasStarted(true);
   };
 
   const handleSkipIntroForever = async () => {
     try {
       await base44.auth.updateMe({ skip_exam_intro: true });
       setShowIntroDialog(false);
-      setShowModeSelection(true);
+      setHasStarted(true);
     } catch (error) {
       console.error("Error updating user settings:", error);
       setShowIntroDialog(false);
-      setShowModeSelection(true);
+      setHasStarted(true);
     }
-  };
-
-  const handleModeSelect = (mode) => {
-    setDisplayMode(mode);
-    setShowModeSelection(false);
-    setHasStarted(true);
   };
 
   const handleExitAttempt = async () => {
@@ -562,12 +548,14 @@ export default function ExamModuleAPage() {
     if (currentSection === 'reading') {
       if (currentQuestion < exam.reading_questions.length - 1) {
         setCurrentQuestion(prev => prev + 1);
+        setTimeout(() => setIsSubmitting(false), 300);
       } else {
         setCurrentSection("listening");
+        setTimeout(() => setIsSubmitting(false), 300);
       }
+    } else {
+      setTimeout(() => setIsSubmitting(false), 300);
     }
-    
-    setTimeout(() => setIsSubmitting(false), 300);
   };
 
   const handlePrevQuestion = () => {
@@ -967,10 +955,13 @@ export default function ExamModuleAPage() {
   }
 
   if (hasStarted && !showResults && currentSection === 'reading') {
+    const readingQuestion = exam.reading_questions[currentQuestion];
+    const readingProgress = ((currentQuestion + 1) / exam.reading_questions.length) * 100;
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-[2rem] p-6 shadow-xl mb-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-[2rem] p-4 shadow-xl mb-4">
+          <div className="flex items-center justify-between mb-3">
             <Button variant="ghost" size="icon" onClick={handleExitAttempt} className="text-white hover:bg-white/20">
               <ArrowLeft className="w-6 h-6" />
             </Button>
@@ -979,89 +970,106 @@ export default function ExamModuleAPage() {
               <span className="text-xl font-bold text-white">{formatTime(timeLeft)}</span>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white">{exam.title}</h1>
+          <h1 className="text-xl font-bold text-white text-center mb-2">{exam.title}</h1>
+          <Progress value={readingProgress} className="h-2 bg-white/20" />
+          <div className="flex justify-between text-white text-xs mt-2">
+            <span>שאלה {currentQuestion + 1} מתוך {exam.reading_questions.length}</span>
+          </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-6 pb-6">
+        <div className="max-w-6xl mx-auto px-4 pb-6">
           <div className="grid lg:grid-cols-5 gap-4">
-            {/* Reading Text */}
-            <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 overflow-y-auto max-h-[calc(100vh-280px)]">
-              <div className="mb-4 pb-3 border-b">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <BookOpen className="w-6 h-6 text-blue-600" />
+            {exam.reading_text && (
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 lg:max-h-[calc(100vh-240px)] lg:overflow-y-auto lg:sticky lg:top-4">
+                <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-600" />
                   Reading Text
                 </h3>
+                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap bg-gray-50 rounded-lg p-3" dir="ltr">
+                  {exam.reading_text}
+                </div>
               </div>
-              <div className="prose max-w-none" dir="ltr">
-                {exam.reading_text ? (
-                  exam.reading_text.split('\n\n').map((paragraph, idx) => (
-                    <p key={idx} className="text-gray-700 mb-4 leading-relaxed">{paragraph}</p>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">No reading text available</p>
-                )}
-              </div>
-            </div>
+            )}
 
-            {/* Questions */}
-            <div className="lg:col-span-3 bg-white rounded-xl shadow-lg p-6 overflow-y-auto max-h-[calc(100vh-280px)]">
-              <h3 className="text-lg font-bold mb-4">שאלות</h3>
-              <div className="space-y-6">
-                {exam.reading_questions.map((questionItem) => (
-                  <div key={questionItem.question_number} className="mb-6 pb-6 border-b last:border-b-0">
-                    <h4 className="font-bold text-gray-900 mb-3">
-                      Question {questionItem.question_number} ({questionItem.points} points)
-                    </h4>
-                    <p className="text-gray-700 mb-4 text-left" dir="ltr">{questionItem.question_text}</p>
+            <div className={exam.reading_text ? "lg:col-span-3" : "lg:col-span-5"}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Question {readingQuestion.question_number}</h2>
+                    <div className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
+                      {readingQuestion.points} נק'
+                    </div>
+                  </div>
 
-                    {questionItem.question_type === "multiple_choice" ? (
-                      <div className="space-y-2">
-                        {questionItem.options.map((optionValue, optionIndex) => (
-                          <button
-                            key={optionIndex}
-                            onClick={() => handleReadingAnswer(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
-                              readingAnswers[questionItem.question_number] === optionValue
-                                ? 'bg-purple-50 border-purple-500 shadow-md'
-                                : 'bg-gray-50 border-gray-200 hover:border-purple-300'
-                            }`}
-                            dir="ltr"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                readingAnswers[questionItem.question_number] === optionValue
-                                  ? 'border-purple-500 bg-purple-500'
-                                  : 'border-gray-300'
-                              }`}>
-                                {readingAnswers[questionItem.question_number] === optionValue && (
-                                  <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                                )}
-                              </div>
-                              <span className="text-gray-700">{optionValue}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
+                  <p className="text-gray-700 text-base sm:text-lg mb-6 whitespace-pre-wrap" dir="ltr">{readingQuestion.question_text}</p>
+
+                  {readingQuestion.question_type === 'multiple_choice' && readingQuestion.options && (
+                    <div className="space-y-3">
+                      {readingQuestion.options.map((optionValue, optionIndex) => (
+                        <button
+                          key={optionIndex}
+                          onClick={() => handleReadingAnswer(readingQuestion.question_number, optionValue)}
+                          className={`w-full p-3 sm:p-4 rounded-xl border-2 text-left transition-all ${
+                            readingAnswers[readingQuestion.question_number] === optionValue
+                              ? 'bg-blue-100 border-blue-500'
+                              : 'bg-white border-gray-200 hover:border-blue-300'
+                          }`}
+                          dir="ltr"
+                        >
+                          {optionValue}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {readingQuestion.question_type !== 'multiple_choice' && (
+                    <Input
+                      value={readingAnswers[readingQuestion.question_number] || ''}
+                      onChange={(e) => handleReadingAnswer(readingQuestion.question_number, e.target.value)}
+                      placeholder="Type your answer..."
+                      className="w-full h-12 text-base sm:text-lg"
+                      dir="ltr"
+                    />
+                  )}
+
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      onClick={handlePrevQuestion}
+                      disabled={currentQuestion === 0}
+                      variant="outline"
+                      className="flex-1 h-11 sm:h-12"
+                    >
+                      <ChevronRight className="w-5 h-5 ml-2" />
+                      הקודם
+                    </Button>
+
+                    {currentQuestion === exam.reading_questions.length - 1 ? (
+                      <Button 
+                        onClick={() => setCurrentSection('listening')} 
+                        disabled={isSubmitting}
+                        className="flex-1 h-11 sm:h-12 bg-purple-600 disabled:opacity-50"
+                      >
+                        המשך להאזנה
+                      </Button>
                     ) : (
-                      <Input
-                        placeholder="Type your answer here..."
-                        value={readingAnswers[questionItem.question_number] || ""}
-                        onChange={(e) => handleReadingAnswer(questionItem.question_number, e.target.value)}
-                        className="h-12"
-                        dir="ltr"
-                      />
+                      <Button
+                        onClick={handleNextQuestion}
+                        disabled={isSubmitting}
+                        className="flex-1 h-11 sm:h-12 bg-blue-600 disabled:opacity-50"
+                      >
+                        הבא
+                        <ChevronLeft className="w-5 h-5 mr-2" />
+                      </Button>
                     )}
                   </div>
-                ))}
-              </div>
-
-              <Button 
-                onClick={() => setCurrentSection('listening')} 
-                disabled={isSubmitting}
-                className="w-full h-14 bg-blue-600 mt-6 disabled:opacity-50"
-              >
-                המשך להאזנה
-              </Button>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
