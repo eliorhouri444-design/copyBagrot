@@ -35,6 +35,20 @@ export default function AdminExamScannerPage() {
     loadUser();
   }, []);
 
+  useEffect(() => {
+    // Update units when subject changes
+    if (availableUnits.length > 0 && !availableUnits.includes(selectedUnits)) {
+      setSelectedUnits(availableUnits[0]);
+    }
+  }, [selectedSubject, availableUnits]);
+
+  useEffect(() => {
+    // Update module when units change
+    if (availableModules.length > 0 && !availableModules.find(m => m.id === selectedModule)) {
+      setSelectedModule(availableModules[0]?.id || '');
+    }
+  }, [selectedUnits, availableModules]);
+
   const defaultModulesStructure = {
     "אנגלית": {
       3: [
@@ -607,7 +621,10 @@ export default function AdminExamScannerPage() {
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-2">מקצוע</label>
-              <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+              <Select value={selectedSubject} onValueChange={(v) => {
+                setSelectedSubject(v);
+                setSelectedModule('');
+              }}>
                 <SelectTrigger className="h-12">
                   <SelectValue />
                 </SelectTrigger>
