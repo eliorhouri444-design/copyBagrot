@@ -39,7 +39,7 @@ export default function ExtendedReadingPage() {
 
   const displayUnits = user?.selected_units || 4;
   const targetWords = displayUnits === 5 ? 450 : 300;
-  const questionsCount = displayUnits === 5 ? 12 : 8;
+  const questionsCount = 10;
 
   const loadQuestionsFromBank = async (topicId, currentUser) => {
     setIsLoading(true);
