@@ -113,13 +113,19 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
       continue;
     }
 
-    // Format: Question | Answer (with optional multiple answers separated by ;)
+    // Format: Question | Answer [| OPTIONS: opt1; opt2; opt3] [| EXPLANATION: text]
     if (line.includes('|')) {
       const parts = line.split('|').map(p => p.trim());
       
       if (parts.length >= 2) {
         let questionText = parts[0].replace(/^Q:\s*/i, '').replace(/^Question:\s*/i, '');
         const answerPart = parts[1];
+        
+        // Extract explanation if provided (parts[2] or after answer)
+        let explanation = "";
+        if (parts.length >= 3 && !parts[2].match(/^\d+$/)) {
+          explanation = parts[2];
+        }
         
         // Check if this is a writing question
         const isWriting = questionText.match(/^\[WRITING\]\s*/i) || 
@@ -131,14 +137,17 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
           questionText = questionText.replace(/^\[WRITING\]\s*/i, '').trim();
         }
         
-        // Parse multiple acceptable answers (separated by semicolons)
+        // Parse multiple acceptable answers and options (separated by semicolons)
         const acceptableAnswers = isWriting ? [] : answerPart.split(';').map(a => a.trim()).filter(a => a);
         const mainAnswer = acceptableAnswers[0] || answerPart;
         
+        // If we have multiple answers, treat them as options for multiple choice
+        const options = acceptableAnswers.length > 1 ? acceptableAnswers : [];
+        
         // Check if override subject/units/topic provided
-        const overrideSubject = parts[2] || subject;
-        const overrideUnits = parts[3] ? parseInt(parts[3]) : units;
-        const overrideTopic = parts[4] || topicId;
+        const overrideSubject = parts[2] && parts[2].match(/^\d+$/) ? parts[2] : (parts[3] || subject);
+        const overrideUnits = parts[3] && parts[3].match(/^\d+$/) ? parseInt(parts[3]) : (parts[4] ? parseInt(parts[4]) : units);
+        const overrideTopic = parts[4] && !parts[4].match(/^\d+$/) ? parts[4] : (parts[5] || topicId);
 
         const newQuestion = createQuestion(
           questionText,
@@ -149,7 +158,9 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
           counter++,
           currentStory,
           isWriting,
-          acceptableAnswers
+          acceptableAnswers,
+          options,
+          explanation
         );
 
         questions.push(newQuestion);
@@ -225,7 +236,7 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
   return questions;
 }
 
-function createQuestion(questionText, answer, subject, units, topicId, counter, story = null, forceWriting = false, acceptableAnswers = []) {
+function createQuestion(questionText, answer, subject, units, topicId, counter, story = null, forceWriting = false, acceptableAnswers = [], options = [], explanation = "") {
   const timestamp = Date.now();
   const questionId = `${subject}_${units}_${topicId}_${counter}_${timestamp}`;
   
@@ -234,7 +245,8 @@ function createQuestion(questionText, answer, subject, units, topicId, counter, 
   
   if (forceWriting || answer === 'writing') {
     questionType = "writing";
-  } else if (questionText.toLowerCase().includes('choose') || 
+  } else if (options.length > 0 || 
+      questionText.toLowerCase().includes('choose') || 
       questionText.toLowerCase().includes('select') ||
       questionText.toLowerCase().includes('בחר') ||
       questionText.toLowerCase().includes('סמן')) {
@@ -271,11 +283,19 @@ function createQuestion(questionText, answer, subject, units, topicId, counter, 
     is_active: true
   };
 
+  if (options.length > 0) {
+    question.options = options;
+  }
+  
+  if (explanation) {
+    question.explanation = explanation;
+  }
+
   if (story) {
     question.reading_text = story;
   }
   
-  console.log(`✅ Created Q${counter}: topic_id="${topicId}", ${acceptableAnswers.length} acceptable answers`);
+  console.log(`✅ Created Q${counter}: topic_id="${topicId}", type=${questionType}, ${acceptableAnswers.length} answers, ${options.length} options`);
 
   return question;
 }
