@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -6,6 +6,7 @@ import { Upload, CheckCircle, Loader2, AlertCircle, Brain, Sparkles, BookOpen, C
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AdminExamScannerPage() {
   const navigate = useNavigate();
@@ -143,14 +144,54 @@ export default function AdminExamScannerPage() {
     }
   };
 
+  const { data: customModules = [] } = useQuery({
+    queryKey: ['custom-modules', selectedSubject, selectedUnits],
+    queryFn: async () => {
+      const all = await base44.entities.ModuleDefinition.list();
+      return all.filter(m => m.subject === selectedSubject && parseInt(m.unit_level) === parseInt(selectedUnits));
+    },
+    enabled: !!selectedSubject && !!selectedUnits,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const availableUnits = useMemo(() => {
     const units = defaultModulesStructure[selectedSubject];
-    return units ? Object.keys(units).map(Number).sort((a, b) => a - b) : [3, 4, 5];
+    return units ? Object.keys(units).map(Number).sort((a, b) => a - b) : [2, 3, 4, 5];
   }, [selectedSubject]);
 
   const availableModules = useMemo(() => {
-    return defaultModulesStructure[selectedSubject]?.[selectedUnits] || [];
-  }, [selectedSubject, selectedUnits]);
+    const defaultMods = defaultModulesStructure[selectedSubject]?.[selectedUnits] || [];
+    const modulesMap = new Map();
+
+    // Add default modules
+    defaultMods.forEach(mod => {
+      modulesMap.set(mod.id, mod);
+    });
+
+    // Add/override with custom modules
+    customModules.forEach(customMod => {
+      const existing = modulesMap.get(customMod.module_id);
+      if (existing) {
+        modulesMap.set(customMod.module_id, {
+          ...existing,
+          id: customMod.module_id,
+          title: customMod.title || existing.title,
+          description: customMod.description || existing.description,
+          details: customMod.details || existing.details
+        });
+      } else {
+        // New custom module
+        modulesMap.set(customMod.module_id, {
+          id: customMod.module_id,
+          title: customMod.title,
+          description: customMod.description || '',
+          details: customMod.details || ''
+        });
+      }
+    });
+
+    return Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [selectedSubject, selectedUnits, customModules]);
 
   // פונקציה מתקדמת לזיהוי גאומטריה וויזואליזציות
   const detectVisualizationFromText = (text) => {
