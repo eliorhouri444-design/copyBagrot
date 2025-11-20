@@ -356,10 +356,10 @@ export default function ExtendedReadingPage() {
   const hasAnswered = !!answers[currentQuestion.question_id];
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
-        <div className="flex items-center justify-between text-white mb-3">
+      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+        <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
@@ -371,10 +371,19 @@ export default function ExtendedReadingPage() {
 
           <div className="text-center flex-1">
             <h1 className="text-base sm:text-xl font-bold">{topicName}</h1>
-            <p className="text-xs sm:text-sm opacity-90">Question {currentQuestionIndex + 1} / {currentSetQuestions.length}</p>
+            <p className="text-xs sm:text-sm opacity-90">שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          <div className="w-8 sm:w-10" />
+          {readingText && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowStoryDialog(true)}
+              className="text-white hover:bg-white/20"
+            >
+              <BookOpen className="w-5 h-5" />
+            </Button>
+          )}
         </div>
 
         <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
@@ -388,11 +397,35 @@ export default function ExtendedReadingPage() {
       </div>
 
       {/* Split Screen Layout */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden p-2 sm:p-3">
+        {/* Story Dialog */}
+        <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
+          <DialogContent dir="ltr" className="sm:max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl font-bold" dir="rtl">📖 Reading Text</DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto max-h-[60vh] p-4">
+              <div 
+                className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
+                style={{ 
+                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
+                }}
+              >
+                {readingText}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Top Half - Reading Text */}
         {readingText && (
-          <div className="h-1/2 border-b-4 border-blue-300 bg-white overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 flex items-center gap-2 flex-shrink-0">
+          <div className="h-[45%] border-b-4 border-blue-300 bg-white rounded-t-xl sm:rounded-t-2xl overflow-hidden flex flex-col shadow-lg mb-2">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 flex items-center justify-center gap-2 flex-shrink-0">
               <BookOpen className="w-5 h-5 text-white" />
               <span className="text-white font-bold text-sm">Reading Text</span>
             </div>
@@ -411,84 +444,84 @@ export default function ExtendedReadingPage() {
         )}
 
         {/* Bottom Half - Question */}
-        <div className={`${readingText ? 'h-1/2' : 'h-full'} bg-white overflow-hidden flex flex-col`}>
-          <motion.div
-            key={currentQuestion.question_id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex-1 flex flex-col overflow-hidden"
-          >
-            {/* Question Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4 pb-4">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
-                </div>
-                <div className="flex-1">
-                  <p
-                    className="text-base sm:text-lg text-gray-900 leading-relaxed whitespace-pre-wrap text-left"
-                    dir="ltr"
-                    style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
-                  >
-                    {currentQuestion.question_text}
-                  </p>
-                  
-                  {currentQuestion.question_image_url && (
-                    <img
-                      src={currentQuestion.question_image_url}
-                      alt="Question"
-                      className="mt-4 rounded-lg max-w-full"
-                    />
-                  )}
-                </div>
+        <motion.div
+          key={currentQuestion.question_id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden"
+        >
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4 pt-6 sm:pt-8">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
               </div>
-
-              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
-                <div className="space-y-2">
-                  {currentQuestion.options.map((option, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
-                      className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
-                        answers[currentQuestion.question_id] === option
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-300'
-                      } cursor-pointer`}
-                      dir="ltr"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                          answers[currentQuestion.question_id] === option
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
-                        }`}>
-                          {answers[currentQuestion.question_id] === option && (
-                            <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                          )}
-                        </div>
-                        <span className="text-sm font-medium text-gray-900">{option}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Open answer input for non-multiple choice */}
-              {currentQuestion.question_type !== "multiple_choice" && currentQuestion.question_type !== "multi_choice" && (
-                <div className="mt-4">
-                  <Textarea
-                    value={answers[currentQuestion.question_id] || ""}
-                    onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                    placeholder="Type your answer here..."
-                    className="w-full h-32 text-base resize-none"
-                    dir="ltr"
+              <div className="flex-1">
+                <p
+                  className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap text-left"
+                  dir="ltr"
+                  style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                >
+                  {currentQuestion.question_text}
+                </p>
+                
+                {currentQuestion.question_image_url && (
+                  <img
+                    src={currentQuestion.question_image_url}
+                    alt="Question"
+                    className="mt-4 rounded-lg max-w-full"
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            {/* Submit Button - Fixed at Bottom of Question Area */}
-            <div className="border-t-2 border-gray-200 bg-white p-3 sm:p-4 flex-shrink-0">
+            {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
+              <div className="space-y-2">
+                {currentQuestion.options.map((option, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
+                    className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
+                      answers[currentQuestion.question_id] === option
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'
+                    } cursor-pointer`}
+                    dir="ltr"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        answers[currentQuestion.question_id] === option
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {answers[currentQuestion.question_id] === option && (
+                          <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{option}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Answer input area - fixed at bottom */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
+            <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
+              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
+                <div className="text-center text-sm text-gray-600">
+                  בחר תשובה למעלה ↑
+                </div>
+              ) : (
+                <Textarea
+                  value={answers[currentQuestion.question_id] || ""}
+                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                  placeholder="הקלד את תשובתך כאן..."
+                  className="w-full h-28 text-base resize-none"
+                  dir="ltr"
+                />
+              )}
+
               <Button
                 onClick={handleSubmitAnswer}
                 disabled={!hasAnswered || isSubmitting}
@@ -497,18 +530,18 @@ export default function ExtendedReadingPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Checking...
+                    בודק...
                   </>
                 ) : (
                   <>
-                    {currentQuestionIndex < currentSetQuestions.length - 1 ? 'Next Question' : 'Finish & See Results'}
+                    {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
                     <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   </>
                 )}
               </Button>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
