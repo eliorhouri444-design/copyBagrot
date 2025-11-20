@@ -553,7 +553,9 @@ export default function TopicPracticeNewPage() {
 
   const handleContinueToNextSet = () => {
     const nextSet = setNumber + 1;
-    const nextSetStartIndex = (nextSet - 1) * QUESTIONS_PER_SET;
+    const isWritingTopic = currentSetQuestions.some(q => q.question_type === "writing");
+    const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
+    const nextSetStartIndex = (nextSet - 1) * questionsPerSet;
     
     if (nextSetStartIndex >= allQuestions.length) {
       finishPractice();
@@ -563,22 +565,19 @@ export default function TopicPracticeNewPage() {
     const isPremium = user?.is_premium;
     
     if (!isPremium && setNumber >= FREE_USER_MAX_SETS) {
-      setShowContinueDialog(false);
       setShowAdDialog(true);
       return;
     }
 
     if (!isPremium) {
-      setShowSummary(false);
       setShowAdConfirmDialog(true);
     } else {
       // Reset state and navigate
-      setShowSummary(false);
       setAnswers({});
       setResults({});
       setCurrentQuestionIndex(0);
       setShowReadingText(true);
-      navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
+      window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
     }
   };
 
@@ -594,7 +593,7 @@ export default function TopicPracticeNewPage() {
     setResults({});
     setCurrentQuestionIndex(0);
     setShowReadingText(true);
-    navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
+    window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
   };
 
   const finishPractice = async () => {

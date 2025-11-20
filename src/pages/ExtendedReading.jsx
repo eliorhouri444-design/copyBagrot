@@ -224,12 +224,11 @@ export default function ExtendedReadingPage() {
     
     if (isPremium) {
       // Premium users go directly to next set
-      setShowSummary(false);
       setAnswers({});
       setResults({});
       setCurrentQuestionIndex(0);
       setShowReadingText(true);
-      navigate(createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
+      window.location.href = createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
     } else {
       // Free users see ad confirmation
       setShowAdConfirmDialog(true);
@@ -248,7 +247,7 @@ export default function ExtendedReadingPage() {
     setResults({});
     setCurrentQuestionIndex(0);
     setShowReadingText(true);
-    navigate(createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
+    window.location.href = createPageUrl(`ExtendedReading?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
   };
 
   const finishPractice = async () => {
