@@ -107,28 +107,21 @@ export default function TopicPracticeNewPage() {
       const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
 
-      // Ensure minimum questions per set by duplicating if needed
-      let expandedQuestions = [...questionsForTopic];
-      while (expandedQuestions.length < questionsPerSet && questionsForTopic.length > 0) {
-        const needed = questionsPerSet - expandedQuestions.length;
-        expandedQuestions = [...expandedQuestions, ...questionsForTopic.slice(0, Math.min(needed, questionsForTopic.length))];
-      }
-
-      // Now get all sets
-      const totalSets = Math.ceil(expandedQuestions.length / questionsPerSet);
-      let allSetsQuestions = [];
-      
-      for (let i = 0; i < totalSets; i++) {
-        const start = i * questionsPerSet;
-        const end = start + questionsPerSet;
-        allSetsQuestions.push(...expandedQuestions.slice(start, end));
-      }
-
-      setAllQuestions(allSetsQuestions);
+      setAllQuestions(questionsForTopic);
 
       const startIndex = (setNumber - 1) * questionsPerSet;
       const endIndex = startIndex + questionsPerSet;
-      const setQuestions = allSetsQuestions.slice(startIndex, endIndex);
+      let setQuestions = questionsForTopic.slice(startIndex, endIndex);
+
+      // If not enough questions for a full set, repeat from the beginning
+      if (setQuestions.length < questionsPerSet && questionsForTopic.length > 0) {
+        while (setQuestions.length < questionsPerSet) {
+          const needed = questionsPerSet - setQuestions.length;
+          setQuestions = [...setQuestions, ...questionsForTopic.slice(0, needed)];
+        }
+      }
+
+      setQuestions = setQuestions.slice(0, questionsPerSet);
       
       if (setQuestions.length === 0) {
         setLoadError(`לא נמצאו שאלות לסט ${setNumber}`);
@@ -714,7 +707,9 @@ export default function TopicPracticeNewPage() {
                       )}
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
-                        <div className="text-sm text-gray-700 mb-2">{q.question_text.substring(0, 80)}...</div>
+                        <div className="text-sm text-gray-700 mb-2">
+                          {typeof q.question_text === 'string' ? q.question_text.substring(0, 80) : (q.question_text?.text || 'שאלה').substring(0, 80)}...
+                        </div>
 
                         {q.question_type === "writing" && result?.writingEvaluation ? (
                           <div className="space-y-2 mt-3">
@@ -792,11 +787,15 @@ export default function TopicPracticeNewPage() {
                           <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                              <div className="text-sm font-semibold text-red-700">{result?.userAnswer || "לא נענה"}</div>
+                              <div className="text-sm font-semibold text-red-700" dir="ltr">
+                                {typeof result?.userAnswer === 'string' ? result.userAnswer : (result?.userAnswer?.text || "לא נענה")}
+                              </div>
                             </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                              <div className="text-sm font-semibold text-green-700">{result?.correctAnswer}</div>
+                              <div className="text-sm font-semibold text-green-700" dir="ltr">
+                                {typeof result?.correctAnswer === 'string' ? result.correctAnswer : (result?.correctAnswer?.value || "לא ידוע")}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -1050,7 +1049,7 @@ export default function TopicPracticeNewPage() {
           animate={{ opacity: 1 }}
           className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
         >
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-24">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
@@ -1070,78 +1069,74 @@ export default function TopicPracticeNewPage() {
             />
           ) : (
             <>
-          <div className="flex items-start gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
-            </div>
-            <div className="flex-1">
-              <p
-                className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
-                dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
-                style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
-              >
-                {currentQuestion.question_text}
-              </p>
-              
-              {currentQuestion.question_image_url && (
-                <img
-                  src={currentQuestion.question_image_url}
-                  alt="Question"
-                  className="mt-4 rounded-lg max-w-full"
+              <div className="flex items-start gap-3 mb-6">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
+                </div>
+                <div className="flex-1">
+                  <p
+                    className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
+                    dir={typeof currentQuestion.question_text === 'string' && currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
+                    style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                  >
+                    {typeof currentQuestion.question_text === 'string' ? currentQuestion.question_text : (currentQuestion.question_text?.text || 'שאלה')}
+                  </p>
+                  
+                  {currentQuestion.question_image_url && (
+                    <img
+                      src={currentQuestion.question_image_url}
+                      alt="Question"
+                      className="mt-4 rounded-lg max-w-full"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
+                      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                        answers[currentQuestion.question_id] === option
+                          ? 'border-blue-500 bg-blue-100'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                      dir="ltr"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          answers[currentQuestion.question_id] === option
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {answers[currentQuestion.question_id] === option && (
+                            <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                          )}
+                        </div>
+                        <span className="text-base font-medium text-gray-900">{option}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <Input
+                  value={answers[currentQuestion.question_id] || ""}
+                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                  placeholder="Type your answer..."
+                  className="w-full h-12 text-base"
+                  dir="ltr"
                 />
               )}
-            </div>
-          </div>
-
-          {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
-            <div className="space-y-2">
-              {currentQuestion.options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
-                  className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
-                    answers[currentQuestion.question_id] === option
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-300'
-                  } cursor-pointer`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      answers[currentQuestion.question_id] === option
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {answers[currentQuestion.question_id] === option && (
-                        <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                      )}
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{option}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
             </>
           )}
           </div>
 
-          {/* Answer input area - fixed at bottom */}
+          {/* Fixed bottom button */}
           {currentQuestion.question_type !== "writing" && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
-              <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
-                {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
-                  <div className="text-center text-sm text-gray-600">
-                    בחר תשובה למעלה ↑
-                  </div>
-                ) : (
-                  <Textarea
-                    value={answers[currentQuestion.question_id] || ""}
-                    onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                    placeholder="הקלד את תשובתך כאן..."
-                    className="w-full h-28 text-base resize-none"
-                  />
-                )}
-
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4">
+              <div className="max-w-md mx-auto">
                 <Button
                   onClick={handleSubmitAnswer}
                   disabled={!hasAnswered || isSubmitting}
