@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -853,13 +852,25 @@ export default function TopicPracticeNewPage() {
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                             <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
                             <div className="text-sm font-semibold text-red-700" dir="ltr">
-                            {String(result?.userAnswer || "לא נענה")}
+                            {(() => {
+                            const ans = result?.userAnswer;
+                            if (!ans) return "לא נענה";
+                            if (typeof ans === 'string') return ans;
+                            if (typeof ans === 'object') return ans.text || ans.value || JSON.stringify(ans);
+                            return String(ans);
+                            })()}
                             </div>
                             </div>
                             <div className="bg-white rounded-lg p-3 border border-green-200">
                             <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
                             <div className="text-sm font-semibold text-green-700" dir="ltr">
-                            {String(result?.correctAnswer || "לא ידוע")}
+                            {(() => {
+                            const ans = result?.correctAnswer;
+                            if (!ans) return "לא ידוע";
+                            if (typeof ans === 'string') return ans;
+                            if (typeof ans === 'object') return ans.text || ans.value || JSON.stringify(ans);
+                            return String(ans);
+                            })()}
                             </div>
                             </div>
                           </div>
