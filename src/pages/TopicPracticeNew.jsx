@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -458,13 +457,30 @@ export default function TopicPracticeNewPage() {
             correctAnswer = correctAnswers[0].value || "";
           }
 
-          const normalizedUserAnswer = userAnswer.trim().toLowerCase();
-          
-          isCorrect = correctAnswers.some(ans => 
-            ans.value?.toLowerCase() === normalizedUserAnswer
-          ) || acceptableVariants.some(variant => 
-            variant.toLowerCase() === normalizedUserAnswer
-          );
+          const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/[.,!?;]/g, '');
+
+          // Check against all acceptable answers with fuzzy matching
+          isCorrect = correctAnswers.some(ans => {
+            const normalized = ans.value?.toLowerCase().replace(/[.,!?;]/g, '');
+            return normalized === normalizedUserAnswer || 
+                   normalizedUserAnswer.includes(normalized) ||
+                   normalized.includes(normalizedUserAnswer);
+          }) || acceptableVariants.some(variant => {
+            const normalized = variant.toLowerCase().replace(/[.,!?;]/g, '');
+            return normalized === normalizedUserAnswer ||
+                   normalizedUserAnswer.includes(normalized) ||
+                   normalized.includes(normalizedUserAnswer);
+          });
+
+          // Also check if question has acceptable_answers array
+          if (!isCorrect && currentQuestion.acceptable_answers?.length > 0) {
+            isCorrect = currentQuestion.acceptable_answers.some(ans => {
+              const normalized = ans.toLowerCase().replace(/[.,!?;]/g, '');
+              return normalized === normalizedUserAnswer ||
+                     normalizedUserAnswer.includes(normalized) ||
+                     normalized.includes(normalizedUserAnswer);
+            });
+          }
 
           status = isCorrect ? "correct" : "incorrect";
         }

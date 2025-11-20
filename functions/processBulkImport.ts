@@ -113,23 +113,27 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
       continue;
     }
 
-    // Format: Question | Answer
+    // Format: Question | Answer (with optional multiple answers separated by ;)
     if (line.includes('|')) {
       const parts = line.split('|').map(p => p.trim());
       
       if (parts.length >= 2) {
         let questionText = parts[0].replace(/^Q:\s*/i, '').replace(/^Question:\s*/i, '');
-        const answer = parts[1];
+        const answerPart = parts[1];
         
         // Check if this is a writing question
         const isWriting = questionText.match(/^\[WRITING\]\s*/i) || 
-                         answer.toLowerCase() === 'writing' ||
+                         answerPart.toLowerCase() === 'writing' ||
                          questionText.toLowerCase().includes('write about') ||
                          questionText.toLowerCase().includes('describe in');
         
         if (isWriting) {
           questionText = questionText.replace(/^\[WRITING\]\s*/i, '').trim();
         }
+        
+        // Parse multiple acceptable answers (separated by semicolons)
+        const acceptableAnswers = isWriting ? [] : answerPart.split(';').map(a => a.trim()).filter(a => a);
+        const mainAnswer = acceptableAnswers[0] || answerPart;
         
         // Check if override subject/units/topic provided
         const overrideSubject = parts[2] || subject;
@@ -138,13 +142,14 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
 
         const newQuestion = createQuestion(
           questionText,
-          isWriting ? 'writing' : answer,
+          isWriting ? 'writing' : mainAnswer,
           overrideSubject,
           overrideUnits,
           overrideTopic,
           counter++,
           currentStory,
-          isWriting
+          isWriting,
+          acceptableAnswers
         );
 
         questions.push(newQuestion);
@@ -220,7 +225,7 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
   return questions;
 }
 
-function createQuestion(questionText, answer, subject, units, topicId, counter, story = null, forceWriting = false) {
+function createQuestion(questionText, answer, subject, units, topicId, counter, story = null, forceWriting = false, acceptableAnswers = []) {
   const timestamp = Date.now();
   const questionId = `${subject}_${units}_${topicId}_${counter}_${timestamp}`;
   
@@ -261,6 +266,7 @@ function createQuestion(questionText, answer, subject, units, topicId, counter, 
     max_score: questionType === "writing" ? 100 : 10,
     difficulty_level: difficulty,
     answer: questionType === "writing" ? "" : answer,
+    acceptable_answers: acceptableAnswers.length > 0 ? acceptableAnswers : [answer],
     origin_type: "teacher_custom",
     is_active: true
   };
@@ -269,7 +275,7 @@ function createQuestion(questionText, answer, subject, units, topicId, counter, 
     question.reading_text = story;
   }
   
-  console.log(`✅ Created Q${counter}: topic_id="${topicId}", subject="${subject}", units=${units}`);
+  console.log(`✅ Created Q${counter}: topic_id="${topicId}", ${acceptableAnswers.length} acceptable answers`);
 
   return question;
 }

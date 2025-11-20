@@ -237,7 +237,8 @@ export default function AdminBulkImportPage() {
       title: "פורמט פשוט",
       example: `What is 2+2? | 4
 The capital of France? | Paris
-תרגם: שלום | Hello`
+Replace with synonym: 'big' | large; huge; massive; giant
+Complete: I ___ to school | go; walk; drive`
     },
     {
       title: "עם סיפור",
