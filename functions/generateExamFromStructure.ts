@@ -17,40 +17,36 @@ Deno.serve(async (req) => {
     const { subject, unitLevel, moduleId, includeDiagrams, generate_solutions } = await req.json();
     console.log('✅ Request parsed:', { subject, unitLevel, moduleId });
 
-    console.log('🔍 Step 3: Loading exam structures...');
+    console.log('🔍 Step 3: Loading exam examples...');
+    // טעינה ממקורות שונים - ExamStructure או GenericExam
     const allStructures = await base44.asServiceRole.entities.ExamStructure.list();
-    console.log(`✅ Loaded ${allStructures.length} total structures`);
+    const allGenericExams = await base44.asServiceRole.entities.GenericExam.list();
+    console.log(`✅ Loaded ${allStructures.length} ExamStructure + ${allGenericExams.length} GenericExam`);
 
-    console.log('🔍 Step 4: Filtering structures...');
+    console.log('🔍 Step 4: Filtering examples...');
     console.log('Looking for:', { subject, unitLevel: parseInt(unitLevel), moduleId });
     
-    // Debug: Show sample structures
-    if (allStructures.length > 0) {
-      console.log('Sample structure:', {
-        subject: allStructures[0].subject,
-        unit_level: allStructures[0].unit_level,
-        module_id: allStructures[0].module_id
-      });
-    }
-    
-    const structures = allStructures.filter(s => {
-      const matches = s.subject === subject && 
+    // סינון ExamStructure
+    const structuresFromExamStructure = allStructures.filter(s => {
+      return s.subject === subject && 
         s.unit_level === parseInt(unitLevel) && 
         s.module_id === moduleId;
-      
-      if (!matches) {
-        console.log('Structure mismatch:', {
-          expected: { subject, unitLevel: parseInt(unitLevel), moduleId },
-          actual: { subject: s.subject, unit_level: s.unit_level, module_id: s.module_id },
-          subject_match: s.subject === subject,
-          unit_match: s.unit_level === parseInt(unitLevel),
-          module_match: s.module_id === moduleId
-        });
-      }
-      
-      return matches;
     });
-    console.log(`✅ Found ${structures.length} matching structures`);
+    
+    // סינון GenericExam (כולל מבחנים שנסרקו)
+    const structuresFromGenericExam = allGenericExams.filter(exam => {
+      return exam.subject === subject && 
+        exam.unit_level === parseInt(unitLevel) && 
+        exam.module_id === moduleId &&
+        exam.is_generated !== true; // רק מבחנים נסרקים, לא כאלה שכבר נוצרו
+    });
+    
+    console.log(`✅ Found ${structuresFromExamStructure.length} from ExamStructure`);
+    console.log(`✅ Found ${structuresFromGenericExam.length} from GenericExam`);
+    
+    // שילוב המקורות
+    const structures = [...structuresFromExamStructure, ...structuresFromGenericExam];
+    console.log(`✅ Total: ${structures.length} matching structures`);
 
     if (structures.length === 0) {
       console.error('❌ No matching structures found');
@@ -62,7 +58,7 @@ Deno.serve(async (req) => {
 
     const randomIndex = Math.floor(Math.random() * structures.length);
     const examStructure = structures[randomIndex];
-    console.log(`🎯 Selected structure: ${examStructure.structure_name}`);
+    console.log(`🎯 Selected structure: ${examStructure.structure_name || examStructure.title}`);
 
     // יצירת מבחן חדש בהתבסס על המבנה
     const generationPrompt = `
