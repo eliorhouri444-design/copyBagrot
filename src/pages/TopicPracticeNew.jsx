@@ -449,95 +449,85 @@ export default function TopicPracticeNewPage() {
         console.log("✅ Feedback dialog should be open now");
         return; // Stop here, don't auto-advance
       } else {
-        // Regular question handling
+        // NEW ANSWER CHECKING SYSTEM
+        let correctAnswer = "";
+        let allCorrectAnswers = [];
+        let explanation = "";
+
+        // 1. Get correct answers from SolutionBank
         const solutions = await base44.entities.SolutionBank.filter({
           question_id: currentQuestion.question_id
         });
 
-        let isCorrect = false;
-        let status = "incorrect";
-        let correctAnswer = "";
-        let explanation = "";
-        let allAcceptableAnswers = [];
-
         if (solutions.length > 0) {
           const solution = solutions[0];
-          const finalAnswers = solution.final_answers || [];
-          const acceptableVariants = solution.acceptable_variants || [];
-          explanation = solution.explanation || currentQuestion.explanation || "";
+          explanation = solution.explanation || "";
 
-          // Extract all acceptable answers from final_answers
-          finalAnswers.forEach(ans => {
-            if (typeof ans === 'string') {
-              allAcceptableAnswers.push(ans);
-            } else if (ans?.value) {
-              allAcceptableAnswers.push(String(ans.value));
-              if (ans.variants && Array.isArray(ans.variants)) {
-                ans.variants.forEach(v => allAcceptableAnswers.push(String(v)));
+          // Get from final_answers
+          if (solution.final_answers) {
+            solution.final_answers.forEach(ans => {
+              if (typeof ans === 'string' && ans) {
+                allCorrectAnswers.push(ans);
+              } else if (ans?.value) {
+                allCorrectAnswers.push(String(ans.value));
               }
-            }
-          });
+            });
+          }
 
-          // Add acceptable_variants
-          acceptableVariants.forEach(variant => {
-            if (typeof variant === 'string') {
-              allAcceptableAnswers.push(variant);
-            } else if (variant?.value) {
-              allAcceptableAnswers.push(String(variant.value));
-            }
-          });
-
-          // Set first answer as the display answer
-          if (allAcceptableAnswers.length > 0) {
-            correctAnswer = allAcceptableAnswers[0];
+          // Get from acceptable_variants
+          if (solution.acceptable_variants) {
+            solution.acceptable_variants.forEach(variant => {
+              if (typeof variant === 'string' && variant) {
+                allCorrectAnswers.push(variant);
+              }
+            });
           }
         }
 
-        // Add from question's acceptable_answers
-        if (currentQuestion.acceptable_answers?.length > 0) {
-          currentQuestion.acceptable_answers.forEach(ans => {
-            allAcceptableAnswers.push(String(ans));
-          });
-          if (!correctAnswer) {
-            correctAnswer = String(currentQuestion.acceptable_answers[0]);
-          }
-        }
-
-        // Add from question's correct_answer
+        // 2. Get from question itself
         if (currentQuestion.correct_answer) {
-          allAcceptableAnswers.push(String(currentQuestion.correct_answer));
-          if (!correctAnswer) {
-            correctAnswer = String(currentQuestion.correct_answer);
-          }
+          allCorrectAnswers.push(String(currentQuestion.correct_answer));
         }
 
-        // Simple normalization - just lowercase and trim
-        const normalizedUserAnswer = userAnswer.toLowerCase().trim();
+        if (currentQuestion.acceptable_answers) {
+          currentQuestion.acceptable_answers.forEach(ans => {
+            if (ans) allCorrectAnswers.push(String(ans));
+          });
+        }
 
-        // Check exact match first
-        isCorrect = allAcceptableAnswers.some(acceptableAns => {
-          const normalized = String(acceptableAns).toLowerCase().trim();
-          return normalized === normalizedUserAnswer;
+        // 3. Set display answer
+        correctAnswer = allCorrectAnswers[0] || "לא ידוע";
+
+        // 4. Check if answer is correct - EXACT MATCH ONLY
+        const userLower = userAnswer.toLowerCase().trim();
+        const isCorrect = allCorrectAnswers.some(ans => {
+          return String(ans).toLowerCase().trim() === userLower;
         });
 
-        status = isCorrect ? "correct" : "incorrect";
-
+        // 5. Save attempt
         await base44.entities.AttemptNew.create({
           question_id: currentQuestion.question_id,
           subject_id: currentQuestion.subject_id,
           topic_id: topicId,
           session_id: sessionId,
           user_answer_text: userAnswer,
-          score: isCorrect ? currentQuestion.max_score : 0,
-          max_score: currentQuestion.max_score,
+          score: isCorrect ? (currentQuestion.max_score || 1) : 0,
+          max_score: currentQuestion.max_score || 1,
           percentage: isCorrect ? 100 : 0,
-          status: status,
+          status: isCorrect ? "correct" : "incorrect",
           time_spent_seconds: 0
         });
 
+        // 6. Store results
         setResults(prev => ({
           ...prev,
-          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer, explanation }
+          [currentQuestion.question_id]: {
+            isCorrect,
+            status: isCorrect ? "correct" : "incorrect",
+            correctAnswer,
+            userAnswer,
+            explanation
+          }
         }));
       }
 
