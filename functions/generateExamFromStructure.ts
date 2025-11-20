@@ -18,10 +18,14 @@ Deno.serve(async (req) => {
     console.log('✅ Request parsed:', { subject, unitLevel, moduleId });
 
     console.log('🔍 Step 3: Loading exam examples...');
-    // טעינה ממקורות שונים - ExamStructure או GenericExam
+    // טעינה ממקורות שונים - ExamStructure, GenericExam, ModuleA/B/C
     const allStructures = await base44.asServiceRole.entities.ExamStructure.list();
     const allGenericExams = await base44.asServiceRole.entities.GenericExam.list();
-    console.log(`✅ Loaded ${allStructures.length} ExamStructure + ${allGenericExams.length} GenericExam`);
+    const allModuleAExams = await base44.asServiceRole.entities.ModuleAExam.list();
+    const allModuleBExams = await base44.asServiceRole.entities.ModuleBExam.list();
+    const allModuleCExams = await base44.asServiceRole.entities.ModuleCExam.list();
+    
+    console.log(`✅ Loaded ${allStructures.length} ExamStructure + ${allGenericExams.length} GenericExam + ${allModuleAExams.length} ModuleA + ${allModuleBExams.length} ModuleB + ${allModuleCExams.length} ModuleC`);
 
     console.log('🔍 Step 4: Filtering examples...');
     console.log('Looking for:', { subject, unitLevel: parseInt(unitLevel), moduleId });
@@ -41,11 +45,31 @@ Deno.serve(async (req) => {
         exam.is_generated !== true; // רק מבחנים נסרקים, לא כאלה שכבר נוצרו
     });
     
+    // סינון ModuleA/B/C (מבחנים מסוג A/B/C)
+    let structuresFromModules = [];
+    if (moduleId === 'A') {
+      structuresFromModules = allModuleAExams.filter(exam => 
+        exam.subject === subject && 
+        (exam.unit_level || exam.units) === parseInt(unitLevel)
+      );
+    } else if (moduleId === 'B') {
+      structuresFromModules = allModuleBExams.filter(exam => 
+        exam.subject === subject && 
+        (exam.unit_level || exam.units) === parseInt(unitLevel)
+      );
+    } else if (moduleId === 'C') {
+      structuresFromModules = allModuleCExams.filter(exam => 
+        exam.subject === subject && 
+        (exam.unit_level || exam.units) === parseInt(unitLevel)
+      );
+    }
+    
     console.log(`✅ Found ${structuresFromExamStructure.length} from ExamStructure`);
     console.log(`✅ Found ${structuresFromGenericExam.length} from GenericExam`);
+    console.log(`✅ Found ${structuresFromModules.length} from Module${moduleId}`);
     
     // שילוב המקורות
-    const structures = [...structuresFromExamStructure, ...structuresFromGenericExam];
+    const structures = [...structuresFromExamStructure, ...structuresFromGenericExam, ...structuresFromModules];
     console.log(`✅ Total: ${structures.length} matching structures`);
 
     if (structures.length === 0) {
