@@ -102,9 +102,9 @@ export default function ExamsPage() {
     },
     "כימיה": {
       5: [
-        { id: "043381", title: "שאלון 043381", description: "כימיה חלק א'", details: "מבנה החומר, תמיסות, קינטיקה", duration: 180, color: "from-orange-500 to-orange-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 0 },
-        { id: "043382", title: "שאלון 043382", description: "כימיה חלק ב'", details: "שיווי משקל, כימיה אורגנית", duration: 180, color: "from-red-500 to-red-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 1 },
-        { id: "043383", title: "שאלון 043383", description: "כימיה חלק ג'", details: "עבודת חקר", duration: 120, color: "from-pink-500 to-pink-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }
+        { id: "37381", title: "שאלון 37381 - פרק א'", description: "שאלות חובה", details: "מבנה החומר, תמיסות, קינטיקה, שיווי משקל - שאלות חובה לכולם", duration: 180, color: "from-orange-500 to-orange-600", points: "70", parts: ["חובה"], entity: "GenericExam", order: 0 },
+        { id: "37381_B", title: "שאלון 37381 - פרק ב'", description: "שאלות בחירה", details: "העמקה בנושאים - בחירה בין מספר שאלות", duration: 120, color: "from-red-500 to-red-600", points: "30", parts: ["בחירה"], entity: "GenericExam", order: 1 },
+        { id: "lab", title: "הערכה פנימית", description: "עבודת מעבדה", details: "בדיקה מעשית וכתיבת דוח - מהווה 15-30% מהציון", duration: 180, color: "from-pink-500 to-pink-600", points: "30", parts: ["מעבדה"], entity: "GenericExam", order: 2 }
       ]
     },
     "ביולוגיה": {
