@@ -508,9 +508,35 @@ export default function AdminExamScannerPage() {
       setProgress(50);
       setStatusMessage('מעבד עם AI...');
 
+      const prompt = isBibleExam 
+        ? `נתח את מבחן הבגרות בתנ"ך הבא.
+
+⚠️ חשוב מאוד - מבנה מבחן תנ"ך:
+• מבחן תנ"ך מכיל בדרך כלל 3-5 שאלות בלבד
+• כל שאלה מכילה מספר סעיפים פנימיים (א, ב, ג, ד...)
+• יש קטע מקראי אחד (reading_text) שכל השאלות מתייחסות אליו
+
+חלץ בדיוק:
+1. קטע מקראי (reading_text) - הטקסט המקורי מהתנ"ך
+2. שאלות (questions) - כל שאלה עם הסעיפים שלה:
+   - question_number: מספר השאלה הראשית (1, 2, 3...)
+   - question_text: טקסט השאלה הראשית
+   - parts: מערך של סעיפים (א, ב, ג...)
+     * part_id: מזהה הסעיף (א, ב, ג)
+     * text: טקסט הסעיף
+     * correct_answer: תשובה מצופה (אם ניתן)
+     * points: ניקוד הסעיף
+   - chapter: הפרק בתנ"ך (בראשית, שמות וכו')
+   - points: סך ניקוד כל השאלה
+
+⚠️ אל תפצל סעיפים לשאלות נפרדות!
+סעיף א, ב, ג של שאלה 1 = parts של question_number 1`
+        : `חלץ את כל השאלות מהמבחן, כולל מספר שאלה, טקסט, סוג, אפשרויות תשובה, תשובה נכונה, נקודות ונושא.`;
+
       const extractionResult = await base44.integrations.Core.ExtractDataFromUploadedFile({
         file_url: file_url,
-        json_schema: extractionSchema
+        json_schema: extractionSchema,
+        ...(isBibleExam && { prompt })
       });
 
       if (extractionResult.status === 'error') {
