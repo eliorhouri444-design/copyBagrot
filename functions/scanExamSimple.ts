@@ -171,6 +171,7 @@ ${subject === 'היסטוריה' || subject === 'ספרות' ? '- זהה טקס�
                                 difficulty_level: { type: "string" },
                                 question_type: { type: "string" },
                                 points: { type: "integer" },
+                                question_text: { type: "string" },
                                 has_diagram: { type: "boolean" },
                                 diagram_description: { type: "string" },
                                 has_text: { type: "boolean" },
