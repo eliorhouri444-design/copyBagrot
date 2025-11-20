@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
+import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -46,7 +47,6 @@ export default function TopicPracticeNewPage() {
   const [showStoryDialog, setShowStoryDialog] = useState(false);
   const [listeningText, setListeningText] = useState("");
   const [showListeningIntro, setShowListeningIntro] = useState(false);
-  const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
   const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
 
   const [showCalculator, setShowCalculator] = useState(false);
@@ -885,31 +885,31 @@ export default function TopicPracticeNewPage() {
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start gap-3 bg-indigo-50 rounded-lg p-3">
                   <span className="text-indigo-600 font-bold text-lg flex-shrink-0">1</span>
-                  <span className="font-medium">האזן לקטע השמיעה - <strong>ניתן לשמוע עד פעמיים בלבד!</strong></span>
+                  <span className="font-medium">האזן לקטע השמיעה - <strong>רק פעמיים!</strong></span>
                 </li>
                 <li className="flex items-start gap-3 bg-purple-50 rounded-lg p-3">
                   <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
-                  <span className="font-medium">לאחר מכן תענה על <strong>{currentSetQuestions.length} שאלות</strong> על הקטע</span>
+                  <span className="font-medium">אחרי פעמיים, עבור לענות על <strong>{currentSetQuestions.length} שאלות</strong></span>
                 </li>
-                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3">
+                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3 border-2 border-red-300">
                   <span className="text-red-600 font-bold text-lg flex-shrink-0">⚠️</span>
-                  <span className="font-medium"><strong>שים לב:</strong> לאחר שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
+                  <span className="font-medium"><strong>חשוב מאוד:</strong> אחרי שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
                 </li>
               </ul>
             </div>
 
             <Button
               onClick={() => setShowListeningIntro(false)}
-              disabled={!canProceedToQuestions && playCount === 0}
+              disabled={!canProceedToQuestions}
               className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {canProceedToQuestions || playCount > 0 ? (
+              {canProceedToQuestions ? (
                 <>
                   ✓ התחל לענות על השאלות
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </>
               ) : (
-                'האזן לקטע לפחות פעם אחת כדי להמשיך'
+                'שמע את הקטע פעמיים כדי להמשיך'
               )}
             </Button>
           </motion.div>
@@ -1247,7 +1247,7 @@ export default function TopicPracticeNewPage() {
                 {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
               </div>
               <div className="text-sm text-gray-600 mb-3">תשובות נכונות</div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-900 mt-3">
                 {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
               </div>
               <div className="text-xs text-gray-600">דרגת השליטה בנושא</div>
