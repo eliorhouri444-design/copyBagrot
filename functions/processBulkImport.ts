@@ -62,27 +62,53 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
 
   const lines = rawInput.split('\n').map(l => l.trim()).filter(l => l);
 
-  // First pass: collect all stories
+  // First pass: collect all stories (including Story: without number)
+  let currentStory = null;
+  const storyBlocks = [];
+  
   for (const line of lines) {
-    const storyMatch = line.match(/^(story|text|reading)\s+(\d+):\s*(.+)/i);
-    if (storyMatch) {
-      const storyNumber = parseInt(storyMatch[2]);
-      const storyText = storyMatch[3].trim();
+    // Match "Story: text" (without number)
+    const simpleStoryMatch = line.match(/^(story|text|reading):\s*(.+)/i);
+    if (simpleStoryMatch) {
+      currentStory = simpleStoryMatch[2].trim();
+      storyBlocks.push({ story: currentStory, questions: [] });
+      console.log(`📖 New Story Block: ${currentStory.substring(0, 50)}...`);
+      continue;
+    }
+    
+    // Match "Story 1: text" (with number)
+    const numberedStoryMatch = line.match(/^(story|text|reading)\s+(\d+):\s*(.+)/i);
+    if (numberedStoryMatch) {
+      const storyNumber = parseInt(numberedStoryMatch[2]);
+      const storyText = numberedStoryMatch[3].trim();
       stories[storyNumber] = storyText;
       console.log(`📖 Story ${storyNumber}: ${storyText.substring(0, 50)}...`);
+      continue;
     }
   }
 
-  // If readingStory provided, use it for all
+  // If readingStory provided globally, use it for all
   if (readingStory) {
     stories[1] = readingStory;
+    currentStory = readingStory;
   }
 
-  // Second pass: parse questions
+  // Second pass: parse questions and assign to story blocks
+  currentStory = readingStory || null;
+  let currentBlockIndex = -1;
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Skip story lines
+    // Detect new story block
+    const simpleStoryMatch = line.match(/^(story|text|reading):\s*(.+)/i);
+    if (simpleStoryMatch) {
+      currentStory = simpleStoryMatch[2].trim();
+      currentBlockIndex = storyBlocks.findIndex(b => b.story === currentStory);
+      continue;
+    }
+
+    // Skip numbered story lines
     if (line.match(/^(story|text|reading)\s+\d+:/i)) {
       continue;
     }
@@ -110,16 +136,23 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
         const overrideUnits = parts[3] ? parseInt(parts[3]) : units;
         const overrideTopic = parts[4] || topicId;
 
-        questions.push(createQuestion(
+        const newQuestion = createQuestion(
           questionText,
           isWriting ? 'writing' : answer,
           overrideSubject,
           overrideUnits,
           overrideTopic,
           counter++,
-          null,
+          currentStory,
           isWriting
-        ));
+        );
+
+        questions.push(newQuestion);
+        
+        // Also add to current story block if exists
+        if (currentBlockIndex >= 0 && storyBlocks[currentBlockIndex]) {
+          storyBlocks[currentBlockIndex].questions.push(newQuestion);
+        }
       }
       continue;
     }
@@ -167,19 +200,23 @@ function parseInput(rawInput, subject, units, topicId, readingStory = null) {
     }
   }
 
-  // Assign stories to questions (every 10 questions gets a story)
-  console.log(`📚 Total stories: ${Object.keys(stories).length}, Total questions: ${questions.length}`);
+  // Assign numbered stories to questions (every 10 questions gets a story)
+  console.log(`📚 Total numbered stories: ${Object.keys(stories).length}, Story blocks: ${storyBlocks.length}, Total questions: ${questions.length}`);
   
   if (Object.keys(stories).length > 0) {
     for (let i = 0; i < questions.length; i++) {
-      const storyNumber = Math.floor(i / 10) + 1;
-      if (stories[storyNumber]) {
-        questions[i].reading_text = stories[storyNumber];
-        console.log(`✅ Q${i + 1} (${i % 10 + 1}/10) → Story ${storyNumber}`);
+      // Only assign numbered stories if the question doesn't already have reading_text from Story: block
+      if (!questions[i].reading_text) {
+        const storyNumber = Math.floor(i / 10) + 1;
+        if (stories[storyNumber]) {
+          questions[i].reading_text = stories[storyNumber];
+          console.log(`✅ Q${i + 1} (${i % 10 + 1}/10) → Story ${storyNumber}`);
+        }
       }
     }
   }
   
+  console.log(`🎯 Final: ${questions.filter(q => q.reading_text).length} questions have reading text`);
   return questions;
 }
 

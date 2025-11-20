@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Upload, CheckCircle, Copy, Eye, Trash2, Edit2, Save } from "lucide-react";
+import { ArrowLeft, Upload, CheckCircle, AlertCircle, FileText, Copy, Eye, Download, Trash2, Sparkles, Edit2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -241,9 +241,11 @@ The capital of France? | Paris
     },
     {
       title: "עם סיפור",
-      example: `Story: Tom went to the park yesterday.
+      example: `Story: Tom went to the park yesterday. He played football with his friends and had a great time. They stayed until sunset.
 Q: Where did Tom go? | To the park
-Q: When did Tom go? | Yesterday`
+Q: When did Tom go? | Yesterday
+Q: What did he play? | Football
+Q: Who did he play with? | His friends`
     },
     {
       title: "שאלות כתיבה",
