@@ -208,11 +208,11 @@ export default function TakeExamPage() {
   // Pre-exam intro
   if (!examStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto p-4 pb-24">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto p-6"
         >
           <div className="text-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -222,6 +222,7 @@ export default function TakeExamPage() {
             <p className="text-gray-600">{exam.subject} • {exam.unit_level} יחידות</p>
           </div>
 
+          {/* Exam Details */}
           <div className="space-y-3 mb-6">
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
               <div className="flex items-center justify-between">
@@ -235,7 +236,70 @@ export default function TakeExamPage() {
                 <span className="text-purple-600 font-bold">{questions.length}</span>
               </div>
             </div>
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 font-semibold">ציון עובר</span>
+                <span className="text-green-600 font-bold">{exam.passing_grade || 56}</span>
+              </div>
+            </div>
           </div>
+
+          {/* Instructions */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border-2 border-amber-200 mb-6">
+            <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
+              <span className="text-2xl">📋</span>
+              הוראות המבחן
+            </h3>
+            <ul className="space-y-2 text-gray-700">
+              {readingText && (
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold">1.</span>
+                  <span>תקרא את טקסט הקריאה בעיון לפני תחילת השאלות</span>
+                </li>
+              )}
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold">{readingText ? "2" : "1"}.</span>
+                <span>ענה על כל השאלות בזמן שהוקצב</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold">{readingText ? "3" : "2"}.</span>
+                <span>תוכל לנווט בין השאלות בכל עת</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold">{readingText ? "4" : "3"}.</span>
+                <span>לחץ "סיים מבחן" כשתסיים את כל השאלות</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Module Specific Info */}
+          {module === "A" && (
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-6">
+              <h4 className="font-bold text-blue-900 mb-2">מבנה מודול A:</h4>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• הבנת הנקרא - 70 נקודות</li>
+                <li>• האזנה - 30 נקודות</li>
+              </ul>
+            </div>
+          )}
+          {module === "B" && (
+            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 mb-6">
+              <h4 className="font-bold text-purple-900 mb-2">מבנה מודול B:</h4>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• דקדוק ואוצר מילים - 70 נקודות</li>
+                <li>• כתיבה - 30 נקודות</li>
+              </ul>
+            </div>
+          )}
+          {module === "C" && (
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200 mb-6">
+              <h4 className="font-bold text-green-900 mb-2">מבנה מודול C:</h4>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• הבנת הנקרא - 70 נקודות</li>
+                <li>• כתיבה - 30 נקודות</li>
+              </ul>
+            </div>
+          )}
 
           <Button onClick={handleStartExam} className="w-full h-14 bg-green-600 hover:bg-green-700 text-lg font-bold">
             התחל מבחן
