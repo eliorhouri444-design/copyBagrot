@@ -561,10 +561,11 @@ export default function AdminExamScannerPage() {
 כל האותיות א, ב, ג, ד והמספרים בסוגריים (1), (2) הם part_id.`
         : `חלץ את כל השאלות מהמבחן, כולל מספר שאלה, טקסט, סוג, אפשרויות תשובה, תשובה נכונה, נקודות ונושא.`;
 
-      const extractionResult = await base44.integrations.Core.ExtractDataFromUploadedFile({
-        file_url: file_url,
-        json_schema: extractionSchema,
-        ...(isBibleExam && { prompt })
+      // שימוש ב-InvokeLLM עם הקובץ ישירות - יותר יציב ומהיר
+      const extractionResult = await base44.integrations.Core.InvokeLLM({
+        prompt: isBibleExam ? prompt : 'חלץ את כל השאלות מהמבחן, כולל מספר שאלה, טקסט, סוג, אפשרויות תשובה, תשובה נכונה, נקודות ונושא.',
+        file_urls: [file_url],
+        response_json_schema: extractionSchema
       });
 
       if (extractionResult.status === 'error') {
