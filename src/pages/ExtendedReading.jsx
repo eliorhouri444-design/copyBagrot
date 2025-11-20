@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, Check, X, ChevronRight, Trophy, AlertCircle, BookOpen, Loader2, Crown } from "lucide-react";
+import ListeningPlayer from "@/components/practice/ListeningPlayer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -38,6 +39,9 @@ export default function ExtendedReadingPage() {
   const [readingText, setReadingText] = useState("");
   const [showReadingText, setShowReadingText] = useState(true);
   const [showStoryDialog, setShowStoryDialog] = useState(false);
+  const [listeningText, setListeningText] = useState("");
+  const [showListeningIntro, setShowListeningIntro] = useState(false);
+  const [canProceedToQuestions, setCanProceedToQuestions] = useState(false);
   const [showAdDialog, setShowAdDialog] = useState(false);
   const [showAdConfirmDialog, setShowAdConfirmDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,13 +119,27 @@ export default function ExtendedReadingPage() {
 
       setCurrentSetQuestions(setQuestions);
 
-      // Get reading text
-      if (setQuestions[0]?.reading_text) {
-        setReadingText(setQuestions[0].reading_text);
-        setShowReadingText(true);
-      } else {
+      // Check if this is listening comprehension
+      const isListeningComprehension = topicId.toLowerCase().includes('listening') || 
+                                       topicId.toLowerCase().includes('האזנה');
+      
+      if (isListeningComprehension && setQuestions[0]?.reading_text) {
+        setListeningText(setQuestions[0].reading_text);
+        setShowListeningIntro(true);
+        // Don't set reading text for listening topics
         setReadingText("");
         setShowReadingText(false);
+      } else {
+        // Check if this is reading comprehension and get reading text
+        if (setQuestions[0]?.reading_text) {
+          setReadingText(setQuestions[0].reading_text);
+          setShowReadingText(true);
+        } else {
+          setReadingText("");
+          setShowReadingText(false);
+        }
+        setListeningText("");
+        setShowListeningIntro(false);
       }
 
       const session = await base44.entities.PracticeSessionNew.create({
@@ -463,6 +481,91 @@ export default function ExtendedReadingPage() {
   const currentQuestion = currentSetQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
+  const isListeningTopic = topicId?.toLowerCase().includes('listening') || 
+                           topicId?.toLowerCase().includes('האזנה');
+
+  // Show listening intro if exists and requested
+  if (listeningText && showListeningIntro) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+          <div className="flex items-center justify-between text-white">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="text-white hover:bg-white/20 h-9 w-9"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+
+            <div className="text-center flex-1">
+              <h1 className="text-lg sm:text-xl font-bold">🎧 {topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • Listening Practice</p>
+            </div>
+
+            <div className="w-9" />
+          </div>
+        </div>
+
+        <div className="px-4 sm:px-6 pb-20 max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
+              <div className="text-5xl mb-3">🎧</div>
+              <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
+              <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
+            </div>
+
+            <ListeningPlayer 
+              audioText={listeningText} 
+              maxPlays={2}
+              onMaxPlaysReached={() => setCanProceedToQuestions(true)}
+            />
+
+            <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
+              <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
+                <span className="text-2xl">📝</span>
+                הוראות חשובות:
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3 bg-indigo-50 rounded-lg p-3">
+                  <span className="text-indigo-600 font-bold text-lg flex-shrink-0">1</span>
+                  <span className="font-medium">האזן לקטע השמיעה - <strong>רק פעמיים!</strong></span>
+                </li>
+                <li className="flex items-start gap-3 bg-purple-50 rounded-lg p-3">
+                  <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
+                  <span className="font-medium">אחרי פעמיים, עבור לענות על <strong>{currentSetQuestions.length} שאלות</strong></span>
+                </li>
+                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3 border-2 border-red-300">
+                  <span className="text-red-600 font-bold text-lg flex-shrink-0">⚠️</span>
+                  <span className="font-medium"><strong>חשוב מאוד:</strong> אחרי שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
+                </li>
+              </ul>
+            </div>
+
+            <Button
+              onClick={() => setShowListeningIntro(false)}
+              disabled={!canProceedToQuestions}
+              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {canProceedToQuestions ? (
+                <>
+                  ✓ התחל לענות על השאלות
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                </>
+              ) : (
+                'שמע את הקטע פעמיים כדי להמשיך'
+              )}
+            </Button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
@@ -483,7 +586,7 @@ export default function ExtendedReadingPage() {
             <p className="text-xs sm:text-sm opacity-90">שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && (
+          {readingText && !isListeningTopic && (
             <Button
               variant="ghost"
               size="icon"
