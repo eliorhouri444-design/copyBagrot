@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 import MathCalculator from "@/components/practice/MathCalculator";
@@ -109,11 +110,12 @@ export default function TopicPracticeNewPage() {
       const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
 
-      if (!questionsForTopic || questionsForTopic.length === 0) {
-        setError("לא נמצאו שאלות לנושא זה");
-        setIsLoading(false);
-        return;
-      }
+      // This check is redundant - already handled above
+      // if (!questionsForTopic || questionsForTopic.length === 0) {
+      //   setLoadError("לא נמצאו שאלות לנושא זה");
+      //   setIsLoading(false);
+      //   return;
+      // }
 
       setAllQuestions(questionsForTopic);
 
