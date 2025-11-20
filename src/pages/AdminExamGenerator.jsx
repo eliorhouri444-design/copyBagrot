@@ -112,6 +112,30 @@ export default function AdminExamGeneratorPage() {
       organized[subject][unitLevel][moduleId].structures.push(structure);
     });
 
+    // הוספת ModuleA/B/C
+    [...moduleAExams.map(e => ({...e, moduleId: 'A'})), 
+     ...moduleBExams.map(e => ({...e, moduleId: 'B'})), 
+     ...moduleCExams.map(e => ({...e, moduleId: 'C'}))
+    ].forEach(exam => {
+      const subject = exam.subject;
+      const unitLevel = exam.unit_level || exam.units;
+      const moduleId = exam.moduleId;
+      
+      if (!organized[subject]) organized[subject] = {};
+      if (!organized[subject][unitLevel]) organized[subject][unitLevel] = {};
+      if (!organized[subject][unitLevel][moduleId]) {
+        organized[subject][unitLevel][moduleId] = {
+          subject,
+          unit_level: unitLevel,
+          module_id: moduleId,
+          structures: [],
+          generated_count: 0
+        };
+      }
+      
+      organized[subject][unitLevel][moduleId].structures.push(exam);
+    });
+
     generatedExams.forEach(exam => {
       const subject = exam.subject;
       const unitLevel = exam.unit_level;
@@ -123,7 +147,7 @@ export default function AdminExamGeneratorPage() {
     });
 
     return organized;
-  }, [examStructures, generatedExams]);
+  }, [examStructures, generatedExams, moduleAExams, moduleBExams, moduleCExams]);
 
   const filteredData = React.useMemo(() => {
     const filtered = {};
