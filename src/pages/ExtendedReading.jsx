@@ -355,10 +355,6 @@ export default function ExtendedReadingPage() {
   const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
 
-  const currentQuestion = currentSetQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
-  const hasAnswered = !!answers[currentQuestion.question_id];
-
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
       {/* Header */}
