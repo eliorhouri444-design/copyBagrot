@@ -927,8 +927,8 @@ export default function TopicPracticeNewPage() {
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+      <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
+        <div className="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-b-[2rem] p-4 shadow-xl">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -940,25 +940,25 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
-              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+              <h1 className="text-lg font-bold">{topicName}</h1>
+              <p className="text-xs opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
             </div>
 
             <div className="w-9" />
           </div>
         </div>
 
-        <div className="px-4 sm:px-6 pb-20 max-w-2xl mx-auto">
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
+            className="space-y-3 max-w-2xl mx-auto"
           >
             <ListeningPlayer audioText={listeningText} />
 
-            <div className="bg-white rounded-2xl shadow-lg p-5">
-              <h3 className="font-bold text-gray-900 text-lg mb-3">הוראות:</h3>
-              <ul className="space-y-2 text-gray-700">
+            <div className="bg-white rounded-xl shadow-lg p-4">
+              <h3 className="font-bold text-gray-900 text-base mb-2">הוראות:</h3>
+              <ul className="space-y-2 text-gray-700 text-sm">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
                   <span>האזן לקטע השמיעה בעיון (מומלץ לפחות פעמיים)</span>
@@ -973,15 +973,19 @@ export default function TopicPracticeNewPage() {
                 </li>
               </ul>
             </div>
+          </motion.div>
+        </div>
 
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 pb-6 shadow-2xl">
+          <div className="max-w-2xl mx-auto">
             <Button
               onClick={() => setShowListeningIntro(false)}
-              className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl shadow-md"
             >
               התחל לענות על השאלות
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
-          </motion.div>
+          </div>
         </div>
       </div>
     );
@@ -990,8 +994,8 @@ export default function TopicPracticeNewPage() {
   // Show reading text if exists and requested
   if (readingText && showReadingText) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+      <div className="h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-[2rem] p-4 shadow-xl">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -1003,36 +1007,36 @@ export default function TopicPracticeNewPage() {
             </Button>
 
             <div className="text-center flex-1">
-              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
-              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+              <h1 className="text-lg font-bold">{topicName}</h1>
+              <p className="text-xs opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
             </div>
 
             <div className="w-9" />
           </div>
         </div>
 
-        <div className="px-4 sm:px-6 pb-20">
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto"
+            className="bg-white rounded-xl shadow-lg overflow-hidden max-w-2xl mx-auto h-full flex flex-col"
           >
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5 border-b-2 border-blue-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b-2 border-blue-100">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">קרא את הטקסט</h2>
-                  <p className="text-xs sm:text-sm text-gray-600">לאחר מכן תענה על 10 שאלות</p>
+                  <h2 className="text-lg font-bold text-gray-900">קרא את הטקסט</h2>
+                  <p className="text-xs text-gray-600">לאחר מכן תענה על 10 שאלות</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-5 sm:p-6">
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-4 sm:p-5 border border-gray-200">
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-3 border border-gray-200">
                 <div 
-                  className="text-[15px] sm:text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                  className="text-sm leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
                   style={{ 
                     fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
                     direction: 'ltr'
@@ -1042,17 +1046,19 @@ export default function TopicPracticeNewPage() {
                 </div>
               </div>
             </div>
-
-            <div className="p-4 sm:p-5 pt-0">
-              <Button
-                onClick={() => setShowReadingText(false)}
-                className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
-              >
-                יאללה לקרוא - המשך לשאלות
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </Button>
-            </div>
           </motion.div>
+        </div>
+
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 pb-6 shadow-2xl">
+          <div className="max-w-2xl mx-auto">
+            <Button
+              onClick={() => setShowReadingText(false)}
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-base font-bold rounded-xl shadow-md"
+            >
+              יאללה לקרוא - המשך לשאלות
+              <ChevronLeft className="w-5 h-5 mr-2" />
+            </Button>
+          </div>
         </div>
       </div>
     );
