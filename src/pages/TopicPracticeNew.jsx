@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
+import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react"; // Added FileText
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -494,9 +494,11 @@ export default function TopicPracticeNewPage() {
       // מעבר ישיר לשאלה הבאה או לסיכום
       if (currentQuestionIndex < currentSetQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
+        setIsSubmitting(false); // Reset submitting state after moving to next question
       } else {
         saveWeakTopicsStats();
         setShowSummary(true);
+        setIsSubmitting(false); // Reset submitting state when showing summary
       }
     } catch (error) {
       console.error("❌ Error submitting answer:", error);
