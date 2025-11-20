@@ -568,15 +568,8 @@ export default function AdminExamScannerPage() {
         response_json_schema: extractionSchema
       });
 
-      if (extractionResult.status === 'error') {
-        // בדיקה אם השגיאה קשורה לגודל קובץ
-        if (extractionResult.details?.includes('20MB') || extractionResult.details?.includes('10MB') || extractionResult.details?.includes('size') || extractionResult.details?.includes('גדול')) {
-          throw new Error(`הקובץ גדול מדי לעיבוד!\n\nגודל: ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB\nמקסימום: 20MB\n\n💡 דחוס את ה-PDF או פצל אותו לקבצים קטנים יותר.`);
-        }
-        throw new Error(extractionResult.details || 'שגיאה בחילוץ הנתונים');
-      }
-
-      let questionsData = extractionResult.output;
+      // התוצאה מגיעה ישירות כאובייקט מ-InvokeLLM
+      let questionsData = extractionResult;
 
       if (questionsData.questions && Array.isArray(questionsData.questions)) {
         questionsData = questionsData.questions;
