@@ -495,49 +495,17 @@ export default function ExamsPage() {
       return;
     }
 
-    console.log('✅ Navigating to exam:', exam.id, 'Type:', exam.exam_type);
-
-    let targetPage = '';
-    
+    // Determine module type
+    let moduleType = "Generic";
     if (exam.exam_type === "module_a") {
-      targetPage = "ExamModuleA";
+      moduleType = "A";
     } else if (exam.exam_type === "module_b") {
-      targetPage = "ExamModuleB";
+      moduleType = "B";
     } else if (exam.exam_type === "module_c") {
-      targetPage = "ExamModuleC";
-    } else if (exam.exam_type === "generic") {
-      if (exam.subject === 'מתמטיקה') {
-        targetPage = "ExamMath";
-      } else if (exam.subject === 'פיזיקה') {
-        targetPage = "ExamPhysics";
-      } else if (exam.subject === 'ספרות') {
-        targetPage = "ExamLiterature";
-      } else if (exam.subject === 'כימיה') {
-        targetPage = "ExamChemistry";
-      } else if (exam.subject === 'ביולוגיה') {
-        targetPage = "ExamBiology";
-      } else {
-        targetPage = "ExamGeneric";
-      }
-    } else {
-      console.warn('⚠️ Unknown exam type:', exam.exam_type);
-      targetPage = "ExamGeneric";
+      moduleType = "C";
     }
 
-    try {
-      sessionStorage.setItem('currentExamId', exam.id);
-      console.log('💾 Stored examId in sessionStorage:', exam.id);
-    } catch (error) {
-      console.error('Error storing examId:', error);
-    }
-
-    const targetPath = createPageUrl(targetPage);
-    const fullPath = `${targetPath}?examId=${encodeURIComponent(exam.id)}`;
-
-    console.log('📍 Navigating to:', fullPath);
-    console.log('📍 examId being passed:', exam.id);
-
-    navigate(fullPath);
+    navigate(createPageUrl(`TakeExam?examid=${exam.id}&module=${moduleType}`));
   };
 
   const handleRandomExam = (moduleId) => {
