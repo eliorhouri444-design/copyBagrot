@@ -220,7 +220,13 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    const userAnswer = String(providedAnswer || answers[currentQuestion.question_id] || "");
+    
+    // Get the actual answer value - if it's an object, extract the text
+    let rawAnswer = providedAnswer || answers[currentQuestion.question_id] || "";
+    if (typeof rawAnswer === 'object' && rawAnswer !== null) {
+      rawAnswer = rawAnswer.text || rawAnswer.value || JSON.stringify(rawAnswer);
+    }
+    const userAnswer = String(rawAnswer);
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
@@ -1108,30 +1114,37 @@ export default function TopicPracticeNewPage() {
 
           {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
             <div className="space-y-2">
-              {currentQuestion.options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
-                  className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
-                    answers[currentQuestion.question_id] === option
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-300'
-                  } cursor-pointer`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      answers[currentQuestion.question_id] === option
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {answers[currentQuestion.question_id] === option && (
-                        <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                      )}
+              {currentQuestion.options.map((option, idx) => {
+                const optionText = typeof option === 'object' ? (option.text || option.value || option) : option;
+                const currentAnswer = answers[currentQuestion.question_id];
+                const currentAnswerText = typeof currentAnswer === 'object' ? (currentAnswer.text || currentAnswer.value || currentAnswer) : currentAnswer;
+                const isSelected = currentAnswerText === optionText;
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
+                    className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'
+                    } cursor-pointer`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {isSelected && (
+                          <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{optionText}</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{option}</span>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           )}
             </>
