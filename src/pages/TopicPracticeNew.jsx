@@ -217,15 +217,19 @@ export default function TopicPracticeNewPage() {
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
     
-    // Extract the actual answer value
-    let userAnswerRaw = providedAnswer || answers[currentQuestion.question_id] || "";
+    // Get the raw answer from state or parameter
+    let rawAnswer = providedAnswer || answers[currentQuestion.question_id] || "";
     
-    // If it's an object (from multiple choice), get the text value
-    if (typeof userAnswerRaw === 'object' && userAnswerRaw !== null) {
-      userAnswerRaw = userAnswerRaw.text || userAnswerRaw.value || userAnswerRaw.answer || String(userAnswerRaw);
+    // Convert to plain string - handle all cases
+    let userAnswer = "";
+    if (typeof rawAnswer === 'string') {
+      userAnswer = rawAnswer.trim();
+    } else if (typeof rawAnswer === 'object' && rawAnswer !== null) {
+      // Extract text from object (from multiple choice selections)
+      userAnswer = (rawAnswer.text || rawAnswer.value || rawAnswer.label || "").trim();
+    } else {
+      userAnswer = String(rawAnswer).trim();
     }
-    
-    const userAnswer = String(userAnswerRaw).trim();
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
