@@ -11,9 +11,9 @@ export default function AdminExamScannerPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState('מתמטיקה');
-  const [selectedUnits, setSelectedUnits] = useState(5);
-  const [selectedModule, setSelectedModule] = useState('1');
+  const [selectedSubject, setSelectedSubject] = useState('אנגלית');
+  const [selectedUnits, setSelectedUnits] = useState(3);
+  const [selectedModule, setSelectedModule] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
@@ -35,74 +35,108 @@ export default function AdminExamScannerPage() {
     loadUser();
   }, []);
 
-  const examStructures = {
+  const defaultModulesStructure = {
+    "אנגלית": {
+      3: [
+        { id: "C", title: "מודול C", description: "קריאה והבנה", details: "Reading Comprehension" },
+        { id: "A", title: "מודול A", description: "הבנת נשמע", details: "Listening" },
+        { id: "B", title: "מודול B", description: "הבנת נשמע מתקדמת", details: "Advanced Listening" }
+      ],
+      4: [
+        { id: "C", title: "מודול C", description: "הבנת הנקרא", details: "Reading Comprehension" },
+        { id: "D", title: "מודול D", description: "הבעה בכתב", details: "Writing" },
+        { id: "E", title: "מודול E", description: "קריאה מתקדמת", details: "Advanced Reading" }
+      ],
+      5: [
+        { id: "E", title: "מודול E", description: "קריאה גבוהה", details: "High-level Reading" },
+        { id: "F", title: "מודול F", description: "כתיבה מתקדמת", details: "Advanced Writing" },
+        { id: "G", title: "מודול G", description: "כתיבה יצירתית", details: "Creative Writing" }
+      ]
+    },
     "מתמטיקה": {
-      3: {
-        name: "שאלון 803",
-        sections: ["אלגברה", "גאומטריה", "משוואות"],
-        questionTypes: ["multiple_choice", "short_answer", "calculation"],
-        hasGeometry: true,
-        hasCalculus: false,
-        pointsPerQuestion: 8,
-        totalQuestions: 12,
-        passingGrade: 56
-      },
-      4: {
-        name: "שאלון 804",
-        sections: ["אלגברה מתקדמת", "גאומטריה אנליטית", "טריגונומטריה"],
-        questionTypes: ["multiple_choice", "short_answer", "calculation", "proof"],
-        hasGeometry: true,
-        hasCalculus: false,
-        pointsPerQuestion: 10,
-        totalQuestions: 10,
-        passingGrade: 56
-      },
-      5: {
-        name: "שאלון 581 (806)",
-        sections: ["אלגברה ליניארית", "חדו״א", "גאומטריה אנליטית"],
-        questionTypes: ["multiple_choice", "short_answer", "calculation", "proof", "open_question"],
-        hasGeometry: true,
-        hasCalculus: true,
-        pointsPerQuestion: 12,
-        totalQuestions: 8,
-        passingGrade: 56
-      }
+      3: [
+        { id: "801", title: "שאלון 801", description: "אלגברה בסיסית", details: "משוואות, חזקות, שורשים, בעיות מילוליות" },
+        { id: "802", title: "שאלון 802", description: "גיאומטריה וסטטיסטיקה", details: "פונקציות ריבועיות, גיאומטריה, סטטיסטיקה" }
+      ],
+      4: [
+        { id: "803", title: "שאלון 803", description: "טריגונומטריה ופונקציות", details: "טריגו, גזירה, בעיות קצב, גיאומטריה" },
+        { id: "804", title: "שאלון 804", description: "פונקציות מתקדמות", details: "פונקציות רציונליות, אי-שוויונים, חקירה" }
+      ],
+      5: [
+        { id: "805", title: "שאלון 805", description: "חקירה ודיפרנציאלי", details: "נגזרות מתקדמות, חקירה, קצב משתנה" },
+        { id: "806", title: "שאלון 806", description: "אינטגרלים וסדרות", details: "אינטגרלים, שטחים, סדרות, לוגריתמים" }
+      ]
     },
     "פיזיקה": {
-      3: {
-        name: "מכניקה + חשמל",
-        sections: ["מכניקה", "חשמל"],
-        questionTypes: ["calculation", "short_answer", "explanation"],
-        hasGeometry: false,
-        hasCalculus: false,
-        pointsPerQuestion: 10,
-        totalQuestions: 10,
-        passingGrade: 56
-      },
-      5: {
-        name: "מכניקה + חשמל + קרינה",
-        sections: ["מכניקה מתקדמת", "חשמל ומגנטיות", "קרינה וחומר"],
-        questionTypes: ["calculation", "short_answer", "explanation", "proof"],
-        hasGeometry: false,
-        hasCalculus: true,
-        pointsPerQuestion: 12,
-        totalQuestions: 8,
-        passingGrade: 56
-      }
+      5: [
+        { id: "581", title: "שאלון 581", description: "מכניקה", details: "קינמטיקה, דינמיקה, אנרגיה" },
+        { id: "582", title: "שאלון 582", description: "חשמל, גלים וחום", details: "חשמל סטטי, מגנטיות, גלים, תרמודינמיקה" }
+      ]
     },
-    "אנגלית": {
-      3: {
-        name: "Module A/B/C",
-        sections: ["Reading", "Grammar", "Writing"],
-        questionTypes: ["multiple_choice", "short_answer", "writing"],
-        hasGeometry: false,
-        hasCalculus: false,
-        pointsPerQuestion: 10,
-        totalQuestions: 15,
-        passingGrade: 56
-      }
+    "כימיה": {
+      5: [
+        { id: "043381", title: "שאלון 043381", description: "כימיה חלק א'", details: "מבנה החומר, תמיסות, קינטיקה" },
+        { id: "043382", title: "שאלון 043382", description: "כימיה חלק ב'", details: "שיווי משקל, כימיה אורגנית" },
+        { id: "043383", title: "שאלון 043383", description: "כימיה חלק ג'", details: "עבודת חקר" }
+      ]
+    },
+    "ביולוגיה": {
+      5: [
+        { id: "054581", title: "שאלון 054581", description: "ביולוגיה חלק א'", details: "התא, גנטיקה, גוף האדם" },
+        { id: "054582", title: "שאלון 054582", description: "ביולוגיה חלק ב'", details: "אקולוגיה, אבולוציה" },
+        { id: "054583", title: "שאלון 054583", description: "עבודת חקר", details: "מחקר מעשי" }
+      ]
+    },
+    "ספרות": {
+      2: [
+        { id: "2101", title: "שאלון 2101", description: "ספרות 2 יחידות", details: "שירה, סיפור קצר, אמצעים אומנותיים" }
+      ],
+      5: [
+        { id: "2102", title: "שאלון 2102", description: "ספרות 5 יחידות - חלק א'", details: "שירה, דמות ומסר" },
+        { id: "2103", title: "שאלון 2103", description: "ספרות 5 יחידות - חלק ב'", details: "סיפור קצר, אמצעים אומנותיים" }
+      ]
+    },
+    "היסטוריה": {
+      2: [
+        { id: "2211", title: "שאלון 2211", description: "היסטוריה 2 יחידות", details: "ציונות, השואה, הקמת המדינה" }
+      ],
+      5: [
+        { id: "2212", title: "שאלון 2212", description: "היסטוריה 5 יחידות - ישראל", details: "ציונות, מדינת ישראל" },
+        { id: "2213", title: "שאלון 2213", description: "היסטוריה 5 יחידות - אירופה", details: "אירופה ועם ישראל, השואה" }
+      ]
+    },
+    "גאוגרפיה": {
+      5: [
+        { id: "046511", title: "שאלון 046511", description: "גאוגרפיה עיונית", details: "אקלים, מים, אוכלוסייה, ישראל" },
+        { id: "046512", title: "שאלון 046512", description: "מפות ונתונים", details: "קריאת מפות, ניתוח נתונים" },
+        { id: "046581", title: "שאלון 046581", description: "עבודת חקר", details: "מחקר שטח" }
+      ]
+    },
+    "אזרחות": {
+      2: [
+        { id: "1121", title: "שאלון 1121", description: "שאלון חובה", details: "דמוקרטיה, זכויות אדם, מוסדות" },
+        { id: "1122", title: "שאלון 1122", description: "שאלון פתוח", details: "חוקי יסוד, השלטון בישראל" }
+      ]
+    },
+    'תנ"ך': {
+      2: [
+        { id: "1211", title: 'שאלון 1211', description: 'תנ"ך 2 יחידות', details: "שמואל, מלכים, נביאים" }
+      ],
+      5: [
+        { id: "1212", title: 'שאלון 1212', description: 'תנ"ך 5 יחידות - חלק א\'', details: "שמואל, פילוג הממלכה" },
+        { id: "1213", title: 'שאלון 1213', description: 'תנ"ך 5 יחידות - חלק ב\'', details: "מלכים, נביאים אחרונים" }
+      ]
     }
   };
+
+  const availableUnits = useMemo(() => {
+    const units = defaultModulesStructure[selectedSubject];
+    return units ? Object.keys(units).map(Number).sort((a, b) => a - b) : [3, 4, 5];
+  }, [selectedSubject]);
+
+  const availableModules = useMemo(() => {
+    return defaultModulesStructure[selectedSubject]?.[selectedUnits] || [];
+  }, [selectedSubject, selectedUnits]);
 
   // פונקציה מתקדמת לזיהוי גאומטריה וויזואליזציות
   const detectVisualizationFromText = (text) => {
@@ -326,6 +360,11 @@ export default function AdminExamScannerPage() {
       return;
     }
 
+    if (!selectedModule) {
+      setError('יש לבחור שאלון');
+      return;
+    }
+
     // בדיקה כפולה של גודל הקובץ
     if (selectedFile.size > 20 * 1024 * 1024) {
       setError(`⚠️ הקובץ גדול מדי!\n\nגודל הקובץ: ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB\nמקסימום: 20MB\n\n💡 פתרונות:\n1. דחוס את ה-PDF (באתרים כמו ilovepdf.com)\n2. פצל למספר קבצים קטנים יותר\n3. צלם תמונות של הדפים והעלה במקום PDF`);
@@ -344,7 +383,13 @@ export default function AdminExamScannerPage() {
       setProgress(20);
       setStatusMessage('מנתח מבנה מבחן...');
 
-      const structure = examStructures[selectedSubject]?.[selectedUnits] || examStructures["מתמטיקה"][5];
+      const moduleInfo = availableModules.find(m => m.id === selectedModule) || availableModules[0] || {};
+      const structure = {
+        name: moduleInfo.title || selectedModule,
+        pointsPerQuestion: 10,
+        totalQuestions: 10,
+        passingGrade: 56
+      };
       
       setProgress(30);
       setStatusMessage('חולץ נתונים מה-PDF...');
@@ -521,7 +566,13 @@ export default function AdminExamScannerPage() {
     "מתמטיקה": Calculator,
     "פיזיקה": Atom,
     "אנגלית": BookText,
-    "ספרות": BookOpen
+    "ספרות": BookOpen,
+    "כימיה": Atom,
+    "ביולוגיה": BookOpen,
+    "היסטוריה": BookOpen,
+    "גאוגרפיה": BookOpen,
+    "אזרחות": BookOpen,
+    'תנ"ך': BookOpen
   };
 
   const SubjectIcon = subjectIcons[selectedSubject] || Calculator;
@@ -577,70 +628,50 @@ export default function AdminExamScannerPage() {
 
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-2">יחידות</label>
-              <Select value={selectedUnits.toString()} onValueChange={(v) => setSelectedUnits(parseInt(v))}>
+              <Select value={selectedUnits.toString()} onValueChange={(v) => {
+                setSelectedUnits(parseInt(v));
+                setSelectedModule('');
+              }}>
                 <SelectTrigger className="h-12">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">3 יחידות</SelectItem>
-                  <SelectItem value="4">4 יחידות</SelectItem>
-                  <SelectItem value="5">5 יחידות</SelectItem>
+                  {availableUnits.map(unit => (
+                    <SelectItem key={unit} value={unit.toString()}>{unit} יחידות</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">מודול</label>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">שאלון</label>
               <Select value={selectedModule} onValueChange={setSelectedModule}>
                 <SelectTrigger className="h-12">
-                  <SelectValue />
+                  <SelectValue placeholder="בחר שאלון" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">מודול 1</SelectItem>
-                  <SelectItem value="2">מודול 2</SelectItem>
-                  <SelectItem value="3">מודול 3</SelectItem>
+                  {availableModules.map(module => (
+                    <SelectItem key={module.id} value={module.id}>
+                      {module.title} - {module.description}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {examStructures[selectedSubject]?.[selectedUnits] && (
+          {selectedModule && availableModules.find(m => m.id === selectedModule) && (
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
               <div className="flex items-center gap-3 mb-4">
                 <SubjectIcon className="w-6 h-6 text-blue-600" />
                 <h3 className="font-bold text-slate-900">
-                  {examStructures[selectedSubject][selectedUnits].name}
+                  {availableModules.find(m => m.id === selectedModule)?.title}
                 </h3>
               </div>
               
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <div className="font-semibold text-slate-700 mb-1">חלקים:</div>
-                  <ul className="text-slate-600 space-y-1">
-                    {examStructures[selectedSubject][selectedUnits].sections.map((section, idx) => (
-                      <li key={idx}>• {section}</li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <div className="font-semibold text-slate-700 mb-1">תכונות:</div>
-                  <ul className="text-slate-600 space-y-1">
-                    <li>✓ {examStructures[selectedSubject][selectedUnits].totalQuestions} שאלות</li>
-                    <li>✓ {examStructures[selectedSubject][selectedUnits].pointsPerQuestion} נק' לשאלה</li>
-                    {examStructures[selectedSubject][selectedUnits].hasGeometry && <li>✓ זיהוי איורים אוטומטי</li>}
-                    {examStructures[selectedSubject][selectedUnits].hasCalculus && <li>✓ חדו״א</li>}
-                  </ul>
-                </div>
-
-                <div>
-                  <div className="font-semibold text-slate-700 mb-1">סוגי שאלות:</div>
-                  <ul className="text-slate-600 space-y-1">
-                    {examStructures[selectedSubject][selectedUnits].questionTypes.slice(0, 3).map((type, idx) => (
-                      <li key={idx}>• {type}</li>
-                    ))}
-                  </ul>
-                </div>
+              <div className="text-sm text-slate-700">
+                <div className="font-semibold mb-2">תיאור:</div>
+                <p className="text-slate-600">{availableModules.find(m => m.id === selectedModule)?.details}</p>
               </div>
             </div>
           )}
