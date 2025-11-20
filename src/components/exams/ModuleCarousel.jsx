@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, Shuffle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
+import { Progress } from "@/components/ui/progress";
 
 export default function ModuleCarousel({ 
   modules, 
@@ -18,11 +19,11 @@ export default function ModuleCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? modules.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? (modules?.length || 1) - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev === modules.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === (modules?.length || 1) - 1 ? 0 : prev + 1));
   };
 
   const handleModuleClick = (module) => {
@@ -32,6 +33,14 @@ export default function ModuleCarousel({
       onSelectExam(module.id);
     }
   };
+
+  if (!modules || modules.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        לא נמצאו מודולים
+      </div>
+    );
+  }
 
   const currentModule = modules[currentIndex];
 

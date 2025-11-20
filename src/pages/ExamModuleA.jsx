@@ -339,7 +339,7 @@ export default function ExamModuleAPage() {
     const listeningResults = [];
     const unitLevel = exam.unit_level || 3;
 
-    for (const questionItem of exam.reading_questions) {
+    for (const questionItem of (exam.reading_questions || [])) {
       const userAnswer = readingAnswers[questionItem.question_number];
       let isCorrect = false;
       let pointsAwarded = 0;
@@ -377,7 +377,7 @@ export default function ExamModuleAPage() {
       });
     }
 
-    for (const questionItem of exam.listening_questions) {
+    for (const questionItem of (exam.listening_questions || [])) {
       const userAnswer = listeningAnswers[questionItem.question_number];
       let isCorrect = false;
       let pointsAwarded = 0;
@@ -546,7 +546,7 @@ export default function ExamModuleAPage() {
     setIsSubmitting(true);
     
     if (currentSection === 'reading') {
-      if (currentQuestion < exam.reading_questions.length - 1) {
+      if (currentQuestion < (exam.reading_questions?.length || 0) - 1) {
         setCurrentQuestion(prev => prev + 1);
         setTimeout(() => setIsSubmitting(false), 300);
       } else {
@@ -890,7 +890,7 @@ export default function ExamModuleAPage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
-            {exam.listening_questions.map((questionItem) => (
+            {(exam.listening_questions || []).map((questionItem) => (
               <div key={questionItem.question_number} className="pb-6 border-b last:border-b-0">
                 <h4 className="font-bold text-gray-900 mb-3">שאלה {questionItem.question_number} ({questionItem.points} נקודות)</h4>
                 <p className="text-gray-700 mb-4" dir="ltr">{questionItem.question_text}</p>
@@ -966,8 +966,19 @@ export default function ExamModuleAPage() {
       );
     }
 
-    const readingQuestion = exam.reading_questions[currentQuestion];
-    const readingProgress = ((currentQuestion + 1) / exam.reading_questions.length) * 100;
+    const readingQuestion = exam.reading_questions?.[currentQuestion];
+    if (!readingQuestion) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+            <p className="text-gray-600">שגיאה בטעינת השאלה</p>
+          </div>
+        </div>
+      );
+    }
+    
+    const readingProgress = ((currentQuestion + 1) / (exam.reading_questions?.length || 1)) * 100;
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -984,7 +995,7 @@ export default function ExamModuleAPage() {
           <h1 className="text-xl font-bold text-white text-center mb-2">{exam.title}</h1>
           <Progress value={readingProgress} className="h-2 bg-white/20" />
           <div className="flex justify-between text-white text-xs mt-2">
-            <span>שאלה {currentQuestion + 1} מתוך {exam.reading_questions.length}</span>
+            <span>שאלה {currentQuestion + 1} מתוך {exam.reading_questions?.length || 0}</span>
           </div>
         </div>
 
@@ -1060,7 +1071,7 @@ export default function ExamModuleAPage() {
                       הקודם
                     </Button>
 
-                    {currentQuestion === exam.reading_questions.length - 1 ? (
+                    {currentQuestion === (exam.reading_questions?.length || 1) - 1 ? (
                       <Button 
                         onClick={() => setCurrentSection('listening')} 
                         disabled={isSubmitting}

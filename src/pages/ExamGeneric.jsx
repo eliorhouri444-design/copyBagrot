@@ -257,7 +257,7 @@ export default function ExamGenericPage() {
         }
       };
 
-      for (const questionItem of exam.questions) {
+      for (const questionItem of (exam.questions || [])) {
         const userAnswer = userAnswers[questionItem.question_number];
         let isCorrect = false;
         let pointsAwarded = 0;
@@ -561,7 +561,7 @@ export default function ExamGenericPage() {
 
           <div className="bg-blue-50 rounded-xl p-4">
             <p className="text-sm text-gray-700">
-              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.grammar_questions.length}
+              <strong>שאלה:</strong> {savedProgress.current_question + 1} מתוך {exam.questions?.length || 0}
             </p>
             <p className="text-sm text-gray-700">
               <strong>זמן נותר:</strong> {Math.floor(savedProgress.time_left / 60)} דקות
@@ -606,7 +606,7 @@ export default function ExamGenericPage() {
               </div>
               <div className="bg-purple-50 rounded-xl p-4 text-center">
                 <CheckCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900">{exam.questions.length}</div>
+                <div className="text-2xl font-bold text-gray-900">{exam.questions?.length || 0}</div>
                 <div className="text-sm text-gray-600">שאלות</div>
               </div>
             </div>
@@ -630,7 +630,7 @@ export default function ExamGenericPage() {
 
                 <div className="bg-white rounded-lg p-3 border border-blue-100">
                   <div className="font-semibold text-gray-900 mb-1">📊 מבנה הניקוד</div>
-                  <p>סה"כ {exam.questions.length} שאלות • {exam.total_points} נקודות • ציון עובר: {exam.passing_grade}</p>
+                  <p>סה"כ {exam.questions?.length || 0} שאלות • {exam.total_points} נקודות • ציון עובר: {exam.passing_grade}</p>
                 </div>
 
                 {exam.reading_text && (
@@ -742,6 +742,21 @@ export default function ExamGenericPage() {
     );
   }
 
+  if (!exam.questions || exam.questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50">
+        <div className="text-center bg-white rounded-2xl shadow-xl p-8">
+          <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">לא נמצאו שאלות</h2>
+          <p className="text-gray-600 mb-4">אין שאלות במבחן זה</p>
+          <Button onClick={() => navigate(createPageUrl("Exams"))} className="bg-blue-600">
+            חזור למבחנים
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const question = exam.questions[currentQuestion];
   const progress = ((currentQuestion + 1) / exam.questions.length) * 100;
 
@@ -791,7 +806,7 @@ export default function ExamGenericPage() {
         <h1 className="text-xl font-bold text-white text-center mb-2">{exam.title}</h1>
         <Progress value={progress} className="h-2 bg-white/20" />
         <div className="flex justify-between text-white text-xs mt-2">
-          <span>שאלה {currentQuestion + 1} מתוך {exam.questions.length}</span>
+          <span>שאלה {currentQuestion + 1} מתוך {exam.questions?.length || 0}</span>
         </div>
       </div>
 
@@ -893,7 +908,7 @@ export default function ExamGenericPage() {
                       הקודם
                     </Button>
 
-                    {currentQuestion === exam.questions.length - 1 ? (
+                    {currentQuestion === (exam.questions?.length || 1) - 1 ? (
                       <Button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
@@ -903,7 +918,7 @@ export default function ExamGenericPage() {
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1))}
+                        onClick={() => setCurrentQuestion(prev => Math.min((exam.questions?.length || 1) - 1, prev + 1))}
                         className="flex-1 h-12 bg-blue-600"
                       >
                         הבא
