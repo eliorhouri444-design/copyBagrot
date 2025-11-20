@@ -181,20 +181,6 @@ export default function TakeExamPage() {
     setShowResults(true);
   };
 
-  const getQuestions = () => {
-    if (!exam) return [];
-
-    if (module === "A") {
-      return [...(exam.reading_questions || []), ...(exam.listening_questions || [])];
-    } else if (module === "B") {
-      return exam.grammar_questions || [];
-    } else if (module === "C") {
-      return exam.questions || [];
-    } else {
-      return exam.questions || [];
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
@@ -225,9 +211,8 @@ export default function TakeExamPage() {
     return <ExamResults results={results} exam={exam} onExit={() => navigate(createPageUrl("Exams"))} />;
   }
 
-  const questions = getQuestions();
-  const currentQuestion = questions[currentQuestionIndex];
-  const readingText = exam.reading_text || "";
+  const questionsForIntro = getQuestions();
+  const readingTextForIntro = exam.reading_text || "";
 
   // Pre-exam intro
   if (!examStarted) {
@@ -256,7 +241,7 @@ export default function TakeExamPage() {
             <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
               <div className="flex items-center justify-between">
                 <span className="text-gray-700 font-semibold">מספר שאלות</span>
-                <span className="text-purple-600 font-bold">{questions.length}</span>
+                <span className="text-purple-600 font-bold">{questionsForIntro.length}</span>
               </div>
             </div>
             <div className="bg-green-50 rounded-xl p-4 border border-green-200">
@@ -273,22 +258,22 @@ export default function TakeExamPage() {
               הוראות המבחן
             </h3>
             <ul className="space-y-2 text-gray-700 text-sm">
-              {readingText && (
+              {readingTextForIntro && (
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
                   <span>תקרא את טקסט הקריאה בעיון לפני תחילת השאלות</span>
                 </li>
               )}
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">{readingText ? "2" : "1"}.</span>
+                <span className="text-blue-600 font-bold">{readingTextForIntro ? "2" : "1"}.</span>
                 <span>ענה על כל השאלות בזמן שהוקצב</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">{readingText ? "3" : "2"}.</span>
+                <span className="text-blue-600 font-bold">{readingTextForIntro ? "3" : "2"}.</span>
                 <span>תוכל לנווט בין השאלות בכל עת</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">{readingText ? "4" : "3"}.</span>
+                <span className="text-blue-600 font-bold">{readingTextForIntro ? "4" : "3"}.</span>
                 <span>לחץ "סיים מבחן" כשתסיים את כל השאלות</span>
               </li>
             </ul>
@@ -331,12 +316,12 @@ export default function TakeExamPage() {
     );
   }
 
-  const questions = getQuestions();
-  const currentQuestion = questions[currentQuestionIndex];
-  const readingText = exam?.reading_text || "";
+  const questionsInExam = getQuestions();
+  const currentQuestionInExam = questionsInExam[currentQuestionIndex];
+  const readingTextInExam = exam?.reading_text || "";
 
   // Show reading text first if exists
-  if (showReadingFirst && readingText) {
+  if (showReadingFirst && readingTextInExam) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-3xl p-4 shadow-xl mb-4">
@@ -359,7 +344,7 @@ export default function TakeExamPage() {
             <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 mb-5">
               <h3 className="font-bold text-blue-900 mb-2 text-lg">📖 קרא בעיון!</h3>
               <p className="text-sm text-gray-700 leading-relaxed">
-                קרא את הטקסט הבא בעיון. לאחר מכן תענה על {questions.length} שאלות על הטקסט.
+                קרא את הטקסט הבא בעיון. לאחר מכן תענה על {questionsInExam.length} שאלות על הטקסט.
                 <br />תוכל לחזור לטקסט בכל שלב באמצעות כפתור 📖 בראש המסך.
               </p>
             </div>
@@ -369,7 +354,7 @@ export default function TakeExamPage() {
               dir="ltr"
               style={{ fontFamily: "'Segoe UI', -apple-system, sans-serif" }}
             >
-              {readingText}
+              {readingTextInExam}
             </div>
           </div>
 
@@ -433,19 +418,19 @@ export default function TakeExamPage() {
           <div className="bg-white/20 rounded-full h-2">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+              animate={{ width: `${((currentQuestionIndex + 1) / questionsInExam.length) * 100}%` }}
               className="h-full bg-white rounded-full"
             />
           </div>
           <p className="text-center text-sm mt-2 text-white/90">
-            שאלה {currentQuestionIndex + 1} מתוך {questions.length}
+            שאלה {currentQuestionIndex + 1} מתוך {questionsInExam.length}
           </p>
         </div>
       </div>
 
       <div className="px-4 max-w-2xl mx-auto pb-24">
         <ExamQuestion
-          question={currentQuestion}
+          question={currentQuestionInExam}
           questionNumber={currentQuestionIndex + 1}
           userAnswer={answers[`q_${currentQuestionIndex}`]}
           onAnswerChange={(answer) => handleAnswerChange(`q_${currentQuestionIndex}`, answer)}
@@ -465,7 +450,7 @@ export default function TakeExamPage() {
             </Button>
           )}
           
-          {currentQuestionIndex < questions.length - 1 ? (
+          {currentQuestionIndex < questionsInExam.length - 1 ? (
             <Button
               onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
               className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 font-bold text-base"
@@ -485,9 +470,9 @@ export default function TakeExamPage() {
         </div>
       </div>
 
-      {readingText && (
+      {readingTextInExam && (
         <ReadingTextPanel
-          text={readingText}
+          text={readingTextInExam}
           open={showReadingPanel}
           onClose={() => setShowReadingPanel(false)}
         />
