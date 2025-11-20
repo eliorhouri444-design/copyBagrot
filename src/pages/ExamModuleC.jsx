@@ -587,16 +587,11 @@ export default function ExamModuleCPage() {
     setCurrentSection("reading");
     setCurrentQuestion(0);
     setTimeLeft(exam?.duration_minutes * 60 || 3600);
-    setExamMode('exam'); // Default to exam mode when starting fresh
-    setDisplayMode('carousel'); // Default to carousel display mode
+    setExamMode('exam');
+    setDisplayMode('carousel');
     setShowResumeDialog(false);
-    if (user?.skip_exam_intro) {
-      setShowModeSelectionDialog(true);
-      setShowIntroDialog(false);
-    } else {
-      setShowIntroDialog(true);
-      setShowModeSelectionDialog(false);
-    }
+    setShowIntroDialog(true);
+    setShowModeSelectionDialog(false);
     setHasStarted(false);
   };
 
