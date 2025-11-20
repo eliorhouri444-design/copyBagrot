@@ -1190,13 +1190,33 @@ export default function TopicPracticeNewPage() {
               {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
                 <div className="space-y-3">
                   {currentQuestion.options.map((option, idx) => {
-                    const optionText = typeof option === 'string' ? option : (option?.text || option?.value || String(option));
-                    const isSelected = answers[currentQuestion.question_id] === optionText;
+                    // Extract text from option - ALWAYS save as plain string
+                    let optionText = "";
+                    if (typeof option === 'string') {
+                      optionText = option;
+                    } else if (typeof option === 'object' && option !== null) {
+                      optionText = option.text || option.value || option.label || String(option);
+                    } else {
+                      optionText = String(option);
+                    }
+
+                    // Check if this option is selected
+                    const currentAnswer = answers[currentQuestion.question_id];
+                    let isSelected = false;
+                    if (typeof currentAnswer === 'string') {
+                      isSelected = currentAnswer === optionText;
+                    } else if (typeof currentAnswer === 'object' && currentAnswer !== null) {
+                      const ansText = currentAnswer.text || currentAnswer.value || currentAnswer.label || "";
+                      isSelected = ansText === optionText;
+                    }
 
                     return (
                       <button
                         key={idx}
-                        onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
+                        onClick={() => {
+                          // ALWAYS save as plain string, never as object
+                          setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }));
+                        }}
                         className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                           isSelected
                             ? 'border-blue-500 bg-blue-100'
