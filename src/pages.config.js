@@ -49,6 +49,7 @@ import AdminListeningManager from './pages/AdminListeningManager';
 import ExtendedReading from './pages/ExtendedReading';
 import AdminTopics from './pages/AdminTopics';
 import ExamChemistry from './pages/ExamChemistry';
+import TakeExam from './pages/TakeExam';
 import __Layout from './Layout.jsx';
 
 
@@ -104,6 +105,7 @@ export const PAGES = {
     "ExtendedReading": ExtendedReading,
     "AdminTopics": AdminTopics,
     "ExamChemistry": ExamChemistry,
+    "TakeExam": TakeExam,
 }
 
 export const pagesConfig = {
