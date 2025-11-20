@@ -456,19 +456,22 @@ export default function TopicPracticeNewPage() {
           explanation = solution.explanation || currentQuestion.explanation || "";
 
           if (correctAnswers.length > 0) {
-            correctAnswer = correctAnswers[0].value || "";
+            // Handle both string and object formats
+            const firstAnswer = correctAnswers[0];
+            correctAnswer = typeof firstAnswer === 'string' ? firstAnswer : (firstAnswer?.value || "");
           }
 
           const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/[.,!?;]/g, '');
 
           // Check against all acceptable answers with fuzzy matching
           isCorrect = correctAnswers.some(ans => {
-            const normalized = ans.value?.toLowerCase().replace(/[.,!?;]/g, '');
+            const answerValue = typeof ans === 'string' ? ans : ans.value;
+            const normalized = answerValue?.toLowerCase().replace(/[.,!?;]/g, '');
             return normalized === normalizedUserAnswer || 
                    normalizedUserAnswer.includes(normalized) ||
                    normalized.includes(normalizedUserAnswer);
           }) || acceptableVariants.some(variant => {
-            const normalized = variant.toLowerCase().replace(/[.,!?;]/g, '');
+            const normalized = (typeof variant === 'string' ? variant : variant.value || '').toLowerCase().replace(/[.,!?;]/g, '');
             return normalized === normalizedUserAnswer ||
                    normalizedUserAnswer.includes(normalized) ||
                    normalized.includes(normalizedUserAnswer);
@@ -834,7 +837,7 @@ export default function TopicPracticeNewPage() {
                             <div className="bg-white rounded-lg p-3 border border-green-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
                               <div className="text-sm font-semibold text-green-700" dir="ltr">
-                                {typeof result?.correctAnswer === 'string' ? result.correctAnswer : (result?.correctAnswer?.value || "לא ידוע")}
+                                {String(result?.correctAnswer || "לא ידוע")}
                               </div>
                             </div>
                           </div>
