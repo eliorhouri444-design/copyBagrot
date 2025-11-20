@@ -21,35 +21,6 @@ export default function AdminExamScannerPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const u = await base44.auth.me();
-        setUser(u);
-        if (u?.role !== 'admin') {
-          navigate(createPageUrl("Home"));
-        }
-      } catch (error) {
-        navigate(createPageUrl("Home"));
-      }
-    };
-    loadUser();
-  }, []);
-
-  useEffect(() => {
-    // Update units when subject changes
-    if (availableUnits.length > 0 && !availableUnits.includes(selectedUnits)) {
-      setSelectedUnits(availableUnits[0]);
-    }
-  }, [selectedSubject, availableUnits]);
-
-  useEffect(() => {
-    // Update module when units change
-    if (availableModules.length > 0 && !availableModules.find(m => m.id === selectedModule)) {
-      setSelectedModule(availableModules[0]?.id || '');
-    }
-  }, [selectedUnits, availableModules]);
-
   const defaultModulesStructure = {
     "אנגלית": {
       3: [
@@ -192,6 +163,35 @@ export default function AdminExamScannerPage() {
 
     return Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
   }, [selectedSubject, selectedUnits, customModules]);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const u = await base44.auth.me();
+        setUser(u);
+        if (u?.role !== 'admin') {
+          navigate(createPageUrl("Home"));
+        }
+      } catch (error) {
+        navigate(createPageUrl("Home"));
+      }
+    };
+    loadUser();
+  }, []);
+
+  useEffect(() => {
+    // Update units when subject changes
+    if (availableUnits.length > 0 && !availableUnits.includes(selectedUnits)) {
+      setSelectedUnits(availableUnits[0]);
+    }
+  }, [selectedSubject, availableUnits, selectedUnits]);
+
+  useEffect(() => {
+    // Update module when units change
+    if (availableModules.length > 0 && !availableModules.find(m => m.id === selectedModule)) {
+      setSelectedModule(availableModules[0]?.id || '');
+    }
+  }, [selectedUnits, availableModules, selectedModule]);
 
   // פונקציה מתקדמת לזיהוי גאומטריה וויזואליזציות
   const detectVisualizationFromText = (text) => {
