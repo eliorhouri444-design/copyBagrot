@@ -186,6 +186,7 @@ ${!isEnglishExam ? `
           description: { type: "string" },
           duration_minutes: { type: "integer" },
           total_points: { type: "integer" },
+          reading_text: { type: "string", description: "Full reading passage in original language" },
           instructions: { type: "string" },
           questions: {
             type: "array",
@@ -193,11 +194,12 @@ ${!isEnglishExam ? `
               type: "object",
               properties: {
                 question_number: { type: "integer" },
-                question_text: { type: "string" },
+                question_text: { type: "string", description: "Question in ORIGINAL language - English for English exams" },
                 question_type: { type: "string" },
                 question_image_url: { type: "string" },
                 topic: { type: "string" },
                 points: { type: "integer" },
+                options: { type: "array", items: { type: "string" }, description: "All options in ORIGINAL language" },
                 parts: {
                   type: "array",
                   items: {
@@ -209,7 +211,7 @@ ${!isEnglishExam ? `
                     }
                   }
                 },
-                correct_answer: { type: "string" },
+                correct_answer: { type: "string", description: "Correct answer in ORIGINAL language" },
                 explanation: { type: "string" },
                 solution_steps: { type: "array", items: { type: "string" } },
                 rubric: {
@@ -240,7 +242,8 @@ ${!isEnglishExam ? `
       description: generatedExam.description,
       duration_minutes: examStructure.duration_minutes,
       total_points: examStructure.total_points,
-      instructions: generatedExam.instructions,
+      reading_text: generatedExam.reading_text || '',
+      instructions: generatedExam.instructions || '',
       questions: generatedExam.questions,
       is_generated: true,
       is_copyright_free: true
