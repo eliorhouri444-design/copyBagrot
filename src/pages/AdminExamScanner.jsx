@@ -450,7 +450,40 @@ export default function AdminExamScannerPage() {
       setStatusMessage('חולץ נתונים מה-PDF...');
 
       // 2. Extract data using ExtractDataFromUploadedFile
-      const extractionSchema = {
+      const isBibleExam = selectedSubject === 'תנ"ך';
+      
+      const extractionSchema = isBibleExam ? {
+        type: "object",
+        properties: {
+          reading_text: { type: "string", description: "הקטע המקראי המלא" },
+          questions: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                question_number: { type: "integer" },
+                question_text: { type: "string", description: "טקסט השאלה הראשית" },
+                parts: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      part_id: { type: "string", description: "מזהה הסעיף (א, ב, ג)" },
+                      text: { type: "string", description: "טקסט הסעיף" },
+                      correct_answer: { type: "string" },
+                      explanation: { type: "string" },
+                      points: { type: "integer" }
+                    }
+                  }
+                },
+                question_type: { type: "string" },
+                points: { type: "integer" },
+                topic: { type: "string" }
+              }
+            }
+          }
+        }
+      } : {
         type: "object",
         properties: {
           questions: {
@@ -528,7 +561,7 @@ export default function AdminExamScannerPage() {
       setStatusMessage('שומר מבחן...');
 
       // 4. Create exam
-      const newExam = await base44.entities.GenericExam.create({
+      const examData = {
         title: `${selectedSubject} ${structure.name} - ${new Date().toLocaleDateString('he-IL')}`,
         subject: selectedSubject,
         unit_level: selectedUnits,
@@ -539,7 +572,14 @@ export default function AdminExamScannerPage() {
         passing_grade: structure.passingGrade,
         instructions: `ענה על כל השאלות. מותר להשתמש במחשבון ${selectedSubject === 'מתמטיקה' ? 'ובדף נוסחאות' : ''}.`,
         questions: processedQuestions
-      });
+      };
+
+      // Add reading text for Bible exams
+      if (isBibleExam && extractionResult.output?.reading_text) {
+        examData.reading_text = extractionResult.output.reading_text;
+      }
+
+      const newExam = await base44.entities.GenericExam.create(examData);
 
       setProgress(100);
       setStatusMessage('הושלם בהצלחה! ✅');
