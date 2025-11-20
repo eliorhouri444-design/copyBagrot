@@ -27,12 +27,15 @@ Deno.serve(async (req) => {
         let subjectPrompt = '';
         
         if (subject === 'אנגלית') {
-            subjectPrompt = `**מבחן אנגלית** - שים לב:
-- זהה סיפורים/טקסטים לקריאה
-- שאלות הבנה, אוצר מילים, דקדוק
-- שאלות על הסיפור מתייחסות לתוכן הטקסט
-- בחלק הכתיבה (Writing) יש נושא/שאלה
-- **חשוב:** כתוב את כל שמות החלקים, שאלות ותכנים באנגלית כמו שהם מופיעים במבחן המקורי (PART I, WRITTEN RECEPTION, וכו')`;
+            subjectPrompt = `**ENGLISH EXAM - CRITICAL INSTRUCTIONS:**
+- This is an ENGLISH matriculation exam
+- ALL question text MUST be extracted in English (exactly as written)
+- ALL answer options MUST be in English
+- ALL section names in English (PART I, WRITTEN RECEPTION, etc.)
+- Identify reading passages and extract them FULLY in English
+- Writing section prompts must be in English
+- **ABSOLUTELY NO TRANSLATION TO HEBREW**
+- Extract EXACTLY as written in the original exam`;
         } else if (subject === 'מתמטיקה') {
             subjectPrompt = `**מבחן מתמטיקה** - שים לב:
 - שאלות חישוב עם נוסחאות
@@ -93,33 +96,34 @@ Deno.serve(async (req) => {
 
 ${subjectPrompt}
 
-**משימה:**
-נתח את המבחן בקובץ ותחלץ:
+**Your Task:**
+Analyze and extract with PERFECT accuracy:
 
-### 1️⃣ מידע כללי:
-- מספר שאלות כולל
-- סך נקודות
-- משך זמן (בדקות)
-- מספר דפים
+### 1️⃣ General Info:
+- Total questions count
+- Total points
+- Duration (in minutes)
+- Total pages
 
-### 2️⃣ מבנה חלקים:
-אם יש חלוקה לחלקים/פרקים (חלק א, חלק ב, Reading, Writing וכו'), רשום:
-- מספר החלק
-- שם החלק
-- נקודות
-- טווח שאלות (1-3, 4-7 וכו')
+### 2️⃣ Section Structure:
+If divided into sections (Part A, Part B, Reading, Writing, etc.):
+- Section number
+- Section name (KEEP IN ORIGINAL LANGUAGE)
+- Points per section
+- Question range (1-3, 4-7, etc.)
 
-### 3️⃣ מבנה שאלות:
-לכל שאלה במבחן:
-- מספר השאלה
-- הנושא (לפי המקצוע)
-- תתי נושאים
-- רמת קושי (easy/medium/hard)
-- סוג השאלה (בהתאם למקצוע)
-- נקודות
-- **question_text: העתק את השאלה המקורית בדיוק כמו שהיא כתובה במבחן (באנגלית למבחני אנגלית!)**
-- האם יש איור/גרף/טקסט (true/false)
-- תיאור האיור/טקסט אם יש
+### 3️⃣ Question Structure:
+For EVERY question:
+- question_number: the actual number
+- topic: main topic area
+- sub_topics: array of subtopics
+- difficulty_level: easy/medium/hard
+- question_type: type of question
+- points: points value
+- **question_text: Copy EXACTLY as written in ORIGINAL LANGUAGE (English for English exams!)**
+- options: if multiple choice, ALL options in ORIGINAL LANGUAGE
+- has_diagram: true/false
+- diagram_description: if diagram exists, describe in detail
 
 ### 4️⃣ התפלגות נושאים:
 עבור כל נושא שמופיע:
@@ -132,12 +136,14 @@ ${subject === 'אנגלית' ? '- זהה וחלץ טקסטים/סיפורים ל
 ${subject === 'מתמטיקה' ? '- זהה נוסחאות, איורים גאומטריים' : ''}
 ${subject === 'היסטוריה' || subject === 'ספרות' ? '- זהה טקסטים, קטעים, מסמכים (תוכן מלא)' : ''}
 
-**חשוב מאוד:**
-- תהיה מדויק במספרים
-- ספור את כל השאלות והנקודות
-- זהה את כל הנושאים
-- **למבחני אנגלית: העתק את השאלות בדיוק באנגלית כמו שהן במבחן! אל תתרגם לעברית!**
-- חלץ תכנים מיוחדים (סיפורים, טקסטים) במלואם באותה שפה שהם כתובים
+**CRITICAL RULES - NO EXCEPTIONS:**
+- Be precise with numbers - count every question and point
+- Identify all topics correctly
+- **For ENGLISH exams: Extract questions EXACTLY in English - DO NOT TRANSLATE TO HEBREW**
+- **For OTHER subjects: Extract in Hebrew as written**
+- Extract full content (stories, passages) in ORIGINAL language
+- For multiple choice: extract ALL options in ORIGINAL language
+- Section names: KEEP in original language (e.g., "PART I: WRITTEN RECEPTION")
 
 החזר JSON מובנה.`,
             file_urls: [fileUrl],
