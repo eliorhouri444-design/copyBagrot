@@ -107,6 +107,12 @@ export default function TopicPracticeNewPage() {
       const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
 
+      if (!questionsForTopic || questionsForTopic.length === 0) {
+        setError("לא נמצאו שאלות לנושא זה");
+        setIsLoading(false);
+        return;
+      }
+
       setAllQuestions(questionsForTopic);
 
       const startIndex = (setNumber - 1) * questionsPerSet;

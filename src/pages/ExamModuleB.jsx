@@ -1195,6 +1195,7 @@ export default function ExamModuleBPage() {
                   })()}
                 </motion.div>
               </AnimatePresence>
+            )}
           </motion.div>
         )}
 

@@ -796,7 +796,12 @@ export default function ExamGenericPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pb-6">
-        {/* Always carousel mode */}
+        {!exam?.questions || exam.questions.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+            <p className="text-gray-600">לא נמצאו שאלות במבחן זה</p>
+          </div>
+        ) : (
           <div className="grid lg:grid-cols-5 gap-4">
             {exam.reading_text && (
               <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
@@ -910,6 +915,7 @@ export default function ExamGenericPage() {
               </AnimatePresence>
             </div>
           </div>
+        )}
       </div>
     </div>
   );

@@ -955,6 +955,17 @@ export default function ExamModuleAPage() {
   }
 
   if (hasStarted && !showResults && currentSection === 'reading') {
+    if (!exam?.reading_questions || exam.reading_questions.length === 0) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+            <p className="text-gray-600">לא נמצאו שאלות קריאה במבחן זה</p>
+          </div>
+        </div>
+      );
+    }
+
     const readingQuestion = exam.reading_questions[currentQuestion];
     const readingProgress = ((currentQuestion + 1) / exam.reading_questions.length) * 100;
     
