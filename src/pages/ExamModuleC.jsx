@@ -1195,7 +1195,7 @@ export default function ExamModuleCPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            {displayMode === 'carousel' ? (
+            {/* Always carousel mode */}
               <div className="space-y-4 lg:grid lg:grid-cols-5 lg:gap-4 lg:space-y-0">
                 {exam.reading_text && (
                   <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 lg:max-h-[calc(100vh-240px)] lg:overflow-y-auto lg:sticky lg:top-4">
