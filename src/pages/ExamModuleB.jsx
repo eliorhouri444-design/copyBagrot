@@ -575,7 +575,7 @@ export default function ExamModuleBPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNextQuestion = () => {
-    if (isSubmitting) return;
+    if (isSubmitting || !exam?.grammar_questions) return;
     setIsSubmitting(true);
 
     if (currentQuestion < exam.grammar_questions.length - 1) {
@@ -1027,8 +1027,8 @@ export default function ExamModuleBPage() {
 
   // Calculate progress for the progress bar
   const progress = currentSection === "grammar"
-    ? (currentQuestion / exam.grammar_questions.length) * 50 // Half of the progress for grammar
-    : 50 + (countWords(writingText) / (exam.writing_max_words || 45)) * 50; // Other half for writing
+    ? ((exam?.grammar_questions?.length || 0) > 0 ? (currentQuestion / exam.grammar_questions.length) * 50 : 0)
+    : 50 + (countWords(writingText) / (exam.writing_max_words || 45)) * 50;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
