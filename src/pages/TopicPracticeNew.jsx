@@ -1220,9 +1220,29 @@ export default function TopicPracticeNewPage() {
                     );
                   })}
                 </div>
+              ) : currentQuestion.question_type === "fill_in_blank" ? (
+                <Input
+                  value={(() => {
+                    const ans = answers[currentQuestion.question_id];
+                    if (!ans) return "";
+                    if (typeof ans === 'string') return ans;
+                    if (typeof ans === 'object') return ans.text || ans.value || "";
+                    return String(ans);
+                  })()}
+                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                  placeholder="Type your answer..."
+                  className="w-full h-12 text-base"
+                  dir="ltr"
+                />
               ) : (
                 <Input
-                  value={answers[currentQuestion.question_id] || ""}
+                  value={(() => {
+                    const ans = answers[currentQuestion.question_id];
+                    if (!ans) return "";
+                    if (typeof ans === 'string') return ans;
+                    if (typeof ans === 'object') return ans.text || ans.value || "";
+                    return String(ans);
+                  })()}
                   onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
                   placeholder="Type your answer..."
                   className="w-full h-12 text-base"
