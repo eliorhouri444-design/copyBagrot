@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Check, X, ChevronRight, Trophy, AlertCircle, BookOpen, Loader2 } from "lucide-react";
+import { ChevronLeft, Check, X, ChevronRight, Trophy, AlertCircle, BookOpen, Loader2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -318,6 +318,8 @@ export default function ExtendedReadingPage() {
   }
 
   if (showSummary) {
+    const nextSetExists = ((setNumber) * QUESTIONS_PER_SET) < allQuestions.length;
+    
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -383,13 +385,78 @@ export default function ExtendedReadingPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button onClick={finishPractice} className="w-full bg-blue-600 hover:bg-blue-700">
-                חזור לתרגול
-                <ChevronRight className="w-5 h-5 ml-2" />
+              {nextSetExists && (
+                <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
+                  המשך לסט הבא
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                </Button>
+              )}
+              <Button onClick={finishPractice} variant="outline" className="w-full">
+                סיים וחזור לתרגול
               </Button>
             </div>
           </motion.div>
         </div>
+
+        {/* Ad Dialogs */}
+        <Dialog open={showAdConfirmDialog} onOpenChange={setShowAdConfirmDialog}>
+          <DialogContent dir="rtl" className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">המשך לסט הבא</DialogTitle>
+              <DialogDescription>
+                כדי להמשיך לסט הבא, נדרש לצפות בסרטון קצר
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+              <div className="text-center space-y-2">
+                <div className="text-4xl mb-2">📺</div>
+                <p className="text-gray-700 text-sm">
+                  צפה בסרטון קצר והמשך לתרגל עוד {QUESTIONS_PER_SET} שאלות
+                </p>
+                <p className="text-xs text-gray-500">
+                  או שדרג לפרימיום לתרגול ללא הגבלה
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-col gap-2">
+              <Button
+                onClick={handleConfirmWatchAd}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                צפה בסרטון והמשך
+              </Button>
+              <Button variant="outline" onClick={finishPractice} className="w-full">
+                סיים תרגול
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>
+          <DialogContent dir="rtl" className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>המשך לסט הבא</DialogTitle>
+              <DialogDescription>צפה בסרטון כדי להמשיך</DialogDescription>
+            </DialogHeader>
+
+            <div className="text-center py-4">
+              <AdManager onContinue={handleAdComplete}>
+                <div className="bg-blue-50 rounded-xl p-6">
+                  <div className="text-4xl mb-3">📺</div>
+                  <p className="text-gray-700">צופה בסרטון...</p>
+                </div>
+              </AdManager>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={finishPractice}>
+                סיים תרגול
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
