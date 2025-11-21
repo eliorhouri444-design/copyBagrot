@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -1169,9 +1170,7 @@ export default function TopicPracticeNewPage() {
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
               <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
-                  <div className="text-center text-sm text-gray-600">
-                    בחר תשובה למעלה ↑
-                  </div>
+                  <div></div>
                 ) : (
                   <Textarea
                     value={answers[currentQuestion.question_id] || ""}
