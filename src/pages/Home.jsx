@@ -470,7 +470,7 @@ export default function HomePage() {
             <div className="p-4 pt-0">
               <Button
                 onClick={() => navigate(createPageUrl("Exams"))}
-                className="w-full bg-green-600 hover:bg-green-700 h-12 font-bold"
+                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold"
               >
                 <FileCheck className="w-5 h-5 ml-2" />
                 התחל מבחן בגרות
