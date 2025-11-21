@@ -910,7 +910,7 @@ export default function ExamGenericPage() {
 
         {/* Questions Panel */}
         <div className={`${exam.reading_text ? 'md:w-1/2' : 'w-full'} bg-white rounded-xl shadow-lg flex flex-col overflow-hidden`} style={{ height: '100%' }}>
-            {displayMode === 'carousel' ? (
+          {displayMode === 'carousel' ? (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentQuestion}
@@ -1058,9 +1058,9 @@ export default function ExamGenericPage() {
                     )}
                   </div>
                 </motion.div>
-              </AnimatePresence>
-            ) : (
-              <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+            </AnimatePresence>
+          ) : (
+            <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                 {exam.questions.map((questionItem, qIdx) => (
                   <div key={qIdx} className="mb-4 pb-4 border-b-2 border-gray-200 last:border-b-0">
                     <div className="flex justify-between items-start mb-2">
@@ -1175,10 +1175,9 @@ export default function ExamGenericPage() {
                   >
                     {isSubmitting ? <><Loader2 className="animate-spin w-4 h-4 sm:w-5 sm:h-5 ml-2" />שומר...</> : 'סיים מבחן'}
                   </Button>
-                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
