@@ -164,9 +164,15 @@ export default function ExtendedReadingPage() {
   const handleSubmitAnswer = async () => {
     if (isSubmitting) return;
 
-    setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    const userAnswer = String(answers[currentQuestion.question_id] || "");
+    const userAnswer = String(answers[currentQuestion.question_id] || "").trim();
+    
+    // Don't allow empty answers
+    if (!userAnswer) {
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const solutions = await base44.entities.SolutionBank.filter({
