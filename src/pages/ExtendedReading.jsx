@@ -488,7 +488,7 @@ export default function ExtendedReadingPage() {
   if (listeningText && showListeningIntro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+        <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
