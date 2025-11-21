@@ -986,28 +986,8 @@ export default function ExamGenericPage() {
               </AnimatePresence>
             </div>
           </div>
-        ) : (
-          <div className="flex gap-4 h-[calc(100vh-240px)]">
-            {exam.reading_text && (
-              <div className="w-2/5 bg-white rounded-xl shadow-lg p-6 overflow-y-auto">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 sticky top-0 bg-white pb-2 border-b">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
-                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-                </h3>
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                  {exam.reading_text}
-                </div>
-              </div>
-            )}
-
-            <div className={exam.reading_text ? "w-3/5" : "w-full"}>
-              <div className="bg-white rounded-xl shadow-lg p-6 h-full overflow-y-auto">
-                <div className="text-sm text-gray-600">Placeholder</div>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
+    </div>
     </div>
   );
 }
