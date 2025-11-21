@@ -1100,7 +1100,7 @@ export default function ExamGenericPage() {
                       );
                     })()}
 
-                    {/* Multiple choice with options array */}
+                    {/* Multiple choice with options array - only if no American style detected */}
                     {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
                       <div className="space-y-2">
                         {questionItem.options.map((optionValue, optionIndex) => (
@@ -1121,7 +1121,7 @@ export default function ExamGenericPage() {
                     )}
 
                     {/* Short answer */}
-                    {questionItem.question_type === 'short_answer' && (
+                    {questionItem.question_type === 'short_answer' && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
                       <Input
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
@@ -1132,11 +1132,27 @@ export default function ExamGenericPage() {
                     )}
 
                     {/* Open questions, calculations, proofs */}
-                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && (
+                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
                       <Textarea
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
+                        className="w-full h-32"
+                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                      />
+                    )}
+
+                    {/* Fallback for any other question type - as long as not American style */}
+                    {questionItem.question_type !== 'multiple_choice' && 
+                     questionItem.question_type !== 'short_answer' &&
+                     questionItem.question_type !== 'open_question' &&
+                     questionItem.question_type !== 'calculation' &&
+                     questionItem.question_type !== 'proof' &&
+                     !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
+                      <Textarea
+                        value={userAnswers[questionItem.question_number] || ''}
+                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
                         className="w-full h-32"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
