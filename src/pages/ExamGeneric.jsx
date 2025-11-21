@@ -147,11 +147,15 @@ export default function ExamGenericPage() {
         completed: false
       };
 
+      console.log('Saving progress with display_mode:', displayMode);
+
       if (savedProgress?.id) {
         await base44.entities.ExamProgress.update(savedProgress.id, progressData);
+        console.log('Progress updated');
       } else {
         const newProgress = await base44.entities.ExamProgress.create(progressData);
         setSavedProgress(newProgress);
+        console.log('New progress created');
       }
     } catch (error) {
       console.error("Error saving progress:", error);
@@ -160,13 +164,24 @@ export default function ExamGenericPage() {
 
   const handleResumeProgress = () => {
     if (savedProgress) {
-      console.log('Resuming progress:', savedProgress);
+      console.log('=== Resuming Saved Progress ===');
+      console.log('Full saved progress object:', savedProgress);
       console.log('Display mode from saved:', savedProgress.display_mode);
+
       setUserAnswers(JSON.parse(JSON.stringify(savedProgress.user_answers || {})));
       setCurrentQuestion(savedProgress.current_question || 0);
       setTimeLeft(savedProgress.time_left || (exam.duration_minutes * 60));
+
       const savedMode = savedProgress.display_mode;
-      setDisplayMode(savedMode === 'normal' || savedMode === 'carousel' ? savedMode : 'carousel');
+      console.log('Setting display mode to:', savedMode);
+
+      if (savedMode === 'normal' || savedMode === 'carousel') {
+        setDisplayMode(savedMode);
+      } else {
+        console.warn('Invalid display mode, defaulting to carousel');
+        setDisplayMode('carousel');
+      }
+
       setExamStarted(true);
       setSavedProgress(null);
     }
