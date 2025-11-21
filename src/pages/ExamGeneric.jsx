@@ -1197,7 +1197,6 @@ export default function ExamGenericPage() {
           </div>
         </div>
       )}
-                  <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="text-xl font-bold text-gray-900">
                         {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
