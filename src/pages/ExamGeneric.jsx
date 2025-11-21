@@ -873,8 +873,8 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-        ) : (
-          <div className="space-y-4">
+      <div className="max-w-6xl mx-auto px-4 pb-6">
+        <div className="space-y-4">
             {exam.reading_text && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -1002,73 +1002,11 @@ export default function ExamGenericPage() {
 
             <div className={exam.reading_text ? "w-3/5" : "w-full"}>
               <div className="bg-white rounded-xl shadow-lg p-6 h-full overflow-y-auto">
-                {exam.questions.map((questionItem, qIdx) => (
-                  <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">
-                        {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
-                      </h3>
-                      <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
-                        {questionItem.points} נק'
-                      </span>
-                    </div>
-
-                    <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                      {questionItem.question_text}
-                    </p>
-
-                    {questionItem.question_type === 'multiple_choice' && questionItem.options && (
-                      <div className="space-y-2">
-                        {questionItem.options.map((optionValue, optionIndex) => (
-                          <button
-                            key={optionIndex}
-                            onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
-                              userAnswers[questionItem.question_number] === optionValue
-                                ? 'bg-blue-100 border-blue-500'
-                                : 'bg-white border-gray-200 hover:border-blue-300'
-                            }`}
-                            dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                          >
-                            {optionValue}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {questionItem.question_type === 'short_answer' && (
-                      <Input
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                        className="w-full h-12"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-
-                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && (
-                      <Textarea
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                        className="w-full h-32"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-                  </div>
-                ))}
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold"
-                >
-                  {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
-                </Button>
+                <div className="text-sm text-gray-600">Placeholder</div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
