@@ -1183,17 +1183,21 @@ export default function ExamGenericPage() {
                     )}
                   </div>
                 ))}
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold mt-6"
-                >
-                  {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
-                </Button>
-              </div>
+              </>
             )}
           </div>
+
+          {displayMode === 'normal' && (
+            <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 p-4 flex-shrink-0">
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold"
+              >
+                {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
