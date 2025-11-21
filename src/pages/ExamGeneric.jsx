@@ -936,7 +936,7 @@ export default function ExamGenericPage() {
                     if (extracted && extracted.hasOptions) {
                       return (
                         <>
-                          <p className="text-gray-700 text-lg mb-4" dir="ltr">
+                          <p className="text-gray-800 text-base leading-relaxed mb-4" dir="ltr">
                             {extracted.mainQuestion}
                           </p>
                           <div className="space-y-2">
@@ -944,7 +944,7 @@ export default function ExamGenericPage() {
                               <button
                                 key={optionIndex}
                                 onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
+                                className={`w-full p-3 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[question.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
@@ -959,7 +959,7 @@ export default function ExamGenericPage() {
                       );
                     }
                     return (
-                      <p className="text-gray-700 text-lg mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                      <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
                         {question.question_text}
                       </p>
                     );
@@ -971,7 +971,7 @@ export default function ExamGenericPage() {
                         <button
                           key={optionIndex}
                           onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                          className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
+                          className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
                             userAnswers[question.question_number] === optionValue
                               ? 'bg-blue-100 border-blue-500 shadow-md'
                               : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1095,7 +1095,7 @@ export default function ExamGenericPage() {
                     if (extracted && extracted.hasOptions) {
                       return (
                         <>
-                          <p className="text-gray-700 text-lg mb-4" dir="ltr">
+                          <p className="text-gray-800 text-base leading-relaxed mb-4" dir="ltr">
                             {extracted.mainQuestion}
                           </p>
                           <div className="space-y-2">
@@ -1103,7 +1103,7 @@ export default function ExamGenericPage() {
                               <button
                                 key={optionIndex}
                                 onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
+                                className={`w-full p-3 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[questionItem.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1118,7 +1118,7 @@ export default function ExamGenericPage() {
                       );
                     }
                     return (
-                      <p className="text-gray-700 text-lg mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                      <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
                         {questionItem.question_text}
                       </p>
                     );
@@ -1131,7 +1131,7 @@ export default function ExamGenericPage() {
                         <button
                           key={optionIndex}
                           onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                          className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
+                          className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
                             userAnswers[questionItem.question_number] === optionValue
                               ? 'bg-blue-100 border-blue-500 shadow-md'
                               : 'bg-white border-gray-200 hover:border-blue-300'
