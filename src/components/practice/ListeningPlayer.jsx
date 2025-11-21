@@ -64,7 +64,7 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 text-center border-2 border-blue-200">
+      <div className="bg-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 text-center border-2 border-blue-200">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-3" />
         <p className="text-sm text-gray-600">טוען קטע השמעה...</p>
       </div>
@@ -72,9 +72,9 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-blue-200">
+    <div className="bg-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-blue-200">
       <div className="flex items-center justify-center mb-4 sm:mb-6">
-        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-600 rounded-full flex items-center justify-center">
           <Volume2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
         </div>
       </div>
