@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown } from "lucide-react";
+import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
@@ -16,6 +16,7 @@ export default function HomePage() {
   const [isUserLoaded, setIsUserLoaded] = useState(false);
   const [studyGoals, setStudyGoals] = useState(null);
   const [timeUntilExam, setTimeUntilExam] = useState(null);
+  const [isStartingExam, setIsStartingExam] = useState(false);
 
   const [cachedData, setCachedData] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -46,6 +47,58 @@ export default function HomePage() {
   const displaySubject = user?.selected_subject || cachedData.subject || "מקצוע";
   const displayUnits = parseInt(user?.selected_units || cachedData.units || "0");
 
+  const defaultModulesStructure = {
+    "אנגלית": {
+      3: [
+        { id: "C", entity: "ModuleCExam" },
+        { id: "A", entity: "ModuleAExam" },
+        { id: "B", entity: "ModuleBExam" }
+      ],
+      4: [
+        { id: "C", entity: "ModuleCExam" },
+        { id: "D", entity: "GenericExam" },
+        { id: "E", entity: "GenericExam" }
+      ],
+      5: [
+        { id: "E", entity: "GenericExam" },
+        { id: "F", entity: "GenericExam" },
+        { id: "G", entity: "GenericExam" }
+      ]
+    },
+    "מתמטיקה": {
+      3: [{ id: "801", entity: "GenericExam" }, { id: "802", entity: "GenericExam" }],
+      4: [{ id: "803", entity: "GenericExam" }, { id: "804", entity: "GenericExam" }],
+      5: [{ id: "805", entity: "GenericExam" }, { id: "806", entity: "GenericExam" }]
+    },
+    "פיזיקה": {
+      5: [{ id: "581", entity: "GenericExam" }, { id: "582", entity: "GenericExam" }]
+    },
+    "כימיה": {
+      5: [{ id: "043381", entity: "GenericExam" }, { id: "043382", entity: "GenericExam" }, { id: "043383", entity: "GenericExam" }]
+    },
+    "ביולוגיה": {
+      5: [{ id: "054581", entity: "GenericExam" }, { id: "054582", entity: "GenericExam" }, { id: "054583", entity: "GenericExam" }]
+    },
+    "ספרות": {
+      2: [{ id: "2101", entity: "GenericExam" }],
+      5: [{ id: "2102", entity: "GenericExam" }, { id: "2103", entity: "GenericExam" }]
+    },
+    "היסטוריה": {
+      2: [{ id: "2211", entity: "GenericExam" }],
+      5: [{ id: "2212", entity: "GenericExam" }, { id: "2213", entity: "GenericExam" }]
+    },
+    "גאוגרפיה": {
+      5: [{ id: "046511", entity: "GenericExam" }, { id: "046512", entity: "GenericExam" }, { id: "046581", entity: "GenericExam" }]
+    },
+    "אזרחות": {
+      2: [{ id: "1121", entity: "GenericExam" }, { id: "1122", entity: "GenericExam" }]
+    },
+    "תנ\"ך": {
+      2: [{ id: "1211", entity: "GenericExam" }],
+      5: [{ id: "1212", entity: "GenericExam" }, { id: "1213", entity: "GenericExam" }]
+    }
+  };
+
   const { data: practiceAttempts = [] } = useQuery({
     queryKey: ['practice-attempts-home', displaySubject, displayUnits],
     queryFn: async () => {
@@ -75,6 +128,34 @@ export default function HomePage() {
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: 1
+  });
+
+  const { data: allGenericExams = [] } = useQuery({
+    queryKey: ['generic-exams-home'],
+    queryFn: () => base44.entities.GenericExam.list(),
+    enabled: isUserLoaded,
+    staleTime: 10 * 60 * 1000
+  });
+
+  const { data: allModuleAExams = [] } = useQuery({
+    queryKey: ['module-a-home'],
+    queryFn: () => base44.entities.ModuleAExam.list(),
+    enabled: isUserLoaded,
+    staleTime: 10 * 60 * 1000
+  });
+
+  const { data: allModuleBExams = [] } = useQuery({
+    queryKey: ['module-b-home'],
+    queryFn: () => base44.entities.ModuleBExam.list(),
+    enabled: isUserLoaded,
+    staleTime: 10 * 60 * 1000
+  });
+
+  const { data: allModuleCExams = [] } = useQuery({
+    queryKey: ['module-c-home'],
+    queryFn: () => base44.entities.ModuleCExam.list(),
+    enabled: isUserLoaded,
+    staleTime: 10 * 60 * 1000
   });
 
   useEffect(() => {
@@ -240,6 +321,55 @@ export default function HomePage() {
   const examProgress = studyGoals?.recommended_totals?.total_exams_before_exam > 0
     ? Math.min(100, (currentSubjectStats.examsCompleted / studyGoals.recommended_totals.total_exams_before_exam) * 100)
     : 0;
+
+  const handleStartRandomExam = async () => {
+    setIsStartingExam(true);
+    
+    try {
+      const firstModule = defaultModulesStructure[displaySubject]?.[displayUnits]?.[0];
+      if (!firstModule) {
+        alert('לא נמצאו מודולים זמינים');
+        setIsStartingExam(false);
+        return;
+      }
+
+      let exams = [];
+      const moduleId = firstModule.id;
+
+      if (displaySubject === 'אנגלית') {
+        if (moduleId === "A") {
+          exams = [...allModuleAExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits),
+                  ...allGenericExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits && e.module_id === moduleId)];
+        } else if (moduleId === "B") {
+          exams = [...allModuleBExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits),
+                  ...allGenericExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits && e.module_id === moduleId)];
+        } else if (moduleId === "C") {
+          exams = [...allModuleCExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level || e.units) === displayUnits),
+                  ...allGenericExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits && e.module_id === moduleId)];
+        } else {
+          exams = allGenericExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits && e.module_id === moduleId);
+        }
+      } else {
+        exams = allGenericExams.filter(e => e.subject === displaySubject && parseInt(e.unit_level) === displayUnits && e.module_id === moduleId);
+      }
+
+      if (exams.length === 0) {
+        alert('לא נמצאו מבחנים זמינים');
+        setIsStartingExam(false);
+        return;
+      }
+
+      const attemptedIds = examAttempts.map(a => a.exam_id);
+      const unattempted = exams.filter(e => !attemptedIds.includes(e.id));
+      const randomExam = unattempted.length > 0 ? unattempted[Math.floor(Math.random() * unattempted.length)] : exams[Math.floor(Math.random() * exams.length)];
+
+      window.location.href = createPageUrl("ExamGeneric") + `?examId=${encodeURIComponent(randomExam.id)}`;
+    } catch (error) {
+      console.error('Error starting exam:', error);
+      alert('שגיאה בטעינת המבחן');
+      setIsStartingExam(false);
+    }
+  };
 
   const quickAccessCards = [
     {
@@ -469,10 +599,15 @@ export default function HomePage() {
 
             <div className="p-4 pt-0">
               <Button
-                onClick={() => navigate(createPageUrl("Exams"))}
+                onClick={handleStartRandomExam}
+                disabled={isStartingExam}
                 className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold"
               >
-                <FileCheck className="w-5 h-5 ml-2" />
+                {isStartingExam ? (
+                  <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                ) : (
+                  <FileCheck className="w-5 h-5 ml-2" />
+                )}
                 התחל מבחן בגרות
               </Button>
             </div>
