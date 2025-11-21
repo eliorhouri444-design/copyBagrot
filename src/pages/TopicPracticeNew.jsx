@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -960,13 +959,14 @@ export default function TopicPracticeNewPage() {
               </div>
             </div>
 
-            <div className="p-5 sm:p-6">
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-4 sm:p-5 border border-gray-200">
+            <div className="p-4 sm:p-6">
+              <div className="bg-white rounded-lg border-2 border-gray-200">
                 <div 
-                  className="text-[15px] sm:text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                  className="text-base sm:text-lg leading-[1.8] text-gray-900 p-4 sm:p-6 whitespace-pre-wrap text-left"
                   style={{ 
-                    fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
-                    direction: 'ltr'
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    direction: 'ltr',
+                    lineHeight: '1.8'
                   }}
                 >
                   {readingText}
@@ -977,7 +977,7 @@ export default function TopicPracticeNewPage() {
             <div className="p-4 sm:p-5 pt-0">
               <Button
                 onClick={() => setShowReadingText(false)}
-                className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
+                className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
               >
                 יאללה לקרוא - המשך לשאלות
                 <ChevronLeft className="w-5 h-5 mr-2" />
@@ -990,8 +990,8 @@ export default function TopicPracticeNewPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
-      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
+      <div className="bg-blue-600 p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
@@ -1041,12 +1041,13 @@ export default function TopicPracticeNewPage() {
                 חזור לטקסט המקורי שלפני השאלות
               </DialogDescription>
             </DialogHeader>
-            <div className="p-2 sm:p-4">
+            <div className="p-4 sm:p-6">
               <div
-                className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                className="text-base sm:text-lg leading-[1.8] text-gray-900 whitespace-pre-wrap text-left"
                 style={{
-                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
-                  direction: 'ltr'
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  direction: 'ltr',
+                  lineHeight: '1.8'
                 }}
               >
                 {readingText}
@@ -1067,9 +1068,9 @@ export default function TopicPracticeNewPage() {
           key={currentQuestion.question_id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
+          className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden"
         >
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4 pt-6 sm:pt-8">
+          <div className="flex-1 overflow-y-auto p-4 pb-4 pt-6">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
@@ -1102,31 +1103,31 @@ export default function TopicPracticeNewPage() {
             </div>
           )}
 
-          <div className="flex items-start gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
-            </div>
-            <div className="flex-1">
+          <div className="mb-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
+              </div>
               <p
-                className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
+                className="flex-1 text-base sm:text-lg text-gray-900 leading-[1.7] whitespace-pre-wrap pt-1"
                 dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
                 style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
               >
                 {currentQuestion.question_text}
               </p>
-              
-              {currentQuestion.question_image_url && (
-                <img
-                  src={currentQuestion.question_image_url}
-                  alt="Question"
-                  className="mt-4 rounded-lg max-w-full"
-                />
-              )}
             </div>
+            
+            {currentQuestion.question_image_url && (
+              <img
+                src={currentQuestion.question_image_url}
+                alt="Question"
+                className="mt-4 rounded-xl max-w-full shadow-md border-2 border-gray-200"
+              />
+            )}
           </div>
 
           {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {currentQuestion.options.map((option, idx) => {
                 const optionText = (typeof option === 'object' && option !== null && 'text' in option) 
                   ? option.text 
@@ -1138,23 +1139,23 @@ export default function TopicPracticeNewPage() {
                   <button
                     key={idx}
                     onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
-                    className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
+                    className={`w-full text-left p-4 rounded-xl border-2 transition-all shadow-sm ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-blue-600 bg-blue-50 shadow-md'
+                        : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
                     } cursor-pointer`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                         isSelected
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300'
+                          ? 'border-blue-600 bg-blue-600'
+                          : 'border-gray-400'
                       }`}>
                         {isSelected && (
-                          <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                          <div className="w-3 h-3 bg-white rounded-full" />
                         )}
                       </div>
-                      <span className="text-sm font-medium text-gray-900">{optionText}</span>
+                      <span className="text-base font-medium text-gray-900 flex-1 leading-relaxed">{optionText}</span>
                     </div>
                   </button>
                 );
@@ -1167,8 +1168,8 @@ export default function TopicPracticeNewPage() {
 
           {/* Answer input area - fixed at bottom */}
           {currentQuestion.question_type !== "writing" && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
-              <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
+              <div className="space-y-3">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
                   <div></div>
                 ) : (
@@ -1176,17 +1177,18 @@ export default function TopicPracticeNewPage() {
                     value={answers[currentQuestion.question_id] || ""}
                     onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
                     placeholder="הקלד את תשובתך כאן..."
-                    className="w-full h-28 text-base resize-none"
+                    className="w-full h-24 text-base resize-none border-2 border-gray-300 focus:border-blue-500 rounded-lg"
+                    dir="ltr"
                   />
                 )}
 
                 <Button
                   onClick={() => handleSubmitAnswer()}
                   disabled={!hasAnswered || isSubmitting}
-                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
+                  className="w-full h-14 text-base font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl shadow-lg"
                 >
                   {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <ChevronLeft className="w-5 h-5 mr-2" />
                 </Button>
               </div>
             </div>
