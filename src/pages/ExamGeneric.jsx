@@ -160,7 +160,11 @@ export default function ExamGenericPage() {
       setUserAnswers(savedProgress.user_answers || {});
       setCurrentQuestion(savedProgress.current_question || 0);
       setTimeLeft(savedProgress.time_left || (exam.duration_minutes * 60));
-      setDisplayMode(savedProgress.display_mode || 'carousel');
+      // קריטי: לשמור את המצב המדויק שהמשתמש בחר
+      const savedMode = savedProgress.display_mode;
+      if (savedMode) {
+        setDisplayMode(savedMode);
+      }
       setExamStarted(true);
       setSavedProgress(null);
     }
