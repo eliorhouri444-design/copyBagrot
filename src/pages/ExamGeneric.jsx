@@ -936,17 +936,17 @@ export default function ExamGenericPage() {
                     if (extracted && extracted.hasOptions) {
                       return (
                         <>
-                          <p className="text-gray-700 text-base mb-4" dir="ltr">
+                          <p className="text-gray-700 text-lg mb-4" dir="ltr">
                             {extracted.mainQuestion}
                           </p>
-                          <div className="space-y-3">
+                          <div className="space-y-2">
                             {extracted.options.map((optionValue, optionIndex) => (
                               <motion.button
                                 key={optionIndex}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.99 }}
                                 onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                                className={`w-full p-3 rounded-lg border-2 text-left text-sm transition-all ${
+                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[question.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1027,8 +1027,10 @@ export default function ExamGenericPage() {
                 <div className="flex gap-3 border-t pt-4">
                   <Button
                     onClick={() => {
-                      setDirection(-1);
-                      setCurrentQuestion(prev => Math.max(0, prev - 1));
+                      if (currentQuestion > 0) {
+                        setDirection(-1);
+                        setTimeout(() => setCurrentQuestion(prev => prev - 1), 0);
+                      }
                     }}
                     disabled={currentQuestion === 0}
                     variant="outline"
@@ -1049,8 +1051,10 @@ export default function ExamGenericPage() {
                   ) : (
                     <Button
                       onClick={() => {
-                        setDirection(1);
-                        setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1));
+                        if (currentQuestion < exam.questions.length - 1) {
+                          setDirection(1);
+                          setTimeout(() => setCurrentQuestion(prev => prev + 1), 0);
+                        }
                       }}
                       className="flex-1 h-12 bg-blue-600"
                     >
