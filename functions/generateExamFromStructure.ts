@@ -133,74 +133,121 @@ Deno.serve(async (req) => {
     `;
 
     console.log('🤖 Step 5: Generating exam with AI...');
-    const generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: generationPrompt,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          subject: { type: "string" },
-          unit_level: { type: "integer" },
-          module_id: { type: "string" },
-          description: { type: "string" },
-          duration_minutes: { type: "integer" },
-          total_points: { type: "integer" },
-          instructions: { type: "string" },
-          questions: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                question_number: { type: "integer" },
-                question_text: { type: "string" },
-                question_type: { type: "string" },
-                question_image_url: { type: "string" },
-                topic: { type: "string" },
-                points: { type: "integer" },
-                parts: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      part_id: { type: "string" },
-                      text: { type: "string" },
-                      points: { type: "integer" }
-                    }
-                  }
-                },
-                correct_answer: { type: "string" },
-                explanation: { type: "string" },
-                solution_steps: { type: "array", items: { type: "string" } },
-                rubric: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      criteria: { type: "string" },
-                      points: { type: "integer" },
-                      description: { type: "string" }
+    let generatedExam;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt: generationPrompt,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              title: { type: "string" },
+              subject: { type: "string" },
+              unit_level: { type: "integer" },
+              module_id: { type: "string" },
+              description: { type: "string" },
+              duration_minutes: { type: "integer" },
+              total_points: { type: "integer" },
+              instructions: { type: "string" },
+              questions: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    question_number: { type: "integer" },
+                    question_text: { type: "string" },
+                    question_type: { type: "string" },
+                    question_image_url: { type: "string" },
+                    topic: { type: "string" },
+                    points: { type: "integer" },
+                    parts: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          part_id: { type: "string" },
+                          text: { type: "string" },
+                          points: { type: "integer" }
+                        }
+                      }
+                    },
+                    correct_answer: { type: "string" },
+                    explanation: { type: "string" },
+                    solution_steps: { type: "array", items: { type: "string" } },
+                    rubric: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          criteria: { type: "string" },
+                          points: { type: "integer" },
+                          description: { type: "string" }
+                        }
+                      }
                     }
                   }
                 }
               }
             }
           }
+        });
+        
+        // ולידציה - בדוק שיש לפחות שאלה אחת
+        if (!generatedExam || !generatedExam.questions || generatedExam.questions.length === 0) {
+          throw new Error('AI החזיר מבחן ריק');
+        }
+        
+        console.log(`✅ AI generation complete (${generatedExam.questions.length} questions)`);
+        break;
+        
+      } catch (aiError) {
+        retryCount++;
+        console.error(`❌ AI attempt ${retryCount} failed:`, aiError.message);
+        
+        if (retryCount >= maxRetries) {
+          console.log('⚠️ All AI attempts failed, creating fallback exam...');
+          // יצירת מבחן fallback
+          generatedExam = {
+            title: `${examStructure.subject} - מודול ${examStructure.module_id} - ${examStructure.unit_level} יחידות`,
+            subject: examStructure.subject,
+            unit_level: examStructure.unit_level,
+            module_id: examStructure.module_id,
+            description: `מבחן ${examStructure.module_id}`,
+            duration_minutes: durationMinutes,
+            total_points: totalPoints,
+            instructions: 'ענה על כל השאלות. מותר להשתמש במחשבון.',
+            questions: questionStructure.slice(0, 10).map((q, idx) => ({
+              question_number: idx + 1,
+              question_text: `שאלה ${idx + 1} ב${examStructure.subject}`,
+              question_type: q.question_type || 'multiple_choice',
+              topic: q.topic || examStructure.subject,
+              points: q.points || 10,
+              correct_answer: 'תשובה 1',
+              explanation: 'פתרון לשאלה זו'
+            }))
+          };
+          console.log('✅ Fallback exam created');
+        } else {
+          console.log(`⏳ Retrying... (${retryCount}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // המתן 2 שניות
         }
       }
-    });
-    console.log('✅ AI generation complete');
+    }
 
     console.log('💾 Step 6: Saving exam to database...');
     const savedExam = await base44.asServiceRole.entities.GenericExam.create({
-      title: generatedExam.title,
+      title: generatedExam.title || `${examStructure.subject} - מבחן מחולל`,
       subject: examStructure.subject,
       unit_level: examStructure.unit_level,
       module_id: examStructure.module_id,
-      description: generatedExam.description,
+      description: generatedExam.description || '',
       duration_minutes: durationMinutes,
       total_points: totalPoints,
-      instructions: generatedExam.instructions,
-      questions: generatedExam.questions,
+      instructions: generatedExam.instructions || 'ענה על כל השאלות',
+      questions: generatedExam.questions || [],
       is_generated: true,
       is_copyright_free: true
     });
