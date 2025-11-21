@@ -892,42 +892,195 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      <div className="flex gap-4 px-4 pb-6" style={{ height: 'calc(100vh - 180px)', maxHeight: 'calc(100vh - 180px)' }}>
-        {displayMode === 'carousel' && exam.reading_text && (
-          <div className="w-1/2 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex-shrink-0">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-              </h3>
-            </div>
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                {exam.reading_text}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col ${displayMode === 'carousel' && exam.reading_text ? 'w-1/2' : 'w-full max-w-4xl mx-auto'}`}>
-          {displayMode === 'normal' && exam.reading_text && (
-            <>
+      {displayMode === 'carousel' ? (
+        <div className="flex gap-4 px-4 pb-6" style={{ height: 'calc(100vh - 180px)', maxHeight: 'calc(100vh - 180px)' }}>
+          {exam.reading_text && (
+            <div className="w-1/2 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex-shrink-0">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <BookOpen className="w-5 h-5" />
                   {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
                 </h3>
               </div>
-              <div className="max-h-64 overflow-y-auto p-6 border-b-2 border-gray-200 flex-shrink-0">
+              <div className="flex-1 overflow-y-auto p-6">
                 <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
                   {exam.reading_text}
                 </div>
               </div>
-            </>
+            </div>
           )}
 
-          <div className="flex-1 overflow-y-auto p-6">
-            {displayMode === 'carousel' ? (
+          <div className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col ${exam.reading_text ? 'w-1/2' : 'w-full max-w-4xl mx-auto'}`}>
+            <div className="flex-1 overflow-y-auto p-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {exam.subject === 'אנגלית' ? `Question ${question.question_number}` : `שאלה ${question.question_number}`}
+                    </h2>
+                    <div className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
+                      {question.points} נק'
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const extracted = extractAmericanOptions(question.question_text);
+                    if (extracted && extracted.hasOptions) {
+                      return (
+                        <>
+                          <p className="text-gray-700 text-lg mb-6 whitespace-pre-wrap" dir="ltr">
+                            {extracted.mainQuestion}
+                          </p>
+                          <div className="space-y-3 mb-6">
+                            {extracted.options.map((optionValue, optionIndex) => (
+                              <motion.button
+                                key={optionIndex}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleAnswerChange(question.question_number, optionValue)}
+                                className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                                  userAnswers[question.question_number] === optionValue
+                                    ? 'bg-blue-100 border-blue-500 shadow-md'
+                                    : 'bg-white border-gray-200 hover:border-blue-300'
+                                }`}
+                                dir="ltr"
+                              >
+                                <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
+                                {optionValue}
+                              </motion.button>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        <p className="text-gray-700 text-lg mb-6 whitespace-pre-wrap" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                          {question.question_text}
+                        </p>
+                        {question.question_image_url && (
+                          <img src={question.question_image_url} alt="שאלה" className="max-w-full rounded-lg mb-6" />
+                        )}
+                      </>
+                    );
+                  })()}
+
+                  {/* Multiple choice with options array - only if no American style detected */}
+                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
+                    <div className="space-y-3">
+                      {question.options.map((optionValue, optionIndex) => (
+                        <motion.button
+                          key={optionIndex}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleAnswerChange(question.question_number, optionValue)}
+                          className={`w-full p-4 rounded-xl border-2 transition-all ${
+                            userAnswers[question.question_number] === optionValue
+                              ? 'bg-blue-100 border-blue-500 shadow-md'
+                              : 'bg-white border-gray-200 hover:border-blue-300'
+                          }`}
+                          dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                        >
+                          {optionValue}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Short answer - only if no American style */}
+                  {question.question_type === 'short_answer' && !extractAmericanOptions(question.question_text)?.hasOptions && (
+                    <Input
+                      value={userAnswers[question.question_number] || ''}
+                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                      placeholder={exam.subject === 'אנגלית' ? "Type your answer..." : "הקלד תשובה..."}
+                      className="w-full h-12 text-lg"
+                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                    />
+                  )}
+
+                  {/* Open questions, calculations, proofs - only if no American style */}
+                  {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && !extractAmericanOptions(question.question_text)?.hasOptions && (
+                    <Textarea
+                      value={userAnswers[question.question_number] || ''}
+                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה מלאה..."}
+                      className="w-full h-40 text-lg"
+                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                    />
+                  )}
+
+                  {/* Fallback for other question types - only if no American style */}
+                  {question.question_type !== 'multiple_choice' && 
+                   question.question_type !== 'short_answer' &&
+                   question.question_type !== 'open_question' &&
+                   question.question_type !== 'calculation' &&
+                   question.question_type !== 'proof' && 
+                   !extractAmericanOptions(question.question_text)?.hasOptions && (
+                    <Textarea
+                      value={userAnswers[question.question_number] || ''}
+                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                      className="w-full h-32 text-lg"
+                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                    />
+                  )}
+
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+                      disabled={currentQuestion === 0}
+                      variant="outline"
+                      className="flex-1 h-12"
+                    >
+                      <ChevronRight className="w-5 h-5 ml-2" />
+                      הקודם
+                    </Button>
+
+                    {currentQuestion === exam.questions.length - 1 ? (
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
+                      >
+                        {isSubmitting ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" />שומר...</> : 'סיים מבחן'}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1))}
+                        className="flex-1 h-12 bg-blue-600"
+                      >
+                        הבא
+                        <ChevronLeft className="w-5 h-5 mr-2" />
+                      </Button>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-6xl mx-auto px-6 pb-6">
+          {exam.reading_text && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+                {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+              </h3>
+              <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                {exam.reading_text}
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="space-y-6">
+              {exam.questions.map((questionItem, qIdx) => (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentQuestion}
