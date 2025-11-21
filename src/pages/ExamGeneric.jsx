@@ -931,12 +931,37 @@ export default function ExamGenericPage() {
                     />
                   )}
 
+                  {question.question_type === 'short_answer' && (
+                    <Input
+                      value={userAnswers[question.question_number] || ''}
+                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                      placeholder={exam.subject === 'אנגלית' ? "Type your answer..." : "הקלד תשובה..."}
+                      className="w-full h-12 text-lg"
+                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                    />
+                  )}
+
                   {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && (
                     <Textarea
                       value={userAnswers[question.question_number] || ''}
                       onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
                       placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה מלאה..."}
                       className="w-full h-40 text-lg"
+                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                    />
+                  )}
+
+                  {/* Fallback for any other question type */}
+                  {question.question_type !== 'multiple_choice' && 
+                   question.question_type !== 'short_answer' &&
+                   question.question_type !== 'open_question' &&
+                   question.question_type !== 'calculation' &&
+                   question.question_type !== 'proof' && (
+                    <Textarea
+                      value={userAnswers[question.question_number] || ''}
+                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                      className="w-full h-32 text-lg"
                       dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                     />
                   )}
