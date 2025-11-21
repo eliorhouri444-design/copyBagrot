@@ -961,21 +961,21 @@ export default function ExamGenericPage() {
                       );
                     }
                     return (
-                      <p className="text-gray-700 text-base mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                      <p className="text-gray-700 text-lg mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
                         {question.question_text}
                       </p>
                     );
                   })()}
 
                   {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {question.options.map((optionValue, optionIndex) => (
                         <motion.button
                           key={optionIndex}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
                           onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                          className={`w-full p-4 rounded-lg border-2 transition-all ${
+                          className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
                             userAnswers[question.question_number] === optionValue
                               ? 'bg-blue-100 border-blue-500 shadow-md'
                               : 'bg-white border-gray-200 hover:border-blue-300'
