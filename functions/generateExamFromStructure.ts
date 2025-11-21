@@ -89,6 +89,8 @@ Deno.serve(async (req) => {
     const durationMinutes = examStructure.duration_minutes || examStructure.duration || 90;
     const totalPoints = examStructure.total_points || 100;
     
+    const isEnglishExam = examStructure.subject === 'אנגלית';
+
     const generationPrompt = `
     אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
@@ -102,6 +104,18 @@ Deno.serve(async (req) => {
     📝 **מבנה המבחן:**
     ${JSON.stringify(questionStructure, null, 2)}
 
+    ${isEnglishExam ? `
+    🔴 **חובה! - טקסט קריאה באנגלית:**
+    עבור מבחן אנגלית, חייב ליצור טקסט קריאה (reading_text) באנגלית:
+    - אורך: 200-300 מילים באנגלית
+    - רמה: מתאימה ל-${examStructure.unit_level} יחידות
+    - נושא מעניין: תרבות, טכנולוגיה, מדע, חברה
+    - סגנון: ברור ומובן
+    - הטקסט חייב להיות באנגלית!
+
+    השאלות יתבססו על הטקסט הזה - reading comprehension questions.
+    ` : ''}
+
     🎯 **דרישות:**
 
     1. **תוכן חדש לגמרי:**
@@ -111,7 +125,7 @@ Deno.serve(async (req) => {
     - שמור על אותו מבנה בדיוק
 
     2. **לכל שאלה:**
-    - טקסט השאלה המלא
+    - טקסט השאלה המלא ${isEnglishExam ? '(באנגלית!)' : ''}
     - אם צריך דיאגרמה - תאר אותה בפירוט
     - אם יש סעיפים - צור את כולם
     - תשובות נכונות
@@ -120,7 +134,7 @@ Deno.serve(async (req) => {
 
     3. **שמירה על סטנדרטים:**
     - שפה ברורה ומדויקת
-    - עברית תקנית
+    ${isEnglishExam ? '- אנגלית תקנית ברמה גבוהה' : '- עברית תקנית'}
     - מושגים מקצועיים נכונים
     - התאמה לתכנית הלימודים
 
@@ -129,7 +143,7 @@ Deno.serve(async (req) => {
     - מגוון נושאים
     - קשר למציאות (אם רלוונטי)
 
-    החזר JSON עם המבחן המלא הכולל את כל השאלות, תשובות ופתרונות.
+    החזר JSON עם המבחן המלא${isEnglishExam ? ' כולל reading_text באנגלית' : ''}.
     `;
 
     console.log('🤖 Step 5: Generating exam with AI...');
@@ -139,53 +153,50 @@ Deno.serve(async (req) => {
     
     while (retryCount < maxRetries) {
       try {
-        generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
-          prompt: generationPrompt,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              title: { type: "string" },
-              subject: { type: "string" },
-              unit_level: { type: "integer" },
-              module_id: { type: "string" },
-              description: { type: "string" },
-              duration_minutes: { type: "integer" },
-              total_points: { type: "integer" },
-              instructions: { type: "string" },
-              questions: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    question_number: { type: "integer" },
-                    question_text: { type: "string" },
-                    question_type: { type: "string" },
-                    question_image_url: { type: "string" },
-                    topic: { type: "string" },
-                    points: { type: "integer" },
-                    parts: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          part_id: { type: "string" },
-                          text: { type: "string" },
-                          points: { type: "integer" }
-                        }
+        const examSchema = {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            subject: { type: "string" },
+            unit_level: { type: "integer" },
+            module_id: { type: "string" },
+            description: { type: "string" },
+            duration_minutes: { type: "integer" },
+            total_points: { type: "integer" },
+            instructions: { type: "string" },
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  question_number: { type: "integer" },
+                  question_text: { type: "string" },
+                  question_type: { type: "string" },
+                  question_image_url: { type: "string" },
+                  topic: { type: "string" },
+                  points: { type: "integer" },
+                  parts: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        part_id: { type: "string" },
+                        text: { type: "string" },
+                        points: { type: "integer" }
                       }
-                    },
-                    correct_answer: { type: "string" },
-                    explanation: { type: "string" },
-                    solution_steps: { type: "array", items: { type: "string" } },
-                    rubric: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          criteria: { type: "string" },
-                          points: { type: "integer" },
-                          description: { type: "string" }
-                        }
+                    }
+                  },
+                  correct_answer: { type: "string" },
+                  explanation: { type: "string" },
+                  solution_steps: { type: "array", items: { type: "string" } },
+                  rubric: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        criteria: { type: "string" },
+                        points: { type: "integer" },
+                        description: { type: "string" }
                       }
                     }
                   }
@@ -193,6 +204,19 @@ Deno.serve(async (req) => {
               }
             }
           }
+        };
+        
+        // הוסף reading_text למבחני אנגלית
+        if (isEnglishExam) {
+          examSchema.properties.reading_text = { 
+            type: "string",
+            description: "Reading comprehension text in English (200-300 words)"
+          };
+        }
+        
+        generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt: generationPrompt,
+          response_json_schema: examSchema
         });
         
         // ולידציה - בדוק שיש לפחות שאלה אחת
@@ -238,7 +262,8 @@ Deno.serve(async (req) => {
     }
 
     console.log('💾 Step 6: Saving exam to database...');
-    const savedExam = await base44.asServiceRole.entities.GenericExam.create({
+    
+    const examData = {
       title: generatedExam.title || `${examStructure.subject} - מבחן מחולל`,
       subject: examStructure.subject,
       unit_level: examStructure.unit_level,
@@ -250,7 +275,22 @@ Deno.serve(async (req) => {
       questions: generatedExam.questions || [],
       is_generated: true,
       is_copyright_free: true
-    });
+    };
+    
+    // הוסף reading_text אם קיים (חובה לאנגלית)
+    if (generatedExam.reading_text) {
+      examData.reading_text = generatedExam.reading_text;
+      console.log(`✅ Reading text added (${generatedExam.reading_text.length} characters)`);
+    } else if (isEnglishExam) {
+      console.log('⚠️ Missing reading_text for English exam, generating default...');
+      examData.reading_text = `Festivals are a vibrant part of Chinese culture, celebrated in different parts of the country throughout the year. These festivals are not only a spectacle of colorful parades and traditional performances but also carry deep cultural and historical significance. The Spring Festival, also known as Chinese New Year, is the most important celebration. Families gather for reunion dinners, exchange red envelopes with money, and watch spectacular fireworks displays.
+
+Another major festival is the Mid-Autumn Festival, celebrated during the full moon in autumn. People eat mooncakes, appreciate the moon, and spend time with loved ones. The Dragon Boat Festival commemorates the ancient poet Qu Yuan with exciting boat races and traditional zongzi rice dumplings.
+
+These celebrations preserve ancient traditions while bringing communities together in modern times.`;
+    }
+    
+    const savedExam = await base44.asServiceRole.entities.GenericExam.create(examData);
     console.log('✅ Exam saved with ID:', savedExam.id);
 
     console.log('📝 Step 7: Saving solutions...');
