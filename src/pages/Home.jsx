@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Target, AlertCircle, Calculator, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown } from "lucide-react";
+import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import { differenceInDays, differenceInHours } from "date-fns";
@@ -395,6 +396,16 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+
+            <div className="p-4">
+              <Button
+                onClick={() => navigate(createPageUrl("Practice"))}
+                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold"
+              >
+                <BookOpen className="w-5 h-5 ml-2" />
+                התחל תרגול
+              </Button>
+            </div>
           </motion.div>
         )}
 
@@ -454,6 +465,16 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="p-4 pt-0">
+              <Button
+                onClick={() => navigate(createPageUrl("Exams"))}
+                className="w-full bg-green-600 hover:bg-green-700 h-12 font-bold"
+              >
+                <FileCheck className="w-5 h-5 ml-2" />
+                התחל מבחן בגרות
+              </Button>
             </div>
           </motion.div>
         )}
