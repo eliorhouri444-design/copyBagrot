@@ -29,6 +29,7 @@ export default function ExamGenericPage() {
   const [examFinished, setExamFinished] = useState(false);
   const [score, setScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [direction, setDirection] = useState(1);
   
   const [displayMode, setDisplayMode] = useState('carousel');
   const [showModeDialog, setShowModeDialog] = useState(false);
@@ -915,9 +916,9 @@ export default function ExamGenericPage() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 20 * direction }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: -20 * direction }}
                 className="flex-1 flex flex-col"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -1025,7 +1026,10 @@ export default function ExamGenericPage() {
 
                 <div className="flex gap-3 border-t pt-4">
                   <Button
-                    onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
+                    onClick={() => {
+                      setDirection(-1);
+                      setCurrentQuestion(prev => Math.max(0, prev - 1));
+                    }}
                     disabled={currentQuestion === 0}
                     variant="outline"
                     className="flex-1 h-12"
@@ -1044,7 +1048,10 @@ export default function ExamGenericPage() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1))}
+                      onClick={() => {
+                        setDirection(1);
+                        setCurrentQuestion(prev => Math.min(exam.questions.length - 1, prev + 1));
+                      }}
                       className="flex-1 h-12 bg-blue-600"
                     >
                       הבא
