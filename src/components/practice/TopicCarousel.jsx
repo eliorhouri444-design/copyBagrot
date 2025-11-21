@@ -311,7 +311,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
 
             <Button
               onClick={handleStartPractice}
-              className="w-full h-12 text-base font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-xl"
+              className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
             >
               <Play className="w-5 h-5 ml-2" />
               התחל תרגול
