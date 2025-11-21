@@ -1799,7 +1799,7 @@ export default function TopicPracticeNewPage() {
                   setShowSummary(true);
                 }
               }}
-              className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-bold"
+              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold"
             >
               {currentQuestionIndex < currentSetQuestions.length - 1 ? 'המשך לשאלה הבאה' : 'סיים וראה סיכום'}
               <ChevronLeft className="w-5 h-5 mr-2" />
