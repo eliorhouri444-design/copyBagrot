@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -552,7 +553,7 @@ export default function ExamGenericPage() {
         <DialogContent dir="rtl" className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">מבחן בתהליך</DialogTitle>
-            <DialogDescription>נמצא מבחן שלא הושלם. האם להמשיך?</DialogDescription>
+            <DialogDescription>נמצא מבחן שלא הושלם. האם להמשיף?</DialogDescription>
           </DialogHeader>
 
           <div className="bg-blue-50 rounded-xl p-4">
@@ -1170,7 +1171,7 @@ export default function ExamGenericPage() {
                     />
                   )}
 
-                  {/* Fallback for any other question type - only if no American style */}
+                  {/* Fallback for any other question type - as long as not American style */}
                   {questionItem.question_type !== 'multiple_choice' && 
                    questionItem.question_type !== 'short_answer' &&
                    questionItem.question_type !== 'open_question' &&
@@ -1196,112 +1197,6 @@ export default function ExamGenericPage() {
             >
               {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
             </Button>
-          </div>
-        </div>
-      )}
-                      <h3 className="text-xl font-bold text-gray-900">
-                        {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
-                      </h3>
-                      <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
-                        {questionItem.points} נק'
-                      </span>
-                    </div>
-
-                    {(() => {
-                      const extracted = extractAmericanOptions(questionItem.question_text);
-                      if (extracted && extracted.hasOptions) {
-                        return (
-                          <>
-                            <p className="text-gray-700 mb-4" dir="ltr">
-                              {extracted.mainQuestion}
-                            </p>
-                            <div className="space-y-2 mb-4">
-                              {extracted.options.map((optionValue, optionIndex) => (
-                                <button
-                                  key={optionIndex}
-                                  onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                                  className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
-                                    userAnswers[questionItem.question_number] === optionValue
-                                      ? 'bg-blue-100 border-blue-500 shadow-md'
-                                      : 'bg-white border-gray-200 hover:border-blue-300'
-                                  }`}
-                                  dir="ltr"
-                                >
-                                  <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
-                                  {optionValue}
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        );
-                      }
-                      return (
-                        <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                          {questionItem.question_text}
-                        </p>
-                      );
-                    })()}
-
-                    {/* Multiple choice with options array - only if no American style detected */}
-                    {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                      <div className="space-y-2">
-                        {questionItem.options.map((optionValue, optionIndex) => (
-                          <button
-                            key={optionIndex}
-                            onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 transition-all ${
-                              userAnswers[questionItem.question_number] === optionValue
-                                ? 'bg-blue-100 border-blue-500 shadow-md'
-                                : 'bg-white border-gray-200 hover:border-blue-300'
-                            }`}
-                            dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                          >
-                            {optionValue}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Short answer */}
-                    {questionItem.question_type === 'short_answer' && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                      <Input
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                        className="w-full h-12"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-
-                    {/* Open questions, calculations, proofs */}
-                    {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                      <Textarea
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                        className="w-full h-32"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-
-                    {/* Fallback for any other question type - as long as not American style */}
-                    {questionItem.question_type !== 'multiple_choice' && 
-                     questionItem.question_type !== 'short_answer' &&
-                     questionItem.question_type !== 'open_question' &&
-                     questionItem.question_type !== 'calculation' &&
-                     questionItem.question_type !== 'proof' &&
-                     !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                      <Textarea
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
-                        className="w-full h-32"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
           </div>
         </div>
       )}
