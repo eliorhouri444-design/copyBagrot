@@ -64,19 +64,19 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mx-auto mb-3" />
-        <p className="text-sm">טוען קטע השמעה...</p>
+      <div className="bg-white rounded-[18px] shadow-md p-6 text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#2A63FF] border-t-transparent mx-auto mb-3" />
+        <p className="text-gray-600 text-base">טוען קטע השמעה...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold">🎧 קטע האזנה</h3>
-        <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
-          {playCount} / {maxPlays} השמעות
+    <div className="bg-white rounded-[18px] shadow-md p-[22px]">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-[22px] font-bold text-gray-900">🎧 קטע האזנה</h3>
+        <div className="text-sm bg-[#F4F6F9] px-3 py-1 rounded-full text-gray-700 font-semibold">
+          {playCount} / {maxPlays}
         </div>
       </div>
 
@@ -84,11 +84,17 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
         <Button
           onClick={handlePlay}
           disabled={isPlaying}
-          className="w-full h-14 bg-white text-purple-600 hover:bg-gray-100 font-bold text-base disabled:opacity-50"
+          style={{ 
+            backgroundColor: isPlaying ? '#8EA1C9' : '#1D49C0',
+            borderRadius: '16px',
+            padding: '18px',
+            fontWeight: 600
+          }}
+          className="w-full text-white hover:opacity-90 disabled:opacity-50 text-base"
         >
           {isPlaying ? (
             <>
-              <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin ml-2" />
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
               מנגן...
             </>
           ) : (
@@ -99,15 +105,15 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
           )}
         </Button>
       ) : (
-        <div className="bg-white/10 rounded-xl p-4 text-center">
+        <div className="bg-[#F4F6F9] rounded-[18px] p-5 text-center border-2 border-[#2FD4C7]">
           <div className="text-4xl mb-2">✅</div>
-          <p className="text-sm font-semibold">סיימת את ההשמעות</p>
-          <p className="text-xs opacity-80 mt-1">עכשיו ענה על השאלות</p>
+          <p className="text-base font-semibold text-gray-900">סיימת את ההשמעות</p>
+          <p className="text-sm text-gray-600 mt-1">עכשיו ענה על השאלות</p>
         </div>
       )}
 
       {canPlay && playCount > 0 && (
-        <p className="text-center text-sm mt-4 text-white/80">
+        <p className="text-center text-sm mt-4 text-gray-600">
           💡 עוד השמעה אחת זמינה
         </p>
       )}
