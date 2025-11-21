@@ -888,21 +888,29 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pb-6">
-        <div className="space-y-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 pb-6">
+        <div className="flex flex-col lg:flex-row gap-3">
+          {/* Reading Text Panel - Fixed on larger screens, scrollable on mobile */}
           {exam.reading_text && (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-                {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-              </h3>
-              <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                {exam.reading_text}
+            <div className="lg:w-2/5 bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 lg:sticky lg:top-4 lg:self-start">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 sm:p-4">
+                <div className="flex items-center gap-2 text-white">
+                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <h3 className="text-sm sm:text-base font-bold">
+                    {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                  </h3>
+                </div>
+              </div>
+              <div className="overflow-y-auto p-4 sm:p-6" style={{ maxHeight: '50vh' }}>
+                <div className="text-gray-700 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                  {exam.reading_text}
+                </div>
               </div>
             </div>
           )}
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          {/* Questions Panel */}
+          <div className={`flex-1 bg-white rounded-xl shadow-lg ${exam.reading_text ? 'lg:w-3/5' : 'w-full'}`}>
             {displayMode === 'carousel' ? (
               <AnimatePresence mode="wait">
                 <motion.div
@@ -1053,14 +1061,14 @@ export default function ExamGenericPage() {
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div>
+              <div className="overflow-y-auto p-3 sm:p-6" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 {exam.questions.map((questionItem, qIdx) => (
-                  <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-xl font-bold text-gray-900">
+                  <div key={qIdx} className="mb-4 pb-4 border-b-2 border-gray-200 last:border-b-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900">
                         {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
                       </h3>
-                      <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
+                      <span className="bg-blue-100 px-2 py-1 rounded-full text-xs sm:text-sm font-bold text-blue-600 flex-shrink-0">
                         {questionItem.points} נק'
                       </span>
                     </div>
@@ -1070,15 +1078,15 @@ export default function ExamGenericPage() {
                       if (extracted && extracted.hasOptions) {
                         return (
                           <>
-                            <p className="text-gray-700 mb-4" dir="ltr">
+                            <p className="text-gray-700 text-sm sm:text-base mb-3" dir="ltr">
                               {extracted.mainQuestion}
                             </p>
-                            <div className="space-y-2 mb-4">
+                            <div className="space-y-1.5 mb-3">
                               {extracted.options.map((optionValue, optionIndex) => (
                                 <button
                                   key={optionIndex}
                                   onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                                  className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                                  className={`w-full p-2.5 sm:p-3 rounded-lg border-2 text-left transition-all text-sm sm:text-base ${
                                     userAnswers[questionItem.question_number] === optionValue
                                       ? 'bg-blue-100 border-blue-500 shadow-md'
                                       : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1094,7 +1102,7 @@ export default function ExamGenericPage() {
                         );
                       }
                       return (
-                        <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                        <p className="text-gray-700 text-sm sm:text-base mb-3" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
                           {questionItem.question_text}
                         </p>
                       );
@@ -1102,12 +1110,12 @@ export default function ExamGenericPage() {
 
                     {/* Multiple choice with options array - only if no American style detected */}
                     {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         {questionItem.options.map((optionValue, optionIndex) => (
                           <button
                             key={optionIndex}
                             onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 transition-all ${
+                            className={`w-full p-2.5 sm:p-3 rounded-lg border-2 transition-all text-sm sm:text-base ${
                               userAnswers[questionItem.question_number] === optionValue
                                 ? 'bg-blue-100 border-blue-500 shadow-md'
                                 : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1126,7 +1134,7 @@ export default function ExamGenericPage() {
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                        className="w-full h-12"
+                        className="w-full h-10 sm:h-12 text-sm sm:text-base"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
                     )}
@@ -1137,7 +1145,7 @@ export default function ExamGenericPage() {
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                        className="w-full h-32"
+                        className="w-full h-24 sm:h-32 text-sm sm:text-base"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
                     )}
@@ -1153,20 +1161,22 @@ export default function ExamGenericPage() {
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
-                        className="w-full h-32"
+                        className="w-full h-24 sm:h-32 text-sm sm:text-base"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
                     )}
                   </div>
                 ))}
 
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold mt-6"
-                >
-                  {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
-                </Button>
+                <div className="sticky bottom-0 bg-white border-t-2 border-gray-200 p-3 sm:p-4 -mx-3 sm:-mx-6 -mb-3 sm:-mb-6">
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm sm:text-base"
+                  >
+                    {isSubmitting ? <><Loader2 className="animate-spin w-4 h-4 sm:w-5 sm:h-5 ml-2" />שומר...</> : 'סיים מבחן'}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
