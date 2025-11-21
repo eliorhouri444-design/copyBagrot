@@ -892,21 +892,41 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pb-6">
-        <div className="space-y-4">
-          {exam.reading_text && (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+      <div className="flex gap-4 px-4 pb-6" style={{ height: 'calc(100vh - 180px)', maxHeight: 'calc(100vh - 180px)' }}>
+        {displayMode === 'carousel' && exam.reading_text && (
+          <div className="w-1/2 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex-shrink-0">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
                 {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
               </h3>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
               <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
                 {exam.reading_text}
               </div>
             </div>
+          </div>
+        )}
+
+        <div className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col ${displayMode === 'carousel' && exam.reading_text ? 'w-1/2' : 'w-full max-w-4xl mx-auto'}`}>
+          {displayMode === 'normal' && exam.reading_text && (
+            <>
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex-shrink-0">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                </h3>
+              </div>
+              <div className="max-h-64 overflow-y-auto p-6 border-b-2 border-gray-200 flex-shrink-0">
+                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                  {exam.reading_text}
+                </div>
+              </div>
+            </>
           )}
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex-1 overflow-y-auto p-6">
             {displayMode === 'carousel' ? (
               <AnimatePresence mode="wait">
                 <motion.div
