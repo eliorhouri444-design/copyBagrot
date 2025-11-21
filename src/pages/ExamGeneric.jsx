@@ -161,10 +161,12 @@ export default function ExamGenericPage() {
   const handleResumeProgress = () => {
     if (savedProgress) {
       console.log('Resuming progress:', savedProgress);
+      console.log('Display mode from saved:', savedProgress.display_mode);
       setUserAnswers(JSON.parse(JSON.stringify(savedProgress.user_answers || {})));
       setCurrentQuestion(savedProgress.current_question || 0);
       setTimeLeft(savedProgress.time_left || (exam.duration_minutes * 60));
-      setDisplayMode(savedProgress.display_mode || 'carousel');
+      const savedMode = savedProgress.display_mode;
+      setDisplayMode(savedMode === 'normal' || savedMode === 'carousel' ? savedMode : 'carousel');
       setExamStarted(true);
       setSavedProgress(null);
     }
