@@ -900,7 +900,8 @@ export default function ExamGenericPage() {
                     <img src={question.question_image_url} alt="שאלה" className="max-w-full rounded-lg mb-6" />
                   )}
 
-                  {question.question_type === 'multiple_choice' && question.options && (
+                  {/* Multiple choice with options */}
+                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && (
                     <div className="space-y-3">
                       {question.options.map((optionValue, optionIndex) => (
                         <motion.button
@@ -921,6 +922,16 @@ export default function ExamGenericPage() {
                     </div>
                   )}
 
+                  {/* Multiple choice without separate options (American style in text) - no input needed */}
+                  {question.question_type === 'multiple_choice' && (!question.options || question.options.length === 0) && (
+                    <div className="bg-gray-50 rounded-xl p-4 text-center border-2 border-gray-200">
+                      <p className="text-sm text-gray-600">
+                        {exam.subject === 'אנגלית' ? 'Select your answer from the options above' : 'בחר תשובה מהאפשרויות למעלה'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Short answer */}
                   {question.question_type === 'short_answer' && (
                     <Input
                       value={userAnswers[question.question_number] || ''}
@@ -931,6 +942,7 @@ export default function ExamGenericPage() {
                     />
                   )}
 
+                  {/* Open questions, calculations, proofs */}
                   {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && (
                     <Textarea
                       value={userAnswers[question.question_number] || ''}
@@ -941,7 +953,7 @@ export default function ExamGenericPage() {
                     />
                   )}
 
-                  {/* Fallback for any other question type */}
+                  {/* Fallback for other question types */}
                   {question.question_type !== 'multiple_choice' && 
                    question.question_type !== 'short_answer' &&
                    question.question_type !== 'open_question' &&
@@ -1004,7 +1016,8 @@ export default function ExamGenericPage() {
                       {questionItem.question_text}
                     </p>
 
-                    {questionItem.question_type === 'multiple_choice' && questionItem.options && (
+                    {/* Multiple choice with options */}
+                    {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && (
                       <div className="space-y-2">
                         {questionItem.options.map((optionValue, optionIndex) => (
                           <button
@@ -1023,6 +1036,16 @@ export default function ExamGenericPage() {
                       </div>
                     )}
 
+                    {/* Multiple choice without separate options - no input needed */}
+                    {questionItem.question_type === 'multiple_choice' && (!questionItem.options || questionItem.options.length === 0) && (
+                      <div className="bg-gray-50 rounded-xl p-4 text-center border-2 border-gray-200">
+                        <p className="text-sm text-gray-600">
+                          {exam.subject === 'אנגלית' ? 'Select your answer from the options above' : 'בחר תשובה מהאפשרויות למעלה'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Short answer */}
                     {questionItem.question_type === 'short_answer' && (
                       <Input
                         value={userAnswers[questionItem.question_number] || ''}
@@ -1033,26 +1056,12 @@ export default function ExamGenericPage() {
                       />
                     )}
 
+                    {/* Open questions, calculations, proofs */}
                     {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && (
                       <Textarea
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                        className="w-full h-32"
-                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                      />
-                    )}
-
-                    {/* Fallback for any other question type */}
-                    {questionItem.question_type !== 'multiple_choice' && 
-                     questionItem.question_type !== 'short_answer' &&
-                     questionItem.question_type !== 'open_question' &&
-                     questionItem.question_type !== 'calculation' &&
-                     questionItem.question_type !== 'proof' && (
-                      <Textarea
-                        value={userAnswers[questionItem.question_number] || ''}
-                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
                         className="w-full h-32"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
