@@ -486,7 +486,7 @@ export default function ExtendedReadingPage() {
 
   const currentQuestion = currentSetQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
-  const hasAnswered = !!answers[currentQuestion.question_id];
+  const hasAnswered = !!(answers[currentQuestion.question_id]?.trim());
   const isListeningTopic = topicId?.toLowerCase().includes('listening') || 
                            topicId?.toLowerCase().includes('האזנה');
 
