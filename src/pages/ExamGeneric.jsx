@@ -1077,7 +1077,7 @@ export default function ExamGenericPage() {
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div>
+              <>
                 {exam.questions.map((questionItem, qIdx) => (
                   <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
                     <div className="flex justify-between items-start mb-3">
