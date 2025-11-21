@@ -931,16 +931,6 @@ export default function ExamGenericPage() {
                     />
                   )}
 
-                  {question.question_type === 'short_answer' && (
-                    <Input
-                      value={userAnswers[question.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Type your answer..." : "הקלד תשובה..."}
-                      className="w-full h-12 text-lg"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
-
                   {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && (
                     <Textarea
                       value={userAnswers[question.question_number] || ''}
@@ -1048,6 +1038,21 @@ export default function ExamGenericPage() {
                         value={userAnswers[questionItem.question_number] || ''}
                         onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
                         placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
+                        className="w-full h-32"
+                        dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
+                      />
+                    )}
+
+                    {/* Fallback for any other question type */}
+                    {questionItem.question_type !== 'multiple_choice' && 
+                     questionItem.question_type !== 'short_answer' &&
+                     questionItem.question_type !== 'open_question' &&
+                     questionItem.question_type !== 'calculation' &&
+                     questionItem.question_type !== 'proof' && (
+                      <Textarea
+                        value={userAnswers[questionItem.question_number] || ''}
+                        onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                        placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
                         className="w-full h-32"
                         dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                       />
