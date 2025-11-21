@@ -893,32 +893,33 @@ export default function ExamGenericPage() {
       </div>
 
       {displayMode === 'carousel' ? (
-        <div className="flex gap-4 px-4 pb-6" style={{ height: 'calc(100vh - 180px)', maxHeight: 'calc(100vh - 180px)' }}>
-          {exam.reading_text && (
-            <div className="w-1/2 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex-shrink-0">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-                </h3>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                  {exam.reading_text}
+        <div className="px-4 pb-6" style={{ height: 'calc(100vh - 180px)', maxHeight: 'calc(100vh - 180px)' }}>
+          <div className="bg-white rounded-xl shadow-lg h-full overflow-hidden flex flex-col max-w-4xl mx-auto">
+            <div className="flex-1 overflow-y-auto">
+              {exam.reading_text && (
+                <div className="border-b-2 border-gray-200">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <BookOpen className="w-5 h-5" />
+                      {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                    </h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                      {exam.reading_text}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          <div className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col ${exam.reading_text ? 'w-1/2' : 'w-full max-w-4xl mx-auto'}`}>
-            <div className="flex-1 overflow-y-auto p-6">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentQuestion}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                >
+              <div className="p-6">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentQuestion}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
                   <div className="flex items-start justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">
                       {exam.subject === 'אנגלית' ? `Question ${question.question_number}` : `שאלה ${question.question_number}`}
