@@ -900,8 +900,8 @@ export default function ExamGenericPage() {
                     <img src={question.question_image_url} alt="שאלה" className="max-w-full rounded-lg mb-6" />
                   )}
 
-                  {/* Multiple choice with options */}
-                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && (
+                  {/* Multiple choice with options array */}
+                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
                     <div className="space-y-3">
                       {question.options.map((optionValue, optionIndex) => (
                         <motion.button
@@ -911,7 +911,7 @@ export default function ExamGenericPage() {
                           onClick={() => handleAnswerChange(question.question_number, optionValue)}
                           className={`w-full p-4 rounded-xl border-2 transition-all ${
                             userAnswers[question.question_number] === optionValue
-                              ? 'bg-blue-100 border-blue-500'
+                              ? 'bg-blue-100 border-blue-500 shadow-md'
                               : 'bg-white border-gray-200 hover:border-blue-300'
                           }`}
                           dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
@@ -919,15 +919,6 @@ export default function ExamGenericPage() {
                           {optionValue}
                         </motion.button>
                       ))}
-                    </div>
-                  )}
-
-                  {/* Multiple choice without separate options (American style in text) - no input needed */}
-                  {question.question_type === 'multiple_choice' && (!question.options || question.options.length === 0) && (
-                    <div className="bg-gray-50 rounded-xl p-4 text-center border-2 border-gray-200">
-                      <p className="text-sm text-gray-600">
-                        {exam.subject === 'אנגלית' ? 'Select your answer from the options above' : 'בחר תשובה מהאפשרויות למעלה'}
-                      </p>
                     </div>
                   )}
 
@@ -983,7 +974,7 @@ export default function ExamGenericPage() {
                       <Button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="flex-1 h-12 bg-gradient-to-r from-green-600 to-emerald-600"
+                        className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
                       >
                         {isSubmitting ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" />שומר...</> : 'סיים מבחן'}
                       </Button>
@@ -1012,20 +1003,51 @@ export default function ExamGenericPage() {
                       </span>
                     </div>
 
-                    <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                      {questionItem.question_text}
-                    </p>
+                    {(() => {
+                      const extracted = extractAmericanOptions(questionItem.question_text);
+                      if (extracted && extracted.hasOptions) {
+                        return (
+                          <>
+                            <p className="text-gray-700 mb-4" dir="ltr">
+                              {extracted.mainQuestion}
+                            </p>
+                            <div className="space-y-2 mb-4">
+                              {extracted.options.map((optionValue, optionIndex) => (
+                                <button
+                                  key={optionIndex}
+                                  onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
+                                  className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
+                                    userAnswers[questionItem.question_number] === optionValue
+                                      ? 'bg-blue-100 border-blue-500 shadow-md'
+                                      : 'bg-white border-gray-200 hover:border-blue-300'
+                                  }`}
+                                  dir="ltr"
+                                >
+                                  <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
+                                  {optionValue}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        );
+                      }
+                      return (
+                        <p className="text-gray-700 mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                          {questionItem.question_text}
+                        </p>
+                      );
+                    })()}
 
-                    {/* Multiple choice with options */}
-                    {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && (
+                    {/* Multiple choice with options array */}
+                    {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
                       <div className="space-y-2">
                         {questionItem.options.map((optionValue, optionIndex) => (
                           <button
                             key={optionIndex}
                             onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                            className={`w-full p-3 rounded-lg border-2 text-right transition-all ${
+                            className={`w-full p-3 rounded-lg border-2 transition-all ${
                               userAnswers[questionItem.question_number] === optionValue
-                                ? 'bg-blue-100 border-blue-500'
+                                ? 'bg-blue-100 border-blue-500 shadow-md'
                                 : 'bg-white border-gray-200 hover:border-blue-300'
                             }`}
                             dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
@@ -1033,15 +1055,6 @@ export default function ExamGenericPage() {
                             {optionValue}
                           </button>
                         ))}
-                      </div>
-                    )}
-
-                    {/* Multiple choice without separate options - no input needed */}
-                    {questionItem.question_type === 'multiple_choice' && (!questionItem.options || questionItem.options.length === 0) && (
-                      <div className="bg-gray-50 rounded-xl p-4 text-center border-2 border-gray-200">
-                        <p className="text-sm text-gray-600">
-                          {exam.subject === 'אנגלית' ? 'Select your answer from the options above' : 'בחר תשובה מהאפשרויות למעלה'}
-                        </p>
                       </div>
                     )}
 
@@ -1072,7 +1085,7 @@ export default function ExamGenericPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full h-14 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold mt-6"
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold mt-6"
                 >
                   {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
                 </Button>
