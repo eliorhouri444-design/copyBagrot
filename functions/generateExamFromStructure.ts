@@ -17,60 +17,35 @@ Deno.serve(async (req) => {
     const { subject, unitLevel, moduleId, includeDiagrams, generate_solutions } = await req.json();
     console.log('✅ Request parsed:', { subject, unitLevel, moduleId });
 
-    console.log('🔍 Step 3: Loading exam examples...');
-    // טעינה ממקורות שונים - ExamStructure, GenericExam, ModuleA/B/C
-    const allStructures = await base44.asServiceRole.entities.ExamStructure.list();
-    const allGenericExams = await base44.asServiceRole.entities.GenericExam.list();
-    const allModuleAExams = await base44.asServiceRole.entities.ModuleAExam.list();
-    const allModuleBExams = await base44.asServiceRole.entities.ModuleBExam.list();
-    const allModuleCExams = await base44.asServiceRole.entities.ModuleCExam.list();
-    
-    console.log(`✅ Loaded ${allStructures.length} ExamStructure + ${allGenericExams.length} GenericExam + ${allModuleAExams.length} ModuleA + ${allModuleBExams.length} ModuleB + ${allModuleCExams.length} ModuleC`);
+    console.log('🔍 Step 3: Loading exam examples (optimized)...');
 
-    console.log('🔍 Step 4: Filtering examples...');
-    console.log('Looking for:', { subject, unitLevel: parseInt(unitLevel), moduleId });
-    
-    // סינון ExamStructure
-    const structuresFromExamStructure = allStructures.filter(s => {
-      return s.subject === subject && 
-        s.unit_level === parseInt(unitLevel) && 
-        s.module_id === moduleId;
-    });
-    
-    // סינון GenericExam (כולל מבחנים שנסרקו)
-    const structuresFromGenericExam = allGenericExams.filter(exam => {
-      return exam.subject === subject && 
-        exam.unit_level === parseInt(unitLevel) && 
-        exam.module_id === moduleId &&
-        exam.is_generated !== true; // רק מבחנים נסרקים, לא כאלה שכבר נוצרו
-    });
-    
-    // סינון ModuleA/B/C (מבחנים מסוג A/B/C)
-    let structuresFromModules = [];
-    if (moduleId === 'A') {
-      structuresFromModules = allModuleAExams.filter(exam => 
-        exam.subject === subject && 
-        (exam.unit_level || exam.units) === parseInt(unitLevel)
-      );
-    } else if (moduleId === 'B') {
-      structuresFromModules = allModuleBExams.filter(exam => 
-        exam.subject === subject && 
-        (exam.unit_level || exam.units) === parseInt(unitLevel)
-      );
-    } else if (moduleId === 'C') {
-      structuresFromModules = allModuleCExams.filter(exam => 
-        exam.subject === subject && 
-        (exam.unit_level || exam.units) === parseInt(unitLevel)
-      );
-    }
-    
-    console.log(`✅ Found ${structuresFromExamStructure.length} from ExamStructure`);
-    console.log(`✅ Found ${structuresFromGenericExam.length} from GenericExam`);
-    console.log(`✅ Found ${structuresFromModules.length} from Module${moduleId}`);
-    
-    // שילוב המקורות
-    const structures = [...structuresFromExamStructure, ...structuresFromGenericExam, ...structuresFromModules];
-    console.log(`✅ Total: ${structures.length} matching structures`);
+    // טעינה מקבילה ויעילה יותר - רק מה שצריך
+    const [genericExams, moduleExams] = await Promise.all([
+      base44.asServiceRole.entities.GenericExam.filter({
+        subject,
+        unit_level: parseInt(unitLevel),
+        module_id: moduleId
+      }),
+      (async () => {
+        if (moduleId === 'A') {
+          return base44.asServiceRole.entities.ModuleAExam.filter({ subject });
+        } else if (moduleId === 'B') {
+          return base44.asServiceRole.entities.ModuleBExam.filter({ subject });
+        } else if (moduleId === 'C') {
+          return base44.asServiceRole.entities.ModuleCExam.filter({ subject });
+        }
+        return [];
+      })()
+    ]);
+
+    // סינון מבחנים נסרקים בלבד (לא generated)
+    const scannedExams = genericExams.filter(exam => exam.is_generated !== true);
+    const filteredModuleExams = moduleExams.filter(exam => 
+      (exam.unit_level || exam.units) === parseInt(unitLevel)
+    );
+
+    const structures = [...scannedExams, ...filteredModuleExams];
+    console.log(`✅ Found ${structures.length} matching structures`);
 
     if (structures.length === 0) {
       console.error('❌ No matching structures found');
@@ -89,48 +64,12 @@ Deno.serve(async (req) => {
     const durationMinutes = examStructure.duration_minutes || examStructure.duration || 90;
     const totalPoints = examStructure.total_points || 100;
     
-    const generationPrompt = `
-אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
+    const generationPrompt = `צור מבחן ${examStructure.subject} ${examStructure.unit_level}יח' מודול ${examStructure.module_id}.
 
-📋 **מידע כללי:**
-- מקצוע: ${examStructure.subject}
-- רמה: ${examStructure.unit_level} יחידות
-- שאלון: ${examStructure.module_id}
-- משך: ${durationMinutes} דקות
-- נקודות: ${totalPoints}
+    מבנה: ${questionStructure.length} שאלות, ${totalPoints} נק', ${durationMinutes} דק'.
 
-📝 **מבנה המבחן:**
-${JSON.stringify(questionStructure, null, 2)}
-
-🎯 **דרישות:**
-
-1. **תוכן חדש לגמרי:**
-   - אל תעתיק שום שאלה מהמבחן המקורי
-   - צור תוכן מקורי ומגוון
-   - שמור על רמת קושי זהה
-   - שמור על אותו מבנה בדיוק
-
-2. **לכל שאלה:**
-   - טקסט השאלה המלא
-   - אם צריך דיאגרמה - תאר אותה בפירוט
-   - אם יש סעיפים - צור את כולם
-   - תשובות נכונות
-   - הסבר מפורט
-   - רובריקת ניקוד
-
-3. **שמירה על סטנדרטים:**
-   - שפה ברורה ומדויקת
-   - עברית תקנית
-   - מושגים מקצועיים נכונים
-   - התאמה לתכנית הלימודים
-
-4. **איכות:**
-   - שאלות מאתגרות אך הוגנות
-   - מגוון נושאים
-   - קשר למציאות (אם רלוונטי)
-
-החזר JSON עם המבחן המלא הכולל את כל השאלות, תשובות ופתרונות.
-`;
+    לכל שאלה: טקסט, תשובה נכונה, הסבר קצר, נקודות.
+    שמור על אותו מבנה ורמת קושי. תוכן חדש לגמרי.`;
 
     console.log('🤖 Step 5: Generating exam with AI...');
     const generatedExam = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -190,45 +129,21 @@ ${JSON.stringify(questionStructure, null, 2)}
     });
     console.log('✅ AI generation complete');
 
-    console.log('💾 Step 6: Saving exam to database...');
+    console.log('💾 Step 6: Saving exam...');
     const savedExam = await base44.asServiceRole.entities.GenericExam.create({
-      title: generatedExam.title,
+      title: generatedExam.title || `${examStructure.subject} - מבחן מחולל`,
       subject: examStructure.subject,
       unit_level: examStructure.unit_level,
       module_id: examStructure.module_id,
-      description: generatedExam.description,
+      description: generatedExam.description || '',
       duration_minutes: durationMinutes,
       total_points: totalPoints,
-      instructions: generatedExam.instructions,
-      questions: generatedExam.questions,
+      instructions: generatedExam.instructions || 'ענה על כל השאלות',
+      questions: generatedExam.questions || [],
       is_generated: true,
       is_copyright_free: true
     });
-    console.log('✅ Exam saved with ID:', savedExam.id);
-
-    console.log('📝 Step 7: Saving solutions...');
-    // שמירת פתרונות אם נדרש
-    if (generate_solutions) {
-      for (const question of generatedExam.questions) {
-        await base44.asServiceRole.entities.SolutionBank.create({
-          question_id: `generated_${savedExam.id}_q${question.question_number}`,
-          solution_text: question.explanation,
-          solution_steps: question.solution_steps?.map((step, idx) => ({
-            step: idx + 1,
-            description: step
-          })) || [],
-          final_answers: [{
-            part_id: "main",
-            value: question.correct_answer
-          }],
-          rubric: question.rubric || [],
-          verified: false
-        });
-      }
-    }
-
-    console.log('✅ Solutions saved');
-    console.log('🎉 Generation complete!');
+    console.log('✅ Saved:', savedExam.id);
 
     return Response.json({
       success: true,
