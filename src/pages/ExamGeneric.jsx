@@ -948,7 +948,7 @@ export default function ExamGenericPage() {
                 </h3>
               </div>
               <div className="overflow-y-auto p-3 h-[calc(100%-44px)]">
-                <div className="text-gray-700 text-xs leading-relaxed whitespace-pre-wrap" dir="ltr">
+                <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap" dir="ltr">
                   {exam.reading_text}
                 </div>
               </div>
