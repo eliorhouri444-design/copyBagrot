@@ -944,7 +944,7 @@ export default function ExamGenericPage() {
                               <button
                                 key={optionIndex}
                                 onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                                className={`w-full p-3 rounded-lg border-2 text-left text-base transition-all ${
+                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[question.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1103,7 +1103,7 @@ export default function ExamGenericPage() {
                               <button
                                 key={optionIndex}
                                 onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                                className={`w-full p-3 rounded-lg border-2 text-left text-base transition-all ${
+                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[questionItem.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
@@ -1131,7 +1131,7 @@ export default function ExamGenericPage() {
                         <button
                           key={optionIndex}
                           onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                          className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
+                          className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
                             userAnswers[questionItem.question_number] === optionValue
                               ? 'bg-blue-100 border-blue-500 shadow-md'
                               : 'bg-white border-gray-200 hover:border-blue-300'
