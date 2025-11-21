@@ -64,7 +64,7 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 text-center border-2 border-gray-200">
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 text-center border-2 border-blue-200">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-3" />
         <p className="text-sm text-gray-600">טוען קטע השמעה...</p>
       </div>
@@ -72,7 +72,7 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-gray-200">
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-blue-200">
       <div className="flex items-center justify-center mb-4 sm:mb-6">
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
           <Volume2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
@@ -81,7 +81,7 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
 
       <div className="text-center mb-4">
         <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">🎧 קטע האזנה</h3>
-        <div className="inline-block bg-blue-50 px-4 py-2 rounded-full border-2 border-blue-200">
+        <div className="inline-block bg-white px-4 py-2 rounded-full border-2 border-blue-300">
           <span className="text-sm font-bold text-blue-700">
             {playCount} / {maxPlays} השמעות
           </span>
@@ -92,7 +92,7 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
         <Button
           onClick={handlePlay}
           disabled={isPlaying}
-          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-base sm:text-lg disabled:opacity-50 shadow-md"
+          className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base sm:text-lg disabled:opacity-50 shadow-md"
         >
           {isPlaying ? (
             <>
