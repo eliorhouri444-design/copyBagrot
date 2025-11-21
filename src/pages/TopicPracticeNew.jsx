@@ -620,7 +620,7 @@ export default function TopicPracticeNewPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F4F6F9' }}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-16 w-16 text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600 font-semibold text-lg">טוען שאלות...</p>
@@ -631,15 +631,14 @@ export default function TopicPracticeNewPage() {
 
   if (loadError) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#F9F4F6' }}>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">שגיאה</h2>
           <p className="text-gray-700 mb-6">{loadError}</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            style={{ backgroundColor: '#2A63FF' }}
-            className="w-full hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700"
           >
             <ChevronRight className="w-5 h-5 ml-2" />
             חזור לתרגול
@@ -651,15 +650,14 @@ export default function TopicPracticeNewPage() {
 
   if (currentSetQuestions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#F4F6F9' }}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
           <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">אין שאלות</h2>
           <p className="text-gray-600 mb-6">לא נמצאו שאלות עבור נושא זה</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            style={{ backgroundColor: '#2A63FF' }}
-            className="w-full hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700"
           >
             חזור לתרגול
           </Button>
@@ -670,7 +668,7 @@ export default function TopicPracticeNewPage() {
 
   if (showSummary) {
     return (
-      <div className="fixed inset-0 overflow-y-auto" style={{ backgroundColor: '#F4F6F9' }}>
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="min-h-screen flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -685,7 +683,7 @@ export default function TopicPracticeNewPage() {
               <p className="text-gray-600">הנה התוצאות שלך</p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-[18px] p-6 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
               <div className="text-center mb-4">
                 <div className="text-5xl font-bold text-blue-600">
                   {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
@@ -701,14 +699,14 @@ export default function TopicPracticeNewPage() {
               {currentSetQuestions.map((q, idx) => {
                 const result = results[q.question_id];
                 return (
-                  <div key={idx} className={`rounded-[18px] p-4 border-2 ${
+                  <div key={idx} className={`rounded-xl p-4 border-2 ${
                     q.question_type === "writing" 
                       ? 'bg-blue-50 border-blue-300' 
                       : result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'
                   }`}>
                     <div className="flex items-start gap-3">
                       {q.question_type === "writing" ? (
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style={{ backgroundColor: '#2A63FF' }}>
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           {Math.round(result?.percentage || 0)}
                         </div>
                       ) : result?.isCorrect ? (
@@ -722,7 +720,7 @@ export default function TopicPracticeNewPage() {
 
                         {q.question_type === "writing" && result?.writingEvaluation ? (
                           <div className="space-y-2 mt-3">
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[18px] p-4 border-2 border-blue-300">
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-300">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
                                 Detailed Score Breakdown
@@ -814,7 +812,7 @@ export default function TopicPracticeNewPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button onClick={handleContinueToNextSet} style={{ backgroundColor: '#2A63FF' }} className="w-full hover:bg-blue-700">
+              <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
                 המשך לסט הבא
                 <ChevronLeft className="w-5 h-5 mr-2" />
               </Button>
@@ -840,65 +838,81 @@ export default function TopicPracticeNewPage() {
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#F4F6F9' }}>
-        <div style={{ background: 'linear-gradient(180deg, #2A63FF, #7A2BEE)' }} className="p-6 text-white text-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="absolute top-6 right-6 text-white hover:bg-white/20"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </Button>
-          <h1 className="text-[22px] font-bold">🎧 {topicName}</h1>
-          <p className="text-sm opacity-90 mt-1">סט {setNumber} • Listening Practice</p>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+          <div className="flex items-center justify-between text-white">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="text-white hover:bg-white/20 h-9 w-9"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+
+            <div className="text-center flex-1">
+              <h1 className="text-lg sm:text-xl font-bold">🎧 {topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • Listening Practice</p>
+            </div>
+
+            <div className="w-9" />
+          </div>
         </div>
 
-        <div className="px-4 sm:px-6 py-6 max-w-2xl mx-auto space-y-4">
-          <ListeningPlayer 
-            audioText={listeningText} 
-            maxPlays={2}
-            onMaxPlaysReached={() => setCanProceedToQuestions(true)}
-          />
-
-          <div className="bg-white rounded-[18px] shadow-md p-[22px]">
-            <h3 className="font-bold text-gray-900 text-[20px] mb-4">📝 הוראות</h3>
-            <ul className="space-y-3 text-gray-700 text-base">
-              <li className="flex items-start gap-3">
-                <span className="font-bold text-[#2A63FF] flex-shrink-0">1.</span>
-                <span>האזן לקטע השמיעה - <strong>רק פעמיים!</strong></span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="font-bold text-[#2A63FF] flex-shrink-0">2.</span>
-                <span>אחרי פעמיים, עבור לענות על {currentSetQuestions.length} שאלות</span>
-              </li>
-              <li className="flex items-start gap-3 text-[#FF4D6A]">
-                <span className="font-bold flex-shrink-0">⚠️</span>
-                <span><strong>חשוב:</strong> אחרי שתתחיל לענות, לא תוכל לשמוע שוב!</span>
-              </li>
-            </ul>
-          </div>
-
-          <Button
-            onClick={() => setShowListeningIntro(false)}
-            disabled={!canProceedToQuestions}
-            style={{ 
-              backgroundColor: canProceedToQuestions ? '#1D49C0' : '#8EA1C9',
-              borderRadius: '16px',
-              padding: '18px',
-              fontWeight: 600
-            }}
-            className="w-full text-white text-base disabled:cursor-not-allowed"
+        <div className="px-4 sm:px-6 pb-20 max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
           >
-            {canProceedToQuestions ? (
-              <>
-                התחל לענות על השאלות
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </>
-            ) : (
-              'שמע את הקטע פעמיים כדי להמשיך'
-            )}
-          </Button>
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
+              <div className="text-5xl mb-3">🎧</div>
+              <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
+              <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע מספר פעמים</p>
+            </div>
+
+            <ListeningPlayer 
+              audioText={listeningText} 
+              maxPlays={2}
+              onMaxPlaysReached={() => setCanProceedToQuestions(true)}
+            />
+
+            <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
+              <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
+                <span className="text-2xl">📝</span>
+                הוראות חשובות:
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-3 bg-indigo-50 rounded-lg p-3">
+                  <span className="text-indigo-600 font-bold text-lg flex-shrink-0">1</span>
+                  <span className="font-medium">האזן לקטע השמיעה - <strong>רק פעמיים!</strong></span>
+                </li>
+                <li className="flex items-start gap-3 bg-purple-50 rounded-lg p-3">
+                  <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
+                  <span className="font-medium">אחרי פעמיים, עבור לענות על <strong>{currentSetQuestions.length} שאלות</strong></span>
+                </li>
+                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3 border-2 border-red-300">
+                  <span className="text-red-600 font-bold text-lg flex-shrink-0">⚠️</span>
+                  <span className="font-medium"><strong>חשוב מאוד:</strong> אחרי שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
+                </li>
+              </ul>
+            </div>
+
+            <Button
+              onClick={() => setShowListeningIntro(false)}
+              disabled={!canProceedToQuestions}
+              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {canProceedToQuestions ? (
+                <>
+                  ✓ התחל לענות על השאלות
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                </>
+              ) : (
+                'שמע את הקטע פעמיים כדי להמשיך'
+              )}
+            </Button>
+          </motion.div>
         </div>
       </div>
     );
@@ -907,61 +921,65 @@ export default function TopicPracticeNewPage() {
   // Show reading text if exists and requested
   if (readingText && showReadingText) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#F4F6F9' }}>
-        <div style={{ background: 'linear-gradient(180deg, #2A63FF, #7A2BEE)' }} className="p-6 text-white text-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="absolute top-6 right-6 text-white hover:bg-white/20"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </Button>
-          <h1 className="text-[22px] font-bold">{topicName}</h1>
-          <p className="text-sm opacity-90 mt-1">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+          <div className="flex items-center justify-between text-white">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="text-white hover:bg-white/20 h-9 w-9"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+
+            <div className="text-center flex-1">
+              <h1 className="text-lg sm:text-xl font-bold">{topicName}</h1>
+              <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • {currentSetQuestions.length} שאלות</p>
+            </div>
+
+            <div className="w-9" />
+          </div>
         </div>
 
-        <div className="px-4 sm:px-6 py-6">
+        <div className="px-4 sm:px-6 pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-[18px] shadow-md overflow-hidden max-w-2xl mx-auto"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto"
           >
-            <div className="p-[22px]">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#2A63FF' }}>
-                  <BookOpen className="w-6 h-6 text-white" />
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5 border-b-2 border-blue-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-[22px] font-bold text-gray-900">קרא את הטקסט</h2>
-                  <p className="text-base text-gray-600">לאחר מכן תענה על השאלות</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">קרא את הטקסט</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">לאחר מכן תענה על 10 שאלות</p>
                 </div>
               </div>
+            </div>
 
-              <div style={{ backgroundColor: '#F4F6F9', borderRadius: '18px', padding: '22px' }}>
+            <div className="p-5 sm:p-6">
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-4 sm:p-5 border border-gray-200">
                 <div 
-                  className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+                  className="text-[15px] sm:text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
                   style={{ 
-                    fontFamily: "'Inter', 'SF Pro', sans-serif",
+                    fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
                     direction: 'ltr'
                   }}
                 >
                   {readingText}
                 </div>
               </div>
+            </div>
 
+            <div className="p-4 sm:p-5 pt-0">
               <Button
                 onClick={() => setShowReadingText(false)}
-                style={{ 
-                  backgroundColor: '#1D49C0',
-                  borderRadius: '16px',
-                  padding: '18px',
-                  fontWeight: 600,
-                  marginTop: '20px'
-                }}
-                className="w-full text-white hover:opacity-90 text-base"
+                className="w-full h-12 sm:h-14 bg-green-600 hover:bg-green-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
               >
-                המשך לשאלות
+                יאללה לקרוא - המשך לשאלות
                 <ChevronLeft className="w-5 h-5 mr-2" />
               </Button>
             </div>
@@ -972,21 +990,21 @@ export default function TopicPracticeNewPage() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col max-w-md mx-auto" style={{ backgroundColor: '#F4F6F9' }}>
-      <div style={{ background: 'linear-gradient(180deg, #2A63FF, #7A2BEE)' }} className="p-4 shadow-xl flex-shrink-0">
-        <div className="flex items-center justify-between text-white mb-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
+      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+        <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20 h-10 w-10"
+            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-[20px] font-bold">{topicName}</h1>
-            <p className="text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1}/{currentSetQuestions.length}</p>
+            <h1 className="text-base sm:text-xl font-bold">{topicName}</h1>
+            <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
           {readingText && !isListeningTopic && (
@@ -1001,7 +1019,7 @@ export default function TopicPracticeNewPage() {
           )}
         </div>
 
-        <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+        <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -1027,7 +1045,7 @@ export default function TopicPracticeNewPage() {
               <div
                 className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
                 style={{
-                  fontFamily: "'Inter', 'SF Pro', sans-serif",
+                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
                   direction: 'ltr'
                 }}
               >
@@ -1035,7 +1053,7 @@ export default function TopicPracticeNewPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setShowStoryDialog(false)} style={{ backgroundColor: '#2A63FF' }} className="w-full hover:bg-blue-700">
+              <Button onClick={() => setShowStoryDialog(false)}>
                 חזור לשאלות
               </Button>
             </DialogFooter>
@@ -1049,9 +1067,9 @@ export default function TopicPracticeNewPage() {
           key={currentQuestion.question_id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-[18px] shadow-md overflow-hidden max-h-full m-3"
+          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden max-h-full"
         >
-          <div className="flex-1 overflow-y-auto p-[22px]">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4 pt-6 sm:pt-8">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
@@ -1074,7 +1092,7 @@ export default function TopicPracticeNewPage() {
           {/* Separator after reading text */}
           {readingText && currentQuestionIndex === 0 && (
             <div className="mb-6">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[18px] p-4 text-center shadow-md mb-6">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-center shadow-md mb-6">
                 <div className="flex items-center justify-center gap-2 text-white">
                   <BookOpen className="w-5 h-5" />
                   <span className="text-base font-bold">Questions About The Reading Text</span>
@@ -1085,14 +1103,14 @@ export default function TopicPracticeNewPage() {
           )}
 
           <div className="flex items-start gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#2A63FF' }}>
-              <span className="font-bold text-white">{currentQuestionIndex + 1}</span>
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="font-bold text-blue-600">{currentQuestionIndex + 1}</span>
             </div>
             <div className="flex-1">
               <p
-                className="text-[18px] text-gray-900 leading-relaxed whitespace-pre-wrap"
+                className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap"
                 dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
-                style={{ fontFamily: "'Inter', 'SF Pro', sans-serif" }}
+                style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
               >
                 {currentQuestion.question_text}
               </p>
@@ -1120,25 +1138,24 @@ export default function TopicPracticeNewPage() {
                   <button
                     key={idx}
                     onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
-                    style={{
-                      borderRadius: '14px',
-                      padding: '14px',
-                      border: isSelected ? '2px solid #2A63FF' : '2px solid #DCE3F7',
-                      backgroundColor: isSelected ? '#F4F6F9' : '#FFFFFF'
-                    }}
-                    className="w-full text-right transition-all cursor-pointer hover:border-[#2A63FF]"
+                    className={`w-full text-right p-3 rounded-xl border-2 transition-all ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'
+                    } cursor-pointer`}
                   >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0`}
-                      style={{
-                        borderColor: isSelected ? '#2A63FF' : '#DCE3F7',
-                        backgroundColor: isSelected ? '#2A63FF' : 'transparent'
-                      }}
-                    >
-                      {isSelected && (
-                        <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                      )}
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        isSelected
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {isSelected && (
+                          <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{optionText}</span>
                     </div>
-                    <span className="text-base text-gray-900" style={{ fontFamily: "'Inter', 'SF Pro', sans-serif" }}>{optionText}</span>
                   </button>
                 );
               })}
@@ -1150,8 +1167,8 @@ export default function TopicPracticeNewPage() {
 
           {/* Answer input area - fixed at bottom */}
           {currentQuestion.question_type !== "writing" && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 shadow-2xl p-4 z-20" style={{ borderColor: '#DCE3F7' }}>
-              <div className="max-w-md mx-auto space-y-3">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
+              <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
                   <div></div>
                 ) : (
@@ -1159,30 +1176,17 @@ export default function TopicPracticeNewPage() {
                     value={answers[currentQuestion.question_id] || ""}
                     onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
                     placeholder="הקלד את תשובתך כאן..."
-                    style={{
-                      borderRadius: '14px',
-                      padding: '14px',
-                      border: '2px solid #DCE3F7',
-                      fontFamily: "'Inter', 'SF Pro', sans-serif",
-                      fontSize: '16px'
-                    }}
-                    className="w-full h-28 resize-none placeholder-italic"
+                    className="w-full h-28 text-base resize-none"
                   />
                 )}
 
                 <Button
                   onClick={() => handleSubmitAnswer()}
                   disabled={!hasAnswered || isSubmitting}
-                  style={{
-                    backgroundColor: hasAnswered ? '#1D49C0' : '#8EA1C9',
-                    borderRadius: '16px',
-                    padding: '18px',
-                    fontWeight: 600
-                  }}
-                  className="w-full text-white text-base disabled:cursor-not-allowed"
+                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
                 >
                   {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
-                  <ChevronLeft className="w-5 h-5 mr-2" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 </Button>
               </div>
             </div>
@@ -1211,14 +1215,14 @@ export default function TopicPracticeNewPage() {
             <div 
               className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
               style={{ 
-                fontFamily: "'Inter', 'SF Pro', sans-serif"
+                fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
               }}
             >
               {readingText}
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowStoryDialog(false)} style={{ backgroundColor: '#2A63FF' }} className="w-full hover:bg-blue-700">
+            <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
               סגור
             </Button>
           </DialogFooter>
@@ -1235,7 +1239,7 @@ export default function TopicPracticeNewPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-blue-50 rounded-[18px] p-4 my-4">
+          <div className="bg-blue-50 rounded-xl p-4 my-4">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-600 mb-2">
                 {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
@@ -1273,7 +1277,7 @@ export default function TopicPracticeNewPage() {
             <Button variant="outline" onClick={finishPractice}>
               סיים תרגול
             </Button>
-            <Button onClick={handleContinueToNextSet} style={{ backgroundColor: '#1D49C0' }} className="hover:bg-green-700">
+            <Button onClick={handleContinueToNextSet} className="bg-green-600 hover:bg-green-700">
               <Trophy className="w-5 h-5 ml-2" />
               המשך לסט הבא
             </Button>
@@ -1290,7 +1294,7 @@ export default function TopicPracticeNewPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-blue-50 rounded-[18px] p-4 border-2 border-blue-200">
+          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
             <div className="text-center space-y-2">
               <div className="text-4xl mb-2">📺</div>
               <p className="text-gray-700 text-sm">
@@ -1305,8 +1309,7 @@ export default function TopicPracticeNewPage() {
           <DialogFooter className="flex flex-col gap-2">
             <Button
               onClick={handleConfirmWatchAd}
-              style={{ backgroundColor: '#2A63FF' }}
-              className="w-full hover:bg-blue-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               צפה בסרטון והמשך
             </Button>
@@ -1352,7 +1355,7 @@ export default function TopicPracticeNewPage() {
               </>
             ) : (
               <AdManager onContinue={handleAdComplete}>
-                <div className="bg-blue-50 rounded-[18px] p-6">
+                <div className="bg-blue-50 rounded-xl p-6">
                   <div className="text-4xl mb-3">📺</div>
                   <p className="text-gray-700">צופה בסרטון...</p>
                 </div>
@@ -1373,9 +1376,10 @@ export default function TopicPracticeNewPage() {
         <DialogContent dir="rtl" className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold`}
-                style={{ backgroundColor: writingFeedbackData?.percentage >= 70 ? '#1CB84D' : (writingFeedbackData?.percentage >= 50 ? 'rgb(234 179 8)' : 'rgb(239 68 68)') }}
-              >
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold ${
+                writingFeedbackData?.percentage >= 70 ? 'bg-green-500' : 
+                writingFeedbackData?.percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+              }`}>
                 {Math.round(writingFeedbackData?.percentage || 0)}
               </div>
               <div className="flex-1">
@@ -1396,7 +1400,7 @@ export default function TopicPracticeNewPage() {
             <div className="space-y-4 py-4">
               {/* Opening Summary */}
               {writingFeedbackData.evaluation.opening_sentence && (
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[18px] p-4 text-white">
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white">
                   <div className="text-sm font-bold mb-2">📋 סיכום ראשוני</div>
                   <div className="text-base leading-relaxed">{writingFeedbackData.evaluation.opening_sentence}</div>
                 </div>
@@ -1431,7 +1435,7 @@ export default function TopicPracticeNewPage() {
               </div>
 
               {/* Score Breakdown */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[18px] p-5 border-2 border-blue-300">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-300">
                 <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                   <span className="text-xl">📊</span>
                   פירוט הציון
@@ -1476,7 +1480,7 @@ export default function TopicPracticeNewPage() {
               {showRewriteOptions && (
                 <div className="space-y-3">
                   {writingFeedbackData.evaluation.rewritten_version_90_plus && (
-                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-[18px] p-4 border-2 border-amber-300">
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-300">
                       <div className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
                         <Crown className="w-5 h-5" />
                         גרסה משודרגת (90+)
@@ -1488,7 +1492,7 @@ export default function TopicPracticeNewPage() {
                   )}
 
                   {writingFeedbackData.evaluation.rewritten_with_connectors && (
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-[18px] p-4 border-2 border-purple-300">
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
                       <div className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         גרסה עם מילות קישור
@@ -1500,7 +1504,7 @@ export default function TopicPracticeNewPage() {
                   )}
 
                   {writingFeedbackData.evaluation.rewritten_advanced_vocabulary && (
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-[18px] p-4 border-2 border-green-300">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
                       <div className="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         גרסה עם אוצר מילים מתקדם
@@ -1515,7 +1519,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Sentence Analysis */}
               {showSentenceAnalysis && writingFeedbackData.evaluation.sentence_by_sentence_analysis?.length > 0 && (
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-[18px] p-4 border-2 border-blue-300">
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
                   <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">🔍</span>
                     ניתוח משפט אחר משפט
@@ -1547,7 +1551,7 @@ export default function TopicPracticeNewPage() {
               {showVocabularyHelp && (
                 <div className="space-y-3">
                   {writingFeedbackData.evaluation.connectors_to_use?.length > 0 && (
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-[18px] p-4 border-2 border-purple-300">
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
                       <div className="text-sm font-bold text-purple-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         מילות קישור לשימוש
@@ -1565,7 +1569,7 @@ export default function TopicPracticeNewPage() {
                   )}
 
                   {writingFeedbackData.evaluation.advanced_vocabulary?.length > 0 && (
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-[18px] p-4 border-2 border-green-300">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
                       <div className="text-sm font-bold text-green-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         מילים מתקדמות לשדרוג
@@ -1583,7 +1587,7 @@ export default function TopicPracticeNewPage() {
                   )}
 
                   {writingFeedbackData.evaluation.useful_phrases?.length > 0 && (
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-[18px] p-4 border-2 border-blue-300">
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
                       <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">💬</span>
                         ביטויים שימושיים לבגרות
@@ -1602,7 +1606,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Recurring Mistakes */}
               {writingFeedbackData.evaluation.recurring_mistakes?.length > 0 && (
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-[18px] p-4 border-2 border-red-300">
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-300">
                   <div className="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">⚠️</span>
                     טעויות שחוזרות על עצמן
@@ -1628,7 +1632,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Strengths */}
               {writingFeedbackData.evaluation.strengths?.length > 0 && (
-                <div className="bg-green-50 rounded-[18px] p-4 border-2 border-green-200">
+                <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
                   <div className="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">✅</span>
                     נקודות חוזק
@@ -1646,7 +1650,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Areas to Improve */}
               {writingFeedbackData.evaluation.areas_to_improve?.length > 0 && (
-                <div className="bg-orange-50 rounded-[18px] p-4 border-2 border-orange-200">
+                <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
                   <div className="text-sm font-bold text-orange-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">🎯</span>
                     תחומים לשיפור
@@ -1664,7 +1668,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Grammar Errors */}
               {writingFeedbackData.evaluation.grammar_errors?.length > 0 && (
-                <div className="bg-red-50 rounded-[18px] p-4 border-2 border-red-200">
+                <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
                   <div className="text-sm font-bold text-red-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">⚠️</span>
                     שגיאות דקדוק שזוהו
@@ -1684,7 +1688,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Spelling Errors */}
               {writingFeedbackData.evaluation.spelling_errors?.length > 0 && (
-                <div className="bg-pink-50 rounded-[18px] p-4 border-2 border-pink-200">
+                <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200">
                   <div className="text-sm font-bold text-pink-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">✏️</span>
                     שגיאות כתיב שזוהו
@@ -1708,7 +1712,7 @@ export default function TopicPracticeNewPage() {
 
               {/* What to Do Next Time */}
               {writingFeedbackData.evaluation.what_to_do_next_time && (
-                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[18px] p-4 text-white">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white">
                   <div className="text-sm font-bold mb-2 flex items-center gap-2">
                     <span className="text-xl">🎯</span>
                     מה לעשות בפעם הבאה
@@ -1719,7 +1723,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Tense Errors */}
               {writingFeedbackData.evaluation.tense_errors?.length > 0 && (
-                <div className="bg-amber-50 rounded-[18px] p-4 border-2 border-amber-200">
+                <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
                   <div className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">⏰</span>
                     שגיאות זמנים (עבר/הווה/עתיד)
@@ -1750,7 +1754,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Agreement Errors */}
               {writingFeedbackData.evaluation.agreement_errors?.length > 0 && (
-                <div className="bg-purple-50 rounded-[18px] p-4 border-2 border-purple-200">
+                <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200">
                   <div className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">🔢</span>
                     שגיאות הסכמה (יחיד/רבים)
@@ -1771,7 +1775,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Punctuation Errors */}
               {writingFeedbackData.evaluation.punctuation_errors?.length > 0 && (
-                <div className="bg-blue-50 rounded-[18px] p-4 border-2 border-blue-200">
+                <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
                   <div className="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">📝</span>
                     שגיאות ניקוד ואותיות גדולות
@@ -1800,8 +1804,7 @@ export default function TopicPracticeNewPage() {
                   setShowSummary(true);
                 }
               }}
-              style={{ backgroundColor: '#1D49C0' }}
-              className="w-full hover:bg-green-700 h-12 text-lg font-bold"
+              className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-bold"
             >
               {currentQuestionIndex < currentSetQuestions.length - 1 ? 'המשך לשאלה הבאה' : 'סיים וראה סיכום'}
               <ChevronLeft className="w-5 h-5 mr-2" />
