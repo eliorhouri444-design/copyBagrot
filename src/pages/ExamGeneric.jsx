@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -190,8 +189,12 @@ export default function ExamGenericPage() {
   };
 
   const handleConfirmExit = async () => {
+    // וודא שמירה לפני יציאה
     await saveProgress();
-    navigate(createPageUrl("Exams"));
+    // המתן קצת כדי שהשמירה תסתיים
+    setTimeout(() => {
+      navigate(createPageUrl("Exams"));
+    }, 300);
   };
 
   const handleAnswerChange = (questionNumber, answer) => {
