@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -56,20 +56,26 @@ export default function AdminExamStructurePage() {
       }
     },
     "פיזיקה": {
-      units: [5],
+      units: [3, 4, 5],
       modules: {
+        3: [{ id: "035203", name: "שאלון 035203" }],
+        4: [{ id: "035204", name: "שאלון 035204" }],
         5: [{ id: "035201", name: "שאלון 035201 - מכניקה" }, { id: "035202", name: "שאלון 035202 - חשמל" }]
       }
     },
     "כימיה": {
-      units: [5],
+      units: [3, 4, 5],
       modules: {
+        3: [{ id: "041203", name: "שאלון 041203" }],
+        4: [{ id: "041204", name: "שאלון 041204" }],
         5: [{ id: "041201", name: "שאלון 041201 - אורגנית" }, { id: "041202", name: "שאלון 041202 - כללית" }]
       }
     },
     "ביולוגיה": {
-      units: [5],
+      units: [3, 4, 5],
       modules: {
+        3: [{ id: "046203", name: "שאלון 046203" }],
+        4: [{ id: "046204", name: "שאלון 046204" }],
         5: [{ id: "046201", name: "שאלון 046201 - תא" }, { id: "046202", name: "שאלון 046202 - פיזיולוגיה" }]
       }
     },
@@ -79,16 +85,41 @@ export default function AdminExamStructurePage() {
         2: [{ id: "H1", name: "היסטוריה כללית" }, { id: "H2", name: "היסטוריה של עם ישראל" }]
       }
     },
+    "אזרחות": {
+      units: [2],
+      modules: {
+        2: [{ id: "CIV1", name: "אזרחות - מבנה א'" }, { id: "CIV2", name: "אזרחות - מבנה ב'" }]
+      }
+    },
     "ספרות": {
       units: [2],
       modules: {
         2: [{ id: "L1", name: "ספרות עברית" }, { id: "L2", name: "ספרות עולם" }]
       }
     },
+    "תנ\"ך": {
+      units: [2],
+      modules: {
+        2: [{ id: "BIBLE1", name: "תנ\"ך - תורה" }, { id: "BIBLE2", name: "תנ\"ך - נביאים וכתובים" }]
+      }
+    },
     "גאוגרפיה": {
       units: [2],
       modules: {
         2: [{ id: "G1", name: "גאוגרפיה של ישראל" }, { id: "G2", name: "גאוגרפיה עולמית" }]
+      }
+    },
+    "מדעי המחשב": {
+      units: [3, 5],
+      modules: {
+        3: [{ id: "CS3", name: "מדעי מחשב 3 יח'" }],
+        5: [{ id: "CS5", name: "מדעי מחשב 5 יח'" }]
+      }
+    },
+    "תלמוד": {
+      units: [2],
+      modules: {
+        2: [{ id: "TALMUD1", name: "תלמוד - מסכת א'" }, { id: "TALMUD2", name: "תלמוד - מסכת ב'" }]
       }
     }
   };
