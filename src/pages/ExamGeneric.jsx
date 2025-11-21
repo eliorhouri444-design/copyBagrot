@@ -1059,9 +1059,10 @@ export default function ExamGenericPage() {
                         <ChevronLeft className="w-5 h-5 mr-2" />
                       </Button>
                     )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
