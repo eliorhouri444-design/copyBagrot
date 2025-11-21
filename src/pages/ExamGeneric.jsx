@@ -888,29 +888,28 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 pb-6">
-        <div className="flex flex-col lg:flex-row gap-3">
-          {/* Reading Text Panel - Fixed on larger screens, scrollable on mobile */}
-          {exam.reading_text && (
-            <div className="lg:w-2/5 bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 lg:sticky lg:top-4 lg:self-start">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 sm:p-4">
-                <div className="flex items-center gap-2 text-white">
-                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <h3 className="text-sm sm:text-base font-bold">
-                    {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-                  </h3>
-                </div>
-              </div>
-              <div className="overflow-y-auto p-4 sm:p-6" style={{ maxHeight: '50vh' }}>
-                <div className="text-gray-700 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                  {exam.reading_text}
-                </div>
+      <div className="flex flex-col md:flex-row gap-2 sm:gap-3 px-2 sm:px-4 pb-2 sm:pb-3" style={{ height: 'calc(100vh - 140px)' }}>
+        {/* Reading Text Panel */}
+        {exam.reading_text && (
+          <div className="md:w-1/2 bg-white rounded-xl shadow-lg flex flex-col overflow-hidden" style={{ height: '100%' }}>
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 sm:p-4 flex-shrink-0">
+              <div className="flex items-center gap-2 text-white">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+                <h3 className="text-sm sm:text-base font-bold">
+                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                </h3>
               </div>
             </div>
-          )}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              <div className="text-gray-700 text-xs sm:text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                {exam.reading_text}
+              </div>
+            </div>
+          </div>
+        )}
 
-          {/* Questions Panel */}
-          <div className={`flex-1 bg-white rounded-xl shadow-lg ${exam.reading_text ? 'lg:w-3/5' : 'w-full'}`}>
+        {/* Questions Panel */}
+        <div className={`${exam.reading_text ? 'md:w-1/2' : 'w-full'} bg-white rounded-xl shadow-lg flex flex-col overflow-hidden`} style={{ height: '100%' }}>
             {displayMode === 'carousel' ? (
               <AnimatePresence mode="wait">
                 <motion.div
@@ -1061,7 +1060,7 @@ export default function ExamGenericPage() {
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <div className="overflow-y-auto p-3 sm:p-6" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                 {exam.questions.map((questionItem, qIdx) => (
                   <div key={qIdx} className="mb-4 pb-4 border-b-2 border-gray-200 last:border-b-0">
                     <div className="flex justify-between items-start mb-2">
@@ -1168,7 +1167,7 @@ export default function ExamGenericPage() {
                   </div>
                 ))}
 
-                <div className="sticky bottom-0 bg-white border-t-2 border-gray-200 p-3 sm:p-4 -mx-3 sm:-mx-6 -mb-3 sm:-mb-6">
+                <div className="flex-shrink-0 bg-white border-t-2 border-gray-200 p-3 sm:p-4">
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
