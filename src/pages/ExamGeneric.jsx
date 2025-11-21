@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
+import AdManager from "@/components/ads/AdManager";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ export default function ExamGenericPage() {
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
+  const [showRetryAd, setShowRetryAd] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
@@ -805,12 +807,21 @@ export default function ExamGenericPage() {
               >
                 חזרה למבחנים
               </Button>
-              <Button
-                onClick={() => window.location.reload()}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-              >
-                נסה שוב
-              </Button>
+              {user?.subscription_status === 'premium' ? (
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  נסה שוב
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setShowRetryAd(true)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  נסה שוב
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -877,6 +888,16 @@ export default function ExamGenericPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AdManager
+        isOpen={showRetryAd}
+        onClose={() => setShowRetryAd(false)}
+        onAdComplete={() => {
+          setShowRetryAd(false);
+          window.location.reload();
+        }}
+        actionType="exam_retry"
+      />
 
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-xl p-3 shadow-lg mb-3">
         <div className="flex items-center justify-between mb-2">
