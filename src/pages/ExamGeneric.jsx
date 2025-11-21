@@ -941,10 +941,8 @@ export default function ExamGenericPage() {
                           </p>
                           <div className="space-y-2">
                             {extracted.options.map((optionValue, optionIndex) => (
-                              <motion.button
+                              <button
                                 key={optionIndex}
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.99 }}
                                 onClick={() => handleAnswerChange(question.question_number, optionValue)}
                                 className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                                   userAnswers[question.question_number] === optionValue
@@ -954,7 +952,7 @@ export default function ExamGenericPage() {
                                 dir="ltr"
                               >
                                 {optionValue}
-                              </motion.button>
+                              </button>
                             ))}
                           </div>
                         </>
@@ -970,10 +968,8 @@ export default function ExamGenericPage() {
                   {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
                     <div className="space-y-2">
                       {question.options.map((optionValue, optionIndex) => (
-                        <motion.button
+                        <button
                           key={optionIndex}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
                           onClick={() => handleAnswerChange(question.question_number, optionValue)}
                           className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
                             userAnswers[question.question_number] === optionValue
@@ -983,7 +979,7 @@ export default function ExamGenericPage() {
                           dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
                         >
                           {optionValue}
-                        </motion.button>
+                        </button>
                       ))}
                     </div>
                   )}
