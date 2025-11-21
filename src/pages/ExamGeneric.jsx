@@ -1090,11 +1090,15 @@ export default function ExamGenericPage() {
                   ) : (
                     <Button
                       onClick={() => {
+                        const hasAnswer = userAnswers[question.question_number]?.trim();
+                        if (!hasAnswer) return;
+                        
                         if (currentQuestion < exam.questions.length - 1) {
                           setDirection(1);
                           setTimeout(() => setCurrentQuestion(prev => prev + 1), 0);
                         }
                       }}
+                      disabled={!userAnswers[question.question_number]?.trim()}
                       className="flex-1 h-12 bg-blue-600"
                     >
                       הבא
