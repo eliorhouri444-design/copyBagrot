@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, RotateCcw } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -64,19 +64,27 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mx-auto mb-3" />
-        <p className="text-sm">טוען קטע השמעה...</p>
+      <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 text-center border-2 border-gray-200">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-3" />
+        <p className="text-sm text-gray-600">טוען קטע השמעה...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold">🎧 קטע האזנה</h3>
-        <div className="text-sm bg-white/20 px-3 py-1 rounded-full">
-          {playCount} / {maxPlays} השמעות
+    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-gray-200">
+      <div className="flex items-center justify-center mb-4 sm:mb-6">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <Volume2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+        </div>
+      </div>
+
+      <div className="text-center mb-4">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">🎧 קטע האזנה</h3>
+        <div className="inline-block bg-blue-50 px-4 py-2 rounded-full border-2 border-blue-200">
+          <span className="text-sm font-bold text-blue-700">
+            {playCount} / {maxPlays} השמעות
+          </span>
         </div>
       </div>
 
@@ -84,31 +92,31 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
         <Button
           onClick={handlePlay}
           disabled={isPlaying}
-          className="w-full h-14 bg-white text-purple-600 hover:bg-gray-100 font-bold text-base disabled:opacity-50"
+          className="w-full h-12 sm:h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-base sm:text-lg disabled:opacity-50 shadow-md"
         >
           {isPlaying ? (
             <>
-              <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin ml-2" />
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
               מנגן...
             </>
           ) : (
             <>
               <Volume2 className="w-5 h-5 ml-2" />
-              {playCount === 0 ? 'השמע' : 'השמע פעם אחרונה'}
+              {playCount === 0 ? 'השמע את הקטע' : 'השמע שוב (פעם אחרונה)'}
             </>
           )}
         </Button>
       ) : (
-        <div className="bg-white/10 rounded-xl p-4 text-center">
-          <div className="text-4xl mb-2">✅</div>
-          <p className="text-sm font-semibold">סיימת את ההשמעות</p>
-          <p className="text-xs opacity-80 mt-1">עכשיו ענה על השאלות</p>
+        <div className="bg-green-50 border-2 border-green-300 rounded-xl p-4 sm:p-6 text-center">
+          <div className="text-4xl sm:text-5xl mb-3">✅</div>
+          <p className="text-base sm:text-lg font-bold text-green-800 mb-1">סיימת את ההשמעות</p>
+          <p className="text-xs sm:text-sm text-green-700">עכשיו ענה על השאלות</p>
         </div>
       )}
 
       {canPlay && playCount > 0 && (
-        <p className="text-center text-sm mt-4 text-white/80">
-          💡 עוד השמעה אחת זמינה
+        <p className="text-center text-xs sm:text-sm mt-4 text-gray-600">
+          💡 נותרה עוד השמעה אחת
         </p>
       )}
     </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -909,7 +908,9 @@ export default function TopicPracticeNewPage() {
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </>
               ) : (
-                'שמע את הקטע פעמיים כדי להמשיך'
+                <>
+                  <span className="text-sm sm:text-base">שמע את הקטע פעמיים כדי להמשיך</span>
+                </>
               )}
             </Button>
           </motion.div>
