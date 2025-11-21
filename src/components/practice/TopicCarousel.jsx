@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus } from "lucide-react";
@@ -12,8 +12,23 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingTopic, setIsCheckingTopic] = useState(false);
+  const [cachedTopics, setCachedTopics] = useState(null);
 
   useEffect(() => {
+    // טעינה ראשונית מיידית מ-cache
+    const cacheKey = `topics_${subject}_${units}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsedCache = JSON.parse(cached);
+        setTopics(parsedCache);
+        setCachedTopics(parsedCache);
+        setIsLoading(false);
+      } catch (e) {
+        console.error('Cache parse error:', e);
+      }
+    }
+    
     loadTopics();
   }, [subject, units]);
 
@@ -114,14 +129,19 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
         return b.actualQuestionCount - a.actualQuestionCount;
       });
 
-      const user = await base44.auth.me();
-      const attempts = await base44.entities.AttemptNew.filter({
-        created_by: user.email,
-        subject_id: subject
-      });
+      // טעינה מקבילה של user ו-attempts
+      const [user, attempts] = await Promise.all([
+        base44.auth.me(),
+        base44.entities.AttemptNew.list()
+      ]);
+      
+      const relevantAttempts = attempts.filter(a => 
+        a.created_by === user.email && 
+        a.subject_id === subject
+      );
 
       const topicsWithStats = topicsArray.map(topic => {
-        const topicAttempts = attempts.filter(a => a.topic_id === topic.topic_id);
+        const topicAttempts = relevantAttempts.filter(a => a.topic_id === topic.topic_id);
         
         // Count unique questions answered
         const uniqueQuestions = new Set(topicAttempts.map(a => a.question_id));
@@ -143,10 +163,18 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
       });
 
       setTopics(topicsWithStats);
+      
+      // שמירה ב-cache
+      const cacheKey = `topics_${subject}_${units}`;
+      sessionStorage.setItem(cacheKey, JSON.stringify(topicsWithStats));
 
     } catch (error) {
       console.error("Error loading topics:", error);
-      setTopics([]);
+      if (cachedTopics) {
+        setTopics(cachedTopics); // שימוש ב-cache במקרה של שגיאה
+      } else {
+        setTopics([]);
+      }
     } finally {
       setIsLoading(false);
     }
