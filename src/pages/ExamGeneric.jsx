@@ -985,9 +985,8 @@ export default function ExamGenericPage() {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
