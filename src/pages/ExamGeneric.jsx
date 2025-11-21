@@ -894,24 +894,24 @@ export default function ExamGenericPage() {
       </div>
 
       {displayMode === 'carousel' ? (
-        <div className="px-4 pb-6 flex gap-4" style={{ height: 'calc(100vh - 180px)' }}>
-          {exam.reading_text && (
-            <div className="w-1/2 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col" style={{ height: '100%' }}>
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
-                </h3>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
-                  {exam.reading_text}
+        <div className="px-4 pb-6" style={{ height: 'calc(100vh - 180px)' }}>
+          <div className="bg-white rounded-xl shadow-lg h-full overflow-hidden flex flex-col max-w-4xl mx-auto">
+            {exam.reading_text && (
+              <div className="border-b-2 border-gray-200" style={{ height: '40%', minHeight: '40%' }}>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3">
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
+                  </h3>
+                </div>
+                <div className="overflow-y-auto p-4" style={{ height: 'calc(100% - 48px)' }}>
+                  <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap" dir="ltr">
+                    {exam.reading_text}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className={`${exam.reading_text ? 'w-1/2' : 'w-full max-w-4xl mx-auto'} bg-white rounded-xl shadow-lg overflow-hidden flex flex-col`} style={{ height: '100%' }}>
             <div className="flex-1 overflow-y-auto p-6">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -1059,12 +1059,12 @@ export default function ExamGenericPage() {
                         <ChevronLeft className="w-5 h-5 mr-2" />
                       </Button>
                     )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
+      </div>
       ) : (
         <div className="max-w-6xl mx-auto px-6 pb-6">
           {exam.reading_text && (
