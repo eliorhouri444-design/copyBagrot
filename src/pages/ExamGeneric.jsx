@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -989,10 +989,10 @@ export default function ExamGenericPage() {
             </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-5 gap-4">
+          <div className="flex gap-4 h-[calc(100vh-240px)]">
             {exam.reading_text && (
-              <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="w-2/5 bg-white rounded-xl shadow-lg p-6 overflow-y-auto">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 sticky top-0 bg-white pb-2 border-b">
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
                 </h3>
@@ -1002,8 +1002,8 @@ export default function ExamGenericPage() {
               </div>
             )}
 
-            <div className={exam.reading_text ? "lg:col-span-3" : "lg:col-span-5"}>
-              <div className="bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto">
+            <div className={exam.reading_text ? "w-3/5" : "w-full"}>
+              <div className="bg-white rounded-xl shadow-lg p-6 h-full overflow-y-auto">
                 {exam.questions.map((questionItem, qIdx) => (
                   <div key={qIdx} className="mb-6 pb-6 border-b last:border-b-0">
                     <div className="flex justify-between items-start mb-3">
