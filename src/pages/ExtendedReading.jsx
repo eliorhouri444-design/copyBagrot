@@ -514,10 +514,10 @@ export default function ExtendedReadingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
+            <div className="bg-blue-600 rounded-2xl shadow-xl p-6 text-white text-center">
               <div className="text-5xl mb-3">🎧</div>
               <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
-              <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
+              <p className="text-blue-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
             </div>
 
             <ListeningPlayer 
