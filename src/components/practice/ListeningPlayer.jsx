@@ -50,7 +50,13 @@ export default function ListeningPlayer({ audioText, maxPlays = 2, onMaxPlaysRea
     if (playCount >= maxPlays) return;
 
     window.speechSynthesis.cancel();
-    setPlayCount(prev => prev + 1);
+    const newCount = playCount + 1;
+    setPlayCount(newCount);
+    
+    if (newCount >= maxPlays && onMaxPlaysReached) {
+      setTimeout(() => onMaxPlaysReached(), 1000);
+    }
+    
     window.speechSynthesis.speak(utteranceRef.current);
   };
 
