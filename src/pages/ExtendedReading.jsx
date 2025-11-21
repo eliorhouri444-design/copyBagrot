@@ -550,7 +550,7 @@ export default function ExtendedReadingPage() {
             <Button
               onClick={() => setShowListeningIntro(false)}
               disabled={!canProceedToQuestions}
-              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 sm:h-16 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {canProceedToQuestions ? (
                 <>
