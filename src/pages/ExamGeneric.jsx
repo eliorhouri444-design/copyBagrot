@@ -945,14 +945,13 @@ export default function ExamGenericPage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                                className={`w-full p-3 rounded-lg border-2 text-left text-sm transition-all ${
                                   userAnswers[question.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500 shadow-md'
                                     : 'bg-white border-gray-200 hover:border-blue-300'
                                 }`}
                                 dir="ltr"
                               >
-                                <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
                                 {optionValue}
                               </motion.button>
                             ))}
@@ -1104,7 +1103,6 @@ export default function ExamGenericPage() {
                                 }`}
                                 dir="ltr"
                               >
-                                <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
                                 {optionValue}
                               </button>
                             ))}
