@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -1029,21 +1030,19 @@ export default function TopicPracticeNewPage() {
         </div>
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden p-2 sm:p-3">
-        {/* Story panel on the right (if exists) */}
-        <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
-          <DialogContent dir="rtl" className="sm:max-w-screen-md max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-blue-600" /> הסיפור
-              </DialogTitle>
-              <DialogDescription>
-                חזור לטקסט המקורי שלפני השאלות
-              </DialogDescription>
-            </DialogHeader>
-            <div className="p-4 sm:p-6">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-2 sm:p-3 gap-3">
+        {/* Reading text panel on the right */}
+        {readingText && !isListeningTopic && (
+          <div className="hidden md:flex md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden flex-col">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                <h3 className="text-lg font-bold">הטקסט</h3>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
               <div
-                className="text-base sm:text-lg leading-[1.8] text-gray-900 whitespace-pre-wrap text-left"
+                className="text-base leading-[1.8] text-gray-900 whitespace-pre-wrap text-left"
                 style={{
                   fontFamily: "Georgia, 'Times New Roman', serif",
                   direction: 'ltr',
@@ -1053,23 +1052,16 @@ export default function TopicPracticeNewPage() {
                 {readingText}
               </div>
             </div>
-            <DialogFooter>
-              <Button onClick={() => setShowStoryDialog(false)}>
-                חזור לשאלות
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* No listening player during questions - listening is only in intro screen */}
+          </div>
+        )}
 
         {/* Main question area */}
         <motion.div
-          key={currentQuestion.question_id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden"
-        >
+            key={currentQuestion.question_id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden"
+          >
           <div className="flex-1 overflow-y-auto p-4 pb-4 pt-6">
           {currentQuestion.question_type === "writing" ? (
             <WritingEditor
@@ -1168,8 +1160,8 @@ export default function TopicPracticeNewPage() {
 
           {/* Answer input area - fixed at bottom */}
           {currentQuestion.question_type !== "writing" && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
-              <div className="space-y-3">
+            <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
+              <div className="space-y-3 max-w-2xl mx-auto">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
                   <div></div>
                 ) : (
