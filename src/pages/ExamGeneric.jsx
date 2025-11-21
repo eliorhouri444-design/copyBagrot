@@ -873,11 +873,10 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 pb-6">
-        {displayMode === 'carousel' ? (
-          <div className="grid lg:grid-cols-5 gap-4">
+        ) : (
+          <div className="space-y-4">
             {exam.reading_text && (
-              <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-240px)] overflow-y-auto sticky top-4">
+              <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
@@ -888,14 +887,13 @@ export default function ExamGenericPage() {
               </div>
             )}
 
-            <div className={exam.reading_text ? "lg:col-span-3" : "lg:col-span-5"}>
+            <div className="bg-white rounded-xl shadow-lg p-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentQuestion}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="bg-white rounded-xl shadow-lg p-6"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">
