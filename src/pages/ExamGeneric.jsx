@@ -1302,11 +1302,9 @@ export default function ExamGenericPage() {
                   </div>
                 ))}
               </div>
-            )}
           </div>
-
-          </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
