@@ -139,7 +139,7 @@ export default function ExamGenericPage() {
         subject: exam.subject,
         unit_level: exam.unit_level,
         current_question: currentQuestion,
-        user_answers: userAnswers,
+        user_answers: JSON.parse(JSON.stringify(userAnswers)),
         time_left: timeLeft,
         display_mode: displayMode,
         completed: false
@@ -158,10 +158,10 @@ export default function ExamGenericPage() {
 
   const handleResumeProgress = () => {
     if (savedProgress) {
-      setUserAnswers(savedProgress.user_answers || {});
+      console.log('Resuming progress:', savedProgress);
+      setUserAnswers(JSON.parse(JSON.stringify(savedProgress.user_answers || {})));
       setCurrentQuestion(savedProgress.current_question || 0);
       setTimeLeft(savedProgress.time_left || (exam.duration_minutes * 60));
-      // תמיד להחזיר את המצב שנשמר - אם אין, ברירת מחדל carousel
       setDisplayMode(savedProgress.display_mode || 'carousel');
       setExamStarted(true);
       setSavedProgress(null);
@@ -188,11 +188,16 @@ export default function ExamGenericPage() {
 
   const handleConfirmExit = async () => {
     // וודא שמירה לפני יציאה
-    await saveProgress();
+    try {
+      await saveProgress();
+      console.log('Progress saved before exit');
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
     // המתן קצת כדי שהשמירה תסתיים
     setTimeout(() => {
       navigate(createPageUrl("Exams"));
-    }, 300);
+    }, 500);
   };
 
   const handleAnswerChange = (questionNumber, answer) => {
