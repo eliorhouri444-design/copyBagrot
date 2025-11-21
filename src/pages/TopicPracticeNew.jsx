@@ -1122,21 +1122,32 @@ export default function TopicPracticeNewPage() {
           {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
             <div className="space-y-3">
               {currentQuestion.options.map((option, idx) => {
-                const optionText = (typeof option === 'object' && option !== null && 'text' in option) 
-                  ? option.text 
-                  : String(option);
+                let optionText = '';
+                if (typeof option === 'object' && option !== null) {
+                  if ('text' in option) {
+                    optionText = String(option.text);
+                  } else if ('value' in option) {
+                    optionText = String(option.value);
+                  } else {
+                    optionText = JSON.stringify(option);
+                  }
+                } else {
+                  optionText = String(option || '');
+                }
+                
                 const currentAnswer = answers[currentQuestion.question_id];
-                const isSelected = String(currentAnswer) === optionText;
+                const isSelected = String(currentAnswer || '').trim() === optionText.trim();
                 
                 return (
                   <button
                     key={idx}
                     onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all shadow-sm ${
+                    className={`w-full p-4 rounded-xl border-2 transition-all shadow-sm ${
                       isSelected
                         ? 'border-blue-600 bg-blue-50 shadow-md'
                         : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
                     } cursor-pointer`}
+                    dir="ltr"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
@@ -1148,7 +1159,7 @@ export default function TopicPracticeNewPage() {
                           <div className="w-3 h-3 bg-white rounded-full" />
                         )}
                       </div>
-                      <span className="text-base font-medium text-gray-900 flex-1 leading-relaxed">{optionText}</span>
+                      <span className="text-base font-medium text-gray-900 flex-1 leading-relaxed text-left">{optionText}</span>
                     </div>
                   </button>
                 );
