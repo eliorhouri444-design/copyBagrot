@@ -807,6 +807,34 @@ export default function ExamGenericPage() {
     );
   }
 
+  // Helper function to detect and extract American-style options from question text
+  const extractAmericanOptions = (questionText) => {
+    if (!questionText) return null;
+    
+    // Pattern 1: A) ... B) ... C) ... D) ... (multiline safe)
+    const patternParens = /([A-E])\)\s*([^\n]+?)(?=\s*[A-E]\)|$)/gi;
+    // Pattern 2: A. ... B. ... C. ... D. ... (multiline safe)
+    const patternDots = /([A-E])\.\s*([^\n]+?)(?=\s*[A-E]\.|$)/gi;
+    
+    let matches = [...questionText.matchAll(patternParens)];
+    let separator = ')';
+    
+    if (matches.length === 0) {
+      matches = [...questionText.matchAll(patternDots)];
+      separator = '.';
+    }
+    
+    if (matches.length >= 2 && matches.length <= 5) {
+      const options = matches.map(match => match[2].trim());
+      const firstOptionIndex = questionText.indexOf(`A${separator}`);
+      const mainQuestion = questionText.substring(0, firstOptionIndex).trim();
+      
+      return { mainQuestion, options, hasOptions: true };
+    }
+    
+    return null;
+  };
+
   const question = exam.questions[currentQuestion];
   const progress = ((currentQuestion + 1) / exam.questions.length) * 100;
 
@@ -892,15 +920,49 @@ export default function ExamGenericPage() {
                     </div>
                   </div>
 
-                  <p className="text-gray-700 text-lg mb-6 whitespace-pre-wrap" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                    {question.question_text}
-                  </p>
+                  {(() => {
+                    const extracted = extractAmericanOptions(question.question_text);
+                    if (extracted && extracted.hasOptions) {
+                      return (
+                        <>
+                          <p className="text-gray-700 text-lg mb-6 whitespace-pre-wrap" dir="ltr">
+                            {extracted.mainQuestion}
+                          </p>
+                          <div className="space-y-3 mb-6">
+                            {extracted.options.map((optionValue, optionIndex) => (
+                              <motion.button
+                                key={optionIndex}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleAnswerChange(question.question_number, optionValue)}
+                                className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                                  userAnswers[question.question_number] === optionValue
+                                    ? 'bg-blue-100 border-blue-500 shadow-md'
+                                    : 'bg-white border-gray-200 hover:border-blue-300'
+                                }`}
+                                dir="ltr"
+                              >
+                                <span className="font-bold text-blue-600 mr-2">{String.fromCharCode(65 + optionIndex)})</span>
+                                {optionValue}
+                              </motion.button>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        <p className="text-gray-700 text-lg mb-6 whitespace-pre-wrap" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                          {question.question_text}
+                        </p>
+                        {question.question_image_url && (
+                          <img src={question.question_image_url} alt="שאלה" className="max-w-full rounded-lg mb-6" />
+                        )}
+                      </>
+                    );
+                  })()}
 
-                  {question.question_image_url && (
-                    <img src={question.question_image_url} alt="שאלה" className="max-w-full rounded-lg mb-6" />
-                  )}
-
-                  {/* Multiple choice with options array */}
+                  {/* Multiple choice with options array - only if no American style detected */}
                   {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
                     <div className="space-y-3">
                       {question.options.map((optionValue, optionIndex) => (
