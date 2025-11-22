@@ -52,9 +52,10 @@ export default function VocabularyPracticePage() {
   }, []);
 
   useEffect(() => {
-    if (!category) return;
+    const topicIdFromUrl = urlParams.get("topicId");
+    if (!category && !topicIdFromUrl) return;
     loadQuestions();
-  }, [category]);
+  }, [category, urlParams.get("topicId")]);
 
   const loadQuestions = async () => {
     try {
@@ -309,7 +310,7 @@ Return JSON:`,
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">{category}</h1>
+            <h1 className="text-lg font-bold">אוצר מילים</h1>
             <p className="text-sm opacity-90">שאלה {currentIndex + 1} / {questions.length}</p>
           </div>
 
