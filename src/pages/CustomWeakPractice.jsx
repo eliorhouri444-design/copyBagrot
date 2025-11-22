@@ -80,8 +80,26 @@ export default function CustomWeakPracticePage() {
     }
   };
 
-  const handleStartPractice = (topicId) => {
-    navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=1`));
+  const handleStartPractice = async (topicId) => {
+    try {
+      // Verify that questions exist for this topic
+      const questions = await base44.entities.QuestionBank.filter({
+        topic_id: topicId,
+        subject_id: user.selected_subject,
+        unit_level: user.selected_units,
+        is_active: true
+      });
+
+      if (questions.length === 0) {
+        alert('לא נמצאו שאלות לנושא זה');
+        return;
+      }
+
+      navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=1`));
+    } catch (error) {
+      console.error('Error starting practice:', error);
+      alert('שגיאה בטעינת התרגול');
+    }
   };
 
   if (isLoading) {
