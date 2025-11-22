@@ -368,6 +368,24 @@ export default function PracticePage() {
                 </Button>
               </div>
             </div>
+
+            {displaySubject === 'אנגלית' && (
+              <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-4 border-2 border-pink-200 shadow-md col-span-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 mb-1">אוצר מילים</h3>
+                    <p className="text-xs text-gray-600">הוסף וערוך מילים</p>
+                  </div>
+                  <Button
+                    onClick={() => navigate(createPageUrl("AdminVocabulary"))}
+                    className="bg-pink-600 hover:bg-pink-700 text-white h-9 text-sm"
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    נהל מילים
+                  </Button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
