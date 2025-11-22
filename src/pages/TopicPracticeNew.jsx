@@ -448,7 +448,7 @@ export default function TopicPracticeNewPage() {
         console.log("✅ Feedback dialog should be open now");
         return; // Stop here, don't auto-advance
       } else {
-        // Regular question handling
+        // Regular question handling with smart checking
         const solutions = await base44.entities.SolutionBank.filter({
           question_id: currentQuestion.question_id
         });
@@ -456,6 +456,7 @@ export default function TopicPracticeNewPage() {
         let isCorrect = false;
         let status = "incorrect";
         let correctAnswer = "";
+        let aiScore = 0;
 
         if (solutions.length > 0) {
           const solution = solutions[0];
@@ -468,13 +469,67 @@ export default function TopicPracticeNewPage() {
 
           const normalizedUserAnswer = userAnswer.trim().toLowerCase();
           
-          isCorrect = correctAnswers.some(ans => 
+          // First check exact match
+          const exactMatch = correctAnswers.some(ans => 
             ans.value?.toLowerCase() === normalizedUserAnswer
           ) || acceptableVariants.some(variant => 
             variant.toLowerCase() === normalizedUserAnswer
           );
 
-          status = isCorrect ? "correct" : "incorrect";
+          if (exactMatch) {
+            isCorrect = true;
+            status = "correct";
+            aiScore = 100;
+          } else {
+            // Use smart AI checking
+            try {
+              const aiCheck = await base44.integrations.Core.InvokeLLM({
+                prompt: `INSTRUCTIONS FOR CHECKING ANSWERS:
+
+1. Check semantic meaning, not exact wording.
+2. Compare student answer to the correct answer and consider multiple accepted variations.
+3. Use key required words to confirm core meaning.
+4. Allow synonyms and paraphrasing.
+5. Ignore capitalization, punctuation, and minor spelling errors.
+6. Reject answers that change facts, subject, time, or purpose.
+7. Score answers on a scale:
+   - similarity_score 100 = fully correct
+   - similarity_score 70-90 = correct meaning but missing detail
+   - similarity_score 40-60 = related but incorrect
+   - similarity_score 0-30 = wrong
+8. Provide helpful feedback in Hebrew explaining mistakes or missing information.
+
+Question: ${currentQuestion.question_text}
+Correct Answer: ${correctAnswer}
+Acceptable Variations: ${acceptableVariants.join(', ')}
+Student Answer: ${userAnswer}
+
+If the answer expresses the same idea even if phrased differently, mark as correct.
+Focus on meaning, purpose, cause, and key details - not exact wording.
+
+Return JSON:`,
+                response_json_schema: {
+                  type: "object",
+                  properties: {
+                    is_correct: { type: "boolean" },
+                    similarity_score: { type: "number" },
+                    explanation_hebrew: { type: "string" },
+                    missing_details: { type: "string" }
+                  },
+                  required: ["is_correct", "similarity_score", "explanation_hebrew"]
+                }
+              });
+
+              isCorrect = aiCheck.is_correct || aiCheck.similarity_score >= 70;
+              aiScore = aiCheck.similarity_score || 0;
+              status = aiCheck.similarity_score >= 90 ? "correct" : aiCheck.similarity_score >= 70 ? "partial" : "incorrect";
+            } catch (error) {
+              console.error("Error with AI check:", error);
+              isCorrect = false;
+              status = "incorrect";
+              aiScore = 0;
+            }
+          }
         }
 
         await base44.entities.AttemptNew.create({
