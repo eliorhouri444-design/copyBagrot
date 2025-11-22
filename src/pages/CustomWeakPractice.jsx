@@ -83,22 +83,91 @@ export default function CustomWeakPracticePage() {
   const handleStartPractice = async (topicId) => {
     try {
       // Verify that questions exist for this topic
-      const questions = await base44.entities.QuestionBank.filter({
+      let questions = await base44.entities.QuestionBank.filter({
         topic_id: topicId,
         subject_id: user.selected_subject,
         unit_level: user.selected_units,
         is_active: true
       });
 
+      // If no questions exist, generate them
       if (questions.length === 0) {
-        alert('לא נמצאו שאלות לנושא זה');
-        return;
+        const topicName = weakTopics.find(t => t.topic_id === topicId)?.name || topicId;
+        
+        if (!confirm(`אין שאלות לנושא "${topicName}". האם ליצור שאלות חדשות באמצעות AI?`)) {
+          return;
+        }
+
+        // Generate 10 questions for this topic
+        const generatedQuestions = await base44.integrations.Core.InvokeLLM({
+          prompt: `Create 10 practice questions in Hebrew for the following topic:
+Subject: ${user.selected_subject}
+Topic: ${topicName}
+Level: ${user.selected_units} units
+
+Generate diverse questions with different difficulty levels (easy, medium, hard).
+Each question should be clear, relevant to the topic, and include:
+- Question text
+- Correct answer
+- Explanation
+
+Format as a JSON array with this structure for EACH question:`,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              questions: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    question_text: { type: "string" },
+                    question_type: { type: "string", enum: ["open", "multi_choice", "calculation"] },
+                    options: { type: "array", items: { type: "string" } },
+                    correct_answer: { type: "string" },
+                    explanation: { type: "string" },
+                    difficulty_level: { type: "string", enum: ["easy", "medium", "hard"] },
+                    max_score: { type: "number" }
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Save generated questions to database
+        const createdQuestions = [];
+        for (const q of generatedQuestions.questions) {
+          const newQuestion = await base44.entities.QuestionBank.create({
+            question_id: `${topicId}_ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            subject_id: user.selected_subject,
+            unit_level: user.selected_units,
+            topic_id: topicId,
+            question_text: q.question_text,
+            question_type: q.question_type,
+            options: q.options || [],
+            difficulty_level: q.difficulty_level || "medium",
+            max_score: q.max_score || 10,
+            is_active: true,
+            origin_type: "ai_generated"
+          });
+          createdQuestions.push(newQuestion);
+
+          // Create solution
+          await base44.entities.SolutionBank.create({
+            question_id: newQuestion.question_id,
+            solution_text: q.explanation,
+            final_answers: [{ value: q.correct_answer }],
+            verified: false
+          });
+        }
+
+        alert(`נוצרו ${createdQuestions.length} שאלות חדשות! מתחיל תרגול...`);
       }
 
       navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=1`));
     } catch (error) {
       console.error('Error starting practice:', error);
-      alert('שגיאה בטעינת התרגול');
+      alert('שגיאה: ' + error.message);
     }
   };
 
