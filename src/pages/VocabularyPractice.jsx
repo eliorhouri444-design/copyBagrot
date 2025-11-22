@@ -59,23 +59,33 @@ export default function VocabularyPracticePage() {
   const loadQuestions = async () => {
     try {
       const allQuestions = await base44.entities.VocabularyQuestion.list();
-      const filtered = allQuestions.filter(q => 
-        q.category === category && 
-        q.subject_id === displaySubject && 
-        q.unit_level === displayUnits &&
-        q.is_active
-      );
+      
+      // Support both topic_id (from carousel) and category (legacy)
+      const topicId = urlParams.get("topicId");
+      
+      const filtered = allQuestions.filter(q => {
+        const matchesSubject = q.subject_id === displaySubject && q.unit_level === displayUnits && q.is_active;
+        
+        if (topicId) {
+          return matchesSubject && q.topic_id === topicId;
+        } else if (category) {
+          return matchesSubject && q.category === category;
+        }
+        return matchesSubject;
+      });
 
       // Shuffle questions
       const shuffled = filtered.sort(() => Math.random() - 0.5);
       setQuestions(shuffled);
 
       // Create practice session
+      const topicId = urlParams.get("topicId");
+      
       const session = await base44.entities.PracticeSessionNew.create({
         session_type: "topic_practice",
         subject_id: displaySubject,
         unit_level: displayUnits,
-        topic_id: `vocabulary_${category}`,
+        topic_id: topicId || `vocabulary_${category}`,
         questions: shuffled.map(q => q.id),
         started_at: new Date().toISOString(),
         is_completed: false

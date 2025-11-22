@@ -51,6 +51,7 @@ import AdminTopics from './pages/AdminTopics';
 import Statistics from './pages/Statistics';
 import Vocabulary from './pages/Vocabulary';
 import VocabularyPractice from './pages/VocabularyPractice';
+import AdminVocabulary from './pages/AdminVocabulary';
 import __Layout from './Layout.jsx';
 
 
@@ -108,6 +109,7 @@ export const PAGES = {
     "Statistics": Statistics,
     "Vocabulary": Vocabulary,
     "VocabularyPractice": VocabularyPractice,
+    "AdminVocabulary": AdminVocabulary,
 }
 
 export const pagesConfig = {
