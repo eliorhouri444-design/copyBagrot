@@ -42,83 +42,11 @@ export default function CustomWeakExamPage() {
       
       // Load those questions
       const allQuestions = await base44.entities.QuestionBank.list();
-      let weakQuestions = allQuestions.filter(q => 
-        questionIds.includes(q.id) && 
+      const weakQuestions = allQuestions.filter(q => 
+        questionIds.includes(q.question_id) && 
         q.is_active &&
         q.subject_id === currentUser.selected_subject
       );
-
-      // If not enough questions, generate new ones
-      if (weakQuestions.length < 10) {
-        if (confirm(`נמצאו רק ${weakQuestions.length} שאלות. האם ליצור שאלות נוספות על הנושאים החלשים שלך?`)) {
-          const topicStats = {};
-          failedAttempts.forEach(a => {
-            const topic = a.topic_id || 'unknown';
-            topicStats[topic] = (topicStats[topic] || 0) + 1;
-          });
-
-          const weakTopicIds = Object.entries(topicStats)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([topic_id]) => topic_id);
-
-          const allTopics = await base44.entities.TopicNew.list();
-          const topicNames = weakTopicIds.map(id => {
-            const topic = allTopics.find(t => t.topic_id === id);
-            return topic?.name || id;
-          });
-
-          const generatedQuestions = await base44.integrations.Core.InvokeLLM({
-            prompt: `צור 15 שאלות בגרות באנגלית בעברית עבור:
-מקצוע: ${currentUser.selected_subject}
-נושאים חלשים: ${topicNames.join(', ')}
-רמה: ${currentUser.selected_units} יחידות
-
-צור שאלות מאתגרות בסגנון בגרות.
-
-החזר JSON:`,
-            response_json_schema: {
-              type: "object",
-              properties: {
-                questions: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      question_text: { type: "string" },
-                      correct_answer: { type: "string" },
-                      explanation: { type: "string" },
-                      max_score: { type: "number" }
-                    }
-                  }
-                }
-              }
-            }
-          });
-
-          for (const q of generatedQuestions.questions) {
-            const newQ = await base44.entities.QuestionBank.create({
-              question_id: `weak_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              subject_id: currentUser.selected_subject,
-              unit_level: currentUser.selected_units,
-              topic_id: weakTopicIds[0] || 'general',
-              question_text: q.question_text,
-              question_type: "open",
-              difficulty_level: "hard",
-              max_score: q.max_score || 10,
-              is_active: true,
-              origin_type: "ai_generated"
-            });
-            weakQuestions.push(newQ);
-
-            await base44.entities.SolutionBank.create({
-              question_id: newQ.question_id,
-              solution_text: q.explanation,
-              final_answers: [{ value: q.correct_answer }]
-            });
-          }
-        }
-      }
 
       // Shuffle and take 20
       const shuffled = weakQuestions.sort(() => Math.random() - 0.5).slice(0, 20);
