@@ -35,6 +35,30 @@ export default function VocabularyPage() {
     loadUser();
   }, []);
 
+  const getCategoryIcon = (category) => {
+    if (category.includes('Verb')) return Zap;
+    if (category.includes('Academic') || category.includes('Advanced')) return Brain;
+    if (category.includes('Connector')) return Sparkles;
+    if (category.includes('Phrasal')) return BookMarked;
+    if (category.includes('Technology') || category.includes('Science')) return Globe;
+    return BookOpen;
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = [
+      'from-blue-500 to-cyan-500',
+      'from-purple-500 to-pink-500',
+      'from-green-500 to-emerald-500',
+      'from-orange-500 to-red-500',
+      'from-indigo-500 to-purple-500',
+      'from-teal-500 to-cyan-500',
+      'from-rose-500 to-pink-500',
+      'from-amber-500 to-orange-500'
+    ];
+    const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
+  };
+
   const { data: allQuestions = [] } = useQuery({
     queryKey: ['vocabulary-all', displaySubject, displayUnits],
     queryFn: async () => {
@@ -62,30 +86,6 @@ export default function VocabularyPage() {
 
     return Object.values(categoryMap).sort((a, b) => b.count - a.count);
   }, [allQuestions]);
-
-  const getCategoryIcon = (category) => {
-    if (category.includes('Verb')) return Zap;
-    if (category.includes('Academic') || category.includes('Advanced')) return Brain;
-    if (category.includes('Connector')) return Sparkles;
-    if (category.includes('Phrasal')) return BookMarked;
-    if (category.includes('Technology') || category.includes('Science')) return Globe;
-    return BookOpen;
-  };
-
-  const getCategoryColor = (category) => {
-    const colors = [
-      'from-blue-500 to-cyan-500',
-      'from-purple-500 to-pink-500',
-      'from-green-500 to-emerald-500',
-      'from-orange-500 to-red-500',
-      'from-indigo-500 to-purple-500',
-      'from-teal-500 to-cyan-500',
-      'from-rose-500 to-pink-500',
-      'from-amber-500 to-orange-500'
-    ];
-    const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
