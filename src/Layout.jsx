@@ -41,7 +41,7 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
   
   const navItems = [
-    { name: "Statistics", icon: TrendingUp, path: createPageUrl("Statistics"), label: "סטטיסטיקה", color: "#EC4899" },
+    { name: "Statistics", icon: TrendingUp, path: createPageUrl("Statistics"), label: "נתונים", color: "#EC4899" },
     { name: "Practice", icon: BookOpen, path: createPageUrl("Practice"), label: "תרגול", color: "#8B5CF6" },
     { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#3B82F6" },
     { name: "Exams", icon: FileCheck, path: createPageUrl("Exams"), label: "בגרויות", color: "#10B981" },
@@ -242,7 +242,7 @@ function LayoutContent({ children, currentPageName }) {
                   }`}
                   style={isActive ? { color: item.color } : {}}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                  <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
                   <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
                     {item.label}
                   </span>
