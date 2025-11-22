@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical } from "lucide-react";
@@ -281,6 +282,26 @@ export default function PracticePage() {
       </motion.div>
 
       <div className="px-6 space-y-6 pb-6">
+        {displaySubject === 'אנגלית' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            onClick={() => navigate(createPageUrl("Vocabulary"))}
+            className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-3xl p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all"
+          >
+            <div className="flex items-center gap-4 text-white">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                <BookOpen className="w-8 h-8" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-1">📚 אוצר מילים</h3>
+                <p className="text-sm opacity-90">תרגל מילים ומונחים חשובים</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           key={`${displaySubject}_${displayUnits}`}
           initial={{ opacity: 0, y: 20 }}
