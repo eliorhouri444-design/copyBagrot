@@ -51,6 +51,8 @@ import AdminTopics from './pages/AdminTopics';
 import Statistics from './pages/Statistics';
 import Vocabulary from './pages/Vocabulary';
 import VocabularyPractice from './pages/VocabularyPractice';
+import CustomWeakExam from './pages/CustomWeakExam';
+import CustomWeakPractice from './pages/CustomWeakPractice';
 import __Layout from './Layout.jsx';
 
 
@@ -108,6 +110,8 @@ export const PAGES = {
     "Statistics": Statistics,
     "Vocabulary": Vocabulary,
     "VocabularyPractice": VocabularyPractice,
+    "CustomWeakExam": CustomWeakExam,
+    "CustomWeakPractice": CustomWeakPractice,
 }
 
 export const pagesConfig = {

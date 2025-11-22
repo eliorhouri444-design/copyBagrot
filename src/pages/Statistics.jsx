@@ -766,6 +766,55 @@ export default function StatisticsPage() {
             </motion.div>
           )}
 
+          {/* Personalized Learning */}
+          {(statistics.weakTopics.length > 0 || statistics.failedExams.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="space-y-3"
+            >
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Target className="w-6 h-6 text-purple-600" />
+                למידה מותאמת אישית
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3">
+                {statistics.weakTopics.length > 0 && (
+                  <Button
+                    onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+                    className="h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <Zap className="w-6 h-6" />
+                      <div className="text-right">
+                        <div className="text-sm font-bold">תרגול מותאם אישית</div>
+                        <div className="text-xs opacity-90">תרגל {statistics.weakTopics.length} נושאים חלשים</div>
+                      </div>
+                    </div>
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                )}
+
+                {statistics.failedExams.length > 0 && (
+                  <Button
+                    onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                    className="h-16 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <Target className="w-6 h-6" />
+                      <div className="text-right">
+                        <div className="text-sm font-bold">בגרות מותאמת אישית</div>
+                        <div className="text-xs opacity-90">שאלות שטעית בהן בעבר</div>
+                      </div>
+                    </div>
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          )}
+
           {/* Action Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

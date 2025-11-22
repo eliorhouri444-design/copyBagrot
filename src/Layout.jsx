@@ -242,7 +242,7 @@ function LayoutContent({ children, currentPageName }) {
                   }`}
                   style={isActive ? { color: item.color } : {}}
                 >
-                  <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
                   <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
                     {item.label}
                   </span>
