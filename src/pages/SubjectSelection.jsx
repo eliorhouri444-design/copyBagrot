@@ -1,21 +1,22 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Calculator, FlaskConical, Languages, Check, ChevronDown, Atom, Dna, BookMarked, Landmark, MapPin, Scale, ScrollText } from "lucide-react";
+import { BookOpen, Calculator, FlaskConical, Globe, Languages, History, Check, ChevronDown, Atom, TestTube, Dna, BookMarked, Landmark, MapPin, Scale, ScrollText, Beaker, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const subjects = [
-  { name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", units: [3, 4, 5] },
-  { name: "מתמטיקה", icon: Calculator, color: "from-purple-500 to-purple-600", units: [3, 4, 5] },
-  { name: "פיזיקה", icon: Atom, color: "from-green-500 to-emerald-600", units: [5] },
-  { name: "כימיה", icon: FlaskConical, color: "from-orange-500 to-orange-600", units: [5] },
-  { name: "ביולוגיה", icon: Dna, color: "from-teal-500 to-teal-600", units: [5] },
-  { name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", units: [2, 5] },
-  { name: "היסטוריה", icon: Landmark, color: "from-amber-500 to-yellow-600", units: [2, 5] },
-  { name: "גאוגרפיה", icon: MapPin, color: "from-cyan-500 to-sky-600", units: [5] },
-  { name: "אזרחות", icon: Scale, color: "from-indigo-500 to-violet-600", units: [2] },
-  { name: "תנ\"ך", icon: ScrollText, color: "from-rose-500 to-red-600", units: [2, 5] }
+  { name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", units: [3, 4, 5], isLocked: false },
+  { name: "מתמטיקה", icon: Calculator, color: "from-purple-500 to-purple-600", units: [3, 4, 5], isLocked: false },
+  { name: "פיזיקה", icon: Atom, color: "from-green-500 to-emerald-600", units: [5], isLocked: true },
+  { name: "כימיה", icon: FlaskConical, color: "from-orange-500 to-orange-600", units: [5], isLocked: true },
+  { name: "ביולוגיה", icon: Dna, color: "from-teal-500 to-teal-600", units: [5], isLocked: true },
+  { name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", units: [2, 5], isLocked: true },
+  { name: "היסטוריה", icon: Landmark, color: "from-amber-500 to-yellow-600", units: [2, 5], isLocked: true },
+  { name: "גאוגרפיה", icon: MapPin, color: "from-cyan-500 to-sky-600", units: [5], isLocked: true },
+  { name: "אזרחות", icon: Scale, color: "from-indigo-500 to-violet-600", units: [2], isLocked: true },
+  { name: "תנ\"ך", icon: ScrollText, color: "from-rose-500 to-red-600", units: [2, 5], isLocked: true }
 ];
 
 export default function SubjectSelectionPage() {
@@ -24,6 +25,8 @@ export default function SubjectSelectionPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubjectClick = (subject) => {
+    if (subject.isLocked) return;
+    
     if (selectedSubject?.name === subject.name) {
       setSelectedSubject(null);
     } else {
@@ -75,34 +78,55 @@ export default function SubjectSelectionPage() {
               <div key={index} className="bg-white rounded-2xl shadow-md overflow-hidden">
                 {/* Subject Button */}
                 <motion.button
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={subject.isLocked ? {} : { scale: 0.98 }}
                   onClick={() => handleSubjectClick(subject)}
                   className={`w-full p-6 transition-all ${
-                    isOpen ? 'bg-gradient-to-r ' + subject.color : ''
+                    subject.isLocked 
+                      ? 'cursor-not-allowed opacity-60' 
+                      : isOpen 
+                        ? 'bg-gradient-to-r ' + subject.color 
+                        : ''
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                        isOpen 
-                          ? 'bg-white/20 backdrop-blur-sm' 
-                          : 'bg-gradient-to-br ' + subject.color
+                        subject.isLocked
+                          ? 'bg-gray-300'
+                          : isOpen 
+                            ? 'bg-white/20 backdrop-blur-sm' 
+                            : 'bg-gradient-to-br ' + subject.color
                       }`}>
-                        <Icon className={`w-7 h-7 ${isOpen ? 'text-white' : 'text-white'}`} />
+                        {subject.isLocked ? (
+                          <Lock className="w-7 h-7 text-gray-600" />
+                        ) : (
+                          <Icon className={`w-7 h-7 ${isOpen ? 'text-white' : 'text-white'}`} />
+                        )}
                       </div>
                       
-                      <h3 className={`text-xl font-bold ${
-                        isOpen ? 'text-white' : 'text-gray-900'
-                      }`}>
-                        {subject.name}
-                      </h3>
+                      <div className="text-right">
+                        <h3 className={`text-xl font-bold ${
+                          subject.isLocked 
+                            ? 'text-gray-500'
+                            : isOpen 
+                              ? 'text-white' 
+                              : 'text-gray-900'
+                        }`}>
+                          {subject.name}
+                        </h3>
+                        {subject.isLocked && (
+                          <p className="text-sm text-gray-500">בקרוב</p>
+                        )}
+                      </div>
                     </div>
                     
-                    <ChevronDown 
-                      className={`w-6 h-6 transition-transform duration-300 ${
-                        isOpen ? 'rotate-180 text-white' : 'text-gray-400'
-                      }`}
-                    />
+                    {!subject.isLocked && (
+                      <ChevronDown 
+                        className={`w-6 h-6 transition-transform duration-300 ${
+                          isOpen ? 'rotate-180 text-white' : 'text-gray-400'
+                        }`}
+                      />
+                    )}
                   </div>
                 </motion.button>
 
