@@ -48,6 +48,7 @@ import AdminSmartImport from './pages/AdminSmartImport';
 import AdminListeningManager from './pages/AdminListeningManager';
 import ExtendedReading from './pages/ExtendedReading';
 import AdminTopics from './pages/AdminTopics';
+import Statistics from './pages/Statistics';
 import __Layout from './Layout.jsx';
 
 
@@ -102,6 +103,7 @@ export const PAGES = {
     "AdminListeningManager": AdminListeningManager,
     "ExtendedReading": ExtendedReading,
     "AdminTopics": AdminTopics,
+    "Statistics": Statistics,
 }
 
 export const pagesConfig = {
