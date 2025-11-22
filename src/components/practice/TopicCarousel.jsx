@@ -180,12 +180,22 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
     }
   };
 
-  const handleStartPractice = () => {
+  const handleStartPractice = async () => {
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
     
     console.log(`🔍 Starting practice for: ${topic.topic_id}`);
     console.log(`📖 Is Extended Reading: ${topic.isExtendedReading}`);
+    
+    // Check if this is a vocabulary topic
+    const vocabQuestions = await base44.entities.VocabularyQuestion.list();
+    const hasVocabQuestions = vocabQuestions.some(q => q.topic_id === topic.topic_id && q.is_active);
+    
+    if (hasVocabQuestions) {
+      console.log("→ Navigating to VocabularyPractice");
+      navigate(createPageUrl(`VocabularyPractice?topicId=${topicIdParam}`));
+      return;
+    }
     
     if (topic.isExtendedReading) {
       console.log("→ Navigating to ExtendedReading");
