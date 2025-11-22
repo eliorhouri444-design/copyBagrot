@@ -41,10 +41,10 @@ function LayoutContent({ children, currentPageName }) {
   }, []);
   
   const navItems = [
+    { name: "Statistics", icon: TrendingUp, path: createPageUrl("Statistics"), label: "סטטיסטיקה", color: "#EC4899" },
     { name: "Practice", icon: BookOpen, path: createPageUrl("Practice"), label: "תרגול", color: "#8B5CF6" },
     { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#3B82F6" },
     { name: "Exams", icon: FileCheck, path: createPageUrl("Exams"), label: "בגרויות", color: "#10B981" },
-    { name: "Statistics", icon: TrendingUp, path: createPageUrl("Statistics"), label: "סטטיסטיקה", color: "#EC4899" },
     { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }
   ];
 

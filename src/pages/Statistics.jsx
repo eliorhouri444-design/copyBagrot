@@ -3,10 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity, BarChart3, PieChart, Calendar, Flame, Star, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
 
 export default function StatisticsPage() {
   const navigate = useNavigate();
@@ -58,8 +59,8 @@ export default function StatisticsPage() {
   const { data: practiceAttempts = [] } = useQuery({
     queryKey: ['practice-attempts-stats', displaySubject, displayUnits],
     queryFn: async () => {
-      const attempts = await base44.entities.PracticeAttempt.list("-created_date", 200);
-      return attempts.filter((a) => a.subject === displaySubject && a.unit_level === displayUnits);
+      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
+      return attempts.filter((a) => a.subject_id === displaySubject);
     },
     enabled: isUserLoaded && !!displaySubject && displayUnits > 0,
     initialData: []
@@ -78,12 +79,23 @@ export default function StatisticsPage() {
     initialData: []
   });
 
+  const { data: allTopics = [] } = useQuery({
+    queryKey: ['topics-stats', displaySubject, displayUnits],
+    queryFn: async () => {
+      const topics = await base44.entities.TopicNew.list();
+      return topics.filter(t => t.subject_id === displaySubject && t.unit_level === displayUnits && t.is_active);
+    },
+    enabled: isUserLoaded,
+    initialData: []
+  });
+
   const statistics = useMemo(() => {
     const totalPractice = practiceAttempts.length;
     const totalExams = examAttempts.length;
     
-    const correctPractice = practiceAttempts.filter(a => a.is_correct).length;
-    const practiceAccuracy = totalPractice > 0 ? (correctPractice / totalPractice * 100) : 0;
+    const correctPractice = practiceAttempts.filter(a => a.status === "correct").length;
+    const partialPractice = practiceAttempts.filter(a => a.status === "partial").length;
+    const practiceAccuracy = totalPractice > 0 ? ((correctPractice + partialPractice * 0.7) / totalPractice * 100) : 0;
     
     const passedExams = examAttempts.filter(e => e.passed).length;
     const avgExamScore = examAttempts.length > 0 
@@ -92,31 +104,87 @@ export default function StatisticsPage() {
     
     const failedExams = examAttempts.filter(e => !e.passed);
     
-    // Topic analysis
+    // Topic analysis with all topics
     const topicStats = {};
+    
+    allTopics.forEach(topic => {
+      topicStats[topic.topic_id] = {
+        name: topic.name,
+        total: 0,
+        correct: 0,
+        incorrect: 0,
+        partial: 0,
+        avgScore: 0
+      };
+    });
+
     practiceAttempts.forEach(attempt => {
       const topic = attempt.topic_id || 'unknown';
       if (!topicStats[topic]) {
-        topicStats[topic] = { total: 0, correct: 0, incorrect: 0 };
+        topicStats[topic] = { name: topic, total: 0, correct: 0, incorrect: 0, partial: 0, avgScore: 0 };
       }
       topicStats[topic].total++;
-      if (attempt.is_correct) {
+      topicStats[topic].avgScore += (attempt.percentage || 0);
+      
+      if (attempt.status === "correct") {
         topicStats[topic].correct++;
+      } else if (attempt.status === "partial") {
+        topicStats[topic].partial++;
       } else {
         topicStats[topic].incorrect++;
       }
     });
 
-    const topicArray = Object.entries(topicStats).map(([topic, stats]) => ({
-      topic,
-      accuracy: stats.total > 0 ? (stats.correct / stats.total * 100) : 0,
-      total: stats.total,
-      correct: stats.correct,
-      incorrect: stats.incorrect
-    })).sort((a, b) => a.accuracy - b.accuracy);
+    Object.keys(topicStats).forEach(topicId => {
+      const stats = topicStats[topicId];
+      if (stats.total > 0) {
+        stats.avgScore = stats.avgScore / stats.total;
+      }
+    });
+
+    const topicArray = Object.entries(topicStats)
+      .filter(([_, stats]) => stats.total > 0)
+      .map(([topic, stats]) => ({
+        topic,
+        name: stats.name,
+        accuracy: stats.total > 0 ? ((stats.correct + stats.partial * 0.7) / stats.total * 100) : 0,
+        total: stats.total,
+        correct: stats.correct,
+        partial: stats.partial,
+        incorrect: stats.incorrect,
+        avgScore: stats.avgScore
+      }))
+      .sort((a, b) => a.accuracy - b.accuracy);
 
     const weakTopics = topicArray.filter(t => t.accuracy < 60 && t.total >= 3);
     const strongTopics = topicArray.filter(t => t.accuracy >= 80 && t.total >= 3).reverse();
+
+    // Last 7 days activity
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const last7DaysActivity = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const dayPractice = practiceAttempts.filter(a => 
+        a.created_date?.split('T')[0] === dateStr
+      );
+      
+      const dayExams = examAttempts.filter(e => 
+        e.created_date?.split('T')[0] === dateStr
+      );
+      
+      last7DaysActivity.push({
+        date: dateStr,
+        day: date.toLocaleDateString('he-IL', { weekday: 'short' }),
+        practice: dayPractice.length,
+        exams: dayExams.length,
+        total: dayPractice.length + dayExams.length
+      });
+    }
 
     // Recent trend (last 30 days)
     const thirtyDaysAgo = new Date();
@@ -130,11 +198,17 @@ export default function StatisticsPage() {
       new Date(e.created_date) >= thirtyDaysAgo
     );
 
+    const recentCorrect = recentPractice.filter(a => a.status === "correct").length;
+    const recentPartial = recentPractice.filter(a => a.status === "partial").length;
     const recentPracticeAccuracy = recentPractice.length > 0
-      ? (recentPractice.filter(a => a.is_correct).length / recentPractice.length * 100)
+      ? ((recentCorrect + recentPartial * 0.7) / recentPractice.length * 100)
       : 0;
 
     const trend = recentPracticeAccuracy > practiceAccuracy ? 'up' : recentPracticeAccuracy < practiceAccuracy ? 'down' : 'stable';
+
+    // Calculate study time
+    const totalStudyMinutes = (practiceAttempts.length * 3) + (examAttempts.length * 60);
+    const totalStudyHours = Math.floor(totalStudyMinutes / 60);
 
     return {
       totalPractice,
@@ -147,55 +221,118 @@ export default function StatisticsPage() {
       strongTopics,
       recentPractice: recentPractice.length,
       recentExams: recentExams.length,
-      trend
+      trend,
+      last7DaysActivity,
+      topicArray,
+      totalStudyHours,
+      totalStudyMinutes
     };
-  }, [practiceAttempts, examAttempts]);
+  }, [practiceAttempts, examAttempts, allTopics]);
 
-  const getFuturePrediction = () => {
-    if (statistics.totalExams === 0) {
-      return {
-        prediction: "עדיין לא ביצעת מספיק בחינות לחיזוי מדויק",
-        recommendation: "המלצה: בצע לפחות 3 בחינות מלאות כדי לקבל חיזוי מדויק יותר"
-      };
+  const predictedScore = useMemo(() => {
+    // Advanced prediction algorithm
+    const { avgExamScore, practiceAccuracy, totalExams, totalPractice } = statistics;
+    
+    if (totalExams === 0 && totalPractice === 0) {
+      return { score: 0, confidence: 0, message: "אין מספיק נתונים לחיזוי" };
     }
 
-    if (statistics.avgExamScore >= 80) {
-      return {
-        prediction: "מצוין! אתה על המסלול הנכון להצלחה בבגרות 🎯",
-        recommendation: "המשך לתרגל באופן קבוע ושמור על הרמה הגבוהה"
-      };
-    } else if (statistics.avgExamScore >= 60) {
-      return {
-        prediction: "אתה בדרך הנכונה, עם תרגול ממוקד תוכל להגיע ל-90+ 📈",
-        recommendation: "התמקד בנושאים החלשים ותרגל לפחות 30 דקות ביום"
-      };
+    let baseScore = 0;
+    let confidence = 0;
+
+    if (totalExams >= 5) {
+      // High confidence - based mainly on exam performance
+      baseScore = avgExamScore;
+      confidence = Math.min(95, 60 + (totalExams * 5));
+      
+      // Adjust based on practice accuracy
+      if (practiceAccuracy > avgExamScore + 10) {
+        baseScore += (practiceAccuracy - avgExamScore) * 0.3; // Trending up
+      } else if (practiceAccuracy < avgExamScore - 10) {
+        baseScore -= (avgExamScore - practiceAccuracy) * 0.2; // May be declining
+      }
+    } else if (totalExams >= 2) {
+      // Medium confidence - weighted average
+      baseScore = (avgExamScore * 0.6) + (practiceAccuracy * 0.4);
+      confidence = 40 + (totalExams * 10) + Math.min(20, totalPractice);
+    } else if (totalPractice >= 30) {
+      // Practice-based prediction
+      baseScore = practiceAccuracy * 0.85; // Practice tends to be easier
+      confidence = Math.min(60, 20 + totalPractice);
     } else {
-      return {
-        prediction: "יש צורך בשיפור משמעותי - תרגול יומי יכול להעלות את הציון שלך ⚡",
-        recommendation: "המלצה: תרגל 45 דקות ביום, התמקד בנושאים הבסיסיים"
-      };
+      // Low confidence
+      baseScore = practiceAccuracy * 0.8;
+      confidence = Math.min(40, totalPractice * 2);
+    }
+
+    // Cap at realistic bounds
+    baseScore = Math.max(0, Math.min(100, baseScore));
+    
+    let message = "";
+    if (baseScore >= 85) {
+      message = "מצוין! אתה בדרך למעולה 🌟";
+    } else if (baseScore >= 70) {
+      message = "טוב מאוד! עוד קצת ותגיע למעולה 📈";
+    } else if (baseScore >= 55) {
+      message = "עובר, אבל יש מקום לשיפור 💪";
+    } else {
+      message = "נדרש שיפור משמעותי ⚡";
+    }
+
+    return {
+      score: Math.round(baseScore),
+      confidence: Math.round(confidence),
+      message,
+      recommendation: getRecommendation(baseScore, statistics)
+    };
+  }, [statistics]);
+
+  const getRecommendation = (predictedScore, stats) => {
+    if (predictedScore >= 85) {
+      return "המשך לתרגל באופן קבוע כדי לשמור על הרמה הגבוהה";
+    } else if (predictedScore >= 70) {
+      if (stats.weakTopics.length > 0) {
+        return `חזק את הנושאים: ${stats.weakTopics.slice(0, 2).map(t => t.name || t.topic).join(', ')}`;
+      }
+      return "תרגל עוד בחינות מלאות כדי להגיע ל-90+";
+    } else if (predictedScore >= 55) {
+      return "תרגל 30-45 דקות ביום, התמקד בנושאים החלשים";
+    } else {
+      return "נדרש תרגול יומי אינטנסיבי - לפחות שעה ביום";
     }
   };
 
-  const prediction = getFuturePrediction();
+  const pieData = useMemo(() => {
+    const correct = practiceAttempts.filter(a => a.status === "correct").length;
+    const partial = practiceAttempts.filter(a => a.status === "partial").length;
+    const incorrect = practiceAttempts.filter(a => a.status === "incorrect").length;
+    
+    return [
+      { name: 'נכון', value: correct, color: '#10B981' },
+      { name: 'חלקי', value: partial, color: '#F59E0B' },
+      { name: 'שגוי', value: incorrect, color: '#EF4444' }
+    ].filter(d => d.value > 0);
+  }, [practiceAttempts]);
 
   if (!isUserLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600 font-semibold">טוען נתונים...</p>
         </div>
       </div>
     );
   }
 
+  const hasData = statistics.totalPractice > 0 || statistics.totalExams > 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 pb-24">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`bg-gradient-to-r ${headerColor} rounded-b-[2rem] p-6 shadow-xl mb-6`}
+        className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-b-[2rem] p-6 shadow-2xl mb-6"
       >
         <div className="flex items-center justify-between mb-4">
           <Button
@@ -207,268 +344,450 @@ export default function StatisticsPage() {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           
-          <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
-            <Activity className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-2xl px-5 py-2.5 shadow-lg">
+            <TrendingUp className="w-6 h-6 text-white" />
             <span className="text-xl font-bold text-white">הסטטיסטיקה שלי</span>
           </div>
         </div>
         
-        <div className="text-center text-white">
+        <div className="text-center text-white mt-3">
           <h2 className="text-2xl font-bold mb-1">{displaySubject}</h2>
           <p className="text-sm opacity-90">{displayUnits} יחידות</p>
         </div>
       </motion.div>
 
-      <div className="px-6 space-y-6">
-        {/* Overall Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
-        >
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Target className="w-6 h-6 text-blue-600" />
-            סטטיסטיקות כלליות
-          </h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-xl p-4 text-center">
-              <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-gray-900">{statistics.totalPractice}</div>
-              <div className="text-sm text-gray-600">תרגולים</div>
-            </div>
-            
-            <div className="bg-green-50 rounded-xl p-4 text-center">
-              <FileCheck className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-gray-900">{statistics.totalExams}</div>
-              <div className="text-sm text-gray-600">בגרויות</div>
-            </div>
-            
-            <div className="bg-purple-50 rounded-xl p-4 text-center">
-              <CheckCircle className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-gray-900">{Math.round(statistics.practiceAccuracy)}%</div>
-              <div className="text-sm text-gray-600">דיוק תרגולים</div>
-            </div>
-            
-            <div className="bg-amber-50 rounded-xl p-4 text-center">
-              <Award className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-gray-900">{Math.round(statistics.avgExamScore)}</div>
-              <div className="text-sm text-gray-600">ממוצע בגרויות</div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Trend */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
-        >
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            {statistics.trend === 'up' ? (
-              <TrendingUp className="w-6 h-6 text-green-600" />
-            ) : statistics.trend === 'down' ? (
-              <TrendingDown className="w-6 h-6 text-red-600" />
-            ) : (
-              <Activity className="w-6 h-6 text-blue-600" />
-            )}
-            מגמה אחרונה (30 יום)
-          </h3>
-          
-          <div className={`p-4 rounded-xl ${
-            statistics.trend === 'up' ? 'bg-green-50 border-2 border-green-200' : 
-            statistics.trend === 'down' ? 'bg-red-50 border-2 border-red-200' : 
-            'bg-blue-50 border-2 border-blue-200'
-          }`}>
-            <p className={`text-lg font-semibold ${
-              statistics.trend === 'up' ? 'text-green-800' : 
-              statistics.trend === 'down' ? 'text-red-800' : 
-              'text-blue-800'
-            }`}>
-              {statistics.trend === 'up' && '📈 התקדמות מצוינת! אתה משתפר'}
-              {statistics.trend === 'down' && '📉 ירידה קלה - זמן לחזור למסלול'}
-              {statistics.trend === 'stable' && '➡️ רמה יציבה - המשך כך'}
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              ב-30 הימים האחרונים: {statistics.recentPractice} תרגולים • {statistics.recentExams} בגרויות
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Strong Topics */}
-        {statistics.strongTopics.length > 0 && (
+      {!hasData ? (
+        <div className="px-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md mx-auto"
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Award className="w-6 h-6 text-green-600" />
-              נקודות חוזק 💪
-            </h3>
-            
-            <div className="space-y-3">
-              {statistics.strongTopics.slice(0, 5).map((topic, idx) => (
-                <div key={idx} className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold text-gray-900">{topic.topic}</span>
-                    <span className="text-green-700 font-bold">{Math.round(topic.accuracy)}%</span>
-                  </div>
-                  <Progress value={topic.accuracy} className="h-2 bg-green-100" />
-                  <p className="text-xs text-gray-600 mt-1">
-                    {topic.correct} נכונות מתוך {topic.total} תרגולים
-                  </p>
-                </div>
-              ))}
+            <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <BarChart3 className="w-12 h-12 text-purple-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">התחל ללמוד</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              עדיין לא ביצעת תרגולים או בחינות.
+              <br/>
+              התחל לתרגל כדי לראות את הסטטיסטיקות שלך!
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => navigate(createPageUrl("Practice"))}
+                className="w-full h-14 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg font-bold shadow-lg"
+              >
+                <BookOpen className="w-5 h-5 ml-2" />
+                התחל תרגול
+              </Button>
+              <Button
+                onClick={() => navigate(createPageUrl("Exams"))}
+                variant="outline"
+                className="w-full h-14 border-2 border-purple-300 text-purple-700 hover:bg-purple-50 text-lg font-bold"
+              >
+                <FileCheck className="w-5 h-5 ml-2" />
+                עבור לבגרויות
+              </Button>
             </div>
           </motion.div>
-        )}
-
-        {/* Weak Topics */}
-        {statistics.weakTopics.length > 0 && (
+        </div>
+      ) : (
+        <div className="px-4 space-y-5 pb-6">
+          {/* Predicted Score Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl shadow-2xl p-6 text-white overflow-hidden relative"
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <AlertCircle className="w-6 h-6 text-orange-600" />
-              נקודות לשיפור 🎯
-            </h3>
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
             
-            <div className="space-y-3">
-              {statistics.weakTopics.slice(0, 5).map((topic, idx) => (
-                <div key={idx} className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold text-gray-900">{topic.topic}</span>
-                    <span className="text-orange-700 font-bold">{Math.round(topic.accuracy)}%</span>
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Brain className="w-7 h-7" />
+                <h3 className="text-xl font-bold">חיזוי הציון שלך</h3>
+              </div>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 mb-4">
+                <div className="text-center">
+                  <div className="text-7xl font-black mb-2">{predictedScore.score}</div>
+                  <div className="text-sm opacity-90 mb-3">ציון צפוי בבגרות</div>
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <Target className="w-4 h-4" />
+                    <span>רמת ביטחון: {predictedScore.confidence}%</span>
                   </div>
-                  <Progress value={topic.accuracy} className="h-2 bg-orange-100" />
-                  <p className="text-xs text-gray-600 mt-1">
-                    {topic.incorrect} טעויות מתוך {topic.total} תרגולים
-                  </p>
                 </div>
-              ))}
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-3">
+                <p className="text-base font-semibold mb-2">{predictedScore.message}</p>
+                <p className="text-sm opacity-90">{predictedScore.recommendation}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold">{statistics.totalExams}</div>
+                  <div className="text-xs opacity-90">בגרויות נבדקו</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold">{statistics.totalPractice}</div>
+                  <div className="text-xs opacity-90">תרגולים בוצעו</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick Stats Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <div className="bg-white rounded-2xl shadow-lg p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-600">דיוק תרגולים</div>
+                  <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.practiceAccuracy)}%</div>
+                </div>
+              </div>
+              <Progress value={statistics.practiceAccuracy} className="h-2 bg-blue-100" />
             </div>
 
-            <Button
-              onClick={() => navigate(createPageUrl("CustomPractice"))}
-              className="w-full mt-4 bg-orange-600 hover:bg-orange-700 h-12"
+            <div className="bg-white rounded-2xl shadow-lg p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+                  <FileCheck className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-600">ממוצע בגרויות</div>
+                  <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.avgExamScore)}</div>
+                </div>
+              </div>
+              <Progress value={statistics.avgExamScore} className="h-2 bg-green-100" />
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-600">שעות לימוד</div>
+                  <div className="text-2xl font-bold text-gray-900">{statistics.totalStudyHours}h</div>
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">{statistics.totalStudyMinutes} דקות</div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${
+                  statistics.trend === 'up' ? 'bg-gradient-to-br from-green-500 to-emerald-500' :
+                  statistics.trend === 'down' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
+                  'bg-gradient-to-br from-gray-400 to-gray-500'
+                }`}>
+                  {statistics.trend === 'up' ? <TrendingUp className="w-6 h-6 text-white" /> :
+                   statistics.trend === 'down' ? <TrendingDown className="w-6 h-6 text-white" /> :
+                   <Activity className="w-6 h-6 text-white" />}
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs text-gray-600">מגמה</div>
+                  <div className={`text-xl font-bold ${
+                    statistics.trend === 'up' ? 'text-green-600' :
+                    statistics.trend === 'down' ? 'text-red-600' :
+                    'text-gray-600'
+                  }`}>
+                    {statistics.trend === 'up' ? 'משתפר' : statistics.trend === 'down' ? 'יורד' : 'יציב'}
+                  </div>
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">30 הימים האחרונים</div>
+            </div>
+          </motion.div>
+
+          {/* 7 Days Activity Chart */}
+          {statistics.last7DaysActivity.some(d => d.total > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
             >
-              <Zap className="w-5 h-5 ml-2" />
-              תרגול מותאם אישית על הנושאים החלשים
+              <div className="flex items-center gap-2 mb-5">
+                <Calendar className="w-6 h-6 text-purple-600" />
+                <h3 className="text-lg font-bold text-gray-900">פעילות 7 הימים האחרונים</h3>
+              </div>
+              
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={statistics.last7DaysActivity}>
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '2px solid #E5E7EB', 
+                      borderRadius: '12px',
+                      direction: 'rtl'
+                    }}
+                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  />
+                  <Bar dataKey="practice" fill="#8B5CF6" name="תרגולים" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="exams" fill="#EC4899" name="בגרויות" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </motion.div>
+          )}
+
+          {/* Performance Distribution */}
+          {pieData.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <PieChart className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">התפלגות ביצועים</h3>
+              </div>
+              
+              <div className="flex items-center justify-center">
+                <ResponsiveContainer width="100%" height={200}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'white', 
+                        border: '2px solid #E5E7EB', 
+                        borderRadius: '12px',
+                        direction: 'rtl'
+                      }}
+                    />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 mt-4">
+                {pieData.map((item, idx) => (
+                  <div key={idx} className="text-center">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                      <span className="text-xs text-gray-600">{item.name}</span>
+                    </div>
+                    <div className="text-xl font-bold text-gray-900">{item.value}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Strong Topics */}
+          {statistics.strongTopics.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <Award className="w-6 h-6 text-green-600" />
+                <h3 className="text-lg font-bold text-gray-900">נקודות חוזק שלך 💪</h3>
+              </div>
+              
+              <div className="space-y-3">
+                {statistics.strongTopics.slice(0, 5).map((topic, idx) => (
+                  <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4 shadow-sm">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <Star className="w-5 h-5 text-green-600" />
+                        <span className="font-bold text-gray-900">{topic.name || topic.topic}</span>
+                      </div>
+                      <span className="text-green-700 font-black text-xl">{Math.round(topic.accuracy)}%</span>
+                    </div>
+                    <Progress value={topic.accuracy} className="h-2.5 bg-green-200" />
+                    <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
+                      <span>{topic.correct} ✓ {topic.partial > 0 && `• ${topic.partial} ~`}</span>
+                      <span>{topic.total} תרגולים</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Weak Topics */}
+          {statistics.weakTopics.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <AlertCircle className="w-6 h-6 text-orange-600" />
+                <h3 className="text-lg font-bold text-gray-900">נקודות לשיפור 🎯</h3>
+              </div>
+              
+              <div className="space-y-3 mb-4">
+                {statistics.weakTopics.slice(0, 5).map((topic, idx) => (
+                  <div key={idx} className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-2xl p-4 shadow-sm">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-orange-600" />
+                        <span className="font-bold text-gray-900">{topic.name || topic.topic}</span>
+                      </div>
+                      <span className="text-orange-700 font-black text-xl">{Math.round(topic.accuracy)}%</span>
+                    </div>
+                    <Progress value={topic.accuracy} className="h-2.5 bg-orange-200" />
+                    <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
+                      <span>{topic.incorrect} ✗ {topic.partial > 0 && `• ${topic.partial} ~`}</span>
+                      <span>{topic.total} תרגולים</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => navigate(createPageUrl("Practice"))}
+                className="w-full h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg"
+              >
+                <Zap className="w-5 h-5 ml-2" />
+                תרגל את הנושאים החלשים
+              </Button>
+            </motion.div>
+          )}
+
+          {/* All Topics Performance */}
+          {statistics.topicArray.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <BarChart3 className="w-6 h-6 text-purple-600" />
+                <h3 className="text-lg font-bold text-gray-900">ביצועים לפי נושא</h3>
+              </div>
+              
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {statistics.topicArray.map((topic, idx) => (
+                  <div key={idx} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-semibold text-gray-900">{topic.name || topic.topic}</span>
+                      <span className={`text-sm font-bold ${
+                        topic.accuracy >= 80 ? 'text-green-600' :
+                        topic.accuracy >= 60 ? 'text-blue-600' :
+                        'text-orange-600'
+                      }`}>
+                        {Math.round(topic.accuracy)}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={topic.accuracy} 
+                      className={`h-1.5 ${
+                        topic.accuracy >= 80 ? 'bg-green-100' :
+                        topic.accuracy >= 60 ? 'bg-blue-100' :
+                        'bg-orange-100'
+                      }`}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>{topic.correct} ✓ {topic.partial > 0 && `• ${topic.partial} ~`} • {topic.incorrect} ✗</span>
+                      <span>ממוצע: {Math.round(topic.avgScore)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Failed Exams */}
+          {statistics.failedExams.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="bg-white rounded-3xl shadow-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <XCircle className="w-6 h-6 text-red-600" />
+                <h3 className="text-lg font-bold text-gray-900">בגרויות שנכשלו - למד מהן</h3>
+              </div>
+              
+              <div className="space-y-3">
+                {statistics.failedExams.slice(0, 5).map((exam, idx) => (
+                  <div key={idx} className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-2xl p-4 shadow-sm">
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900 text-sm mb-1">
+                          {new Date(exam.created_date).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          חסר: {exam.passing_grade - Math.round(exam.score_percent)} נקודות
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-black text-red-600">
+                          {Math.round(exam.score_percent)}
+                        </div>
+                        <div className="text-xs text-gray-500">/{exam.passing_grade}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => navigate(createPageUrl("Exams"))}
+                className="w-full h-14 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-lg font-bold shadow-lg mt-4"
+              >
+                <Flame className="w-5 h-5 ml-2" />
+                נסה שוב את הבגרויות
+              </Button>
+            </motion.div>
+          )}
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <Button
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-lg font-bold text-base"
+            >
+              <BookOpen className="w-5 h-5 ml-2" />
+              התחל תרגול
+            </Button>
+            <Button
+              onClick={() => navigate(createPageUrl("Exams"))}
+              className="h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-2xl shadow-lg font-bold text-base"
+            >
+              <FileCheck className="w-5 h-5 ml-2" />
+              עבור לבגרויות
             </Button>
           </motion.div>
-        )}
-
-        {/* Failed Exams */}
-        {statistics.failedExams.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
-          >
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <XCircle className="w-6 h-6 text-red-600" />
-              בגרויות שנכשלו
-            </h3>
-            
-            <div className="space-y-3">
-              {statistics.failedExams.slice(0, 5).map((exam, idx) => (
-                <div key={idx} className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
-                        {new Date(exam.created_date).toLocaleDateString('he-IL')}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        ציון: {Math.round(exam.score_percent)} / {exam.passing_grade} נדרש
-                      </p>
-                    </div>
-                    <div className="text-red-700 font-bold text-2xl">
-                      {Math.round(exam.score_percent)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Future Prediction */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl shadow-lg p-6 text-white"
-        >
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Brain className="w-6 h-6" />
-            צפי התקדמות
-          </h3>
-          
-          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
-            <p className="text-lg font-semibold mb-2">{prediction.prediction}</p>
-            <p className="text-sm opacity-90">{prediction.recommendation}</p>
-          </div>
-
-          <Button
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-white text-purple-600 hover:bg-gray-100 h-12 font-bold"
-          >
-            <Clock className="w-5 h-5 ml-2" />
-            התחל תרגול עכשיו
-          </Button>
-        </motion.div>
-
-        {/* Personalized Recommendations */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
-        >
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Zap className="w-6 h-6 text-amber-600" />
-            המלצות מותאמות אישית
-          </h3>
-          
-          <div className="space-y-3">
-            {statistics.weakTopics.length > 0 && (
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
-                <p className="font-semibold text-gray-900 mb-2">תרגול ממוקד</p>
-                <p className="text-sm text-gray-700">
-                  המלצה: תרגל את הנושאים {statistics.weakTopics.slice(0, 2).map(t => t.topic).join(', ')} 
-                  למשך 20 דקות ביום
-                </p>
-              </div>
-            )}
-            
-            {statistics.avgExamScore < 70 && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-                <p className="font-semibold text-gray-900 mb-2">עבוד על בחינות</p>
-                <p className="text-sm text-gray-700">
-                  כדי להעלות את הממוצע שלך, נסה לפתור לפחות 2 בחינות שלמות בשבוע
-                </p>
-              </div>
-            )}
-            
-            {statistics.totalPractice < 50 && (
-              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
-                <p className="font-semibold text-gray-900 mb-2">תרגול יומי</p>
-                <p className="text-sm text-gray-700">
-                  המלצה: תרגל לפחות 10 שאלות ביום כדי לשפר את הדיוק
-                </p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
