@@ -19,6 +19,8 @@ export default function CustomWeakExamPage() {
   const [isChecking, setIsChecking] = useState(false);
   const [answers, setAnswers] = useState({});
   const [showSummary, setShowSummary] = useState(false);
+  const [audioPlayed, setAudioPlayed] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState(null);
 
   useEffect(() => {
     loadUserAndQuestions();
@@ -47,8 +49,7 @@ export default function CustomWeakExamPage() {
         q.is_active === true &&
         q.subject_id === currentUser.selected_subject &&
         !q.reading_text && // לא שאלות עם טקסט קריאה
-        !q.topic_id?.includes('extended_reading') && // לא קריאה מורחבת
-        !q.topic_id?.includes('listening') // לא האזנה
+        !q.topic_id?.includes('extended_reading') // לא קריאה מורחבת
       );
 
       // Shuffle and take up to 20
@@ -114,6 +115,11 @@ Return JSON:`,
       setShowResult(false);
       setIsCorrect(false);
       setFeedback("");
+      setAudioPlayed(false);
+      if (currentAudio) {
+        currentAudio.pause();
+        setCurrentAudio(null);
+      }
     } else {
       setShowSummary(true);
     }
@@ -126,6 +132,26 @@ Return JSON:`,
     }));
     handleNext();
   };
+
+  const handleAudioPlay = () => {
+    if (question.audio_url) {
+      const audio = new Audio(question.audio_url);
+      audio.play();
+      audio.onended = () => {
+        setAudioPlayed(true);
+      };
+      setCurrentAudio(audio);
+    }
+  };
+
+  useEffect(() => {
+    // Reset audio state when question changes
+    setAudioPlayed(false);
+    if (currentAudio) {
+      currentAudio.pause();
+      setCurrentAudio(null);
+    }
+  }, [currentIndex]);
 
   if (questions.length === 0) {
     return (
@@ -200,6 +226,8 @@ Return JSON:`,
 
   const question = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
+  const hasAudio = question.audio_url || question.topic_id?.includes('listening');
+  const canAnswer = !hasAudio || audioPlayed;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex flex-col">
@@ -248,24 +276,52 @@ Return JSON:`,
                 {question.question_text}
               </p>
             </div>
+
+            {hasAudio && (
+              <div className="mt-4 bg-white rounded-xl p-4 border-2 border-blue-200">
+                <div className="flex items-center gap-3">
+                  <div className="text-4xl">🎧</div>
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-gray-900">קטע האזנה</div>
+                    <div className="text-xs text-gray-600">
+                      {audioPlayed ? '✅ הושמע' : 'השמע את הקטע לפני המענה'}
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleAudioPlay}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={audioPlayed}
+                  >
+                    {audioPlayed ? 'הושמע' : 'השמע'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="p-6">
+          <div className="p-6 pt-0">
             {!showResult ? (
               <div className="space-y-4">
+                {!canAnswer && (
+                  <div className="bg-blue-50 border-2 border-blue-300 rounded-2xl p-4 mb-4 text-center">
+                    <div className="text-blue-800 font-bold mb-1">🎧 השמע את הקטע תחילה</div>
+                    <div className="text-sm text-blue-600">לפני שתענה על השאלה, עליך להאזין לקטע</div>
+                  </div>
+                )}
+                
                 <textarea
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="הקלד את תשובתך..."
+                  placeholder={canAnswer ? "הקלד את תשובתך..." : "האזן לקטע תחילה..."}
                   className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
-                  autoFocus
-                  disabled={isChecking}
+                  autoFocus={canAnswer}
+                  disabled={isChecking || !canAnswer}
                 />
 
                 <div className="flex gap-3">
                   <Button
                     onClick={checkAnswer}
-                    disabled={!userAnswer.trim() || isChecking}
+                    disabled={!userAnswer.trim() || isChecking || !canAnswer}
                     className="flex-1 h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg disabled:opacity-50"
                   >
                     {isChecking ? 'בודק...' : 'בדוק'}
