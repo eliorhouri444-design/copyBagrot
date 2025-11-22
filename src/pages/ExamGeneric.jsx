@@ -250,15 +250,32 @@ export default function ExamGenericPage() {
           }
 
           const response = await base44.integrations.Core.InvokeLLM({
-            prompt: `Grade this answer for ${exam.subject} ${unitLevel} units exam.
-            ${explanationLanguageInstruction}
-            
-            Question: ${questionText}
-            Correct: ${correctAnswer}
-            Student: ${userAnswer}
-            
-            If content correct but has spelling errors, set has_spelling_error=true and deduct up to 20%.
-            JSON response:`,
+            prompt: `INSTRUCTIONS FOR CHECKING ANSWERS:
+
+      1. Check semantic meaning, not exact wording.
+      2. Compare student answer to the correct answer and consider multiple accepted variations.
+      3. Use key required words to confirm core meaning.
+      4. Allow synonyms and paraphrasing.
+      5. Ignore capitalization, punctuation, and minor spelling errors.
+      6. Reject answers that change facts, subject, time, or purpose.
+      7. Score answers on a scale:
+      - similarity_score 100 = fully correct
+      - similarity_score 70-90 = correct meaning but missing detail
+      - similarity_score 40-60 = related but incorrect
+      - similarity_score 0-30 = wrong
+      8. Provide helpful feedback explaining mistakes or missing information.
+      ${explanationLanguageInstruction}
+
+      Subject: ${exam.subject} ${unitLevel} units
+      Question: ${questionText}
+      Correct Answer: ${correctAnswer}
+      Student Answer: ${userAnswer}
+
+      If content is correct but has spelling errors, set has_spelling_error=true and deduct up to 20%.
+      If the answer expresses the same idea even if phrased differently, mark as correct.
+      Focus on meaning, purpose, cause, and key details - not exact wording.
+
+      JSON response:`,
             response_json_schema: {
               type: "object",
               properties: {
@@ -268,7 +285,8 @@ export default function ExamGenericPage() {
                 points_deduction_percent: { type: "number" },
                 explanation: { type: "string" },
                 explanation_hebrew: { type: "string" },
-                explanation_english: { type: "string" }
+                explanation_english: { type: "string" },
+                missing_details: { type: "string" }
               },
               required: ["is_correct", "similarity_score"]
             }
