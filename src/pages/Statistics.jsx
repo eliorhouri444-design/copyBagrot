@@ -7,7 +7,7 @@ import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileChe
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export default function StatisticsPage() {
   const navigate = useNavigate();
@@ -558,7 +558,7 @@ export default function StatisticsPage() {
               
               <div className="flex items-center justify-center">
                 <ResponsiveContainer width="100%" height={200}>
-                  <RechartsPieChart>
+                  <PieChart>
                     <Pie
                       data={pieData}
                       cx="50%"
@@ -580,7 +580,7 @@ export default function StatisticsPage() {
                         direction: 'rtl'
                       }}
                     />
-                  </RechartsPieChart>
+                  </PieChart>
                 </ResponsiveContainer>
               </div>
 
