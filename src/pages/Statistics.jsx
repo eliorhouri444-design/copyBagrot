@@ -303,6 +303,8 @@ export default function StatisticsPage() {
   };
 
   const pieData = useMemo(() => {
+    if (!practiceAttempts || practiceAttempts.length === 0) return [];
+    
     const correct = practiceAttempts.filter(a => a.status === "correct").length;
     const partial = practiceAttempts.filter(a => a.status === "partial").length;
     const incorrect = practiceAttempts.filter(a => a.status === "incorrect").length;
