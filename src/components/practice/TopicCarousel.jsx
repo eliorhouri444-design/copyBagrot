@@ -52,6 +52,14 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
         q.topic_id
       );
 
+      // Load vocabulary questions if English
+      const allVocabQuestions = subject === 'אנגלית' ? await base44.entities.VocabularyQuestion.list() : [];
+      const relevantVocabQuestions = allVocabQuestions.filter(q => 
+        q.subject_id === subject && 
+        parseInt(q.unit_level) === parseInt(units) && 
+        q.is_active === true
+      );
+
       // Build topics map starting from TopicNew
       const topicsMap = {};
       
@@ -60,6 +68,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
         topicsMap[topic.topic_id] = {
           topic_id: topic.topic_id,
           questions: [],
+          vocabQuestions: [],
           subject_id: topic.subject_id,
           unit_level: topic.unit_level,
           customTopic: topic
@@ -73,11 +82,27 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
           topicsMap[topicId] = {
             topic_id: topicId,
             questions: [],
+            vocabQuestions: [],
             subject_id: q.subject_id,
             unit_level: q.unit_level
           };
         }
         topicsMap[topicId].questions.push(q);
+      });
+
+      // Add vocabulary questions to topics
+      relevantVocabQuestions.forEach(q => {
+        const topicId = q.topic_id || 'vocabulary_general';
+        if (!topicsMap[topicId]) {
+          topicsMap[topicId] = {
+            topic_id: topicId,
+            questions: [],
+            vocabQuestions: [],
+            subject_id: q.subject_id,
+            unit_level: q.unit_level
+          };
+        }
+        topicsMap[topicId].vocabQuestions.push(q);
       });
 
       const topicsArray = Object.values(topicsMap).map(topic => {
@@ -102,8 +127,9 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
           }
         }
 
-        // Store actual count for statistics
-        const actualCount = topic.questions.length;
+        // Store actual count for statistics - include both regular and vocab questions
+        const actualCount = topic.questions.length + topic.vocabQuestions.length;
+        const isVocabulary = topic.vocabQuestions.length > 0 && topic.questions.length === 0;
         
         // Check if this is Extended Reading by checking first question
         const hasReadingText = topic.questions[0]?.reading_text && 
@@ -120,7 +146,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
           actualQuestionCount: actualCount,
           subject_id: topic.subject_id,
           unit_level: topic.unit_level,
-          isExtendedReading: hasReadingText
+          isExtendedReading: hasReadingText,
+          isVocabulary: isVocabulary
         };
       });
 
@@ -185,13 +212,10 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
     const topicIdParam = encodeURIComponent(topic.topic_id);
     
     console.log(`🔍 Starting practice for: ${topic.topic_id}`);
+    console.log(`📖 Is Vocabulary: ${topic.isVocabulary}`);
     console.log(`📖 Is Extended Reading: ${topic.isExtendedReading}`);
     
-    // Check if this is a vocabulary topic
-    const vocabQuestions = await base44.entities.VocabularyQuestion.list();
-    const hasVocabQuestions = vocabQuestions.some(q => q.topic_id === topic.topic_id && q.is_active);
-    
-    if (hasVocabQuestions) {
+    if (topic.isVocabulary) {
       console.log("→ Navigating to VocabularyPractice");
       navigate(createPageUrl(`VocabularyPractice?topicId=${topicIdParam}`));
       return;
