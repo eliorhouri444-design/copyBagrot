@@ -229,6 +229,21 @@ export default function StatisticsPage() {
     };
   }, [practiceAttempts, examAttempts, allTopics]);
 
+  const getRecommendation = (predictedScore, stats) => {
+    if (predictedScore >= 85) {
+      return "המשך לתרגל באופן קבוע כדי לשמור על הרמה הגבוהה";
+    } else if (predictedScore >= 70) {
+      if (stats.weakTopics.length > 0) {
+        return `חזק את הנושאים: ${stats.weakTopics.slice(0, 2).map(t => t.name || t.topic).join(', ')}`;
+      }
+      return "תרגל עוד בחינות מלאות כדי להגיע ל-90+";
+    } else if (predictedScore >= 55) {
+      return "תרגל 30-45 דקות ביום, התמקד בנושאים החלשים";
+    } else {
+      return "נדרש תרגול יומי אינטנסיבי - לפחות שעה ביום";
+    }
+  };
+
   const predictedScore = useMemo(() => {
     // Advanced prediction algorithm
     const { avgExamScore, practiceAccuracy, totalExams, totalPractice } = statistics;
@@ -286,21 +301,6 @@ export default function StatisticsPage() {
       recommendation: getRecommendation(baseScore, statistics)
     };
   }, [statistics]);
-
-  const getRecommendation = (predictedScore, stats) => {
-    if (predictedScore >= 85) {
-      return "המשך לתרגל באופן קבוע כדי לשמור על הרמה הגבוהה";
-    } else if (predictedScore >= 70) {
-      if (stats.weakTopics.length > 0) {
-        return `חזק את הנושאים: ${stats.weakTopics.slice(0, 2).map(t => t.name || t.topic).join(', ')}`;
-      }
-      return "תרגל עוד בחינות מלאות כדי להגיע ל-90+";
-    } else if (predictedScore >= 55) {
-      return "תרגל 30-45 דקות ביום, התמקד בנושאים החלשים";
-    } else {
-      return "נדרש תרגול יומי אינטנסיבי - לפחות שעה ביום";
-    }
-  };
 
   const pieData = useMemo(() => {
     if (!practiceAttempts || practiceAttempts.length === 0) return [];
