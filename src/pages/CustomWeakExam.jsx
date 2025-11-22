@@ -62,9 +62,10 @@ export default function CustomWeakExamPage() {
             .slice(0, 3)
             .map(([topic_id]) => topic_id);
 
+          const allTopics = await base44.entities.TopicNew.list();
           const topicNames = weakTopicIds.map(id => {
-            const topic = await base44.entities.TopicNew.filter({ topic_id: id });
-            return topic[0]?.name || id;
+            const topic = allTopics.find(t => t.topic_id === id);
+            return topic?.name || id;
           });
 
           const generatedQuestions = await base44.integrations.Core.InvokeLLM({
