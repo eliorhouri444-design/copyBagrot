@@ -56,7 +56,7 @@ export default function CustomWeakPracticePage() {
         .map(([topicId, stats]) => {
           const accuracy = stats.total > 0 ? ((stats.correct + stats.partial * 0.7) / stats.total * 100) : 0;
           const topicMeta = relevantTopics.find(t => t.topic_id === topicId);
-          
+
           return {
             topic_id: topicId,
             name: topicMeta?.name || topicId,
@@ -69,7 +69,12 @@ export default function CustomWeakPracticePage() {
             partial: stats.partial
           };
         })
-        .filter(t => t.accuracy < 70 && t.total >= 3) // Weak topics with enough data
+        .filter(t => 
+          t.accuracy < 70 && 
+          t.total >= 3 && 
+          !t.topic_id.includes('extended_reading') && // לא קריאה מורחבת
+          !t.topic_id.includes('listening') // לא האזנה
+        )
         .sort((a, b) => a.accuracy - b.accuracy); // Worst first
 
       setWeakTopics(topicsArray);

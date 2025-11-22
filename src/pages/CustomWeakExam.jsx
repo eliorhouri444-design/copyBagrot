@@ -45,7 +45,10 @@ export default function CustomWeakExamPage() {
       const weakQuestions = allQuestions.filter(q => 
         questionIds.includes(q.question_id) && 
         q.is_active === true &&
-        q.subject_id === currentUser.selected_subject
+        q.subject_id === currentUser.selected_subject &&
+        !q.reading_text && // לא שאלות עם טקסט קריאה
+        !q.topic_id?.includes('extended_reading') && // לא קריאה מורחבת
+        !q.topic_id?.includes('listening') // לא האזנה
       );
 
       // Shuffle and take up to 20
