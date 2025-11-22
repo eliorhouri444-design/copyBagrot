@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2 } from "lucide-react";
+import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
@@ -389,19 +389,19 @@ export default function HomePage() {
       delay: 0.4
     },
     {
-      icon: TrendingDown,
-      title: "ניתוח טעויות",
-      description: "למד מהטעויות שלך",
-      color: "from-red-500 to-orange-600",
-      onClick: () => navigate(createPageUrl("ErrorAnalysisPage")),
+      icon: Zap,
+      title: "תרגול מותאם",
+      description: "נושאים שטעית בהם",
+      color: "from-purple-500 to-pink-600",
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
       delay: 0.45
     },
     {
-      icon: Calculator,
-      title: "מחשבון ציונים",
-      description: "חשב את הציון שלך",
+      icon: Target,
+      title: "בגרות מותאמת",
+      description: "שאלות שטעית בהן",
       color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("GradeCalculator")),
+      onClick: () => navigate(createPageUrl("CustomWeakExam")),
       delay: 0.5
     }
   ];
