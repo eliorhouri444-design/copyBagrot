@@ -49,6 +49,8 @@ import AdminListeningManager from './pages/AdminListeningManager';
 import ExtendedReading from './pages/ExtendedReading';
 import AdminTopics from './pages/AdminTopics';
 import Statistics from './pages/Statistics';
+import Vocabulary from './pages/Vocabulary';
+import VocabularyPractice from './pages/VocabularyPractice';
 import __Layout from './Layout.jsx';
 
 
@@ -104,6 +106,8 @@ export const PAGES = {
     "ExtendedReading": ExtendedReading,
     "AdminTopics": AdminTopics,
     "Statistics": Statistics,
+    "Vocabulary": Vocabulary,
+    "VocabularyPractice": VocabularyPractice,
 }
 
 export const pagesConfig = {
