@@ -37,25 +37,18 @@ export default function CustomWeakExamPage() {
         (a.status === "incorrect" || a.percentage < 60)
       );
 
-      console.log('Failed attempts found:', failedAttempts.length);
-      
       // Get unique question IDs that were failed
       const questionIds = [...new Set(failedAttempts.map(a => a.question_id).filter(Boolean))];
-      console.log('Unique question IDs:', questionIds);
       
-      // Load those questions
+      // Load ALL those questions - matching by question_id field
       const allQuestions = await base44.entities.QuestionBank.list();
-      console.log('Total questions in bank:', allQuestions.length);
-      
       const weakQuestions = allQuestions.filter(q => 
         questionIds.includes(q.question_id) && 
-        q.is_active &&
+        q.is_active === true &&
         q.subject_id === currentUser.selected_subject
       );
-      
-      console.log('Weak questions found:', weakQuestions.length);
 
-      // Shuffle and take 20
+      // Shuffle and take up to 20
       const shuffled = weakQuestions.sort(() => Math.random() - 0.5).slice(0, 20);
       setQuestions(shuffled);
     } catch (error) {
