@@ -204,17 +204,21 @@ Return JSON:`,
     }
   }, [currentIndex]);
 
-  if (questions.length === 0) {
+  if (!user || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
-          <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 mb-2">אין שאלות זמינות</h3>
-          <p className="text-gray-600 mb-6">נראה שלא טעית בשאלות עדיין, או שאתה מעולה! 🌟</p>
-          <Button onClick={() => navigate(createPageUrl("Exams"))} className="w-full">
-            חזרה לבגרויות
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <Target className="w-12 h-12 text-white animate-pulse" />
+          </div>
+          <div className="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
+          <p className="text-gray-600 font-semibold">מחפש טעויות מבגרויות קודמות</p>
+        </motion.div>
       </div>
     );
   }

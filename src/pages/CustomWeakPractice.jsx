@@ -144,13 +144,21 @@ Return JSON:`,
     handleNext();
   };
 
-  if (isLoading) {
+  if (isLoading || questions.length === 0 && !isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <Target className="w-12 h-12 text-white animate-pulse" />
+          </div>
           <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 font-semibold">טוען שאלות שטעית בהן...</p>
-        </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">מכין את התרגול שלך...</h3>
+          <p className="text-gray-600 font-semibold">מחפש שאלות שטעית בהן</p>
+        </motion.div>
       </div>
     );
   }
