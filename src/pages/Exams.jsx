@@ -837,15 +837,14 @@ export default function ExamsPage() {
 
             <div className="p-5 text-center">
               <p className="text-gray-700 text-sm mb-4">
-                מבחן שמבוסס על השאלות שבהן טעית בעבר, כדי לחזק בדיוק את מה שחסר לך
+                בגרות מבוססת על הנושאים שבהם טעית בעבר, כדי לחזק בדיוק מה שצריך
               </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={() => navigate(createPageUrl("WeakExamSelection"))}
                   className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-2xl rounded-2xl"
                 >
-                  <Target className="w-5 h-5" />
-                  <span>בחר סוג מבחן</span>
+                  <span>התחל בגרות</span>
                 </Button>
               </motion.div>
             </div>
