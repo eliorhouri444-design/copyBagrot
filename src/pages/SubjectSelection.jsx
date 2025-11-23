@@ -58,7 +58,7 @@ export default function SubjectSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

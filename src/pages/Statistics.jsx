@@ -318,9 +318,9 @@ export default function StatisticsPage() {
 
   if (!isUserLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600 font-semibold">טוען נתונים...</p>
         </div>
       </div>
@@ -330,31 +330,27 @@ export default function StatisticsPage() {
   const hasData = statistics.totalPractice > 0 || statistics.totalExams > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-24">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-b-[2rem] p-6 shadow-2xl mb-6"
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden"
       >
-        <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Home"))}
-            className="text-white hover:bg-white/20"
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
+        <div className="relative z-10">
+          <button
+            onClick={() => navigate(createPageUrl("SubjectSelection"))}
+            className="flex items-center gap-3 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
           >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          
-          <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-2xl px-5 py-2.5 shadow-lg">
-            <TrendingUp className="w-6 h-6 text-white" />
-            <span className="text-xl font-bold text-white">הסטטיסטיקה שלי</span>
-          </div>
-        </div>
-        
-        <div className="text-center text-white mt-3">
-          <h2 className="text-2xl font-bold mb-1">{displaySubject}</h2>
-          <p className="text-sm opacity-90">{displayUnits} יחידות</p>
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
+              <TrendingUp className="w-7 h-7 text-white" />
+            </div>
+            <div className="text-right flex-1">
+              <h1 className="text-2xl font-bold text-white">הנתונים שלי</h1>
+              <p className="text-sm text-white/90">{displaySubject} • {displayUnits} יחידות</p>
+            </div>
+          </button>
         </div>
       </motion.div>
 
@@ -400,7 +396,7 @@ export default function StatisticsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl shadow-2xl p-6 text-white overflow-hidden relative"
+            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative"
           >
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
@@ -447,12 +443,12 @@ export default function StatisticsPage() {
             transition={{ delay: 0.15 }}
             className="grid grid-cols-2 gap-3"
           >
-            <div className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-600">דיוק תרגולים</div>
                   <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.practiceAccuracy)}%</div>
                 </div>
@@ -460,25 +456,25 @@ export default function StatisticsPage() {
               <Progress value={statistics.practiceAccuracy} className="h-2 bg-blue-100" />
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                   <FileCheck className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-600">ממוצע בגרויות</div>
                   <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.avgExamScore)}</div>
                 </div>
               </div>
-              <Progress value={statistics.avgExamScore} className="h-2 bg-green-100" />
+              <Progress value={statistics.avgExamScore} className="h-2 bg-blue-100" />
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-600">שעות לימוד</div>
                   <div className="text-2xl font-bold text-gray-900">{statistics.totalStudyHours}h</div>
                 </div>
@@ -486,23 +482,19 @@ export default function StatisticsPage() {
               <div className="text-xs text-gray-500">{statistics.totalStudyMinutes} דקות</div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
               <div className="flex items-center gap-3 mb-3">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${
-                  statistics.trend === 'up' ? 'bg-gradient-to-br from-green-500 to-emerald-500' :
-                  statistics.trend === 'down' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
-                  'bg-gradient-to-br from-gray-400 to-gray-500'
-                }`}>
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                   {statistics.trend === 'up' ? <TrendingUp className="w-6 h-6 text-white" /> :
                    statistics.trend === 'down' ? <TrendingDown className="w-6 h-6 text-white" /> :
                    <Activity className="w-6 h-6 text-white" />}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="text-xs text-gray-600">מגמה</div>
                   <div className={`text-xl font-bold ${
                     statistics.trend === 'up' ? 'text-green-600' :
                     statistics.trend === 'down' ? 'text-red-600' :
-                    'text-gray-600'
+                    'text-blue-600'
                   }`}>
                     {statistics.trend === 'up' ? 'משתפר' : statistics.trend === 'down' ? 'יורד' : 'יציב'}
                   </div>
@@ -518,7 +510,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <Calendar className="w-6 h-6 text-purple-600" />
@@ -538,8 +530,8 @@ export default function StatisticsPage() {
                     }}
                     labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                   />
-                  <Bar dataKey="practice" fill="#8B5CF6" name="תרגולים" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="exams" fill="#EC4899" name="בגרויות" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="practice" fill="#3B82F6" name="תרגולים" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="exams" fill="#6366F1" name="בגרויות" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </motion.div>
@@ -551,7 +543,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <BarChart3 className="w-6 h-6 text-blue-600" />
@@ -606,7 +598,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <Award className="w-6 h-6 text-green-600" />
@@ -640,7 +632,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <AlertCircle className="w-6 h-6 text-orange-600" />
@@ -668,7 +660,7 @@ export default function StatisticsPage() {
 
               <Button
                 onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg"
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-bold shadow-lg rounded-xl"
               >
                 <Zap className="w-5 h-5 ml-2" />
                 תרגל את הנושאים החלשים
@@ -682,7 +674,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <BarChart3 className="w-6 h-6 text-purple-600" />
@@ -726,7 +718,7 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45 }}
-              className="bg-white rounded-3xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
                 <XCircle className="w-6 h-6 text-red-600" />
@@ -758,7 +750,7 @@ export default function StatisticsPage() {
 
               <Button
                 onClick={() => navigate(createPageUrl("Exams"))}
-                className="w-full h-14 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-lg font-bold shadow-lg mt-4"
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-bold shadow-lg mt-4 rounded-xl"
               >
                 <Flame className="w-5 h-5 ml-2" />
                 נסה שוב את הבגרויות
@@ -782,15 +774,21 @@ export default function StatisticsPage() {
               <div className="grid grid-cols-1 gap-3">
                 {statistics.weakTopics.length > 0 && (
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-                    className="h-20 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden"
+                    onClick={() => {
+                      if (user?.is_premium) {
+                        navigate(createPageUrl("CustomWeakPractice"));
+                      } else {
+                        navigate(createPageUrl("Premium"));
+                      }
+                    }}
+                    className={`h-20 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden`}
                   >
                     <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
                     <div className="flex items-center gap-3 flex-1">
                       <Target className="w-8 h-8" />
                       <div className="text-right">
                         <div className="text-base font-bold">תרגול טעויות</div>
-                        <div className="text-xs opacity-90">בנה תרגול מכל השאלות שטעית בהן</div>
+                        <div className="text-xs opacity-90">{user?.is_premium ? 'בנה תרגול מכל השאלות שטעית בהן' : '🔒 שדרג לפרימיום'}</div>
                       </div>
                     </div>
                     <ChevronLeft className="w-5 h-5" />
@@ -799,15 +797,21 @@ export default function StatisticsPage() {
 
                 {statistics.failedExams.length > 0 && (
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-                    className="h-20 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden"
+                    onClick={() => {
+                      if (user?.is_premium) {
+                        navigate(createPageUrl("CustomWeakExam"));
+                      } else {
+                        navigate(createPageUrl("Premium"));
+                      }
+                    }}
+                    className={`h-20 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden`}
                   >
                     <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
                     <div className="flex items-center gap-3 flex-1">
                       <Target className="w-8 h-8" />
                       <div className="text-right">
                         <div className="text-base font-bold">תרגול טעויות בבגרות</div>
-                        <div className="text-xs opacity-90">מבחן שמבוסס על השאלות שבהן טעית בעבר</div>
+                        <div className="text-xs opacity-90">{user?.is_premium ? 'מבחן שמבוסס על השאלות שבהן טעית בעבר' : '🔒 שדרג לפרימיום'}</div>
                       </div>
                     </div>
                     <ChevronLeft className="w-5 h-5" />
@@ -826,14 +830,14 @@ export default function StatisticsPage() {
           >
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-lg font-bold text-base"
+              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg font-bold text-base"
             >
               <BookOpen className="w-5 h-5 ml-2" />
               התחל תרגול
             </Button>
             <Button
               onClick={() => navigate(createPageUrl("Exams"))}
-              className="h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-2xl shadow-lg font-bold text-base"
+              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg font-bold text-base"
             >
               <FileCheck className="w-5 h-5 ml-2" />
               עבור לבגרויות
