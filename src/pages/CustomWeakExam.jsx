@@ -213,9 +213,8 @@ Return JSON:`,
           className="text-center"
         >
           <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-            <Target className="w-12 h-12 text-white animate-pulse" />
+            <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
-          <div className="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
           <p className="text-gray-600 font-semibold">מחפש טעויות מבגרויות קודמות</p>
         </motion.div>
