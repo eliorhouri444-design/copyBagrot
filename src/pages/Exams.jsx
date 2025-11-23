@@ -12,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
+  DialogFooter } from
+"@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,94 +71,94 @@ export default function ExamsPage() {
   const defaultModulesStructure = {
     "אנגלית": {
       3: [
-        { id: "C", title: "מודול C", description: "קריאה והבנה", details: "Reading Comprehension", duration: 90, color: "from-purple-500 to-purple-600", points: "70+30", parts: ["Reading"], entity: "ModuleCExam", order: 0 },
-        { id: "A", title: "מודול A", description: "הבנת נשמע", details: "Listening", duration: 90, color: "from-blue-500 to-blue-600", points: "70+30", parts: ["Listening"], entity: "ModuleAExam", order: 1 },
-        { id: "B", title: "מודול B", description: "הבנת נשמע מתקדמת", details: "Advanced Listening", duration: 90, color: "from-cyan-500 to-cyan-600", points: "70+30", parts: ["Listening"], entity: "ModuleBExam", order: 2 }
-      ],
+      { id: "C", title: "מודול C", description: "קריאה והבנה", details: "Reading Comprehension", duration: 90, color: "from-purple-500 to-purple-600", points: "70+30", parts: ["Reading"], entity: "ModuleCExam", order: 0 },
+      { id: "A", title: "מודול A", description: "הבנת נשמע", details: "Listening", duration: 90, color: "from-blue-500 to-blue-600", points: "70+30", parts: ["Listening"], entity: "ModuleAExam", order: 1 },
+      { id: "B", title: "מודול B", description: "הבנת נשמע מתקדמת", details: "Advanced Listening", duration: 90, color: "from-cyan-500 to-cyan-600", points: "70+30", parts: ["Listening"], entity: "ModuleBExam", order: 2 }],
+
       4: [
-        { id: "C", title: "מודול C", description: "הבנת הנקרא", details: "Reading Comprehension", duration: 90, color: "from-blue-500 to-blue-600", points: "70+30", parts: ["Reading"], entity: "ModuleCExam", order: 0 },
-        { id: "D", title: "מודול D", description: "הבעה בכתב", details: "Writing", duration: 120, color: "from-orange-500 to-orange-600", points: "70+30", parts: ["Writing"], entity: "GenericExam", order: 1 },
-        { id: "E", title: "מודול E", description: "קריאה מתקדמת", details: "Advanced Reading", duration: 120, color: "from-pink-500 to-pink-600", points: "100", parts: ["Reading"], entity: "GenericExam", order: 2 }
-      ],
+      { id: "C", title: "מודול C", description: "הבנת הנקרא", details: "Reading Comprehension", duration: 90, color: "from-blue-500 to-blue-600", points: "70+30", parts: ["Reading"], entity: "ModuleCExam", order: 0 },
+      { id: "D", title: "מודול D", description: "הבעה בכתב", details: "Writing", duration: 120, color: "from-orange-500 to-orange-600", points: "70+30", parts: ["Writing"], entity: "GenericExam", order: 1 },
+      { id: "E", title: "מודול E", description: "קריאה מתקדמת", details: "Advanced Reading", duration: 120, color: "from-pink-500 to-pink-600", points: "100", parts: ["Reading"], entity: "GenericExam", order: 2 }],
+
       5: [
-        { id: "E", title: "מודול E", description: "קריאה גבוהה", details: "High-level Reading", duration: 150, color: "from-indigo-500 to-indigo-600", points: "100", parts: ["Reading"], entity: "GenericExam", order: 0 },
-        { id: "F", title: "מודול F", description: "כתיבה מתקדמת", details: "Advanced Writing", duration: 120, color: "from-rose-500 to-rose-600", points: "100", parts: ["Writing"], entity: "GenericExam", order: 1 },
-        { id: "G", title: "מודול G", description: "כתיבה יצירתית", details: "Creative Writing", duration: 90, color: "from-green-500 to-green-600", points: "100", parts: ["Writing"], entity: "GenericExam", order: 2 }
-      ]
+      { id: "E", title: "מודול E", description: "קריאה גבוהה", details: "High-level Reading", duration: 150, color: "from-indigo-500 to-indigo-600", points: "100", parts: ["Reading"], entity: "GenericExam", order: 0 },
+      { id: "F", title: "מודול F", description: "כתיבה מתקדמת", details: "Advanced Writing", duration: 120, color: "from-rose-500 to-rose-600", points: "100", parts: ["Writing"], entity: "GenericExam", order: 1 },
+      { id: "G", title: "מודול G", description: "כתיבה יצירתית", details: "Creative Writing", duration: 90, color: "from-green-500 to-green-600", points: "100", parts: ["Writing"], entity: "GenericExam", order: 2 }]
+
     },
     "מתמטיקה": {
       3: [
-        { id: "801", title: "שאלון 801", description: "אלגברה בסיסית", details: "משוואות, חזקות, שורשים, בעיות מילוליות", duration: 150, color: "from-purple-500 to-purple-600", points: "60", parts: ["אלגברה"], entity: "GenericExam", order: 0 },
-        { id: "802", title: "שאלון 802", description: "גיאומטריה וסטטיסטיקה", details: "פונקציות ריבועיות, גיאומטריה, סטטיסטיקה", duration: 150, color: "from-blue-500 to-blue-600", points: "60", parts: ["גאומטריה"], entity: "GenericExam", order: 1 }
-      ],
+      { id: "801", title: "שאלון 801", description: "אלגברה בסיסית", details: "משוואות, חזקות, שורשים, בעיות מילוליות", duration: 150, color: "from-purple-500 to-purple-600", points: "60", parts: ["אלגברה"], entity: "GenericExam", order: 0 },
+      { id: "802", title: "שאלון 802", description: "גיאומטריה וסטטיסטיקה", details: "פונקציות ריבועיות, גיאומטריה, סטטיסטיקה", duration: 150, color: "from-blue-500 to-blue-600", points: "60", parts: ["גאומטריה"], entity: "GenericExam", order: 1 }],
+
       4: [
-        { id: "803", title: "שאלון 803", description: "טריגונומטריה ופונקציות", details: "טריגו, גזירה, בעיות קצב, גיאומטריה", duration: 150, color: "from-green-500 to-green-600", points: "40", parts: ["טריגונומטריה"], entity: "GenericExam", order: 0 },
-        { id: "804", title: "שאלון 804", description: "פונקציות מתקדמות", details: "פונקציות רציונליות, אי-שוויונים, חקירה", duration: 150, color: "from-purple-500 to-purple-600", points: "60", parts: ["פונקציות"], entity: "GenericExam", order: 1 }
-      ],
+      { id: "803", title: "שאלון 803", description: "טריגונומטריה ופונקציות", details: "טריגו, גזירה, בעיות קצב, גיאומטריה", duration: 150, color: "from-green-500 to-green-600", points: "40", parts: ["טריגונומטריה"], entity: "GenericExam", order: 0 },
+      { id: "804", title: "שאלון 804", description: "פונקציות מתקדמות", details: "פונקציות רציונליות, אי-שוויונים, חקירה", duration: 150, color: "from-purple-500 to-purple-600", points: "60", parts: ["פונקציות"], entity: "GenericExam", order: 1 }],
+
       5: [
-        { id: "805", title: "שאלון 805", description: "חקירה ודיפרנציאלי", details: "נגזרות מתקדמות, חקירה, קצב משתנה", duration: 150, color: "from-indigo-500 to-indigo-600", points: "50", parts: ["דיפרנציאל"], entity: "GenericExam", order: 0 },
-        { id: "806", title: "שאלון 806", description: "אינטגרלים וסדרות", details: "אינטגרלים, שטחים, סדרות, לוגריתמים", duration: 150, color: "from-purple-500 to-purple-600", points: "50", parts: ["אינטגרלים"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "805", title: "שאלון 805", description: "חקירה ודיפרנציאלי", details: "נגזרות מתקדמות, חקירה, קצב משתנה", duration: 150, color: "from-indigo-500 to-indigo-600", points: "50", parts: ["דיפרנציאל"], entity: "GenericExam", order: 0 },
+      { id: "806", title: "שאלון 806", description: "אינטגרלים וסדרות", details: "אינטגרלים, שטחים, סדרות, לוגריתמים", duration: 150, color: "from-purple-500 to-purple-600", points: "50", parts: ["אינטגרלים"], entity: "GenericExam", order: 1 }]
+
     },
     "פיזיקה": {
       5: [
-        { id: "581", title: "שאלון 581", description: "מכניקה", details: "קינמטיקה, דינמיקה, אנרגיה", duration: 120, color: "from-green-500 to-green-600", points: "100", parts: ["מכניקה"], entity: "GenericExam", order: 0 },
-        { id: "582", title: "שאלון 582", description: "חשמל, גלים וחום", details: "חשמל סטטי, מגנטיות, גלים, תרמודינמיקה", duration: 120, color: "from-blue-500 to-blue-600", points: "100", parts: ["חשמל", "גלים", "חום"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "581", title: "שאלון 581", description: "מכניקה", details: "קינמטיקה, דינמיקה, אנרגיה", duration: 120, color: "from-green-500 to-green-600", points: "100", parts: ["מכניקה"], entity: "GenericExam", order: 0 },
+      { id: "582", title: "שאלון 582", description: "חשמל, גלים וחום", details: "חשמל סטטי, מגנטיות, גלים, תרמודינמיקה", duration: 120, color: "from-blue-500 to-blue-600", points: "100", parts: ["חשמל", "גלים", "חום"], entity: "GenericExam", order: 1 }]
+
     },
     "כימיה": {
       5: [
-        { id: "043381", title: "שאלון 043381", description: "כימיה חלק א'", details: "מבנה החומר, תמיסות, קינטיקה", duration: 180, color: "from-orange-500 to-orange-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 0 },
-        { id: "043382", title: "שאלון 043382", description: "כימיה חלק ב'", details: "שיווי משקל, כימיה אורגנית", duration: 180, color: "from-red-500 to-red-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 1 },
-        { id: "043383", title: "שאלון 043383", description: "כימיה חלק ג'", details: "עבודת חקר", duration: 120, color: "from-pink-500 to-pink-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }
-      ]
+      { id: "043381", title: "שאלון 043381", description: "כימיה חלק א'", details: "מבנה החומר, תמיסות, קינטיקה", duration: 180, color: "from-orange-500 to-orange-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 0 },
+      { id: "043382", title: "שאלון 043382", description: "כימיה חלק ב'", details: "שיווי משקל, כימיה אורגנית", duration: 180, color: "from-red-500 to-red-600", points: "100", parts: ["כימיה"], entity: "GenericExam", order: 1 },
+      { id: "043383", title: "שאלון 043383", description: "כימיה חלק ג'", details: "עבודת חקר", duration: 120, color: "from-pink-500 to-pink-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }]
+
     },
     "ביולוגיה": {
       5: [
-        { id: "054581", title: "שאלון 054581", description: "ביולוגיה חלק א'", details: "התא, גנטיקה, גוף האדם", duration: 180, color: "from-teal-500 to-teal-600", points: "100", parts: ["ביולוגיה"], entity: "GenericExam", order: 0 },
-        { id: "054582", title: "שאלון 054582", description: "ביולוגיה חלק ב'", details: "אקולוגיה, אבולוציה", duration: 180, color: "from-green-500 to-green-600", points: "100", parts: ["ביולוגיה"], entity: "GenericExam", order: 1 },
-        { id: "054583", title: "שאלון 054583", description: "עבודת חקר", details: "מחקר מעשי", duration: 120, color: "from-emerald-500 to-emerald-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }
-      ]
+      { id: "054581", title: "שאלון 054581", description: "ביולוגיה חלק א'", details: "התא, גנטיקה, גוף האדם", duration: 180, color: "from-teal-500 to-teal-600", points: "100", parts: ["ביולוגיה"], entity: "GenericExam", order: 0 },
+      { id: "054582", title: "שאלון 054582", description: "ביולוגיה חלק ב'", details: "אקולוגיה, אבולוציה", duration: 180, color: "from-green-500 to-green-600", points: "100", parts: ["ביולוגיה"], entity: "GenericExam", order: 1 },
+      { id: "054583", title: "שאלון 054583", description: "עבודת חקר", details: "מחקר מעשי", duration: 120, color: "from-emerald-500 to-emerald-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }]
+
     },
     "ספרות": {
       2: [
-        { id: "2101", title: "שאלון 2101", description: "ספרות 2 יחידות", details: "שירה, סיפור קצר, אמצעים אומנותיים", duration: 180, color: "from-pink-500 to-pink-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 0 }
-      ],
+      { id: "2101", title: "שאלון 2101", description: "ספרות 2 יחידות", details: "שירה, סיפור קצר, אמצעים אומנותיים", duration: 180, color: "from-pink-500 to-pink-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 0 }],
+
       5: [
-        { id: "2102", title: "שאלון 2102", description: "ספרות 5 יחידות - חלק א'", details: "שירה, דמות ומסר", duration: 180, color: "from-rose-500 to-rose-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 0 },
-        { id: "2103", title: "שאלון 2103", description: "ספרות 5 יחידות - חלק ב'", details: "סיפור קצר, אמצעים אומנותיים", duration: 180, color: "from-fuchsia-500 to-fuchsia-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "2102", title: "שאלון 2102", description: "ספרות 5 יחידות - חלק א'", details: "שירה, דמות ומסר", duration: 180, color: "from-rose-500 to-rose-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 0 },
+      { id: "2103", title: "שאלון 2103", description: "ספרות 5 יחידות - חלק ב'", details: "סיפור קצר, אמצעים אומנותיים", duration: 180, color: "from-fuchsia-500 to-fuchsia-600", points: "100", parts: ["ספרות"], entity: "GenericExam", order: 1 }]
+
     },
     "היסטוריה": {
       2: [
-        { id: "2211", title: "שאלון 2211", description: "היסטוריה 2 יחידות", details: "ציונות, השואה, הקמת המדינה", duration: 180, color: "from-amber-500 to-amber-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 0 }
-      ],
+      { id: "2211", title: "שאלון 2211", description: "היסטוריה 2 יחידות", details: "ציונות, השואה, הקמת המדינה", duration: 180, color: "from-amber-500 to-amber-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 0 }],
+
       5: [
-        { id: "2212", title: "שאלון 2212", description: "היסטוריה 5 יחידות - ישראל", details: "ציונות, מדינת ישראל", duration: 180, color: "from-yellow-500 to-yellow-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 0 },
-        { id: "2213", title: "שאלון 2213", description: "היסטוריה 5 יחידות - אירופה", details: "אירופה ועם ישראל, השואה", duration: 180, color: "from-orange-500 to-orange-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "2212", title: "שאלון 2212", description: "היסטוריה 5 יחידות - ישראל", details: "ציונות, מדינת ישראל", duration: 180, color: "from-yellow-500 to-yellow-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 0 },
+      { id: "2213", title: "שאלון 2213", description: "היסטוריה 5 יחידות - אירופה", details: "אירופה ועם ישראל, השואה", duration: 180, color: "from-orange-500 to-orange-600", points: "100", parts: ["היסטוריה"], entity: "GenericExam", order: 1 }]
+
     },
     "גאוגרפיה": {
       5: [
-        { id: "046511", title: "שאלון 046511", description: "גאוגרפיה עיונית", details: "אקלים, מים, אוכלוסייה, ישראל", duration: 180, color: "from-cyan-500 to-cyan-600", points: "100", parts: ["גאוגרפיה"], entity: "GenericExam", order: 0 },
-        { id: "046512", title: "שאלון 046512", description: "מפות ונתונים", details: "קריאת מפות, ניתוח נתונים", duration: 120, color: "from-sky-500 to-sky-600", points: "100", parts: ["מפות"], entity: "GenericExam", order: 1 },
-        { id: "046581", title: "שאלון 046581", description: "עבודת חקר", details: "מחקר שטח", duration: 120, color: "from-teal-500 to-teal-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }
-      ]
+      { id: "046511", title: "שאלון 046511", description: "גאוגרפיה עיונית", details: "אקלים, מים, אוכלוסייה, ישראל", duration: 180, color: "from-cyan-500 to-cyan-600", points: "100", parts: ["גאוגרפיה"], entity: "GenericExam", order: 0 },
+      { id: "046512", title: "שאלון 046512", description: "מפות ונתונים", details: "קריאת מפות, ניתוח נתונים", duration: 120, color: "from-sky-500 to-sky-600", points: "100", parts: ["מפות"], entity: "GenericExam", order: 1 },
+      { id: "046581", title: "שאלון 046581", description: "עבודת חקר", details: "מחקר שטח", duration: 120, color: "from-teal-500 to-teal-600", points: "100", parts: ["חקר"], entity: "GenericExam", order: 2 }]
+
     },
     "אזרחות": {
       2: [
-        { id: "1121", title: "שאלון 1121", description: "שאלון חובה", details: "דמוקרטיה, זכויות אדם, מוסדות", duration: 120, color: "from-indigo-500 to-indigo-600", points: "70", parts: ["אזרחות"], entity: "GenericExam", order: 0 },
-        { id: "1122", title: "שאלון 1122", description: "שאלון פתוח", details: "חוקי יסוד, השלטון בישראל", duration: 90, color: "from-violet-500 to-violet-600", points: "30", parts: ["אזרחות"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "1121", title: "שאלון 1121", description: "שאלון חובה", details: "דמוקרטיה, זכויות אדם, מוסדות", duration: 120, color: "from-indigo-500 to-indigo-600", points: "70", parts: ["אזרחות"], entity: "GenericExam", order: 0 },
+      { id: "1122", title: "שאלון 1122", description: "שאלון פתוח", details: "חוקי יסוד, השלטון בישראל", duration: 90, color: "from-violet-500 to-violet-600", points: "30", parts: ["אזרחות"], entity: "GenericExam", order: 1 }]
+
     },
     "תנ\"ך": {
       2: [
-        { id: "1211", title: "שאלון 1211", description: "תנ\"ך 2 יחידות", details: "שמואל, מלכים, נביאים", duration: 180, color: "from-rose-500 to-rose-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 0 }
-      ],
+      { id: "1211", title: "שאלון 1211", description: "תנ\"ך 2 יחידות", details: "שמואל, מלכים, נביאים", duration: 180, color: "from-rose-500 to-rose-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 0 }],
+
       5: [
-        { id: "1212", title: "שאלון 1212", description: "תנ\"ך 5 יחידות - חלק א'", details: "שמואל, פילוג הממלכה", duration: 180, color: "from-red-500 to-red-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 0 },
-        { id: "1213", title: "שאלון 1213", description: "תנ\"ך 5 יחידות - חלק ב'", details: "מלכים, נביאים אחרונים", duration: 180, color: "from-pink-500 to-pink-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 1 }
-      ]
+      { id: "1212", title: "שאלון 1212", description: "תנ\"ך 5 יחידות - חלק א'", details: "שמואל, פילוג הממלכה", duration: 180, color: "from-red-500 to-red-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 0 },
+      { id: "1213", title: "שאלון 1213", description: "תנ\"ך 5 יחידות - חלק ב'", details: "מלכים, נביאים אחרונים", duration: 180, color: "from-pink-500 to-pink-600", points: "100", parts: ["תנ\"ך"], entity: "GenericExam", order: 1 }]
+
     }
   };
 
@@ -166,9 +166,9 @@ export default function ExamsPage() {
     queryKey: ['custom-modules', displaySubject, displayUnits],
     queryFn: async () => {
       const all = await base44.entities.ModuleDefinition.list();
-      return all.filter(m => m.subject === displaySubject && parseInt(m.unit_level) === parseInt(displayUnits));
+      return all.filter((m) => m.subject === displaySubject && parseInt(m.unit_level) === parseInt(displayUnits));
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000
   });
 
   const currentModules = useMemo(() => {
@@ -176,12 +176,12 @@ export default function ExamsPage() {
     const modulesMap = new Map();
 
     // Add default modules
-    defaultMods.forEach(mod => {
+    defaultMods.forEach((mod) => {
       modulesMap.set(mod.id, mod);
     });
 
     // Override with custom modules and add new ones
-    customModules.forEach(customMod => {
+    customModules.forEach((customMod) => {
       const existing = modulesMap.get(customMod.module_id);
       if (existing) {
         // Update existing default module
@@ -254,7 +254,7 @@ export default function ExamsPage() {
       if (!user?.email || isLoading) return [];
       const allAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
       return allAttempts.filter((attempt) =>
-        attempt.subject === displaySubject && parseInt(attempt.unit_level) === parseInt(displayUnits)
+      attempt.subject === displaySubject && parseInt(attempt.unit_level) === parseInt(displayUnits)
       );
     },
     enabled: !!user?.email && !isLoading
@@ -282,7 +282,7 @@ export default function ExamsPage() {
     if (!editingModuleData) return;
 
     try {
-      const existing = customModules.find(m => m.module_id === editingModuleData.module_id);
+      const existing = customModules.find((m) => m.module_id === editingModuleData.module_id);
 
       const moduleData = {
         subject: editingModuleData.subject,
@@ -294,7 +294,7 @@ export default function ExamsPage() {
         duration: parseInt(editingModuleData.duration),
         points: editingModuleData.points,
         color: editingModuleData.color,
-        parts: editingModuleData.parts.split(',').map(p => p.trim()).filter(Boolean),
+        parts: editingModuleData.parts.split(',').map((p) => p.trim()).filter(Boolean),
         entity: editingModuleData.entity,
         order: editingModuleData.order
       };
@@ -320,7 +320,7 @@ export default function ExamsPage() {
     if (!confirm(`האם אתה בטוח שברצונך למחוק את המודול '${editingModuleData?.title}'? פעולה זו בלתי הפיכה.`)) return;
 
     try {
-      const existing = customModules.find(m => m.module_id === moduleId);
+      const existing = customModules.find((m) => m.module_id === moduleId);
       if (existing) {
         await base44.entities.ModuleDefinition.delete(existing.id);
         queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
@@ -367,7 +367,7 @@ export default function ExamsPage() {
         duration: parseInt(editingModuleData.duration) || 90,
         points: editingModuleData.points || '100',
         color: editingModuleData.color || 'from-blue-500 to-indigo-600',
-        parts: editingModuleData.parts ? editingModuleData.parts.split(',').map(p => p.trim()).filter(Boolean) : [],
+        parts: editingModuleData.parts ? editingModuleData.parts.split(',').map((p) => p.trim()).filter(Boolean) : [],
         entity: editingModuleData.entity || 'GenericExam',
         order: parseInt(editingModuleData.order) || 999
       };
@@ -468,58 +468,58 @@ export default function ExamsPage() {
     if (displaySubject === 'אנגלית') {
       if (moduleId === "A") {
         const moduleAExams = allModuleAExams.filter((e) =>
-          e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
+        e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
         ).map((e) => ({ ...e, exam_type: "module_a" }));
-        
+
         const genericExamsA = allGenericExams.filter((e) =>
-          e.subject === displaySubject &&
-          parseInt(e.unit_level) === parseInt(displayUnits) &&
-          e.module_id === moduleId
+        e.subject === displaySubject &&
+        parseInt(e.unit_level) === parseInt(displayUnits) &&
+        e.module_id === moduleId
         ).map((e) => ({ ...e, exam_type: "generic" }));
-        
+
         exams = [...moduleAExams, ...genericExamsA];
       } else if (moduleId === "B") {
         const moduleBExams = allModuleBExams.filter((e) =>
-          e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
+        e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
         ).map((e) => ({ ...e, exam_type: "module_b" }));
-        
+
         const genericExamsB = allGenericExams.filter((e) =>
-          e.subject === displaySubject &&
-          parseInt(e.unit_level) === parseInt(displayUnits) &&
-          e.module_id === moduleId
+        e.subject === displaySubject &&
+        parseInt(e.unit_level) === parseInt(displayUnits) &&
+        e.module_id === moduleId
         ).map((e) => ({ ...e, exam_type: "generic" }));
-        
+
         exams = [...moduleBExams, ...genericExamsB];
       } else if (moduleId === "C") {
         const moduleCExams = allModuleCExams.filter((e) => {
           const examUnits = parseInt(e.unit_level || e.units);
           return e.subject === displaySubject && examUnits === parseInt(displayUnits);
         }).map((e) => ({ ...e, exam_type: "module_c" }));
-        
+
         const genericExamsC = allGenericExams.filter((e) =>
-          e.subject === displaySubject &&
-          parseInt(e.unit_level) === parseInt(displayUnits) &&
-          e.module_id === moduleId
+        e.subject === displaySubject &&
+        parseInt(e.unit_level) === parseInt(displayUnits) &&
+        e.module_id === moduleId
         ).map((e) => ({ ...e, exam_type: "generic" }));
-        
+
         exams = [...moduleCExams, ...genericExamsC];
       } else {
         // עבור מודולים אחרים באנגלית (G, D, E, F וכו')
         exams = allGenericExams.filter((e) =>
-          e.subject === displaySubject &&
-          parseInt(e.unit_level) === parseInt(displayUnits) &&
-          e.module_id === moduleId
+        e.subject === displaySubject &&
+        parseInt(e.unit_level) === parseInt(displayUnits) &&
+        e.module_id === moduleId
         ).map((e) => ({ ...e, exam_type: "generic" }));
       }
     } else {
       exams = allGenericExams.filter((e) =>
-        e.subject === displaySubject &&
-        parseInt(e.unit_level) === parseInt(displayUnits) &&
-        e.module_id === moduleId
+      e.subject === displaySubject &&
+      parseInt(e.unit_level) === parseInt(displayUnits) &&
+      e.module_id === moduleId
       ).map((e) => ({ ...e, exam_type: "generic" }));
     }
 
-    console.log(`📋 Module ${moduleId} exams found:`, exams.length, exams.map(e => ({ id: e.id, title: e.title, type: e.exam_type })));
+    console.log(`📋 Module ${moduleId} exams found:`, exams.length, exams.map((e) => ({ id: e.id, title: e.title, type: e.exam_type })));
 
     exams.sort((a, b) => {
       const titleA = a.title || '';
@@ -556,7 +556,7 @@ export default function ExamsPage() {
   const handleExamClick = (exam) => {
     const totalAttempts = examAttempts.length;
     const isPremium = user?.is_premium === true;
-    
+
     if (!isPremium && totalAttempts >= 50) {
       alert("הגעת למגבלה של 50 מבחנים חינם! 🎓\nשדרג לפרימיום כדי להמשיך ללמוד ללא הגבלה.");
       navigate(createPageUrl("Premium"));
@@ -572,7 +572,7 @@ export default function ExamsPage() {
     console.log('✅ Navigating to exam:', exam.id, 'Type:', exam.exam_type);
 
     let targetPage = '';
-    
+
     if (exam.exam_type === "module_a") {
       targetPage = "ExamModuleA";
     } else if (exam.exam_type === "module_b") {
@@ -607,17 +607,17 @@ export default function ExamsPage() {
 
     const targetPath = createPageUrl(targetPage);
     const fullPath = `${targetPath}?examId=${encodeURIComponent(exam.id)}`;
-    
+
     console.log('📍 Navigating to:', fullPath);
     console.log('📍 examId being passed:', exam.id);
-    
+
     window.location.href = fullPath;
   };
 
   const handleRandomExam = (moduleId) => {
     const totalAttempts = examAttempts.length;
     const isPremium = user?.is_premium === true;
-    
+
     if (!isPremium && totalAttempts >= 50) {
       alert("הגעת למגבלה של 50 מבחנים חינם! 🎓\nשדרג לפרימיום כדי להמשיך ללמוד ללא הגבלה.");
       navigate(createPageUrl("Premium"));
@@ -625,9 +625,9 @@ export default function ExamsPage() {
     }
 
     const moduleExams = getModuleExams(moduleId);
-    
+
     if (!moduleExams || moduleExams.length === 0) {
-      const currentModule = currentModules.find(m => m.id === moduleId);
+      const currentModule = currentModules.find((m) => m.id === moduleId);
       const moduleName = currentModule ? currentModule.title : moduleId;
       alert(`אין מבחנים זמינים במודול ${moduleName}`);
       return;
@@ -637,14 +637,14 @@ export default function ExamsPage() {
     const unattemptedExams = moduleExams.filter((e) => !attemptedExamIds.includes(e.id));
 
     const examToStart = unattemptedExams.length > 0 ?
-      unattemptedExams[Math.floor(Math.random() * unattemptedExams.length)] :
-      moduleExams[Math.floor(Math.random() * moduleExams.length)];
+    unattemptedExams[Math.floor(Math.random() * unattemptedExams.length)] :
+    moduleExams[Math.floor(Math.random() * moduleExams.length)];
 
     if (examToStart) {
       console.log('✅ Starting random exam:', examToStart.id, 'Module:', moduleId);
       handleExamClick(examToStart);
     } else {
-      const currentModule = currentModules.find(m => m.id === moduleId);
+      const currentModule = currentModules.find((m) => m.id === moduleId);
       const moduleName = currentModule ? currentModule.title : moduleId;
       alert(`אין מבחנים זמינים במודול ${moduleName}`);
     }
@@ -757,29 +757,29 @@ export default function ExamsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
         <span className="sr-only">טוען...</span>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-blue-600 rounded-b-[2rem] p-4 shadow-xl mb-4 relative overflow-hidden"
-      >
+        className="bg-blue-600 rounded-b-[2rem] p-4 shadow-xl mb-4 relative overflow-hidden">
+
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
 
         <div className="relative z-10">
           <button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-2 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
-          >
+            className="flex items-center gap-2 hover:bg-white/10 rounded-lg p-2 transition-colors w-full">
+
             <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
               <FileCheck className="w-6 h-6 text-white" />
             </div>
@@ -796,8 +796,8 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-3xl p-3 shadow-2xl"
-        >
+          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-3 shadow-md">
+
           <div className="text-center">
             <h2 className="text-base font-bold text-white">
               מודלי בגרות {displayUnits} יחידות • {displaySubject}
@@ -808,8 +808,8 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.4 }}
-        >
+          transition={{ delay: 0.1, duration: 0.4 }}>
+
           <ModuleCarousel
             modules={currentModules}
             onSelectExam={(moduleId) => setShowAllExamsModule(moduleId)}
@@ -817,46 +817,47 @@ export default function ExamsPage() {
             onEditModule={user?.role === 'admin' ? handleEditModule : null}
             isPremium={isPremium}
             onUpgrade={() => navigate(createPageUrl("Premium"))}
-            examAttempts={examAttempts}
-          />
+            examAttempts={examAttempts} />
+
         </motion.div>
 
-        {isPremium && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
-          >
+        {isPremium &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-md overflow-hidden">
+
             <div className="bg-gradient-to-r from-orange-500 to-red-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
-                <h3 className="text-lg font-bold">מבחן מותאם בבגרות</h3>
+                <h3 className="text-lg font-bold">בגרות מותאמת אישית</h3>
                 <Crown className="w-5 h-5 text-yellow-300" />
               </div>
             </div>
 
             <div className="p-5 text-center">
               <p className="text-gray-700 text-sm mb-4">
-                בגרות מבוססת על הנושאים שבהם טעית בעבר, כדי לחזק בדיוק מה שצריך
+                מבחן שמבוסס על השאלות שבהן טעית בעבר, כדי לחזק בדיוק את מה שחסר לך
               </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                  onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-2xl rounded-2xl"
-                >
-                  <span>התחל בגרות</span>
+                onClick={() => navigate(createPageUrl("WeakExamSelection"))}
+                className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg">
+
+                  <Target className="w-5 h-5" />
+                  <span>בחר סוג מבחן</span>
                 </Button>
               </motion.div>
             </div>
           </motion.div>
-        )}
+        }
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-3xl shadow-2xl overflow-hidden mt-6"
-        >
+          className="bg-white rounded-2xl shadow-md overflow-hidden mt-6">
+
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
@@ -868,42 +869,42 @@ export default function ExamsPage() {
           </div>
 
           <div className="p-4">
-            {examAttempts.length > 0 ? (
-              <>
+            {examAttempts.length > 0 ?
+            <>
                 <div className="space-y-3">
                   {examAttempts.slice(0, 2).map((attempt, idx) => {
-                    const examData = allExamsMap.get(attempt.exam_id);
-                    const passed = attempt.score_percent >= 56;
-                    const hasMistakes = attempt.score_percent < 56;
+                  const examData = allExamsMap.get(attempt.exam_id);
+                  const passed = attempt.score_percent >= 56;
+                  const hasMistakes = attempt.score_percent < 56;
 
-                    return (
-                      <div key={attempt.id} className="space-y-2">
+                  return (
+                    <div key={attempt.id} className="space-y-2">
                         <motion.button
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + idx * 0.1 }}
-                          whileHover={{ scale: 1.02, x: -5 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            if (isPremium || unlockedAttempts.has(attempt.id)) {
-                              setShowAttemptDetails(attempt);
-                            } else {
-                              setShowAdDialog(attempt);
-                            }
-                          }}
-                          className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
-                        >
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + idx * 0.1 }}
+                        whileHover={{ scale: 1.02, x: -5 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          if (isPremium || unlockedAttempts.has(attempt.id)) {
+                            setShowAttemptDetails(attempt);
+                          } else {
+                            setShowAdDialog(attempt);
+                          }
+                        }}
+                        className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
+
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
-                              className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
-                              whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.5 }}
-                            >
-                              {passed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                              ) : (
-                                <X className="w-4 h-4 text-red-600" />
-                              )}
+                            className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}>
+
+                              {passed ?
+                            <CheckCircle className="w-4 h-4 text-green-600" /> :
+
+                            <X className="w-4 h-4 text-red-600" />
+                            }
                             </motion.div>
                             <div className="flex-1 text-right">
                               <div className="text-sm font-semibold text-gray-900">
@@ -911,91 +912,91 @@ export default function ExamsPage() {
                               </div>
                               <div className="text-xs text-gray-500">
                                 {new Date(attempt.created_date).toLocaleDateString('he-IL', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            {isPremium ? (
-                              <>
+                            {isPremium ?
+                          <>
                                 <motion.div
-                                  className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-                                >
+                              className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}>
+
                                   {Math.round(attempt.score_percent)}
                                 </motion.div>
                                 <div className="text-[10px] text-gray-500">
                                   {passed ? 'עבר' : 'נכשל'}
                                 </div>
-                              </>
-                            ) : (
-                              <div className="flex items-center gap-1">
+                              </> :
+
+                          <div className="flex items-center gap-1">
                                 <Lock className="w-5 h-5 text-gray-400" />
                               </div>
-                            )}
+                          }
                           </div>
                         </motion.button>
 
-                        {hasMistakes && isPremium && (
-                          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                        {hasMistakes && isPremium &&
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-4 h-4 text-orange-600" />
-                              <h4 className="font-bold text-gray-900 text-sm">מבחן מותאם ממבחן זה</h4>
+                              <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                             </div>
                             <p className="text-xs text-gray-600 mb-2">
                               חזור על השאלות שטעית בהן במבחן זה
                             </p>
                             <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                sessionStorage.setItem('weakExamSource', attempt.exam_id);
-                                navigate(createPageUrl("CustomWeakExam"));
-                              }}
-                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
-                            >
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            sessionStorage.setItem('weakExamSource', attempt.exam_id);
+                            navigate(createPageUrl("CustomWeakExam"));
+                          }}
+                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+
                               <Target className="w-3 h-3" />
-                              מבחן מותאם
+                              מבחן טעויות
                             </Button>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      }
+                      </div>);
+
+                })}
                 </div>
 
-                {examAttempts.length > 2 && (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {examAttempts.length > 2 &&
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
-                      onClick={() => setShowAllExams(true)}
-                      variant="outline"
-                      className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50 rounded-2xl"
-                    >
+                  onClick={() => setShowAllExams(true)}
+                  variant="outline"
+                  className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50">
+
                       צפה בכל המבחנים ({examAttempts.length})
                     </Button>
                   </motion.div>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-6 text-gray-500 text-sm">
+              }
+              </> :
+
+            <div className="text-center py-6 text-gray-500 text-sm">
                 טרם ביצעת מבחנים
               </div>
-            )}
+            }
           </div>
         </motion.div>
 
-        {!isPremium && practiceSessionsCount >= 40 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 border-2 border-amber-200 shadow-2xl"
-          >
+        {!isPremium && practiceSessionsCount >= 40 &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border-2 border-amber-200 shadow-md">
+
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
@@ -1007,72 +1008,72 @@ export default function ExamsPage() {
                 </p>
               </div>
               <Button
-                onClick={() => navigate(createPageUrl("Premium"))}
-                className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-xs font-bold rounded-2xl"
-              >
+              onClick={() => navigate(createPageUrl("Premium"))}
+              className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-xs font-bold">
+
                 <Crown className="w-4 h-4 mr-1" />
                 <span className="font-bold">שדרג</span>
               </Button>
             </div>
           </motion.div>
-        )}
+        }
 
-        {user?.role === 'admin' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-          >
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-4 border-2 border-green-200 shadow-2xl">
+        {user?.role === 'admin' &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-2 border-green-200 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">הוסף שאלון</h3>
                   <p className="text-xs text-gray-600">צור שאלון חדש</p>
                 </div>
                 <Button
-                  onClick={handleAddNewModule}
-                  className="bg-green-600 hover:bg-green-700 text-white h-9 text-sm"
-                >
+                onClick={handleAddNewModule}
+                className="bg-green-600 hover:bg-green-700 text-white h-9 text-sm">
+
                   <span>הוסף</span>
                   <BookCheck className="w-4 h-4 mr-2" />
                 </Button>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-3xl p-4 border-2 border-purple-200 shadow-2xl">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">ניהול מבחנים</h3>
                   <p className="text-xs text-gray-600">הוסף וערוך מבחנים</p>
                 </div>
                 <Button
-                  onClick={() => navigate(createPageUrl("AdminExams"))}
-                  className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm"
-                >
+                onClick={() => navigate(createPageUrl("AdminExams"))}
+                className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm">
+
                   <span>נהל</span>
                   <Upload className="w-4 h-4 mr-2" />
                 </Button>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-4 border-2 border-indigo-200 shadow-2xl">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 border-2 border-indigo-200 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">סדר מודולים</h3>
                   <p className="text-xs text-gray-600">שנה את סדר התצוגה</p>
                 </div>
                 <Button
-                  onClick={() => setShowModuleOrderDialog(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm"
-                >
+                onClick={() => setShowModuleOrderDialog(true)}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm">
+
                   <span>ערוך</span>
                   <Settings className="w-4 h-4 mr-2" />
                 </Button>
               </div>
             </div>
           </motion.div>
-        )}
+        }
       </div>
 
       <Dialog open={showAccessibilityDialog} onOpenChange={setShowAccessibilityDialog}>
@@ -1122,11 +1123,11 @@ export default function ExamsPage() {
               <span className="text-sm font-medium text-gray-700">ניגודיות גבוהה</span>
               <button
                 onClick={() => setHighContrast(!highContrast)}
-                className={`w-12 h-6 rounded-full transition-colors ${highContrast ? 'bg-blue-600' : 'bg-gray-300'} relative`}
-              >
+                className={`w-12 h-6 rounded-full transition-colors ${highContrast ? 'bg-blue-600' : 'bg-gray-300'} relative`}>
+
                 <div
-                  className={`dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${highContrast ? 'translate-x-6' : ''}`}
-                />
+                  className={`dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${highContrast ? 'translate-x-6' : ''}`} />
+
               </button>
             </div>
           </div>
@@ -1142,7 +1143,7 @@ export default function ExamsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!showAdDialog} onOpenChange={() => { setShowAdDialog(null); }}>
+      <Dialog open={!!showAdDialog} onOpenChange={() => {setShowAdDialog(null);}}>
         <DialogContent dir="rtl" className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">צפייה בציון המבחן</DialogTitle>
@@ -1161,13 +1162,13 @@ export default function ExamsPage() {
               <Button
                 onClick={async () => {
                   alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
-                  await new Promise(resolve => setTimeout(resolve, 2000));
-                  setUnlockedAttempts(prev => new Set([...prev, showAdDialog.id]));
+                  await new Promise((resolve) => setTimeout(resolve, 2000));
+                  setUnlockedAttempts((prev) => new Set([...prev, showAdDialog.id]));
                   setShowAttemptDetails(showAdDialog);
                   setShowAdDialog(null);
                 }}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold"
-              >
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold">
+
                 <Play className="w-5 h-5 mr-2" />
                 צפה בפרסומת
               </Button>
@@ -1193,8 +1194,8 @@ export default function ExamsPage() {
                   setShowAdDialog(null);
                   navigate(createPageUrl("Premium"));
                 }}
-                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold"
-              >
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold">
+
                 <Crown className="w-5 h-5 mr-2" />
                 שדרג עכשיו
               </Button>
@@ -1209,20 +1210,20 @@ export default function ExamsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!showAttemptDetails} onOpenChange={() => { setShowAttemptDetails(null); }}>
+      <Dialog open={!!showAttemptDetails} onOpenChange={() => {setShowAttemptDetails(null);}}>
         <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl">פרטי המבחן</DialogTitle>
-            {!isPremium && (
-              <DialogDescription className="flex items-center gap-2 text-green-600">
+            {!isPremium &&
+            <DialogDescription className="flex items-center gap-2 text-green-600">
                 <CheckCircle className="w-4 h-4" />
                 נפתח לאחר צפייה בפרסומת
               </DialogDescription>
-            )}
+            }
           </DialogHeader>
 
-          {showAttemptDetails && (
-            <div className="space-y-4">
+          {showAttemptDetails &&
+          <div className="space-y-4">
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
@@ -1240,9 +1241,9 @@ export default function ExamsPage() {
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
                       {new Date(showAttemptDetails.created_date).toLocaleDateString('he-IL', {
-                        day: 'numeric',
-                        month: 'short'
-                      })}
+                      day: 'numeric',
+                      month: 'short'
+                    })}
                     </div>
                     <div className="text-xs text-gray-600">תאריך</div>
                   </div>
@@ -1256,92 +1257,92 @@ export default function ExamsPage() {
                 </h3>
 
                 <div className="space-y-3">
-                  {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) => (
-                    <div
-                      key={idx}
-                      className={`rounded-xl p-4 border-2 ${
-                        answer.is_correct
-                          ? 'bg-green-50 border-green-200'
-                          : 'bg-red-50 border-red-200'
-                      }`}
-                    >
+                  {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) =>
+                <div
+                  key={idx}
+                  className={`rounded-xl p-4 border-2 ${
+                  answer.is_correct ?
+                  'bg-green-50 border-green-200' :
+                  'bg-red-50 border-red-200'}`
+                  }>
+
                       <div className="font-semibold text-gray-900 mb-2">שאלה {idx + 1}</div>
                       <div className="flex gap-2 text-sm mb-2">
                         <span className={answer.is_correct ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
                           תשובתך: {answer.user_answer || 'לא נענה'}
                         </span>
                       </div>
-                      {!answer.is_correct && answer.correct_answer && (
-                        <div className="text-sm text-green-700 font-semibold mt-1">
+                      {!answer.is_correct && answer.correct_answer &&
+                  <div className="text-sm text-green-700 font-semibold mt-1">
                           תשובה נכונה: {answer.correct_answer}
                         </div>
-                      )}
-                      {answer.explanation && (
-                        <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
+                  }
+                      {answer.explanation &&
+                  <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
                           <div className="font-semibold text-blue-600 mb-1">הסבר:</div>
                           {answer.explanation}
                         </div>
-                      )}
+                  }
                     </div>
-                  ))}
+                )}
 
-                  {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) && (
-                    <div className="text-center text-gray-500 text-sm py-4">
+                  {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) &&
+                <div className="text-center text-gray-500 text-sm py-4">
                       נתונים מפורטים יופיעו לאחר ביצוע המבחן
                     </div>
-                  )}
+                }
                 </div>
               </div>
 
               {showAttemptDetails.answers && showAttemptDetails.answers.length > 0 && (() => {
-                const wrongAnswers = showAttemptDetails.answers.filter(a => !a.is_correct);
-                const weakTopicsFromExam = {};
+              const wrongAnswers = showAttemptDetails.answers.filter((a) => !a.is_correct);
+              const weakTopicsFromExam = {};
 
-                wrongAnswers.forEach(answer => {
-                  const topicKey = answer.topic_key || 'כללי';
-                  if (!weakTopicsFromExam[topicKey]) {
-                    weakTopicsFromExam[topicKey] = 0;
-                  }
-                  weakTopicsFromExam[topicKey]++;
-                });
+              wrongAnswers.forEach((answer) => {
+                const topicKey = answer.topic_key || 'כללי';
+                if (!weakTopicsFromExam[topicKey]) {
+                  weakTopicsFromExam[topicKey] = 0;
+                }
+                weakTopicsFromExam[topicKey]++;
+              });
 
-                const sortedWeakTopics = Object.entries(weakTopicsFromExam)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 3);
+              const sortedWeakTopics = Object.entries(weakTopicsFromExam).
+              sort((a, b) => b[1] - a[1]).
+              slice(0, 3);
 
-                return sortedWeakTopics.length > 0 && (
-                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border-2 border-orange-200">
+              return sortedWeakTopics.length > 0 &&
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border-2 border-orange-200">
                     <div className="flex items-center gap-2 mb-3">
                       <Crown className="w-5 h-5 text-orange-600" />
                       <h4 className="font-bold text-gray-900">מבחן מותאם לטעויות שלך</h4>
                     </div>
                     <div className="space-y-2">
-                      {sortedWeakTopics.map(([topic, count]) => (
-                        <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
+                      {sortedWeakTopics.map(([topic, count]) =>
+                  <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
                           <span className="text-sm font-semibold text-gray-900">{topic}</span>
                           <span className="text-xs text-orange-600 font-bold">{count} טעויות</span>
                         </div>
-                      ))}
+                  )}
                     </div>
                     <Button
-                      onClick={() => {
-                        setShowAttemptDetails(null);
-                        if (isPremium) {
-                          navigate(createPageUrl("WeakExamSelection"));
-                        } else {
-                          navigate(createPageUrl("Premium"));
-                        }
-                      }}
-                      className="w-full mt-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2"
-                    >
+                  onClick={() => {
+                    setShowAttemptDetails(null);
+                    if (isPremium) {
+                      navigate(createPageUrl("WeakExamSelection"));
+                    } else {
+                      navigate(createPageUrl("Premium"));
+                    }
+                  }}
+                  className="w-full mt-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+
                       <Target className="w-4 h-4" />
                       {isPremium ? 'מבחן טעויות מבגרויות' : '🔒 שדרג לפרימיום'}
                     </Button>
-                  </div>
-                );
-              })()}
+                  </div>;
+
+            })()}
             </div>
-          )}
+          }
 
           <DialogFooter>
             <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
@@ -1363,15 +1364,15 @@ export default function ExamsPage() {
           </DialogHeader>
 
           <div className="space-y-2 overflow-y-auto max-h-[50vh] px-1">
-            {showAllExamsModule && getModuleExams(showAllExamsModule).map((exam) => (
-              <button
-                key={exam.id}
-                onClick={() => {
-                  setShowAllExamsModule(null);
-                  handleExamClick(exam);
-                }}
-                className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-200 hover:border-blue-400 flex items-center justify-between group shadow-sm hover:shadow-md"
-              >
+            {showAllExamsModule && getModuleExams(showAllExamsModule).map((exam) =>
+            <button
+              key={exam.id}
+              onClick={() => {
+                setShowAllExamsModule(null);
+                handleExamClick(exam);
+              }}
+              className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-200 hover:border-blue-400 flex items-center justify-between group shadow-sm hover:shadow-md">
+
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 break-words">
                     {exam.title}
@@ -1382,14 +1383,14 @@ export default function ExamsPage() {
                 </div>
                 <ChevronLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
               </button>
-            ))}
+            )}
           </div>
 
           <DialogFooter className="mt-4">
             <Button
               onClick={() => setShowAllExamsModule(null)}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-            >
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+
               סגור
             </Button>
           </DialogFooter>
@@ -1408,8 +1409,8 @@ export default function ExamsPage() {
               const passed = attempt.score_percent >= 56;
               const hasMistakes = attempt.score_percent < 56;
               const moduleInfo = currentModules.find((m) =>
-                m.entity === (attempt.exam_type === 'module_a' ? 'ModuleAExam' : attempt.exam_type === 'module_b' ? 'ModuleBExam' : attempt.exam_type === 'module_c' ? 'ModuleCExam' : attempt.exam_type === 'generic' ? 'GenericExam' : undefined)
-                || m.id === attempt.module_id);
+              m.entity === (attempt.exam_type === 'module_a' ? 'ModuleAExam' : attempt.exam_type === 'module_b' ? 'ModuleBExam' : attempt.exam_type === 'module_c' ? 'ModuleCExam' : attempt.exam_type === 'generic' ? 'GenericExam' : undefined) ||
+              m.id === attempt.module_id);
               const examTypeName = moduleInfo ? moduleInfo.title : 'מבחן בגרות';
 
               return (
@@ -1423,15 +1424,15 @@ export default function ExamsPage() {
                         setShowAdDialog(attempt);
                       }
                     }}
-                    className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
-                  >
+                    className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
+
                     <div className="flex items-center gap-3 flex-1">
                       <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}>
-                        {passed ? (
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <X className="w-4 h-4 text-red-600" />
-                        )}
+                        {passed ?
+                        <CheckCircle className="w-4 h-4 text-green-600" /> :
+
+                        <X className="w-4 h-4 text-red-600" />
+                        }
                       </div>
                       <div className="text-right flex-1">
                         <div className="text-sm font-semibold text-gray-900">
@@ -1450,60 +1451,60 @@ export default function ExamsPage() {
                     </div>
 
                     <div className="text-right">
-                      {isPremium ? (
-                        <>
+                      {isPremium ?
+                      <>
                           <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
                             {Math.round(attempt.score_percent)}
                           </div>
                           <div className="text-[10px] text-gray-500">
                             {passed ? 'עבר' : 'נכשל'}
                           </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-1">
+                        </> :
+
+                      <div className="flex items-center gap-1">
                           <Lock className="w-5 h-5 text-gray-400" />
                         </div>
-                      )}
+                      }
                     </div>
                   </button>
 
-                  {hasMistakes && (
-                    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                  {hasMistakes &&
+                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                       <div className="flex items-center gap-2 mb-2">
                         <Crown className="w-4 h-4 text-orange-600" />
-                        <h4 className="font-bold text-gray-900 text-sm">מבחן מותאם ממבחן זה</h4>
+                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         חזור על השאלות שטעית בהן במבחן זה
                       </p>
                       <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowAllExams(false);
-                          if (isPremium) {
-                            navigate(createPageUrl("CustomWeakExam"));
-                          } else {
-                            navigate(createPageUrl("Premium"));
-                          }
-                        }}
-                        className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
-                      >
-                        {isPremium ? (
-                          <>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowAllExams(false);
+                        if (isPremium) {
+                          navigate(createPageUrl("CustomWeakExam"));
+                        } else {
+                          navigate(createPageUrl("Premium"));
+                        }
+                      }}
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+
+                        {isPremium ?
+                      <>
                             <Target className="w-3 h-3" />
-                            <span>מבחן מותאם</span>
-                          </>
-                        ) : (
-                          <>
+                            <span>מבחן טעויות</span>
+                          </> :
+
+                      <>
                             <Lock className="w-3 h-3" />
                             <span>שדרג לפרימיום</span>
                           </>
-                        )}
+                      }
                       </Button>
                     </div>
-                  )}
-                </div>
-              );
+                  }
+                </div>);
+
             })}
           </div>
 
@@ -1514,8 +1515,8 @@ export default function ExamsPage() {
             <Button
               onClick={handleDeleteAllAttempts}
               variant="destructive"
-              className="w-full sm:w-auto bg-red-500 hover:bg-red-600 flex items-center justify-center gap-2"
-            >
+              className="w-full sm:w-auto bg-red-500 hover:bg-red-600 flex items-center justify-center gap-2">
+
               <Trash2 className="w-4 h-4 mr-2" />
               מחק הכל
             </Button>
@@ -1540,8 +1541,8 @@ export default function ExamsPage() {
               return (
                 <div
                   key={moduleId}
-                  className={`flex items-center justify-between p-3 rounded-xl border-2 bg-gradient-to-r ${module.color} bg-opacity-10`}
-                >
+                  className={`flex items-center justify-between p-3 rounded-xl border-2 bg-gradient-to-r ${module.color} bg-opacity-10`}>
+
                   <div className="flex items-center gap-3 flex-1">
                     <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-bold text-gray-900 text-sm">
                       {index + 1}
@@ -1558,8 +1559,8 @@ export default function ExamsPage() {
                       size="sm"
                       onClick={() => moveModule(index, 'up')}
                       disabled={index === 0}
-                      className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100"
-                    >
+                      className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100">
+
                       <ChevronUp className="w-4 h-4" />
                     </Button>
                     <Button
@@ -1567,13 +1568,13 @@ export default function ExamsPage() {
                       size="sm"
                       onClick={() => moveModule(index, 'down')}
                       disabled={index === moduleOrder.length - 1}
-                      className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100"
-                    >
+                      className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100">
+
                       <ChevronDown className="w-4 h-4" />
                     </Button>
                   </div>
-                </div>
-              );
+                </div>);
+
             })}
           </div>
 
@@ -1600,19 +1601,19 @@ export default function ExamsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {editingModuleData && (
-            <div className="space-y-4 py-4">
+          {editingModuleData &&
+          <div className="space-y-4 py-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   מזהה שאלון (Module ID) *
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.module_id}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, module_id: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: D, E, F או 807"
-                />
+                type="text"
+                value={editingModuleData.module_id}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, module_id: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: D, E, F או 807" />
+
                 <p className="text-xs text-gray-500 mt-1">מזהה ייחודי באותיות או מספרים</p>
               </div>
 
@@ -1621,12 +1622,12 @@ export default function ExamsPage() {
                   כותרת השאלון *
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.title}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, title: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: מודול D או שאלון 807"
-                />
+                type="text"
+                value={editingModuleData.title}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, title: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: מודול D או שאלון 807" />
+
               </div>
 
               <div>
@@ -1634,12 +1635,12 @@ export default function ExamsPage() {
                   תיאור קצר
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.description}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, description: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: כתיבה מתקדמת"
-                />
+                type="text"
+                value={editingModuleData.description}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, description: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: כתיבה מתקדמת" />
+
               </div>
 
               <div>
@@ -1647,11 +1648,11 @@ export default function ExamsPage() {
                   פרטים מלאים
                 </label>
                 <Textarea
-                  value={editingModuleData.details}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, details: e.target.value})}
-                  className="w-full h-20"
-                  placeholder="פירוט מלא של מבנה השאלון"
-                />
+                value={editingModuleData.details}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, details: e.target.value })}
+                className="w-full h-20"
+                placeholder="פירוט מלא של מבנה השאלון" />
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1660,11 +1661,11 @@ export default function ExamsPage() {
                     משך זמן (דקות)
                   </label>
                   <Input
-                    type="number"
-                    value={editingModuleData.duration}
-                    onChange={(e) => setEditingModuleData({...editingModuleData, duration: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
+                  type="number"
+                  value={editingModuleData.duration}
+                  onChange={(e) => setEditingModuleData({ ...editingModuleData, duration: parseInt(e.target.value) })}
+                  className="w-full" />
+
                 </div>
 
                 <div>
@@ -1672,12 +1673,12 @@ export default function ExamsPage() {
                     נקודות
                   </label>
                   <Input
-                    type="text"
-                    value={editingModuleData.points}
-                    onChange={(e) => setEditingModuleData({...editingModuleData, points: e.target.value})}
-                    className="w-full"
-                    placeholder="100 או 70 + 30"
-                  />
+                  type="text"
+                  value={editingModuleData.points}
+                  onChange={(e) => setEditingModuleData({ ...editingModuleData, points: e.target.value })}
+                  className="w-full"
+                  placeholder="100 או 70 + 30" />
+
                 </div>
               </div>
 
@@ -1686,12 +1687,12 @@ export default function ExamsPage() {
                   חלקי השאלון (מופרדים בפסיקים)
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.parts}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, parts: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: Reading, Writing"
-                />
+                type="text"
+                value={editingModuleData.parts}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, parts: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: Reading, Writing" />
+
               </div>
 
               <div>
@@ -1699,9 +1700,9 @@ export default function ExamsPage() {
                   Entity (סוג מבחן)
                 </label>
                 <Select
-                  value={editingModuleData.entity}
-                  onValueChange={(value) => setEditingModuleData({...editingModuleData, entity: value})}
-                >
+                value={editingModuleData.entity}
+                onValueChange={(value) => setEditingModuleData({ ...editingModuleData, entity: value })}>
+
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="בחר entity" />
                   </SelectTrigger>
@@ -1719,9 +1720,9 @@ export default function ExamsPage() {
                   צבע רקע (Tailwind Gradient)
                 </label>
                 <Select
-                  value={editingModuleData.color}
-                  onValueChange={(value) => setEditingModuleData({...editingModuleData, color: value})}
-                >
+                value={editingModuleData.color}
+                onValueChange={(value) => setEditingModuleData({ ...editingModuleData, color: value })}>
+
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="בחר צבע" />
                   </SelectTrigger>
@@ -1743,11 +1744,11 @@ export default function ExamsPage() {
                   סדר תצוגה
                 </label>
                 <Input
-                  type="number"
-                  value={editingModuleData.order}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, order: parseInt(e.target.value)})}
-                  className="w-full"
-                />
+                type="number"
+                value={editingModuleData.order}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, order: parseInt(e.target.value) })}
+                className="w-full" />
+
               </div>
 
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
@@ -1756,7 +1757,7 @@ export default function ExamsPage() {
                 </div>
               </div>
             </div>
-          )}
+          }
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddModuleDialog(false)}>
@@ -1782,19 +1783,19 @@ export default function ExamsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {editingModuleData && (
-            <div className="space-y-4 py-4">
+          {editingModuleData &&
+          <div className="space-y-4 py-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   כותרת המודול
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.title}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, title: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: מודול A"
-                />
+                type="text"
+                value={editingModuleData.title}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, title: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: מודול A" />
+
               </div>
 
               <div>
@@ -1802,12 +1803,12 @@ export default function ExamsPage() {
                   תיאור קצר
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.description}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, description: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: הבנת הנקרא + האזנה"
-                />
+                type="text"
+                value={editingModuleData.description}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, description: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: הבנת הנקרא + האזנה" />
+
               </div>
 
               <div>
@@ -1815,11 +1816,11 @@ export default function ExamsPage() {
                   פרטים מלאים
                 </label>
                 <Textarea
-                  value={editingModuleData.details}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, details: e.target.value})}
-                  className="w-full h-20"
-                  placeholder="לדוגמה: 70 נק' הבנת נקרא + 30 נק' האזנה"
-                />
+                value={editingModuleData.details}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, details: e.target.value })}
+                className="w-full h-20"
+                placeholder="לדוגמה: 70 נק' הבנת נקרא + 30 נק' האזנה" />
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1828,11 +1829,11 @@ export default function ExamsPage() {
                     משך זמן (דקות)
                   </label>
                   <Input
-                    type="number"
-                    value={editingModuleData.duration}
-                    onChange={(e) => setEditingModuleData({...editingModuleData, duration: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
+                  type="number"
+                  value={editingModuleData.duration}
+                  onChange={(e) => setEditingModuleData({ ...editingModuleData, duration: parseInt(e.target.value) })}
+                  className="w-full" />
+
                 </div>
 
                 <div>
@@ -1840,12 +1841,12 @@ export default function ExamsPage() {
                     נקודות
                   </label>
                   <Input
-                    type="text"
-                    value={editingModuleData.points}
-                    onChange={(e) => setEditingModuleData({...editingModuleData, points: e.target.value})}
-                    className="w-full"
-                    placeholder="לדוגמה: 70 + 30"
-                  />
+                  type="text"
+                  value={editingModuleData.points}
+                  onChange={(e) => setEditingModuleData({ ...editingModuleData, points: e.target.value })}
+                  className="w-full"
+                  placeholder="לדוגמה: 70 + 30" />
+
                 </div>
               </div>
 
@@ -1854,12 +1855,12 @@ export default function ExamsPage() {
                   חלקי המודול (מופרדים בפסיקים)
                 </label>
                 <Input
-                  type="text"
-                  value={editingModuleData.parts}
-                  onChange={(e) => setEditingModuleData({...editingModuleData, parts: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: Reading Comprehension, Listening"
-                />
+                type="text"
+                value={editingModuleData.parts}
+                onChange={(e) => setEditingModuleData({ ...editingModuleData, parts: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: Reading Comprehension, Listening" />
+
               </div>
 
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
@@ -1871,19 +1872,19 @@ export default function ExamsPage() {
                 </div>
               </div>
             </div>
-          )}
+          }
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowModuleEditDialog(false)}>
               ביטול
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={() => {
                 handleDeleteModule(editingModuleData.module_id);
                 setShowModuleEditDialog(false);
-              }}
-            >
+              }}>
+
               <Trash2 className="w-4 h-4 mr-2" />
               מחק מודול
             </Button>
@@ -1894,6 +1895,6 @@ export default function ExamsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
