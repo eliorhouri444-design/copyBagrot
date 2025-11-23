@@ -798,7 +798,7 @@ export default function StatisticsPage() {
 
                 {statistics.failedExams.length > 0 && (
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                    onClick={() => navigate(createPageUrl("CustomWeakExamBuilder"))}
                     className="h-16 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
                   >
                     <div className="flex items-center gap-3 flex-1">

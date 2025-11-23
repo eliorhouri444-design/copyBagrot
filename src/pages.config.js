@@ -55,6 +55,7 @@ import CustomWeakExam from './pages/CustomWeakExam';
 import CustomWeakPractice from './pages/CustomWeakPractice';
 import StudyPlanner from './pages/StudyPlanner';
 import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
+import CustomWeakExamBuilder from './pages/CustomWeakExamBuilder';
 import __Layout from './Layout.jsx';
 
 
@@ -116,6 +117,7 @@ export const PAGES = {
     "CustomWeakPractice": CustomWeakPractice,
     "StudyPlanner": StudyPlanner,
     "CustomPracticeBuilder": CustomPracticeBuilder,
+    "CustomWeakExamBuilder": CustomWeakExamBuilder,
 }
 
 export const pagesConfig = {

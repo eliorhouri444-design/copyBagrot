@@ -401,7 +401,7 @@ export default function HomePage() {
       title: "בגרות מותאמת",
       description: "שאלות שטעית בהן",
       color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("CustomWeakExam")),
+      onClick: () => navigate(createPageUrl("CustomWeakExamBuilder")),
       delay: 0.5
       },
       {
