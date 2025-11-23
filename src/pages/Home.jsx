@@ -389,36 +389,12 @@ export default function HomePage() {
       delay: 0.4
     },
     {
-      icon: Zap,
-      title: "תרגול מותאם",
-      description: "נושאים שטעית בהם",
-      color: "from-purple-500 to-pink-600",
-      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
-      delay: 0.45
-    },
-    {
       icon: Target,
       title: "בגרות מותאמת",
       description: "שאלות שטעית בהן",
       color: "from-orange-500 to-red-600",
       onClick: () => navigate(createPageUrl("CustomWeakExamBuilder")),
-      delay: 0.5
-      },
-      {
-      icon: Calendar,
-      title: "תכנון לימודים",
-      description: "ארגן את הזמן שלך",
-      color: "from-green-500 to-emerald-600",
-      onClick: () => navigate(createPageUrl("StudyPlanner")),
-      delay: 0.55
-      },
-      {
-      icon: Target,
-      title: "תרגול מותאם",
-      description: "בנה תרגול בעצמך",
-      color: "from-cyan-500 to-blue-600",
-      onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
-      delay: 0.6
+      delay: 0.45
       }
       ];
 
