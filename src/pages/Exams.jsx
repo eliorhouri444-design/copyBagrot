@@ -960,8 +960,7 @@ export default function ExamsPage() {
                           }}
                           className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
 
-                              <Target className="w-3 h-3" />
-                              מבחן טעויות
+                              בגרות אישית
                             </Button>
                           </div>
                       }
@@ -1335,8 +1334,7 @@ export default function ExamsPage() {
                   }}
                   className="w-full mt-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
-                      <Target className="w-4 h-4" />
-                      {isPremium ? 'מבחן טעויות מבגרויות' : '🔒 שדרג לפרימיום'}
+                      {isPremium ? 'בגרות אישית' : '🔒 שדרג לפרימיום'}
                     </Button>
                   </div>;
 
@@ -1490,10 +1488,7 @@ export default function ExamsPage() {
                       className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
 
                         {isPremium ?
-                      <>
-                            <Target className="w-3 h-3" />
-                            <span>מבחן טעויות</span>
-                          </> :
+                      <span>בגרות אישית</span> :
 
                       <>
                             <Lock className="w-3 h-3" />
