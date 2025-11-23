@@ -22,7 +22,8 @@ function LayoutContent({ children, currentPageName }) {
     'TopicPracticeNew',
     'ExtendedReading',
     'Onboarding',
-    'SubjectSelection'
+    'SubjectSelection',
+    'CustomWeakExam'
   ].includes(currentPageName);
   
   useEffect(() => {
