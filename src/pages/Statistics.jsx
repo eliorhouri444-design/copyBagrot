@@ -330,7 +330,7 @@ export default function StatisticsPage() {
   const hasData = statistics.totalPractice > 0 || statistics.totalExams > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -359,7 +359,7 @@ export default function StatisticsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md mx-auto"
+            className="bg-white rounded-3xl shadow-2xl p-8 text-center max-w-md mx-auto"
           >
             <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <BarChart3 className="w-12 h-12 text-purple-600" />
@@ -373,7 +373,7 @@ export default function StatisticsPage() {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full h-14 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg font-bold shadow-lg"
+                className="w-full h-14 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg font-bold shadow-2xl rounded-2xl"
               >
                 <BookOpen className="w-5 h-5 ml-2" />
                 התחל תרגול
@@ -381,7 +381,7 @@ export default function StatisticsPage() {
               <Button
                 onClick={() => navigate(createPageUrl("Exams"))}
                 variant="outline"
-                className="w-full h-14 border-2 border-purple-300 text-purple-700 hover:bg-purple-50 text-lg font-bold"
+                className="w-full h-14 border-2 border-purple-300 text-purple-700 hover:bg-purple-50 text-lg font-bold rounded-2xl"
               >
                 <FileCheck className="w-5 h-5 ml-2" />
                 עבור לבגרויות
@@ -396,7 +396,7 @@ export default function StatisticsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative"
+            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl shadow-2xl p-6 text-white overflow-hidden relative"
           >
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
