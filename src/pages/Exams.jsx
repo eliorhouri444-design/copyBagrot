@@ -769,7 +769,7 @@ export default function ExamsPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        transition={{ duration: 0.4 }}
         className="bg-blue-600 rounded-b-[2rem] p-4 shadow-xl mb-4 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
@@ -795,7 +795,7 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 120, damping: 15 }}
+          transition={{ duration: 0.3 }}
           className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-3 shadow-md"
         >
           <div className="text-center">
@@ -808,7 +808,7 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
         >
           <ModuleCarousel
             modules={currentModules}

@@ -263,7 +263,7 @@ export default function PracticePage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        transition={{ duration: 0.3 }}
         className={`${headerColor} rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden`}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
@@ -291,7 +291,7 @@ export default function PracticePage() {
           key={`${displaySubject}_${displayUnits}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
+          transition={{ delay: 0.1 }}
         >
           <TopicCarousel
             subject={displaySubject}

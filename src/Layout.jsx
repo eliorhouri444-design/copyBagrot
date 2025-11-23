@@ -235,28 +235,21 @@ function LayoutContent({ children, currentPageName }) {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
+                  className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                     isActive 
                       ? 'text-[var(--primary-blue)]' 
                       : 'text-gray-500 hover:text-[var(--primary-blue)]'
                   }`}
                   style={isActive ? { color: item.color } : {}}
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
-                  </motion.div>
+                  <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
                   <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
                     {item.label}
                   </span>
                   {isActive && (
-                    <motion.div 
-                      layoutId="activeTab"
+                    <div 
                       className="absolute bottom-0 w-8 h-1 rounded-t-full" 
                       style={{ backgroundColor: item.color }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
                 </Link>

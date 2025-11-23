@@ -17,15 +17,12 @@ export default function ModuleCarousel({
 }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
 
   const handlePrevious = () => {
-    setDirection(-1);
     setCurrentIndex((prev) => (prev === 0 ? modules.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setDirection(1);
     setCurrentIndex((prev) => (prev === modules.length - 1 ? 0 : prev + 1));
   };
 
@@ -89,10 +86,10 @@ export default function ModuleCarousel({
       <AnimatePresence mode="wait">
         <motion.div
           key={currentModule?.id || currentModule?.module_id || currentIndex}
-          initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ duration: 0.3 }}
           className="w-full"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
@@ -268,35 +265,31 @@ export default function ModuleCarousel({
                     {/* מבחן אקראי - למעלה - לכולם */}
                     {currentModule.entity !== 'practice' && onRandomExam && (
                       <div className="space-y-3">
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                          <Button
-                            onClick={() => onRandomExam(currentModule.id)}
-                            className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
-                          >
-                            <Shuffle className="w-5 h-5" />
-                            מבחן אקראי
-                          </Button>
-                        </motion.div>
+                        <Button
+                          onClick={() => onRandomExam(currentModule.id)}
+                          className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
+                        >
+                          <Shuffle className="w-5 h-5" />
+                          מבחן אקראי
+                        </Button>
 
-                        <motion.div whileHover={{ scale: isPremium ? 1.02 : 1 }} whileTap={{ scale: isPremium ? 0.98 : 1 }}>
-                          {(isPremium === true) ? (
-                            <Button
-                              onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                              className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white shadow-lg"
-                            >
-                              <Target className="w-5 h-5 ml-2" />
-                              מבחן טעויות
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => navigate(createPageUrl("Premium"))}
-                              className="w-full h-12 text-base font-bold bg-gray-400 hover:bg-gray-500 rounded-xl text-white"
-                            >
-                              <Crown className="w-5 h-5 ml-2" />
-                              מבחן טעויות
-                            </Button>
-                          )}
-                        </motion.div>
+                        {(isPremium === true) ? (
+                          <Button
+                            onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
+                          >
+                            <Target className="w-5 h-5 ml-2" />
+                            מבחן טעויות
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => navigate(createPageUrl("Premium"))}
+                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
+                          >
+                            <Crown className="w-5 h-5 ml-2" />
+                            מבחן טעויות
+                          </Button>
+                        )}
                       </div>
                     )}
 
@@ -304,15 +297,13 @@ export default function ModuleCarousel({
                     {currentModule.entity !== 'practice' && (
                       <>
                         {(isPremium === true) ? (
-                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                            <Button
-                              onClick={() => handleModuleClick(currentModule)}
-                              variant="outline"
-                              className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl"
-                            >
-                              בחר מבחן ספציפי (מעל 100 מבחנים)
-                            </Button>
-                          </motion.div>
+                          <Button
+                            onClick={() => handleModuleClick(currentModule)}
+                            variant="outline"
+                            className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl"
+                          >
+                            בחר מבחן ספציפי (מעל 100 מבחנים)
+                          </Button>
                         ) : (
                           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 border-2 border-amber-200">
                             <div className="text-center mb-2">
@@ -340,15 +331,13 @@ export default function ModuleCarousel({
 
                     {/* אם זה תרגול */}
                     {currentModule.entity === 'practice' && (
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button
-                          onClick={() => handleModuleClick(currentModule)}
-                          className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
-                        >
-                          התחל תרגול
-                          <Play className="w-5 h-5" />
-                        </Button>
-                      </motion.div>
+                      <Button
+                        onClick={() => handleModuleClick(currentModule)}
+                        className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
+                      >
+                        התחל תרגול
+                        <Play className="w-5 h-5" />
+                      </Button>
                     )}
                   </>
                 )}
@@ -360,33 +349,23 @@ export default function ModuleCarousel({
 
       {/* Navigation buttons */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-0 pointer-events-none z-10">
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrevious}
+          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto -translate-x-2"
         >
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrevious}
-            className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto -translate-x-2"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </Button>
-        </motion.div>
+          <ChevronRight className="w-6 h-6" />
+        </Button>
 
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto translate-x-2"
         >
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto translate-x-2"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-        </motion.div>
+          <ChevronLeft className="w-6 h-6" />
+        </Button>
       </div>
 
       {/* Dots indicator */}

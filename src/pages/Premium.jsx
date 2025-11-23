@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -24,13 +25,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+
 
 export default function PremiumPage() {
   const navigate = useNavigate();
@@ -178,7 +174,7 @@ export default function PremiumPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        transition={{ duration: 0.3 }}
         className={`${user?.is_premium ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-amber-500 to-yellow-500'} rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden`}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
@@ -302,10 +298,9 @@ export default function PremiumPage() {
                 {plans.map((plan, idx) => (
                   <motion.div
                     key={plan.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 + idx * 0.1 }}
-                    whileHover={{ scale: 1.03, y: -5 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 + idx * 0.1 }}
                     className={`relative bg-white rounded-3xl shadow-2xl p-8 border-4 ${plan.id === 'yearly' ? 'border-amber-400' : 'border-gray-200'} flex flex-col items-center text-center`}
                   >
                     {plan.badge && (
