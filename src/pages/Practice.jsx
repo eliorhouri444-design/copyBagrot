@@ -316,6 +316,7 @@ export default function PracticePage() {
           subject={displaySubject} 
           units={displayUnits}
           userEmail={user?.email}
+          isPremium={user?.is_premium}
         />
 
         {user?.is_premium && (
