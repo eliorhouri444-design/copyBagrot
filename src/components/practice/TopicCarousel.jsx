@@ -13,6 +13,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingTopic, setIsCheckingTopic] = useState(false);
   const [cachedTopics, setCachedTopics] = useState(null);
+  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     // טעינה ראשונית מיידית מ-cache
@@ -266,10 +267,10 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-3xl p-5 text-white mb-4 relative`}>
               <div className="text-center">
@@ -343,51 +344,70 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Button
-                onClick={handleStartPractice}
-                className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
-              >
-                <Play className="w-5 h-5 ml-2" />
-                התחל תרגול
-              </Button>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-3"
+            >
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handleStartPractice}
+                  className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg"
+                >
+                  <Play className="w-5 h-5 ml-2" />
+                  התחל תרגול
+                </Button>
+              </motion.div>
 
-              {isPremium ? (
-                <Button
-                  onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
-                >
-                  <Target className="w-5 h-5 ml-2" />
-                  תרגול טעויות
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
-                >
-                  <Lock className="w-5 h-5 ml-2" />
-                  תרגול טעויות
-                </Button>
-              )}
-            </div>
+              <motion.div whileHover={{ scale: isPremium ? 1.02 : 1 }} whileTap={{ scale: isPremium ? 0.98 : 1 }}>
+                {isPremium ? (
+                  <Button
+                    onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+                    className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white shadow-lg"
+                  >
+                    <Target className="w-5 h-5 ml-2" />
+                    תרגול טעויות
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => navigate(createPageUrl("Premium"))}
+                    className="w-full h-12 text-base font-bold bg-gray-400 hover:bg-gray-500 rounded-xl text-white"
+                  >
+                    <Crown className="w-5 h-5 ml-2" />
+                    תרגול טעויות
+                  </Button>
+                )}
+              </motion.div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
 
         {topics.length > 1 && (
           <>
-            <button
-              onClick={() => setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1)}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setDirection(-1);
+                setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1);
+              }}
               className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-gray-50 z-10"
             >
               <ChevronRight className="w-6 h-6" />
-            </button>
+            </motion.button>
 
-            <button
-              onClick={() => setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1)}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setDirection(1);
+                setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1);
+              }}
               className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-gray-50 z-10"
             >
               <ChevronLeft className="w-6 h-6" />
-            </button>
+            </motion.button>
           </>
         )}
       </div>
