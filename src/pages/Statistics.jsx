@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity, BarChart3, Calendar, Flame, Star, ChevronLeft } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity, BarChart3, Calendar, Flame, Star, ChevronLeft, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
