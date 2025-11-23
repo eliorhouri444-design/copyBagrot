@@ -404,7 +404,7 @@ export default function HomePage() {
       title: "מבחן טעויות מבגרויות",
       description: "בגרות מותאמת אישית על בסיס הטעויות שלך",
       color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("CustomWeakExam")),
+      onClick: () => navigate(createPageUrl("WeakExamSelection")),
       delay: 0.55,
       isPremium: true
     }
