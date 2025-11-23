@@ -403,8 +403,24 @@ export default function HomePage() {
       color: "from-orange-500 to-red-600",
       onClick: () => navigate(createPageUrl("CustomWeakExam")),
       delay: 0.5
-    }
-  ];
+      },
+      {
+      icon: Calendar,
+      title: "תכנון לימודים",
+      description: "ארגן את הזמן שלך",
+      color: "from-green-500 to-emerald-600",
+      onClick: () => navigate(createPageUrl("StudyPlanner")),
+      delay: 0.55
+      },
+      {
+      icon: Target,
+      title: "תרגול מותאם",
+      description: "בנה תרגול בעצמך",
+      color: "from-cyan-500 to-blue-600",
+      onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
+      delay: 0.6
+      }
+      ];
 
   if (!isUserLoaded) {
     return (
@@ -627,7 +643,7 @@ export default function HomePage() {
         </motion.div>
 
         {/* קיצורי דרך */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {quickAccessCards.map((card, idx) => {
             const Icon = card.icon;
             return (

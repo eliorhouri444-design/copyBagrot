@@ -53,6 +53,8 @@ import Vocabulary from './pages/Vocabulary';
 import VocabularyPractice from './pages/VocabularyPractice';
 import CustomWeakExam from './pages/CustomWeakExam';
 import CustomWeakPractice from './pages/CustomWeakPractice';
+import StudyPlanner from './pages/StudyPlanner';
+import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
 import __Layout from './Layout.jsx';
 
 
@@ -112,6 +114,8 @@ export const PAGES = {
     "VocabularyPractice": VocabularyPractice,
     "CustomWeakExam": CustomWeakExam,
     "CustomWeakPractice": CustomWeakPractice,
+    "StudyPlanner": StudyPlanner,
+    "CustomPracticeBuilder": CustomPracticeBuilder,
 }
 
 export const pagesConfig = {
