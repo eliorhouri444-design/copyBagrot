@@ -154,7 +154,7 @@ export default function LearningPlanPage() {
           </div>
         </motion.div>
         
-        {/* Current Status */}
+        {/* Current Status - Based on Curriculum */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,7 +162,7 @@ export default function LearningPlanPage() {
           className="bg-white rounded-2xl shadow-lg p-6 animate-hover-card"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">מצב נוכחי</h3>
+            <h3 className="text-lg font-bold text-gray-900">התקדמות בסילבוס</h3>
             <Button
               variant="outline"
               size="sm"
@@ -174,9 +174,16 @@ export default function LearningPlanPage() {
           </div>
           
           <div className="space-y-4">
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+              <div className="text-sm text-gray-600 mb-1">פרק נוכחי</div>
+              <div className="text-xl font-bold text-blue-900">
+                פרק {learningProfile.current_chapter}
+              </div>
+            </div>
+            
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">שליטה בחומר</span>
+                <span className="text-sm font-medium text-gray-700">התקדמות בתכנית הלימודים</span>
                 <span className="text-lg font-bold text-blue-600">{Math.round(learningProfile.current_mastery)}%</span>
               </div>
               <Progress value={learningProfile.current_mastery} className="h-3 bg-blue-100" />
@@ -184,13 +191,13 @@ export default function LearningPlanPage() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-green-50 rounded-xl p-3 border border-green-200">
-                <div className="text-2xl font-bold text-green-600">{learningProfile.completed_topics?.length || 0}</div>
-                <div className="text-xs text-gray-600">נושאים שהושלמו</div>
+                <div className="text-2xl font-bold text-green-600">{learningProfile.completed_chapters?.length || 0}</div>
+                <div className="text-xs text-gray-600">פרקים הושלמו</div>
               </div>
               
               <div className="bg-orange-50 rounded-xl p-3 border border-orange-200">
-                <div className="text-2xl font-bold text-orange-600">{learningProfile.weak_topics?.length || 0}</div>
-                <div className="text-xs text-gray-600">נושאים לשיפור</div>
+                <div className="text-2xl font-bold text-orange-600">{learningProfile.chapters_remaining || 0}</div>
+                <div className="text-xs text-gray-600">פרקים נותרו</div>
               </div>
             </div>
           </div>

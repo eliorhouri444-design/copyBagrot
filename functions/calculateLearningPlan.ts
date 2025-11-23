@@ -19,55 +19,40 @@ Deno.serve(async (req) => {
     const examDateTime = new Date(exam_date);
     const daysLeft = Math.max(1, Math.ceil((examDateTime - new Date()) / (1000 * 60 * 60 * 24)));
     
-    // Get all user's attempts to calculate current mastery
-    const allAttempts = await base44.entities.AttemptNew.filter({
+    // Get curriculum for this subject
+    const curriculum = await base44.entities.Curriculum.filter({
+      subject_id,
+      unit_level: parseInt(unit_level),
+      is_mandatory: true
+    });
+    
+    curriculum.sort((a, b) => a.order - b.order);
+    
+    // Get user's learning profile to see completed chapters
+    const existingProfiles = await base44.entities.UserLearningProfile.filter({
+      user_email: user.email,
       subject_id
     });
     
-    const userAttempts = allAttempts.filter(a => a.created_by === user.email);
+    const currentProfile = existingProfiles[0] || {
+      completed_chapters: [],
+      current_chapter: 1
+    };
     
-    // Calculate topic-level mastery
-    const topicStats = {};
-    userAttempts.forEach(attempt => {
-      const topic = attempt.topic_id || 'unknown';
-      if (!topicStats[topic]) {
-        topicStats[topic] = { total: 0, correct: 0, totalScore: 0 };
-      }
-      topicStats[topic].total++;
-      topicStats[topic].totalScore += (attempt.percentage || 0);
-      if (attempt.status === 'correct') {
-        topicStats[topic].correct++;
-      }
-    });
+    // Calculate mastery based on curriculum completion
+    const totalChapters = curriculum.length;
+    const completedChaptersCount = currentProfile.completed_chapters?.length || 0;
+    const currentMastery = totalChapters > 0 ? (completedChaptersCount / totalChapters) * 100 : 0;
     
-    // Identify weak and completed topics
-    const weakTopics = [];
-    const completedTopics = [];
+    // Calculate remaining chapters
+    const chaptersRemaining = totalChapters - completedChaptersCount;
     
-    Object.entries(topicStats).forEach(([topic, stats]) => {
-      const mastery = stats.total > 0 ? stats.totalScore / stats.total : 0;
-      
-      if (mastery >= 80 && stats.total >= 5) {
-        completedTopics.push(topic);
-      } else if (mastery < 70 && stats.total >= 3) {
-        weakTopics.push({
-          topic_id: topic,
-          mastery,
-          priority: Math.floor((70 - mastery) / 10)
-        });
-      }
-    });
+    // Determine next chapter to learn
+    const completedChapterNumbers = currentProfile.completed_chapters?.map(c => c.chapter_number) || [];
+    const nextChapter = curriculum.find(c => !completedChapterNumbers.includes(c.chapter_number));
     
-    // Calculate overall mastery
-    const allTopics = await base44.entities.TopicNew.filter({
-      subject_id,
-      unit_level: parseInt(unit_level),
-      is_active: true
-    });
-    
-    const totalTopics = allTopics.length;
-    const masteredTopics = completedTopics.length;
-    const currentMastery = totalTopics > 0 ? (masteredTopics / totalTopics) * 100 : 0;
+    const weakTopics = currentProfile.weak_topics || [];
+    const completedTopics = currentProfile.completed_topics || [];
     
     // Calculate factors
     const difficultyFactor = unit_level === 5 ? 1.3 : unit_level === 4 ? 1.15 : 1.0;
@@ -100,6 +85,9 @@ Deno.serve(async (req) => {
       target_score: parseInt(target_score),
       exam_date,
       current_mastery: currentMastery,
+      current_chapter: nextChapter?.chapter_number || currentProfile.current_chapter || 1,
+      chapters_remaining: chaptersRemaining,
+      completed_chapters: currentProfile.completed_chapters || [],
       weak_topics: weakTopics.sort((a, b) => b.priority - a.priority),
       completed_topics: completedTopics,
       daily_goal_questions: dailyGoalQuestions,
@@ -117,21 +105,25 @@ Deno.serve(async (req) => {
       updatedProfile = await base44.entities.UserLearningProfile.create(profileData);
     }
     
-    // Generate insights
+    // Generate insights based on curriculum
     const insights = {
       daysLeft,
       currentMastery: Math.round(currentMastery),
       dailyGoal: dailyGoalQuestions,
       weeklyGoal: dailyGoalQuestions * 7,
+      currentChapter: nextChapter?.chapter_name || 'הושלמו כל הפרקים',
+      chaptersRemaining,
+      totalChapters,
+      completedChapters: completedChaptersCount,
       weakTopicsCount: weakTopics.length,
       completedTopicsCount: completedTopics.length,
       onTrack: dailyGoalQuestions <= 50,
       urgency: daysLeft <= 21 ? 'high' : daysLeft <= 60 ? 'medium' : 'low',
       recommendation: daysLeft <= 21 
-        ? 'התמקד בסימולציות מלאות ובנושאים החלשים בלבד'
+        ? 'התמקד בסימולציות מלאות ובחזרה על כל הפרקים'
         : daysLeft <= 60 
-          ? `תרגל ${dailyGoalQuestions} שאלות ביום ותגיע מוכן`
-          : `קצב נוח - ${dailyGoalQuestions} שאלות ביום מספיק`
+          ? `למד ${Math.ceil(chaptersRemaining / (daysLeft / 7))} פרקים בשבוע + תרגל ${dailyGoalQuestions} שאלות ביום`
+          : `קצב נוח - פרק אחד בשבוע + ${dailyGoalQuestions} שאלות ביום`
     };
     
     return Response.json({

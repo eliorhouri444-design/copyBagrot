@@ -110,8 +110,14 @@ export default function DailyPracticePage() {
   };
   
   const getTaskTitle = (task) => {
+    if (task.chapter_name) {
+      return task.task_type === 'review' 
+        ? `חזרה: ${task.chapter_name}`
+        : `${task.chapter_name}`;
+    }
+    
     switch (task.task_type) {
-      case 'review': return 'חזרה על חומר חלש';
+      case 'review': return 'חזרה על חומר';
       case 'new_content': return 'תוכן חדש';
       case 'quiz': return 'בוחן יומי';
       case 'exam': return 'סימולציית מבחן';

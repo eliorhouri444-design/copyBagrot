@@ -1,25 +1,30 @@
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, ChevronLeft, Trash2, Eye, Plus, CheckCircle } from "lucide-react";
+import { BookOpen, Plus, Edit2, Trash2, Save, ChevronLeft, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 export default function AdminCurriculumPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
-  const [selectedCurriculum, setSelectedCurriculum] = useState(null);
-
+  const [selectedSubject, setSelectedSubject] = useState("אנגלית");
+  const [selectedUnits, setSelectedUnits] = useState(3);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingChapter, setEditingChapter] = useState(null);
+  
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -30,185 +35,334 @@ export default function AdminCurriculumPage() {
         }
         setUser(currentUser);
       } catch (error) {
+        console.error("Error loading user:", error);
         navigate(createPageUrl("Home"));
       }
     };
     loadUser();
-  }, [navigate]);
-
-  const { data: curriculums = [], isLoading } = useQuery({
-    queryKey: ['curriculums'],
-    queryFn: () => base44.entities.Curriculum.list("-created_date", 50),
-    enabled: !!user
+  }, []);
+  
+  const { data: chapters = [] } = useQuery({
+    queryKey: ['curriculum', selectedSubject, selectedUnits],
+    queryFn: async () => {
+      const all = await base44.entities.Curriculum.filter({
+        subject_id: selectedSubject,
+        unit_level: parseInt(selectedUnits)
+      });
+      return all.sort((a, b) => a.order - b.order);
+    }
   });
-
+  
+  const saveMutation = useMutation({
+    mutationFn: async (chapterData) => {
+      if (editingChapter?.id) {
+        return await base44.entities.Curriculum.update(editingChapter.id, chapterData);
+      } else {
+        return await base44.entities.Curriculum.create(chapterData);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['curriculum']);
+      setShowEditDialog(false);
+      setEditingChapter(null);
+    }
+  });
+  
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Curriculum.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['curriculums']);
-      setSelectedCurriculum(null);
+      queryClient.invalidateQueries(['curriculum']);
+      setShowEditDialog(false);
+      setEditingChapter(null);
     }
   });
-
-  if (isLoading || !user) {
+  
+  const handleSave = () => {
+    if (!editingChapter?.chapter_name || !editingChapter?.chapter_number) {
+      alert('חובה למלא שם פרק ומספר פרק');
+      return;
+    }
+    
+    saveMutation.mutate({
+      subject_id: selectedSubject,
+      unit_level: parseInt(selectedUnits),
+      chapter_number: parseInt(editingChapter.chapter_number),
+      chapter_name: editingChapter.chapter_name,
+      order: parseInt(editingChapter.order) || 0,
+      is_mandatory: editingChapter.is_mandatory !== false,
+      difficulty_weight: parseFloat(editingChapter.difficulty_weight) || 1.0,
+      exam_weight: parseInt(editingChapter.exam_weight) || 0,
+      ministry_reference: editingChapter.ministry_reference || '',
+      topics: editingChapter.topics || []
+    });
+  };
+  
+  if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">טוען...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
-
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-24">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-b-[2rem] p-6 shadow-xl mb-6"
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden"
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(createPageUrl("AdminContentGenerator"))}
-          className="text-white hover:bg-white/20 mb-4"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">תוכניות לימודים</h1>
-          <p className="text-white/90">{curriculums.length} תוכניות במערכת</p>
+        <div className="relative z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(createPageUrl("Home"))}
+            className="text-white hover:bg-white/20 mb-4"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-white mb-2">ניהול סילבוס משרד החינוך</h1>
+            <p className="text-white/90 text-sm">תכנית הלימודים הרשמית</p>
+          </div>
         </div>
       </motion.div>
-
-      <div className="max-w-6xl mx-auto px-6 space-y-4">
-        {curriculums.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-md p-12 text-center">
-            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <div className="text-gray-600 mb-4">אין תוכניות לימודים במערכת</div>
-            <Button
-              onClick={() => navigate(createPageUrl("AdminContentGenerator"))}
-              className="bg-indigo-600"
+      
+      <div className="px-6 space-y-6">
+        {/* Filters */}
+        <div className="bg-white rounded-2xl shadow-lg p-5">
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+              <SelectTrigger>
+                <SelectValue placeholder="בחר מקצוע" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="אנגלית">אנגלית</SelectItem>
+                <SelectItem value="מתמטיקה">מתמטיקה</SelectItem>
+                <SelectItem value="פיזיקה">פיזיקה</SelectItem>
+                <SelectItem value="כימיה">כימיה</SelectItem>
+                <SelectItem value="ביולוגיה">ביולוגיה</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value={selectedUnits.toString()} onValueChange={(v) => setSelectedUnits(parseInt(v))}>
+              <SelectTrigger>
+                <SelectValue placeholder="יחידות" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">3 יחידות</SelectItem>
+                <SelectItem value="4">4 יחידות</SelectItem>
+                <SelectItem value="5">5 יחידות</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button
+            onClick={() => {
+              setEditingChapter({
+                chapter_number: chapters.length + 1,
+                chapter_name: '',
+                order: chapters.length,
+                is_mandatory: true,
+                difficulty_weight: 1.0,
+                exam_weight: 10,
+                topics: []
+              });
+              setShowEditDialog(true);
+            }}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          >
+            <Plus className="w-4 h-4 ml-2" />
+            הוסף פרק חדש
+          </Button>
+        </div>
+        
+        {/* Chapters List */}
+        <div className="space-y-3">
+          {chapters.map((chapter, idx) => (
+            <motion.div
+              key={chapter.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="bg-white rounded-2xl shadow-lg p-5 animate-hover-card"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              טען תוכנית חדשה
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {curriculums.map((curriculumItem, curriculumIndex) => (
-              <motion.div
-                key={curriculumItem.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: curriculumIndex * 0.05 }}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all"
-              >
-                <div className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="font-bold text-gray-900 mb-1">
-                        {curriculumItem.subject} - כיתה {curriculumItem.grade_level} ({curriculumItem.unit_level} יח')
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">
-                        {curriculumItem.main_topics?.length || 0} נושאים ראשיים
-                      </div>
-                      <div className="flex gap-2 flex-wrap">
-                        {curriculumItem.main_topics?.slice(0, 3).map((topicItem, topicIndex) => (
-                          <span key={topicIndex} className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">
-                            {topicItem.topic_name}
-                          </span>
-                        ))}
-                        {curriculumItem.main_topics?.length > 3 && (
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            +{curriculumItem.main_topics.length - 3} נוספים
-                          </span>
-                        )}
-                      </div>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      {chapter.chapter_number}
                     </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setSelectedCurriculum(curriculumItem)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          if (confirm("למחוק תוכנית זו?")) {
-                            deleteMutation.mutate(curriculumItem.id);
-                          }
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* דיאלוג צפייה בתוכנית */}
-      <Dialog open={!!selectedCurriculum} onOpenChange={() => setSelectedCurriculum(null)}>
-        <DialogContent dir="rtl" className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedCurriculum?.subject} - כיתה {selectedCurriculum?.grade_level}
-            </DialogTitle>
-          </DialogHeader>
-
-          {selectedCurriculum && (
-            <div className="space-y-4 py-4">
-              <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
-                <div className="text-sm font-bold text-indigo-900 mb-2">מידע כללי:</div>
-                <div className="text-sm text-gray-800 space-y-1">
-                  <div>📚 יחידות: {selectedCurriculum.unit_level}</div>
-                  <div>🎯 יעדי למידה: {selectedCurriculum.learning_objectives?.length || 0}</div>
-                  <div>📅 עדכון אחרון: {selectedCurriculum.updated_by_ministry || 'לא ידוע'}</div>
-                </div>
-              </div>
-
-              {selectedCurriculum.main_topics?.map((topicItem, topicIndex) => (
-                <div key={topicIndex} className="bg-white rounded-xl border-2 border-purple-200 p-4">
-                  <div className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600" />
-                    {topicItem.topic_name}
-                  </div>
-                  <div className="text-sm text-gray-700 mb-3">
-                    {topicItem.topic_description}
+                    <h4 className="text-lg font-bold text-gray-900">{chapter.chapter_name}</h4>
                   </div>
                   
-                  <div className="space-y-2">
-                    {topicItem.subtopics?.map((subtopicItem, subtopicIndex) => (
-                      <div key={subtopicIndex} className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                        <div className="text-sm font-bold text-purple-900">{subtopicItem.name}</div>
-                        <div className="text-xs text-gray-700 mt-1">{subtopicItem.description}</div>
-                        {subtopicItem.key_concepts && subtopicItem.key_concepts.length > 0 && (
-                          <div className="flex gap-1 flex-wrap mt-2">
-                            {subtopicItem.key_concepts.map((conceptItem, conceptIndex) => (
-                              <span key={conceptIndex} className="text-xs bg-white px-2 py-0.5 rounded border border-purple-200">
-                                {conceptItem}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                  <div className="text-sm text-gray-600 space-y-1">
+                    {chapter.exam_weight > 0 && (
+                      <div>משקל בבגרות: {chapter.exam_weight}%</div>
+                    )}
+                    {chapter.topics && chapter.topics.length > 0 && (
+                      <div>נושאים: {chapter.topics.length}</div>
+                    )}
                   </div>
                 </div>
-              ))}
+                
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      setEditingChapter(chapter);
+                      setShowEditDialog(true);
+                    }}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => {
+                      if (confirm(`למחוק את ${chapter.chapter_name}?`)) {
+                        deleteMutation.mutate(chapter.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+          
+          {chapters.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              אין פרקים מוגדרים עבור {selectedSubject} {selectedUnits} יחידות
             </div>
           )}
+        </div>
+      </div>
+      
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {editingChapter?.id ? 'עריכת פרק' : 'הוספת פרק חדש'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {editingChapter && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    מספר פרק *
+                  </label>
+                  <Input
+                    type="number"
+                    value={editingChapter.chapter_number}
+                    onChange={(e) => setEditingChapter({...editingChapter, chapter_number: parseInt(e.target.value)})}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    סדר לימוד
+                  </label>
+                  <Input
+                    type="number"
+                    value={editingChapter.order}
+                    onChange={(e) => setEditingChapter({...editingChapter, order: parseInt(e.target.value)})}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  שם הפרק *
+                </label>
+                <Input
+                  value={editingChapter.chapter_name}
+                  onChange={(e) => setEditingChapter({...editingChapter, chapter_name: e.target.value})}
+                  placeholder="לדוגמה: Present Simple and Continuous"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    משקל בבגרות (%)
+                  </label>
+                  <Input
+                    type="number"
+                    value={editingChapter.exam_weight}
+                    onChange={(e) => setEditingChapter({...editingChapter, exam_weight: parseInt(e.target.value)})}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    משקל קושי
+                  </label>
+                  <Select
+                    value={editingChapter.difficulty_weight?.toString()}
+                    onValueChange={(v) => setEditingChapter({...editingChapter, difficulty_weight: parseFloat(v)})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0.8">קל (0.8)</SelectItem>
+                      <SelectItem value="1.0">רגיל (1.0)</SelectItem>
+                      <SelectItem value="1.3">בינוני (1.3)</SelectItem>
+                      <SelectItem value="1.5">קשה (1.5)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  קוד משרד החינוך (אופציונלי)
+                </label>
+                <Input
+                  value={editingChapter.ministry_reference || ''}
+                  onChange={(e) => setEditingChapter({...editingChapter, ministry_reference: e.target.value})}
+                  placeholder="לדוגמה: ENG-4U-CH3"
+                />
+              </div>
+              
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                <div className="text-sm text-gray-700">
+                  <strong>💡 טיפ:</strong> הפרקים מוגדרים לפי תכנית הלימודים הרשמית של משרד החינוך. המערכת תשתמש בהם ליצירת תכנית למידה מותאמת אישית לכל תלמיד.
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+              ביטול
+            </Button>
+            {editingChapter?.id && (
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (confirm('למחוק פרק זה?')) {
+                    deleteMutation.mutate(editingChapter.id);
+                  }
+                }}
+              >
+                <Trash2 className="w-4 h-4 ml-2" />
+                מחק
+              </Button>
+            )}
+            <Button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700">
+              <Save className="w-4 h-4 ml-2" />
+              שמור
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
