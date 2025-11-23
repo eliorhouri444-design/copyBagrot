@@ -311,11 +311,42 @@ export default function PracticePage() {
           />
         </motion.div>
 
-        {user?.role === 'admin' && (
+        {user?.is_premium && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl shadow-md overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-600 p-4">
+              <div className="text-center text-white flex items-center justify-center gap-2">
+                <h3 className="text-lg font-bold">תרגול טעויות</h3>
+                <Crown className="w-5 h-5 text-yellow-300" />
+              </div>
+            </div>
+
+            <div className="p-5 text-center">
+              <p className="text-gray-700 text-sm mb-4">
+                בנה תרגול מכל השאלות שטעית בהן כדי לחזק את הנקודות החלשות שלך
+              </p>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <Target className="w-5 h-5" />
+                  <span>התחל תרגול טעויות</span>
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {user?.role === 'admin' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
             className="grid grid-cols-2 gap-3"
           >
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200 shadow-md">

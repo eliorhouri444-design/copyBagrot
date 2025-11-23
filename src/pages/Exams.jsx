@@ -816,60 +816,31 @@ export default function ExamsPage() {
           />
         </motion.div>
 
-        {isPremium ? (
+        {isPremium && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="bg-white rounded-2xl shadow-md overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <div className="text-center text-white">
-                <h3 className="text-lg font-bold">מבחן מותאם אישית</h3>
-                <p className="text-xs opacity-90">על הנקודות שאתה חלש בהם</p>
+            <div className="bg-gradient-to-r from-orange-500 to-red-600 p-4">
+              <div className="text-center text-white flex items-center justify-center gap-2">
+                <h3 className="text-lg font-bold">תרגול טעויות בבגרות</h3>
+                <Crown className="w-5 h-5 text-yellow-300" />
               </div>
             </div>
 
             <div className="p-5 text-center">
               <p className="text-gray-700 text-sm mb-4">
-                מבחן מותאם אישית על בסיס הנושאים החלשים שלך
+                מבחן שמבוסס על השאלות שבהן טעית בעבר, כדי לחזק בדיוק את מה שחסר לך
               </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                  onClick={() => navigate(createPageUrl("WeakTopics"))}
-                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+                  onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
                 >
-                  <span>צור מבחן מותאם</span>
-                  <Crown className="w-4 h-4" />
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-md overflow-hidden"
-          >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <div className="text-center text-white">
-                <h3 className="text-lg font-bold">מבחן מותאם אישית</h3>
-                <p className="text-xs opacity-90">על הנקודות שאתה חלש בהם</p>
-              </div>
-            </div>
-
-            <div className="p-6 text-center">
-              <p className="text-gray-700 text-sm mb-4">
-                מבחן מותאם אישית על פי טעויות קודמות
-              </p>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <span>שדרג לפרימיום</span>
-                  <Crown className="w-4 h-4" />
+                  <Target className="w-5 h-5" />
+                  <span>התחל תרגול טעויות</span>
                 </Button>
               </motion.div>
             </div>
