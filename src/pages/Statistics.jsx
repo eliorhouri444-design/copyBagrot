@@ -798,14 +798,14 @@ export default function StatisticsPage() {
 
                 {statistics.failedExams.length > 0 && (
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakExamBuilder"))}
+                    onClick={() => navigate(createPageUrl("CustomFailedExamsBuilder"))}
                     className="h-16 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <Target className="w-6 h-6" />
                       <div className="text-right">
-                        <div className="text-sm font-bold">בגרות מותאמת אישית</div>
-                        <div className="text-xs opacity-90">שאלות שטעית בהן בעבר</div>
+                        <div className="text-sm font-bold">בגרות מבגרויות שנכשלת</div>
+                        <div className="text-xs opacity-90">שאלות מבגרויות + נושאים חלשים</div>
                       </div>
                     </div>
                     <ChevronLeft className="w-5 h-5" />

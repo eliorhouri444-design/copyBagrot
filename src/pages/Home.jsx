@@ -389,12 +389,20 @@ export default function HomePage() {
       delay: 0.4
     },
     {
-      icon: Target,
-      title: "בגרות מותאמת",
-      description: "שאלות שטעית בהן",
-      color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("CustomWeakExamBuilder")),
+      icon: Zap,
+      title: "תרגול מותאם",
+      description: "נושאים שטעית בהם",
+      color: "from-purple-500 to-pink-600",
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
       delay: 0.45
+    },
+    {
+      icon: Target,
+      title: "בגרות מטעויות",
+      description: "מבחינות שנכשלת בהן",
+      color: "from-orange-500 to-red-600",
+      onClick: () => navigate(createPageUrl("CustomFailedExamsBuilder")),
+      delay: 0.5
       }
       ];
 
