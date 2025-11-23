@@ -401,8 +401,8 @@ export default function HomePage() {
     },
     {
       icon: Target,
-      title: "תרגול טעויות",
-      description: "מבחן שמבוסס על השאלות שבהן טעית בעבר",
+      title: "מבחן טעויות מבגרויות",
+      description: "בגרות מותאמת אישית על בסיס הטעויות שלך",
       color: "from-orange-500 to-red-600",
       onClick: () => navigate(createPageUrl("CustomWeakExam")),
       delay: 0.55,
