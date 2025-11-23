@@ -626,8 +626,8 @@ export default function StatisticsPage() {
             </motion.div>
           )}
 
-          {/* Weak Topics to Practice */}
-          {statistics.weakTopics.length > 0 && (
+          {/* Overall Performance Overview */}
+          {(statistics.topicArray.length > 0 || examAttempts.length > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -635,39 +635,217 @@ export default function StatisticsPage() {
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
-                <Target className="w-6 h-6 text-blue-600" />
-                <h3 className="text-lg font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
+                <BarChart3 className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">סטטוס לפי נושאים ושאלונים</h3>
               </div>
-              
-              <div className="space-y-3">
-                {statistics.weakTopics.slice(0, 5).map((topic, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 shadow-sm">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-blue-600" />
-                        <span className="font-bold text-gray-900">{topic.name || topic.topic}</span>
+
+              {/* Topics from Practice */}
+              {statistics.topicArray.length > 0 && (
+                <div className="mb-5">
+                  <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-blue-600" />
+                    נושאים בתרגול
+                  </h4>
+                  <div className="space-y-2">
+                    {statistics.topicArray.map((topic, idx) => (
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-bold text-gray-900 text-sm">{topic.name || topic.topic}</span>
+                          <span className={`text-sm font-bold ${
+                            topic.accuracy >= 80 ? 'text-green-600' :
+                            topic.accuracy >= 60 ? 'text-blue-600' :
+                            'text-orange-600'
+                          }`}>
+                            {Math.round(topic.accuracy)}%
+                          </span>
+                        </div>
+                        <Progress value={topic.accuracy} className="h-2 bg-blue-200" />
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="text-xs text-gray-600">
+                            {topic.correct} נכון • {topic.incorrect} טעויות • {topic.total} סה"כ
+                          </div>
+                          {topic.accuracy < 80 && (
+                            <Button
+                              onClick={() => {
+                                sessionStorage.setItem('selectedTopicForPractice', topic.topic);
+                                navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
+                              }}
+                              className="h-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-3 rounded-lg"
+                            >
+                              <BookOpen className="w-3 h-3 ml-1" />
+                              תרגל
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-blue-700 font-black text-xl">{Math.round(topic.accuracy)}%</span>
-                    </div>
-                    <Progress value={topic.accuracy} className="h-2.5 bg-blue-200" />
-                    <div className="flex justify-between items-center mt-3">
-                      <div className="text-xs text-gray-600">
-                        {topic.incorrect} טעויות • {topic.total} תרגולים
-                      </div>
-                      <Button
-                        onClick={() => {
-                          sessionStorage.setItem('selectedTopicForPractice', topic.topic);
-                          navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
-                        }}
-                        className="h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-4 rounded-lg"
-                      >
-                        <BookOpen className="w-3 h-3 ml-1" />
-                        תרגל
-                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Modules from Exams */}
+              {(() => {
+                const moduleStats = {};
+                examAttempts.forEach(attempt => {
+                  const moduleId = attempt.module_id || 'לא ידוע';
+                  if (!moduleStats[moduleId]) {
+                    moduleStats[moduleId] = { total: 0, passed: 0, totalScore: 0 };
+                  }
+                  moduleStats[moduleId].total++;
+                  moduleStats[moduleId].totalScore += attempt.score_percent || 0;
+                  if (attempt.passed) {
+                    moduleStats[moduleId].passed++;
+                  }
+                });
+
+                const moduleArray = Object.entries(moduleStats)
+                  .map(([module, stats]) => ({
+                    module,
+                    avgScore: stats.total > 0 ? stats.totalScore / stats.total : 0,
+                    total: stats.total,
+                    passed: stats.passed
+                  }))
+                  .sort((a, b) => a.avgScore - b.avgScore);
+
+                return moduleArray.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                      <FileCheck className="w-4 h-4 text-blue-600" />
+                      שאלונים בבגרויות
+                    </h4>
+                    <div className="space-y-2">
+                      {moduleArray.map((module, idx) => (
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-gray-900 text-sm">שאלון {module.module}</span>
+                            <span className={`text-sm font-bold ${
+                              module.avgScore >= 80 ? 'text-green-600' :
+                              module.avgScore >= 60 ? 'text-blue-600' :
+                              'text-orange-600'
+                            }`}>
+                              {Math.round(module.avgScore)}%
+                            </span>
+                          </div>
+                          <Progress value={module.avgScore} className="h-2 bg-blue-200" />
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="text-xs text-gray-600">
+                              {module.passed} עבר • {module.total} סה"כ
+                            </div>
+                            {module.avgScore < 80 && (
+                              <Button
+                                onClick={() => {
+                                  if (user?.is_premium) {
+                                    sessionStorage.setItem('weakExamModule', module.module);
+                                    navigate(createPageUrl("CustomWeakExam"));
+                                  } else {
+                                    navigate(createPageUrl("Premium"));
+                                  }
+                                }}
+                                className={`h-7 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-xs font-bold px-3 rounded-lg`}
+                              >
+                                {user?.is_premium ? (
+                                  <>
+                                    <FileCheck className="w-3 h-3 ml-1" />
+                                    מבחן
+                                  </>
+                                ) : (
+                                  <>
+                                    <Crown className="w-3 h-3 ml-1" />
+                                    שדרג
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                );
+              })()}
+            </motion.div>
+          )}
+
+          {/* Improvement Actions */}
+          {(statistics.weakTopics.length > 0 || examAttempts.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="space-y-3"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">פעולות לשיפור 🎯</h3>
               </div>
+
+              {statistics.weakTopics.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-blue-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-bold text-gray-900 text-base">תרגולים לשיפור</h4>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    תרגול על כל השאלות שטעית בהן בתרגולים - ללא כפילויות
+                  </p>
+                  <Button
+                    onClick={() => {
+                      if (user?.is_premium) {
+                        navigate(createPageUrl("CustomWeakPractice"));
+                      } else {
+                        navigate(createPageUrl("Premium"));
+                      }
+                    }}
+                    className={`w-full h-12 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-xl shadow-lg`}
+                  >
+                    {user?.is_premium ? (
+                      <>
+                        <Target className="w-5 h-5 ml-2" />
+                        תרגל שאלות שטעית בהן
+                      </>
+                    ) : (
+                      <>
+                        <Crown className="w-5 h-5 ml-2" />
+                        שדרג לפרימיום
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {examAttempts.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-blue-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileCheck className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-bold text-gray-900 text-base">תרגל נושאים שאתה חלש בהם</h4>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    בגרות מותאמת אישית על כל הנושאים שבהם אתה צריך שיפור
+                  </p>
+                  <Button
+                    onClick={() => {
+                      if (user?.is_premium) {
+                        navigate(createPageUrl("CustomWeakExam"));
+                      } else {
+                        navigate(createPageUrl("Premium"));
+                      }
+                    }}
+                    className={`w-full h-12 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-xl shadow-lg`}
+                  >
+                    {user?.is_premium ? (
+                      <>
+                        <Target className="w-5 h-5 ml-2" />
+                        בגרות מותאמת לחולשות שלך
+                      </>
+                    ) : (
+                      <>
+                        <Crown className="w-5 h-5 ml-2" />
+                        שדרג לפרימיום
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </motion.div>
           )}
 
