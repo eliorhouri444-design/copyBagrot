@@ -319,24 +319,24 @@ export default function PracticePage() {
             className="space-y-3"
           >
             <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-red-500 to-red-600 p-4">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-4">
                 <div className="text-center text-white flex items-center justify-center gap-2">
-                  <h3 className="text-lg font-bold">תרגול טעויות</h3>
+                  <h3 className="text-lg font-bold">תרגול מותאם אישית</h3>
                   <Crown className="w-5 h-5 text-yellow-300" />
                 </div>
               </div>
 
               <div className="p-5 text-center">
                 <p className="text-gray-700 text-sm mb-4">
-                  בנה תרגול מכל השאלות שטעית בהן כדי לחזק את הנקודות החלשות שלך
+                  תרגל שאלות שטעית בהן או נושאים שאתה חלש בהם - מותאם במיוחד בשבילך
                 </p>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-                    className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+                    onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
                   >
                     <Target className="w-5 h-5" />
-                    <span>התחל תרגול טעויות</span>
+                    <span>בחר סוג תרגול</span>
                   </Button>
                 </motion.div>
               </div>
