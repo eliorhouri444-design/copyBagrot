@@ -622,15 +622,16 @@ Return JSON:`,
       return;
     }
 
-    const isPremium = user?.is_premium;
+    const isPremiumUser = user?.is_premium;
+    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
     
-    if (isPremium) {
+    if (isPremiumUser) {
       // Premium users go directly to next set
       setAnswers({});
       setResults({});
       setCurrentQuestionIndex(0);
       setShowReadingText(true);
-      setShowListeningIntro(isListeningTopic && listeningText);
+      setShowListeningIntro(isListening && listeningText);
       window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
     } else {
       // Free users see ad confirmation
@@ -646,11 +647,12 @@ Return JSON:`,
   const handleAdComplete = () => {
     setShowAdDialog(false);
     const nextSet = setNumber + 1;
+    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
     setAnswers({});
     setResults({});
     setCurrentQuestionIndex(0);
     setShowReadingText(true);
-    setShowListeningIntro(isListeningTopic && listeningText);
+    setShowListeningIntro(isListening && listeningText);
     window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
   };
 
@@ -883,8 +885,7 @@ Return JSON:`,
   const currentQuestion = currentSetQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
-  const displayUnits = user?.selected_units || 3; // Moved displayUnits to a higher scope
-
+  const displayUnits = user?.selected_units || 3;
   const isMathSubject = currentQuestion?.subject_id === 'מתמטיקה';
   const isListeningTopic = topicId?.toLowerCase().includes('listening') || 
                            topicId?.toLowerCase().includes('האזנה');
