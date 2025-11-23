@@ -39,6 +39,8 @@ export default function ExamsPage() {
   const [showAddModuleDialog, setShowAddModuleDialog] = useState(false);
   const [editingModuleData, setEditingModuleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAdDialog, setShowAdDialog] = useState(null);
+  const [unlockedAttempts, setUnlockedAttempts] = useState(new Set());
 
   const [cachedData, setCachedData] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -883,7 +885,13 @@ export default function ExamsPage() {
                           transition={{ delay: 0.3 + idx * 0.1 }}
                           whileHover={{ scale: 1.02, x: -5 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => setShowAttemptDetails(attempt)}
+                          onClick={() => {
+                            if (isPremium || unlockedAttempts.has(attempt.id)) {
+                              setShowAttemptDetails(attempt);
+                            } else {
+                              setShowAdDialog(attempt);
+                            }
+                          }}
                           className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
                         >
                           <div className="flex items-center gap-3 flex-1">
@@ -1156,35 +1164,86 @@ export default function ExamsPage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={!!showAdDialog} onOpenChange={() => { setShowAdDialog(null); }}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">צפייה בציון המבחן</DialogTitle>
+            <DialogDescription>
+              בחר אופציה לצפייה בפרטי המבחן והציון
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 text-center">
+              <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
+              </p>
+              <Button
+                onClick={async () => {
+                  alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  setUnlockedAttempts(prev => new Set([...prev, showAdDialog.id]));
+                  setShowAttemptDetails(showAdDialog);
+                  setShowAdDialog(null);
+                }}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                צפה בפרסומת
+              </Button>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">או</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
+              </p>
+              <Button
+                onClick={() => {
+                  setShowAdDialog(null);
+                  navigate(createPageUrl("Premium"));
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold"
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                שדרג עכשיו
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdDialog(null)} className="w-full">
+              ביטול
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!showAttemptDetails} onOpenChange={() => { setShowAttemptDetails(null); }}>
         <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl">פרטי המבחן</DialogTitle>
+            {!isPremium && (
+              <DialogDescription className="flex items-center gap-2 text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                נפתח לאחר צפייה בפרסומת
+              </DialogDescription>
+            )}
           </DialogHeader>
 
-          {showAttemptDetails && !isPremium && (
-            <div className="space-y-4">
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-300 text-center">
-                <Crown className="w-16 h-16 text-amber-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">תכונה פרימיום</h3>
-                <p className="text-gray-700 mb-4">
-                  שדרג לפרימיום כדי לראות ציונים מפורטים, משוב על תשובות ותרגול טעויות
-                </p>
-                <Button
-                  onClick={() => {
-                    setShowAttemptDetails(null);
-                    navigate(createPageUrl("Premium"));
-                  }}
-                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold"
-                >
-                  <Crown className="w-5 h-5 mr-2" />
-                  שדרג עכשיו
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {showAttemptDetails && isPremium && (
+          {showAttemptDetails && (
             <div className="space-y-4">
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
@@ -1306,13 +1365,11 @@ export default function ExamsPage() {
             </div>
           )}
 
-          {isPremium && (
-            <DialogFooter>
-              <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
-                סגור
-              </Button>
-            </DialogFooter>
-          )}
+          <DialogFooter>
+            <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
+              סגור
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -1382,7 +1439,11 @@ export default function ExamsPage() {
                   <button
                     onClick={() => {
                       setShowAllExams(false);
-                      setShowAttemptDetails(attempt);
+                      if (isPremium || unlockedAttempts.has(attempt.id)) {
+                        setShowAttemptDetails(attempt);
+                      } else {
+                        setShowAdDialog(attempt);
+                      }
                     }}
                     className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
                   >
@@ -1411,12 +1472,20 @@ export default function ExamsPage() {
                     </div>
 
                     <div className="text-right">
-                      <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
-                        {Math.round(attempt.score_percent)}
-                      </div>
-                      <div className="text-[10px] text-gray-500">
-                        {passed ? 'עבר' : 'נכשל'}
-                      </div>
+                      {isPremium ? (
+                        <>
+                          <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
+                            {Math.round(attempt.score_percent)}
+                          </div>
+                          <div className="text-[10px] text-gray-500">
+                            {passed ? 'עבר' : 'נכשל'}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <Lock className="w-5 h-5 text-gray-400" />
+                        </div>
+                      )}
                     </div>
                   </button>
 
