@@ -31,12 +31,19 @@ export default function CustomWeakExamPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      // Check if there's a specific exam ID to filter by
+      const specificExamId = sessionStorage.getItem('weakExamSource');
+      if (specificExamId) {
+        sessionStorage.removeItem('weakExamSource'); // Clean up
+      }
+
       // Get all exam attempts (not practice attempts)
       const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
       const userExamAttempts = examAttempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject === currentUser.selected_subject &&
-        parseInt(a.unit_level) === parseInt(currentUser.selected_units)
+        parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
+        (!specificExamId || a.exam_id === specificExamId)
       );
 
       // Collect all wrong answers from all exam attempts
