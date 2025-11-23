@@ -259,7 +259,7 @@ export default function PracticePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-20 pt-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 pt-0">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -328,7 +328,7 @@ export default function PracticePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="bg-gradient-to-br from-blue-50 to-amber-50 rounded-2xl shadow-md overflow-hidden border-2 border-blue-200">
+          <div className="bg-gradient-to-br from-blue-50 to-amber-50 rounded-3xl shadow-2xl overflow-hidden border-2 border-blue-200">
             <div className="bg-gradient-to-r from-blue-600 to-amber-500 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
                 <h3 className="text-lg font-bold">תרגול פרימיום מותאם אישית</h3>

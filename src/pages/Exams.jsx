@@ -765,7 +765,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -796,7 +796,7 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-3 shadow-md"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-3xl p-3 shadow-2xl"
         >
           <div className="text-center">
             <h2 className="text-base font-bold text-white">
@@ -826,7 +826,7 @@ export default function ExamsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-md overflow-hidden"
+            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="bg-gradient-to-r from-orange-500 to-red-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
@@ -856,7 +856,7 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-md overflow-hidden mt-6"
+          className="bg-white rounded-3xl shadow-2xl overflow-hidden mt-6"
         >
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
             <div className="flex items-center gap-3 text-white">

@@ -422,7 +422,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -477,7 +477,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-md overflow-hidden"
+            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
               <div className="flex items-center justify-between text-white">
@@ -549,7 +549,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white rounded-2xl shadow-md overflow-hidden"
+            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
               <div className="flex items-center justify-between text-white">
@@ -623,7 +623,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-md overflow-hidden"
+          className="bg-white rounded-3xl shadow-2xl overflow-hidden"
         >
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3">
             <h3 className="text-base font-bold text-white text-center">לגישה מהירה</h3>
