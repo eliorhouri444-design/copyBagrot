@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,8 @@ import {
   CreditCard,
   Clock,
   Flame,
-  Edit // Added Sparkles import
+  Edit,
+  Sparkles // Added Sparkles import
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { differenceInDays } from "date-fns";
+import { calculateCurrentProgress, calculateRecommendedGoals } from "@/components/tracking/GoalsTracker";
+import GoalsDisplay from "@/components/tracking/GoalsDisplay";
 
 export default function ProfilePage() {
   const navigate = useNavigate();

@@ -18,6 +18,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ModuleCarousel from "@/components/exams/ModuleCarousel";
+import { differenceInDays } from "date-fns";
+import { calculateCurrentProgress, calculateRecommendedGoals } from "@/components/tracking/GoalsTracker";
+import GoalsDisplay from "@/components/tracking/GoalsDisplay";
 
 export default function ExamsPage() {
   const navigate = useNavigate();

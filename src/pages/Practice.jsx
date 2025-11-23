@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TopicCarousel from "@/components/practice/TopicCarousel";
 import RecentPracticeSessions from "@/components/practice/RecentPracticeSessions";
 import { motion } from "framer-motion";
+import { differenceInDays } from "date-fns";
+import { calculateCurrentProgress, calculateRecommendedGoals } from "@/components/tracking/GoalsTracker";
+import GoalsDisplay from "@/components/tracking/GoalsDisplay";
 import {
   Dialog,
   DialogContent,
