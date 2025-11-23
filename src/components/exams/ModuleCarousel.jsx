@@ -300,7 +300,7 @@ export default function ModuleCarousel({
                       variant="outline"
                       className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl">
 
-                            בחר מבחן ספציפי (מעל 100 בגרויות)
+                            בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 border-2 border-amber-200">
