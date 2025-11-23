@@ -229,8 +229,26 @@ export default function OnboardingPage() {
               <div className="text-center mb-2">
                 <div className="text-2xl mb-1">🎯</div>
                 <h2 className="text-lg font-bold text-gray-900 mb-0.5">מה היעד שלך?</h2>
-                <p className="text-xs text-gray-600">בחר יעד ציון לכל מקצוע</p>
+                <p className="text-xs text-gray-600">
+                  {onboardingData.selectedSubjects.length > 1 ? 'בחר יעד משותף או יעד לכל מקצוע' : 'בחר יעד ציון'}
+                </p>
               </div>
+
+              {onboardingData.selectedSubjects.length > 1 && (
+                <div className="mb-3">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-3 border-2 border-blue-200">
+                    <h3 className="text-xs font-bold text-gray-900 mb-2 text-center">יעד משותף לכולם</h3>
+                    <GoalSelector
+                      selectedGoal={null}
+                      onSelectGoal={(goal) => {
+                        onboardingData.selectedSubjects.forEach(subject => {
+                          setSubjectGoal(subject, goal);
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 {onboardingData.selectedSubjects.map((subject, idx) => (
