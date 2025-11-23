@@ -270,7 +270,7 @@ export default function ModuleCarousel({
                           className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
                         >
                           <Shuffle className="w-5 h-5" />
-                          מבחן אקראי
+                          בגרות אקראית
                         </Button>
 
                         {(isPremium === true) ? (
