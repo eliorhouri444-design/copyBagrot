@@ -81,11 +81,12 @@ export default function CustomWeakExamPage() {
       wrongQuestionIds.forEach(questionKey => {
         const details = questionErrorDetails[questionKey];
         const exam = allExams.find(e => e.id === details.exam_id);
-        
+
         if (exam && exam.questions && exam.questions[details.question_index]) {
           const question = exam.questions[details.question_index];
           weakQuestions.push({
             ...question,
+            reading_text: question.reading_text || exam.reading_text,
             exam_id: details.exam_id,
             exam_title: exam.title || 'מבחן בגרות',
             _metadata: {
