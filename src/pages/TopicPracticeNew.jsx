@@ -643,15 +643,17 @@ Return JSON:`,
     const isPremiumUser = user?.is_premium;
     
     if (isPremiumUser) {
-      // Premium users go directly to next set
       continueToNextSet(nextSet);
     } else {
-      // Check if user has rated
-      if (!adSettings?.has_rated) {
-        // Show rating dialog for bonus
+      // Check if user has bonus days left
+      const today = new Date().toISOString().split('T')[0];
+      const hasActiveBonus = adSettings?.bonus_active_until && adSettings.bonus_active_until >= today;
+      
+      if (hasActiveBonus) {
+        continueToNextSet(nextSet);
+      } else if (!adSettings?.has_rated) {
         setShowRatingDialog(true);
       } else {
-        // User already rated, show ad
         setShowAdDialog(true);
       }
     }
@@ -681,7 +683,6 @@ Return JSON:`,
   const handleSubmitRating = async (rating) => {
     try {
       if (rating === 5) {
-        // Give 1 day ad-free
         const bonusEndDate = new Date();
         bonusEndDate.setDate(bonusEndDate.getDate() + 1);
         
@@ -691,12 +692,26 @@ Return JSON:`,
           bonus_active_until: bonusEndDate.toISOString().split('T')[0]
         });
         
+        const updatedSettings = await base44.entities.UserAdSettings.filter({ id: adSettings.id });
+        if (updatedSettings.length > 0) {
+          setAdSettings(updatedSettings[0]);
+        }
+        
         setShowRatingDialog(false);
         alert("🎉 תודה על הדירוג! קיבלת יום אחד ללא פרסומות!");
         const nextSet = setNumber + 1;
         continueToNextSet(nextSet);
       } else {
-        // Show ad instead
+        await base44.entities.UserAdSettings.update(adSettings.id, {
+          has_rated: true,
+          rating_date: new Date().toISOString()
+        });
+        
+        const updatedSettings = await base44.entities.UserAdSettings.filter({ id: adSettings.id });
+        if (updatedSettings.length > 0) {
+          setAdSettings(updatedSettings[0]);
+        }
+        
         setShowRatingDialog(false);
         setShowAdDialog(true);
       }
