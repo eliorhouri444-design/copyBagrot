@@ -421,13 +421,33 @@ export default function HomePage() {
     );
   }
 
+  const todayProgress = studyGoals?.current_progress?.today_minutes || 0;
+  const todayGoal = studyGoals?.daily_goal?.practice_minutes || 30;
+  const todayPercentage = Math.min(100, (todayProgress / todayGoal) * 100);
+
+  const weeklySessionsProgress = studyGoals?.current_progress?.this_week_sessions || 0;
+  const weeklySessionsGoal = studyGoals?.weekly_goal?.practice_sessions || 4;
+  const weeklyPercentage = Math.min(100, (weeklySessionsProgress / weeklySessionsGoal) * 100);
+
+  const daysLeft = timeUntilExam?.days ?? null;
+  const questionsNeeded = studyGoals?.recommended_totals?.total_practice_before_exam - currentSubjectStats.practiceSessionsCount;
+  const examsNeeded = studyGoals?.recommended_totals?.total_exams_before_exam - currentSubjectStats.examsCompleted;
+
+  const dailyQuestionsNeeded = daysLeft && daysLeft > 0 && questionsNeeded > 0
+    ? Math.ceil(questionsNeeded / daysLeft)
+    : 0;
+
+  const dailyExamsNeeded = daysLeft && daysLeft > 0 && examsNeeded > 0
+    ? Math.ceil(examsNeeded / daysLeft)
+    : 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 overflow-x-hidden">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`${headerColor} rounded-b-[2rem] p-3 shadow-xl mb-6 relative overflow-hidden`}
+        className={`${headerColor} rounded-b-[2rem] p-4 shadow-xl mb-4 relative overflow-hidden`}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
@@ -435,238 +455,225 @@ export default function HomePage() {
         <div className="relative z-10">
           <button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-3 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
+            className="flex items-center gap-2 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
           >
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
-              <User className="w-7 h-7 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
+              <User className="w-6 h-6 text-white" />
             </div>
             <div className="text-right flex-1">
-              <h1 className="text-sm font-bold text-white">שלום, {displayName}!</h1>
+              <h1 className="text-base font-bold text-white">שלום, {displayName}!</h1>
               <p className="text-xs text-white/90">{displaySubject} • {displayUnits} יחידות</p>
             </div>
           </button>
-
-          {timeUntilExam && timeUntilExam.days >= 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mt-3 bg-white/20 backdrop-blur-sm rounded-2xl p-2.5 border-2 border-white/30"
-            >
-              <div className="flex items-center justify-center gap-2 text-white">
-                <Clock className="w-4 h-4" />
-                <div className="text-center">
-                  <div className="text-xl font-black">
-                    {timeUntilExam.days} ימים
-                  </div>
-                  <div className="text-[10px] opacity-90">
-                    עד הבגרות ב{displaySubject}
-                  </div>
-                </div>
-                <Flame className="w-4 h-4 animate-pulse" />
-              </div>
-            </motion.div>
-          )}
         </div>
       </motion.div>
 
-      <div className="px-6 space-y-4 pb-4">
-        {/* היעד היומי שלך */}
-        {studyGoals && (
+      <div className="px-4 space-y-3 max-w-screen-lg mx-auto">
+        {/* ספירה לאחור לבגרות */}
+        {timeUntilExam && timeUntilExam.days >= 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl p-4 shadow-xl text-white"
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <div className="flex items-center justify-between text-white">
-                <div className="flex-1 text-right">
-                  <h3 className="text-lg font-bold">היעד היומי שלך</h3>
-                  <p className="text-sm opacity-90">
-                    {studyGoals.daily_goal?.practice_minutes || 30} דקות • {studyGoals.daily_goal?.questions || 10} שאלות
-                  </p>
+            <div className="flex items-center justify-between">
+              <div className="text-right flex-1">
+                <div className="text-xs opacity-90 mb-1">זמן עד הבגרות</div>
+                <div className="text-3xl font-black mb-1">
+                  {timeUntilExam.days} ימים
                 </div>
-                <Target className="w-8 h-8" />
-              </div>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">תרגול יומי</span>
-                  <span className="text-sm font-bold text-blue-600">
-                    {studyGoals.current_progress?.today_minutes || 0} / {studyGoals.daily_goal?.practice_minutes || 30} דקות
-                  </span>
-                </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min(100, ((studyGoals.current_progress?.today_minutes || 0) / (studyGoals.daily_goal?.practice_minutes || 30)) * 100)}%`
-                    }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
-                  />
+                <div className="text-xs opacity-80">
+                  {displaySubject} • {displayUnits} יחידות
                 </div>
               </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">יעד שבועי</span>
-                  <span className="text-sm font-bold text-green-600">
-                    {studyGoals.current_progress?.this_week_sessions || 0} / {studyGoals.weekly_goal?.practice_sessions || 4} תרגולים
-                  </span>
-                </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{
-                      width: `${Math.min(100, ((studyGoals.current_progress?.this_week_sessions || 0) / (studyGoals.weekly_goal?.practice_sessions || 4)) * 100)}%`
-                    }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
-                  />
-                </div>
+              <div className="flex flex-col items-center gap-2">
+                <Clock className="w-12 h-12" />
+                <Flame className="w-6 h-6 animate-pulse" />
               </div>
-            </div>
-
-            <div className="p-4">
-              <Button
-                onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold rounded-2xl"
-              >
-                <BookOpen className="w-5 h-5 ml-2" />
-                התחל תרגול
-              </Button>
             </div>
           </motion.div>
         )}
 
-        {/* ההכנה לבגרות */}
-        {studyGoals?.recommended_totals && (
+        {/* מה צריך לעשות היום */}
+        {studyGoals && daysLeft > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <div className="flex items-center justify-between text-white">
-                <div className="flex-1 text-right">
-                  <h3 className="text-lg font-bold">ההכנה לבגרות</h3>
-                  <p className="text-sm opacity-90">המסלול שלך להצלחה</p>
-                </div>
-                <TrendingUp className="w-8 h-8" />
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3">
+              <div className="flex items-center gap-2 text-white">
+                <Target className="w-5 h-5" />
+                <h3 className="text-base font-bold">מה צריך לעשות היום כדי להצליח?</h3>
               </div>
             </div>
 
-            <div className="p-4 bg-white">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-700">תרגולים שהשלמת</span>
-                    <span className="text-sm font-bold">
-                      {currentSubjectStats.practiceSessionsCount} / {studyGoals.recommended_totals.total_practice_before_exam}
-                    </span>
+            <div className="p-4 space-y-3">
+              {questionsNeeded > 0 && dailyQuestionsNeeded > 0 && (
+                <div className="bg-blue-50 rounded-xl p-3 border-2 border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-bold text-gray-900">תרגול יומי</div>
+                    <div className="text-2xl font-black text-blue-600">{dailyQuestionsNeeded}</div>
                   </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
-                      style={{ width: `${totalProgress}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {totalProgress >= 100 ? '✅ השלמת את היעד!' : `עוד ${studyGoals.recommended_totals.total_practice_before_exam - currentSubjectStats.practiceSessionsCount} תרגולים`}
+                  <div className="text-xs text-gray-600">
+                    שאלות ביום - סה"כ נותרו {questionsNeeded} שאלות ל-{daysLeft} ימים
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-700">מבחנים שעשית</span>
-                    <span className="text-sm font-bold">
-                      {currentSubjectStats.examsCompleted} / {studyGoals.recommended_totals.total_exams_before_exam}
-                    </span>
+              {examsNeeded > 0 && dailyExamsNeeded > 0 && (
+                <div className="bg-green-50 rounded-xl p-3 border-2 border-green-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-bold text-gray-900">בגרויות מלאות</div>
+                    <div className="text-2xl font-black text-green-600">
+                      {dailyExamsNeeded > 0.5 ? `${dailyExamsNeeded}` : '1 בשבוע'}
+                    </div>
                   </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="text-xs text-gray-600">
+                    {dailyExamsNeeded > 0.5 
+                      ? `בגרויות ביום - נותרו ${examsNeeded} מבחנים` 
+                      : `נותרו ${examsNeeded} מבחנים בגרות`}
+                  </div>
+                </div>
+              )}
+
+              {todayGoal && (
+                <div className="bg-amber-50 rounded-xl p-3 border-2 border-amber-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-bold text-gray-900">זמן למידה יומי</div>
+                    <div className="text-2xl font-black text-amber-600">{todayGoal}</div>
+                  </div>
+                  <div className="text-xs text-gray-600">דקות ביום</div>
+                  <div className="h-2 bg-amber-100 rounded-full overflow-hidden mt-2">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
-                      style={{ width: `${examProgress}%` }}
+                      className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
+                      style={{ width: `${todayPercentage}%` }}
                     />
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {examProgress >= 100 ? '✅ השלמת את היעד!' : `עוד ${studyGoals.recommended_totals.total_exams_before_exam - currentSubjectStats.examsCompleted} מבחנים`}
+                    {todayProgress} / {todayGoal} דקות היום
                   </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* קיצורי דרך */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3">
+            <h3 className="text-base font-bold text-white text-center">גישה מהירה</h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 p-3">
+            {quickAccessCards.map((card, idx) => {
+              const Icon = card.icon;
+              const isLocked = card.isPremium && !user?.is_premium;
+              return (
+                <motion.button
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: card.delay, duration: 0.3 }}
+                  whileHover={{ scale: isLocked ? 1 : 1.03 }}
+                  whileTap={{ scale: isLocked ? 1 : 0.97 }}
+                  onClick={isLocked ? () => navigate(createPageUrl("Premium")) : card.onClick}
+                  className={`bg-gradient-to-r ${card.color} rounded-xl p-3 shadow-md text-white text-right hover:shadow-lg transition-all relative ${isLocked ? 'opacity-75' : ''}`}
+                >
+                  {card.isPremium && (
+                    <Crown className="w-3 h-3 absolute top-2 left-2 text-yellow-300" />
+                  )}
+                  <Icon className="w-6 h-6 mb-2" />
+                  <h3 className="text-xs font-bold mb-0.5">{card.title}</h3>
+                  <p className="text-[10px] opacity-90 leading-tight">{card.description}</p>
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* ההתקדמות הכוללת */}
+        {studyGoals?.recommended_totals && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-3">
+              <div className="flex items-center gap-2 text-white">
+                <TrendingUp className="w-5 h-5" />
+                <h3 className="text-base font-bold">ההתקדמות הכוללת שלך</h3>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-3">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-700 font-medium">תרגולים</span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {currentSubjectStats.practiceSessionsCount} / {studyGoals.recommended_totals.total_practice_before_exam}
+                  </span>
+                </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
+                    style={{ width: `${totalProgress}%` }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-700 font-medium">בגרויות</span>
+                  <span className="text-sm font-bold text-green-600">
+                    {currentSubjectStats.examsCompleted} / {studyGoals.recommended_totals.total_exams_before_exam}
+                  </span>
+                </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
+                    style={{ width: `${examProgress}%` }}
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 pt-0">
+            <div className="px-4 pb-4">
               <Button
                 onClick={handleStartRandomExam}
                 disabled={isStartingExam}
-                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold rounded-2xl"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-11 font-bold rounded-xl shadow-md"
               >
                 {isStartingExam ? (
                   <Loader2 className="w-5 h-5 ml-2 animate-spin" />
                 ) : (
                   <FileCheck className="w-5 h-5 ml-2" />
                 )}
-                התחל מבחן בגרות
+                התחל בגרות אקראית
               </Button>
             </div>
           </motion.div>
         )}
-
-        {/* כותרת לגישה מהירה */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-2xl overflow-hidden"
-        >
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3">
-            <h3 className="text-base font-bold text-white text-center">לגישה מהירה</h3>
-          </div>
-        </motion.div>
-
-        {/* קיצורי דרך */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {quickAccessCards.map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <motion.button
-                key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: card.delay, duration: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={card.onClick}
-                className={`bg-gradient-to-r ${card.color} rounded-2xl p-4 shadow-lg text-white text-right hover:shadow-xl transition-all relative`}
-              >
-                {card.isPremium && (
-                  <Crown className="w-4 h-4 absolute top-2 left-2 text-yellow-300" />
-                )}
-                <Icon className="w-8 h-8 mb-2" />
-                <h3 className="text-sm font-bold mb-1">{card.title}</h3>
-                <p className="text-xs opacity-90">{card.description}</p>
-              </motion.button>
-            );
-          })}
-        </div>
 
         {/* Alert if behind schedule */}
         {studyGoals && weeklyProgress < 50 && (
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.3 }}
           >
-            <Alert className="bg-red-50 border-red-200">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              <AlertDescription className="text-red-900">
-                <strong>שים לב!</strong> אתה מתחת ליעד השבועי שלך.
+            <Alert className="bg-red-50 border-red-200 rounded-xl">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-900 text-xs">
+                <strong>שים לב!</strong> אתה מתחת ליעד השבועי.
                 תרגל עוד {(((studyGoals.weekly_goal?.hours || 4) - (weeklyStudyHours || 0))).toFixed(1)} שעות השבוע
               </AlertDescription>
             </Alert>
