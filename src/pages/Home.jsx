@@ -397,7 +397,25 @@ export default function HomePage() {
       color: "from-cyan-500 to-blue-600",
       onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
       delay: 0.45,
-      isPremium: false
+      isPremium: true
+    },
+    {
+      icon: Target,
+      title: "תרגול טעויות",
+      description: "חזור על השאלות שטעית בהן",
+      color: "from-blue-500 to-cyan-600",
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
+      delay: 0.5,
+      isPremium: true
+    },
+    {
+      icon: Target,
+      title: "תרגול טעויות בבגרות",
+      description: "מבחן שמבוסס על השאלות שבהן טעית בעבר",
+      color: "from-orange-500 to-red-600",
+      onClick: () => navigate(createPageUrl("CustomWeakExam")),
+      delay: 0.55,
+      isPremium: true
     }
   ];
 
