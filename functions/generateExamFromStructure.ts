@@ -95,6 +95,133 @@ Deno.serve(async (req) => {
     for (let i = 0; i < count; i++) {
       console.log(`\n🔄 Creating exam ${i + 1}/${count}...`);
       
+    // קביעת דרישות מיוחדות לפי רמה ושאלון
+    let specificRequirements = '';
+    if (isEnglishExam) {
+      if (examStructure.unit_level === 3) {
+        specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 3 יחידות:**
+    
+    **Vocabulary (5-10 שאלות):**
+    - מילים בסיסיות מרשימת 3 יח"ל
+    - השלמת משפטים, בחירת מילה נכונה
+    
+    **Basic Grammar:**
+    - Present Simple, Present Progressive, Past Simple, Future
+    - שאלות מילוי / תיקון משפטים
+    
+    **Reading Comprehension (טקסט קצר 150-200 מילים באנגלית):**
+    - 4-6 שאלות: True/False, Wh-questions, Multiple Choice
+    
+    **Sentence Completion:**
+    - 5 משפטים להשלמה
+    
+    חובה ליצור טקסט קריאה קצר באנגלית (reading_text) של 150-200 מילים.`;
+      } else if (examStructure.unit_level === 4) {
+        if (examStructure.module_id === 'C') {
+          specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 4 יחידות - שאלון C:**
+    
+    **Vocabulary (6-10 שאלות):**
+    - מילים ברמה בינונית
+    - השלמת משפט, Word Forms (שינוי מילה)
+    
+    **Grammar (חובה!):**
+    - Passive Voice
+    - Conditionals (Types 0-2)
+    - Relative Clauses
+    - Modals
+    - Reported Speech
+    - Quantifiers
+    - Gerunds & Infinitives
+    - Present Perfect + Continuous
+    
+    צורה: בחירה, השלמה, תיקון, שכתוב משפט
+    
+    **Reading Comprehension (טקסט 250-350 מילים באנגלית):**
+    - Vocabulary in context
+    - True/False + Justify
+    - Wh-Questions
+    - Inference
+    - Main Idea
+    - Layout/Structure
+    
+    חובה ליצור טקסט קריאה באנגלית (reading_text) של 250-350 מילים.`;
+        } else if (examStructure.module_id === 'E') {
+          specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 4 יחידות - שאלון E:**
+    
+    **Writing Task (80-120 מילים):**
+    - סוגים: Opinion Essay, Formal Letter, Informal Letter, Description, Advantages/Disadvantages
+    - קריטריונים: תוכן, ארגון, שפה
+    
+    **Reading Comprehension (טקסט ארוך 350-450 מילים באנגלית):**
+    - Inference
+    - Comparing information
+    - Cause & Effect
+    - Summarizing
+    - True/False + Justify
+    - Vocabulary in context מורכב
+    - Choosing a title
+    
+    חובה ליצור טקסט קריאה ארוך באנגלית (reading_text) של 350-450 מילים.`;
+        }
+      } else if (examStructure.unit_level === 5) {
+        if (examStructure.module_id === 'G') {
+          specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 5 יחידות - שאלון G:**
+    
+    **Reading Comprehension (טקסט 450-700 מילים באנגלית):**
+    - פרק או שני פרקים
+    - שאלות ברמה גבוהה:
+      * Inference מתקדם
+      * Connecting ideas
+      * Purpose of paragraph
+      * Vocabulary in context advanced
+      * Identifying tone
+      * Writer's opinion
+      * Cause/Effect steps
+    
+    **Restatement (4-6 משפטים):**
+    - שכתוב משפטים תוך שימוש במילה נתונה
+    - שמירה על משמעות זהה
+    
+    **Reading Task נוסף / Integrated Task:**
+    - פרק נוסף + שאלות
+    - סיכום, Matching headings, Completing chart/table
+    
+    חובה ליצור טקסט קריאה מתקדם באנגלית (reading_text) של 450-700 מילים.`;
+        } else if (examStructure.module_id === 'F') {
+          specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 5 יחידות - שאלון F (ספרות):**
+    
+    בחר יצירה ספרותית (סיפור/שיר/מחזה) ויצור שאלות עליה.
+    
+    **5 שאלות הבנה בסיסית:**
+    - פרטי עלילה
+    - תיאור דמות
+    - מוטיב מרכזי
+    - סיבה ותוצאה
+    - הקונפליקט
+    
+    **2-3 שאלות HOTS:**
+    - Compare & contrast
+    - Inferring motives
+    - Explaining cause and effect
+    - Problem-solution
+    - Identifying patterns
+    - Uncovering motives
+    
+    **שאלה פתוחה ארוכה (80-120 מילים):**
+    - How does the story show responsibility?
+    - What choice made the biggest impact on the plot?
+    - How does one event change the character?
+    
+    אין צורך ב-reading_text נפרד - השאלות מתייחסות ליצירה הספרותית.`;
+        }
+      }
+    }
+
     const generationPrompt = `
     אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
@@ -107,18 +234,8 @@ Deno.serve(async (req) => {
 
     📝 **מבנה המבחן:**
     ${JSON.stringify(questionStructure, null, 2)}
-
-    ${isEnglishExam ? `
-    🔴 **חובה! - טקסט קריאה באנגלית:**
-    עבור מבחן אנגלית, חייב ליצור טקסט קריאה (reading_text) באנגלית:
-    - אורך: 200-300 מילים באנגלית
-    - רמה: מתאימה ל-${examStructure.unit_level} יחידות
-    - נושא מעניין: תרבות, טכנולוגיה, מדע, חברה
-    - סגנון: ברור ומובן
-    - הטקסט חייב להיות באנגלית!
-
-    השאלות יתבססו על הטקסט הזה - reading comprehension questions.
-    ` : ''}
+    
+    ${specificRequirements}
 
     🎯 **דרישות:**
 
