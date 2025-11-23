@@ -20,6 +20,7 @@ export default function AdminExamGeneratorPage() {
   const [generatingKey, setGeneratingKey] = useState(null);
   const [showExamDetails, setShowExamDetails] = useState(null);
   const [generationProgress, setGenerationProgress] = useState("");
+  const [examCount, setExamCount] = useState(1);
   
   const [filterSubject, setFilterSubject] = useState("all");
   const [filterUnits, setFilterUnits] = useState("all");
@@ -194,20 +195,24 @@ export default function AdminExamGeneratorPage() {
     const key = `${group.subject}|${group.unit_level}|${group.module_id}`;
     setIsGenerating(true);
     setGeneratingKey(key);
-    setGenerationProgress("🚀 מתחיל יצירה...");
+    setGenerationProgress(`🚀 מתחיל יצירת ${examCount} מבחנים...`);
     
     try {
-      toast.loading('🎯 יוצר מבחן מקורי...', { id: 'gen' });
-      setGenerationProgress("📚 לומד מהמבחנים שנסרקו...");
+      toast.loading(`🎯 יוצר ${examCount} מבחנים מקוריים...`, { id: 'gen' });
+      setGenerationProgress(`📚 לומד מהמבחנים שנסרקו...`);
 
       await new Promise(resolve => setTimeout(resolve, 800));
-      setGenerationProgress("🧠 יוצר שאלות חדשות...");
+      
+      for (let i = 0; i < examCount; i++) {
+        setGenerationProgress(`🧠 יוצר מבחן ${i + 1}/${examCount}...`);
+      }
 
       const result = await base44.functions.invoke('generateExamFromStructure', {
         subject: group.subject,
         unitLevel: group.unit_level,
         moduleId: group.module_id,
-        includeDiagrams: false
+        includeDiagrams: false,
+        count: examCount
       });
 
       console.log('Response:', result);
@@ -217,7 +222,7 @@ export default function AdminExamGeneratorPage() {
       if (result.data?.success) {
         setGenerationProgress("💾 שומר...");
         
-        toast.success(result.data.message || 'המבחן נוצר!', { id: 'gen' });
+        toast.success(result.data.message || `${examCount} מבחנים נוצרו!`, { id: 'gen' });
         
         // רענון מלא של הנתונים
         await queryClient.invalidateQueries(['generated-exams']);
@@ -494,27 +499,43 @@ export default function AdminExamGeneratorPage() {
                               )}
                             </div>
 
-                            <Button
-                              onClick={() => handleGenerate(group)}
-                              disabled={!canGenerate || isGenerating}
-                              className={`w-full h-12 font-bold ${
-                                canGenerate
-                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
-                                  : 'bg-gray-300 text-gray-500'
-                              }`}
-                            >
-                              {isGeneratingThis ? (
-                                <>
-                                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                  יוצר...
-                                </>
-                              ) : (
-                                <>
-                                  <Wand2 className="w-5 h-5 mr-2" />
-                                  צור מבחן מקורי
-                                </>
-                              )}
-                            </Button>
+                            <div className="space-y-2">
+                             <div className="flex items-center gap-2">
+                               <label className="text-sm font-semibold text-gray-700">כמות:</label>
+                               <Input
+                                 type="number"
+                                 min="1"
+                                 max="10"
+                                 value={examCount}
+                                 onChange={(e) => setExamCount(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
+                                 className="w-20 h-9 text-center"
+                                 disabled={isGenerating}
+                               />
+                               <span className="text-xs text-gray-600">מבחנים</span>
+                             </div>
+
+                             <Button
+                               onClick={() => handleGenerate(group)}
+                               disabled={!canGenerate || isGenerating}
+                               className={`w-full h-12 font-bold ${
+                                 canGenerate
+                                   ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
+                                   : 'bg-gray-300 text-gray-500'
+                               }`}
+                             >
+                               {isGeneratingThis ? (
+                                 <>
+                                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                   יוצר {examCount}...
+                                 </>
+                               ) : (
+                                 <>
+                                   <Wand2 className="w-5 h-5 mr-2" />
+                                   צור {examCount} {examCount === 1 ? 'מבחן' : 'מבחנים'}
+                                 </>
+                               )}
+                             </Button>
+                            </div>
                           </motion.div>
                         );
                       })}

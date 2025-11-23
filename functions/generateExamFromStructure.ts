@@ -14,8 +14,8 @@ Deno.serve(async (req) => {
     console.log('✅ User authenticated:', user.email);
 
     console.log('📥 Step 2: Parsing request...');
-    const { subject, unitLevel, moduleId, includeDiagrams, generate_solutions } = await req.json();
-    console.log('✅ Request parsed:', { subject, unitLevel, moduleId });
+    const { subject, unitLevel, moduleId, includeDiagrams, generate_solutions, count = 1 } = await req.json();
+    console.log('✅ Request parsed:', { subject, unitLevel, moduleId, count });
 
     console.log('🔍 Step 3: Loading exam examples...');
     // טעינה ממקורות שונים - ExamStructure, GenericExam, ModuleA/B/C
@@ -84,13 +84,17 @@ Deno.serve(async (req) => {
     const examStructure = structures[randomIndex];
     console.log(`🎯 Selected structure: ${examStructure.structure_name || examStructure.title}`);
 
-    // יצירת מבחן חדש בהתבסס על המבנה
     const questionStructure = examStructure.question_structure || examStructure.questions || [];
     const durationMinutes = examStructure.duration_minutes || examStructure.duration || 90;
     const totalPoints = examStructure.total_points || 100;
-    
     const isEnglishExam = examStructure.subject === 'אנגלית';
 
+    const createdExams = [];
+
+    // יצירת מבחנים בלולאה
+    for (let i = 0; i < count; i++) {
+      console.log(`\n🔄 Creating exam ${i + 1}/${count}...`);
+      
     const generationPrompt = `
     אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
 
@@ -144,9 +148,10 @@ Deno.serve(async (req) => {
     - קשר למציאות (אם רלוונטי)
 
     החזר JSON עם המבחן המלא${isEnglishExam ? ' כולל reading_text באנגלית' : ''}.
+    ${i > 0 ? `\n⚠️ זה מבחן ${i + 1} מתוך ${count} - ודא שהתוכן שונה לגמרי ממבחנים קודמים!` : ''}
     `;
 
-    console.log('🤖 Step 5: Generating exam with AI...');
+    console.log(`🤖 Step 5 (${i + 1}/${count}): Generating exam with AI...`);
     let generatedExam;
     let retryCount = 0;
     const maxRetries = 3;
@@ -261,10 +266,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log('💾 Step 6: Saving exam to database...');
+    console.log(`💾 Step 6 (${i + 1}/${count}): Saving exam to database...`);
     
     const examData = {
-      title: generatedExam.title || `${examStructure.subject} - מבחן מחולל`,
+      title: generatedExam.title || `${examStructure.subject} - מבחן מחולל ${i + 1}`,
       subject: examStructure.subject,
       unit_level: examStructure.unit_level,
       module_id: examStructure.module_id,
@@ -277,7 +282,6 @@ Deno.serve(async (req) => {
       is_copyright_free: true
     };
     
-    // הוסף reading_text אם קיים (חובה לאנגלית)
     if (generatedExam.reading_text) {
       examData.reading_text = generatedExam.reading_text;
       console.log(`✅ Reading text added (${generatedExam.reading_text.length} characters)`);
@@ -291,10 +295,10 @@ These celebrations preserve ancient traditions while bringing communities togeth
     }
     
     const savedExam = await base44.asServiceRole.entities.GenericExam.create(examData);
-    console.log('✅ Exam saved with ID:', savedExam.id);
+    console.log(`✅ Exam ${i + 1} saved with ID:`, savedExam.id);
+    createdExams.push(savedExam);
 
-    console.log('📝 Step 7: Saving solutions...');
-    // שמירת פתרונות אם נדרש
+    console.log(`📝 Step 7 (${i + 1}/${count}): Saving solutions...`);
     if (generate_solutions) {
       for (const question of generatedExam.questions) {
         await base44.asServiceRole.entities.SolutionBank.create({
@@ -314,14 +318,16 @@ These celebrations preserve ancient traditions while bringing communities togeth
       }
     }
 
-    console.log('✅ Solutions saved');
-    console.log('🎉 Generation complete!');
+    console.log(`✅ Exam ${i + 1}/${count} complete!`);
+    }
+
+    console.log(`🎉 All ${count} exams generated successfully!`);
 
     return Response.json({
       success: true,
-      exam_id: savedExam.id,
-      exam: generatedExam,
-      message: 'מבחן חדש נוצר בהצלחה'
+      exams_created: createdExams.length,
+      exam_ids: createdExams.map(e => e.id),
+      message: `${createdExams.length} מבחנים נוצרו בהצלחה`
     });
     
   } catch (error) {
