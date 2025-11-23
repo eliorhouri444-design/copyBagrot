@@ -976,7 +976,7 @@ export default function ExamsPage() {
                   variant="outline"
                   className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50">
 
-                      צפה בכל המבחנים ({examAttempts.length})
+                      צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
                   </motion.div>
               }
