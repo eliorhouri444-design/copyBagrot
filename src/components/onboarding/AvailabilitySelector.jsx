@@ -12,7 +12,7 @@ const timeOptions = [
 
 export default function AvailabilitySelector({ selectedTime, onSelectTime }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-2">
       {timeOptions.map((time, idx) => (
         <motion.button
           key={time.id}
@@ -22,22 +22,22 @@ export default function AvailabilitySelector({ selectedTime, onSelectTime }) {
           whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => onSelectTime(time.id)}
-          className={`p-4 rounded-2xl border-2 transition-all animate-hover-card ${
+          className={`p-3 rounded-xl border-2 transition-all animate-hover-card ${
             selectedTime === time.id
               ? 'border-blue-500 bg-blue-50 shadow-lg'
               : 'border-gray-200 bg-white hover:border-blue-300'
           }`}
         >
-          <div className="text-3xl mb-2">{time.emoji}</div>
-          <div className="font-bold text-gray-900 text-base mb-1">{time.label}</div>
+          <div className="text-2xl mb-1">{time.emoji}</div>
+          <div className="font-bold text-gray-900 text-xs mb-0.5">{time.label}</div>
           <div className="text-xs text-gray-600">{time.questions}</div>
           {selectedTime === time.id && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="mt-2 animate-task-bounce"
+              className="mt-1.5 animate-task-bounce"
             >
-              <CheckCircle className="w-5 h-5 text-blue-600 mx-auto" />
+              <CheckCircle className="w-4 h-4 text-blue-600 mx-auto" />
             </motion.div>
           )}
         </motion.button>

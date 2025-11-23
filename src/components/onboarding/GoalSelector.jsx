@@ -31,7 +31,7 @@ const goals = [
 
 export default function GoalSelector({ selectedGoal, onSelectGoal }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {goals.map((goal, idx) => (
         <motion.button
           key={goal.id}
@@ -41,16 +41,16 @@ export default function GoalSelector({ selectedGoal, onSelectGoal }) {
           whileHover={{ scale: 1.02, x: -4 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSelectGoal(goal.id)}
-          className={`w-full p-3 rounded-2xl border-2 transition-all flex items-center justify-between animate-hover-card ${
+          className={`w-full p-2.5 rounded-xl border-2 transition-all flex items-center justify-between animate-hover-card ${
             selectedGoal === goal.id
               ? 'border-blue-500 bg-blue-50 shadow-lg'
               : 'border-gray-200 bg-white hover:border-blue-300'
           }`}
         >
-          <div className="flex items-center gap-3 text-right">
-            <div className="text-3xl">{goal.emoji}</div>
+          <div className="flex items-center gap-2.5 text-right">
+            <div className="text-2xl">{goal.emoji}</div>
             <div>
-              <div className="font-bold text-gray-900 text-base">{goal.label}</div>
+              <div className="font-bold text-gray-900 text-sm">{goal.label}</div>
               <div className="text-xs text-gray-600">{goal.score} • {goal.description}</div>
             </div>
           </div>
@@ -60,7 +60,7 @@ export default function GoalSelector({ selectedGoal, onSelectGoal }) {
               animate={{ scale: 1 }}
               className="animate-task-bounce"
             >
-              <CheckCircle className="w-6 h-6 text-blue-600" />
+              <CheckCircle className="w-5 h-5 text-blue-600" />
             </motion.div>
           )}
         </motion.button>

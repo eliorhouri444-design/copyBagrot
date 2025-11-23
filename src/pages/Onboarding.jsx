@@ -153,9 +153,9 @@ export default function OnboardingPage() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-3"
+        className="mb-2"
       >
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent text-center">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent text-center">
           בגרות פלוס
         </h1>
         <p className="text-xs text-gray-600 text-center mt-0.5">נבנה תכנית לימוד אישית בשבילך</p>
@@ -171,10 +171,10 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">📚</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">לאילו בגרויות תתכונן?</h2>
-                <p className="text-sm text-gray-600">בחר מקצוע אחד או יותר</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">📚</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">לאילו בגרויות תתכונן?</h2>
+                <p className="text-xs text-gray-600">בחר מקצוע אחד או יותר</p>
               </div>
 
               <SubjectSelector 
@@ -192,20 +192,20 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">🎓</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">כמה יחידות?</h2>
-                <p className="text-sm text-gray-600">בחר רמת יחידות לכל מקצוע</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">🎓</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">כמה יחידות?</h2>
+                <p className="text-xs text-gray-600">בחר רמת יחידות לכל מקצוע</p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {onboardingData.selectedSubjects.map((subject, idx) => (
                   <motion.div
                     key={subject}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-gray-50 rounded-2xl p-3"
+                    className="bg-gray-50 rounded-2xl p-2"
                   >
                     <UnitsSelector
                       subject={subject}
@@ -226,22 +226,22 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">🎯</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">מה היעד שלך?</h2>
-                <p className="text-sm text-gray-600">בחר יעד ציון לכל מקצוע</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">🎯</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">מה היעד שלך?</h2>
+                <p className="text-xs text-gray-600">בחר יעד ציון לכל מקצוע</p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {onboardingData.selectedSubjects.map((subject, idx) => (
                   <motion.div
                     key={subject}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-gray-50 rounded-2xl p-3"
+                    className="bg-gray-50 rounded-2xl p-2"
                   >
-                    <h3 className="text-sm font-bold text-gray-900 mb-2 text-center">
+                    <h3 className="text-xs font-bold text-gray-900 mb-1.5 text-center">
                       {subject} - {onboardingData.subjectUnits[subject]} יחידות
                     </h3>
                     <GoalSelector
@@ -262,10 +262,10 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">⏰</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">כמה זמן יש לך ביום?</h2>
-                <p className="text-sm text-gray-600">בחר את הזמינות היומית שלך</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">⏰</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">כמה זמן יש לך ביום?</h2>
+                <p className="text-xs text-gray-600">בחר את הזמינות היומית שלך</p>
               </div>
 
               <AvailabilitySelector
@@ -283,10 +283,10 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">🎓</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">איך תרצה ללמוד?</h2>
-                <p className="text-sm text-gray-600">בחר את סגנון הלמידה שמתאים לך</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">🎓</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">איך תרצה ללמוד?</h2>
+                <p className="text-xs text-gray-600">בחר את סגנון הלמידה שמתאים לך</p>
               </div>
 
               <LearningStyleSelector
@@ -304,13 +304,13 @@ export default function OnboardingPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-3xl shadow-2xl p-4"
             >
-              <div className="text-center mb-4">
-                <div className="text-3xl mb-2">📅</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">מתי הבגרויות?</h2>
-                <p className="text-sm text-gray-600">הזן מועדי בחינה לכל מקצוע</p>
+              <div className="text-center mb-2">
+                <div className="text-2xl mb-1">📅</div>
+                <h2 className="text-lg font-bold text-gray-900 mb-0.5">מתי הבגרויות?</h2>
+                <p className="text-xs text-gray-600">הזן מועדי בחינה לכל מקצוע</p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {onboardingData.selectedSubjects.map((subject, idx) => (
                   <motion.div
                     key={subject}
@@ -330,41 +330,41 @@ export default function OnboardingPage() {
           )}
         </AnimatePresence>
 
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-1.5 mt-3">
           {[0, 1, 2, 3, 4, 5].map((idx) => (
             <div
               key={idx}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                idx === stage ? 'w-8 bg-gradient-to-r from-blue-600 to-purple-600' : 'w-2 bg-gray-300'
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === stage ? 'w-6 bg-gradient-to-r from-blue-600 to-purple-600' : 'w-1.5 bg-gray-300'
               }`}
             />
           ))}
         </div>
 
         <motion.div 
-          className="mt-4"
+          className="mt-3"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <Button
             onClick={handleNext}
             disabled={!canProceed() || isCreating}
-            className="w-full h-12 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-base shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? (
               <span className="flex items-center justify-center gap-2">
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 <span>בונה תכנית לימוד...</span>
               </span>
             ) : stage === 5 ? (
               <span className="flex items-center justify-center gap-2">
-                <Sparkles className="w-6 h-6" />
+                <Sparkles className="w-5 h-5" />
                 <span>צור תכנית אישית</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <span>הבא</span>
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </span>
             )}
           </Button>
