@@ -37,7 +37,7 @@ export default function ModuleCarousel({
   const currentModule = modules[currentIndex];
 
   const moduleStats = useMemo(() => {
-    if (!examAttempts || examAttempts.length === 0) {
+    if (!currentModule || !examAttempts || examAttempts.length === 0) {
       return {
         totalAttempts: 0,
         passedAttempts: 0,
@@ -62,13 +62,13 @@ export default function ModuleCarousel({
     0;
 
     const maxExams = isPremium === true ? 100 : 5;
-    const progress = Math.min(100, totalAttempts / maxExams * 100);
+    const progress = totalAttempts > 0 ? Math.min(100, Math.round((totalAttempts / maxExams) * 100)) : 0;
 
     return {
       totalAttempts,
       passedAttempts,
       avgScore,
-      progress: Math.round(progress),
+      progress,
       maxExams
     };
   }, [currentModule, examAttempts, isPremium]);

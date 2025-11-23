@@ -181,11 +181,18 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         
         // Calculate progress based on unique questions vs total available
         const actualTotal = topic.actualQuestionCount || topic.questionCount;
-        const progress = actualTotal > 0 ? Math.round((uniqueAnswered / actualTotal) * 100) : 0;
+        const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round((uniqueAnswered / actualTotal) * 100) : 0;
 
         return {
           ...topic,
-          stats: { correct, wrong, partial, total, progress, uniqueAnswered }
+          stats: { 
+            correct: correct || 0, 
+            wrong: wrong || 0, 
+            partial: partial || 0, 
+            total: total || 0, 
+            progress: progress || 0, 
+            uniqueAnswered: uniqueAnswered || 0 
+          }
         };
       });
 
@@ -306,42 +313,44 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               )}
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-              <h3 className="text-base font-bold text-center mb-3">📊 הסטטיסטיקה שלך</h3>
-              
-              <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="flex justify-center items-center mb-2">
-                  <span className="text-xl font-bold text-purple-600">{currentTopic.stats.progress}%</span>
+            {currentTopic.stats && (
+              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+                <h3 className="text-base font-bold text-center mb-3">📊 הסטטיסטיקה שלך</h3>
+                
+                <div className="bg-white rounded-xl p-3 mb-3">
+                  <div className="flex justify-center items-center mb-2">
+                    <span className="text-xl font-bold text-purple-600">{currentTopic.stats.progress}%</span>
+                  </div>
+                  <div className="text-xs font-semibold text-center mb-2">התקדמות</div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${currentTopic.stats.progress}%` }}
+                      transition={{ duration: 0.5 }}
+                      className="h-full bg-purple-600 rounded-full"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-500 text-center mt-1">
+                    {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
+                  </p>
                 </div>
-                <div className="text-xs font-semibold text-center mb-2">התקדמות</div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${currentTopic.stats.progress}%` }}
-                    transition={{ duration: 0.5 }}
-                    className="h-full bg-purple-600 rounded-full"
-                  />
-                </div>
-                <p className="text-[10px] text-gray-500 text-center mt-1">
-                  {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
-                </p>
-              </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-red-100 rounded-xl p-2 text-center">
-                  <div className="text-2xl font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                  <div className="text-[10px] text-gray-700">שגויות</div>
-                </div>
-                <div className="bg-green-100 rounded-xl p-2 text-center">
-                  <div className="text-2xl font-bold text-green-600">{currentTopic.stats.correct}</div>
-                  <div className="text-[10px] text-gray-700">נכונות</div>
-                </div>
-                <div className="bg-orange-100 rounded-xl p-2 text-center">
-                  <div className="text-2xl font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                  <div className="text-[10px] text-gray-700">חלקיות</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-red-100 rounded-xl p-2 text-center">
+                    <div className="text-2xl font-bold text-red-600">{currentTopic.stats.wrong}</div>
+                    <div className="text-[10px] text-gray-700">שגויות</div>
+                  </div>
+                  <div className="bg-green-100 rounded-xl p-2 text-center">
+                    <div className="text-2xl font-bold text-green-600">{currentTopic.stats.correct}</div>
+                    <div className="text-[10px] text-gray-700">נכונות</div>
+                  </div>
+                  <div className="bg-orange-100 rounded-xl p-2 text-center">
+                    <div className="text-2xl font-bold text-orange-600">{currentTopic.stats.partial}</div>
+                    <div className="text-[10px] text-gray-700">חלקיות</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-3">
               <Button
