@@ -316,12 +316,18 @@ export default function PracticePage() {
           />
         </motion.div>
 
-        <RecentPracticeSessions 
-          subject={displaySubject} 
-          units={displayUnits}
-          userEmail={user?.email}
-          isPremium={user?.is_premium}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <RecentPracticeSessions 
+            subject={displaySubject} 
+            units={displayUnits}
+            userEmail={user?.email}
+            isPremium={user?.is_premium}
+          />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

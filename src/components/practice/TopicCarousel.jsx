@@ -354,11 +354,14 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
               {isPremium ? (
                 <Button
-                  onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+                  onClick={() => {
+                    sessionStorage.setItem('weakPracticeTopic', topic.topic_id);
+                    navigate(createPageUrl("CustomWeakPractice"));
+                  }}
                   className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
                 >
                   <Target className="w-5 h-5 ml-2" />
-                  תרגול טעויות
+                  תרגול טעויות בנושא זה
                 </Button>
               ) : (
                 <Button
