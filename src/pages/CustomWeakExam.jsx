@@ -31,87 +31,80 @@ export default function CustomWeakExamPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Get all practice attempts
-      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
-      const userAttempts = attempts.filter(a => 
+      // Get all exam attempts (not practice attempts)
+      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
+      const userExamAttempts = examAttempts.filter(a => 
         a.created_by === currentUser.email && 
-        a.subject_id === currentUser.selected_subject
+        a.subject === currentUser.selected_subject &&
+        parseInt(a.unit_level) === parseInt(currentUser.selected_units)
       );
 
-      // Build question stats with priority scoring
-      const questionStats = {};
-      userAttempts.forEach(attempt => {
-        const qid = attempt.question_id;
-        if (!qid) return;
+      // Collect all wrong answers from all exam attempts
+      const wrongQuestionIds = new Set();
+      const questionErrorDetails = {};
 
-        if (!questionStats[qid]) {
-          questionStats[qid] = {
-            question_id: qid,
-            topic: attempt.topic_id,
-            attempts: 0,
-            successes: 0,
-            lastAttempt: attempt.created_date,
-            difficulty: 3 // default
-          };
-        }
-
-        questionStats[qid].attempts++;
-        if (attempt.status === "correct" || attempt.percentage >= 70) {
-          questionStats[qid].successes++;
+      userExamAttempts.forEach(attempt => {
+        if (attempt.answers && Array.isArray(attempt.answers)) {
+          attempt.answers.forEach((answer, idx) => {
+            if (!answer.is_correct) {
+              const questionKey = `${attempt.exam_id}_${idx}`;
+              wrongQuestionIds.add(questionKey);
+              
+              if (!questionErrorDetails[questionKey]) {
+                questionErrorDetails[questionKey] = {
+                  exam_id: attempt.exam_id,
+                  question_index: idx,
+                  errors: 0,
+                  last_attempt: attempt.created_date
+                };
+              }
+              questionErrorDetails[questionKey].errors++;
+            }
+          });
         }
       });
 
-      // Calculate priority score for each question
-      const now = new Date();
-      const scoredQuestions = Object.values(questionStats).map(stat => {
-        const failures = stat.attempts - stat.successes;
-        const lastDate = new Date(stat.lastAttempt);
-        const daysSince = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
-        const recencyFactor = Math.min(2, 1 + (daysSince / 30)); // Max 2x after 30 days
-        
-        const score = failures * stat.difficulty * recencyFactor;
-        
-        return {
-          ...stat,
-          score,
-          failures
-        };
-      })
-      .filter(q => q.failures > 0) // Only questions with failures
-      .sort((a, b) => b.score - a.score); // Highest priority first
+      console.log('Found wrong answers:', wrongQuestionIds.size);
 
-      // Get top question IDs
-      const topQuestionIds = scoredQuestions.slice(0, 30).map(q => q.question_id);
+      // Now fetch the actual exam questions
+      const [genericExams, moduleAExams, moduleBExams, moduleCExams] = await Promise.all([
+        base44.entities.GenericExam.list(),
+        base44.entities.ModuleAExam.list(),
+        base44.entities.ModuleBExam.list(),
+        base44.entities.ModuleCExam.list()
+      ]);
+
+      const allExams = [...genericExams, ...moduleAExams, ...moduleBExams, ...moduleCExams];
       
-      // Load questions from bank
-      const allQuestions = await base44.entities.QuestionBank.list();
-      const weakQuestions = allQuestions.filter(q => 
-        topQuestionIds.includes(q.question_id) && 
-        q.is_active === true &&
-        q.subject_id === currentUser.selected_subject
-      );
-
-      // Sort by priority score
-      const sortedQuestions = weakQuestions.sort((a, b) => {
-        const scoreA = scoredQuestions.find(s => s.question_id === a.question_id)?.score || 0;
-        const scoreB = scoredQuestions.find(s => s.question_id === b.question_id)?.score || 0;
-        return scoreB - scoreA;
-      }).slice(0, 20);
-
-      // Enrich with metadata
-      const enrichedQuestions = sortedQuestions.map(q => {
-        const stat = scoredQuestions.find(s => s.question_id === q.question_id);
-        return {
-          ...q,
-          _metadata: {
-            failures: stat?.failures || 0,
-            attempts: stat?.attempts || 0,
-            lastScore: stat ? Math.round((stat.successes / stat.attempts) * 100) : 0
-          }
-        };
+      // Extract questions from wrong answers
+      const weakQuestions = [];
+      wrongQuestionIds.forEach(questionKey => {
+        const details = questionErrorDetails[questionKey];
+        const exam = allExams.find(e => e.id === details.exam_id);
+        
+        if (exam && exam.questions && exam.questions[details.question_index]) {
+          const question = exam.questions[details.question_index];
+          weakQuestions.push({
+            ...question,
+            exam_id: details.exam_id,
+            exam_title: exam.title || 'מבחן בגרות',
+            _metadata: {
+              failures: details.errors,
+              attempts: details.errors,
+              lastScore: 0,
+              from_exam: true
+            }
+          });
+        }
       });
 
-      setQuestions(enrichedQuestions);
+      // Sort by number of errors
+      const sortedQuestions = weakQuestions.sort((a, b) => 
+        (b._metadata?.failures || 0) - (a._metadata?.failures || 0)
+      ).slice(0, 20);
+
+      console.log('Loaded weak questions from exams:', sortedQuestions.length);
+      setQuestions(sortedQuestions);
     } catch (error) {
       console.error("Error loading questions:", error);
     }
@@ -244,7 +237,7 @@ Return JSON:`,
               <Trophy className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">תרגול טעויות בבגרות</p>
+            <p className="text-gray-600">מבחן טעויות מבגרויות</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-6 border-2 border-orange-200">
@@ -301,7 +294,7 @@ Return JSON:`,
 
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
-              <h1 className="text-lg font-bold">תרגול טעויות בבגרות</h1>
+              <h1 className="text-lg font-bold">מבחן טעויות מבגרויות</h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
             <p className="text-sm opacity-90">שאלה {currentIndex + 1} / {questions.length}</p>
@@ -326,24 +319,23 @@ Return JSON:`,
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-600 font-medium">שאלה שטעית בה בעבר</div>
-                <div className="text-xs text-orange-600">⚡ חזק את הידע שלך</div>
+                <div className="text-sm text-gray-600 font-medium">שאלה מבגרות קודמות</div>
+                <div className="text-xs text-orange-600">⚡ שאלה שטעית בה במבחן</div>
               </div>
             </div>
 
             {question._metadata && (
               <div className="bg-white rounded-xl p-3 mb-3">
                 <div className="text-xs text-gray-600 font-semibold mb-2">📊 למה השאלה הזו:</div>
-                <div className="flex items-center gap-2 text-xs text-gray-700">
+                <div className="flex items-center gap-2 text-xs text-gray-700 flex-wrap">
                   <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
                     {question._metadata.failures} טעויות
                   </span>
-                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">
-                    {question._metadata.attempts} ניסיונות
-                  </span>
-                  <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">
-                    ציון אחרון: {question._metadata.lastScore}%
-                  </span>
+                  {question.exam_title && (
+                    <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg">
+                      מ: {question.exam_title}
+                    </span>
+                  )}
                 </div>
               </div>
             )}
