@@ -192,7 +192,7 @@ export default function ModuleCarousel({
                   </span>
                 </div>
                 <div className="text-xs text-gray-600 mb-2">
-                  {moduleStats.totalAttempts} / {moduleStats.maxExams} מבחנים {!(isPremium === true) && '(חינם)'}
+                  {moduleStats.totalAttempts} / {moduleStats.maxExams} בגרויות {!(isPremium === true) && '(חינם)'}
                 </div>
                 <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                   <motion.div
@@ -302,13 +302,13 @@ export default function ModuleCarousel({
                       variant="outline"
                       className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl">
 
-                            בחר מבחן ספציפי (מעל 100 מבחנים)
+                            בחר מבחן ספציפי (מעל 100 בגרויות)
                           </Button> :
 
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 border-2 border-amber-200">
                             <div className="text-center mb-2">
-                              <h4 className="text-xs font-bold text-gray-900 mb-0.5">מוגבל ל-5 מבחנים</h4>
-                              <p className="text-[10px] text-gray-600">מוגבל ל-5 המבחנים הראשונים</p>
+                              <h4 className="text-xs font-bold text-gray-900 mb-0.5">מוגבל ל-5 בגרויות</h4>
+                              <p className="text-[10px] text-gray-600">מוגבל ל-5 הבגרויות הראשונות</p>
                             </div>
                             <Button
                         onClick={() => handleModuleClick(currentModule)}
@@ -322,7 +322,7 @@ export default function ModuleCarousel({
                         className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl">
 
                               <Crown className="w-4 h-4" />
-                              לגישה מלאה 100+ מבחנים
+                              לגישה מלאה 100+ בגרויות
                             </Button>
                           </div>
                     }
