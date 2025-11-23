@@ -913,19 +913,49 @@ export default function ExamsPage() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <motion.div
-                              className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-                            >
-                              {Math.round(attempt.score_percent)}
-                            </motion.div>
-                            <div className="text-[10px] text-gray-500">
-                              {passed ? 'עבר' : 'נכשל'}
-                            </div >
+                            {isPremium ? (
+                              <>
+                                <motion.div
+                                  className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
+                                >
+                                  {Math.round(attempt.score_percent)}
+                                </motion.div>
+                                <div className="text-[10px] text-gray-500">
+                                  {passed ? 'עבר' : 'נכשל'}
+                                </div>
+                              </>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <Lock className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
                           </div>
                         </motion.button>
+
+                        {!isPremium && (
+                          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-3 border-2 border-amber-200 mr-2">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Crown className="w-4 h-4 text-amber-600" />
+                              <h4 className="font-bold text-gray-900 text-sm">רוצה לראות את הציון?</h4>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-2">
+                              שדרג לפרימיום כדי לראות ציונים מפורטים ותרגול טעויות
+                            </p>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(createPageUrl("Premium"));
+                              }}
+                              className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
+                            >
+                              <Crown className="w-3 h-3" />
+                              שדרג לפרימיום
+                            </Button>
+                          </div>
+                        )}
 
                         {hasMistakes && isPremium && (
                           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
@@ -1132,7 +1162,29 @@ export default function ExamsPage() {
             <DialogTitle className="text-xl">פרטי המבחן</DialogTitle>
           </DialogHeader>
 
-          {showAttemptDetails && (
+          {showAttemptDetails && !isPremium && (
+            <div className="space-y-4">
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-300 text-center">
+                <Crown className="w-16 h-16 text-amber-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">תכונה פרימיום</h3>
+                <p className="text-gray-700 mb-4">
+                  שדרג לפרימיום כדי לראות ציונים מפורטים, משוב על תשובות ותרגול טעויות
+                </p>
+                <Button
+                  onClick={() => {
+                    setShowAttemptDetails(null);
+                    navigate(createPageUrl("Premium"));
+                  }}
+                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold"
+                >
+                  <Crown className="w-5 h-5 mr-2" />
+                  שדרג עכשיו
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {showAttemptDetails && isPremium && (
             <div className="space-y-4">
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
                 <div className="grid grid-cols-3 gap-4 text-center">
@@ -1254,11 +1306,13 @@ export default function ExamsPage() {
             </div>
           )}
 
-          <DialogFooter>
-            <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
-              סגור
-            </Button>
-          </DialogFooter>
+          {isPremium && (
+            <DialogFooter>
+              <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
+                סגור
+              </Button>
+            </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
 
