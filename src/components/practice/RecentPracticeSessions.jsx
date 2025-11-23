@@ -55,7 +55,27 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
   };
 
   if (!practiceSessions || practiceSessions.length === 0) {
-    return null;
+    return (
+      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+          <div className="flex items-center gap-3 text-white">
+            <div className="flex-1 text-right">
+              <h3 className="text-base font-bold">תרגולים אחרונים</h3>
+              <p className="text-xs opacity-90">הביצועים שלך בתרגול</p>
+            </div>
+            <BookOpen className="w-7 h-7" />
+          </div>
+        </div>
+
+        <div className="p-6 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <BookOpen className="w-8 h-8 text-gray-400" />
+          </div>
+          <p className="text-gray-600 font-medium mb-2">אין תרגולים עדיין</p>
+          <p className="text-gray-500 text-sm">התחל לתרגל כדי לראות את ההתקדמות שלך</p>
+        </div>
+      </div>
+    );
   }
 
   return (
