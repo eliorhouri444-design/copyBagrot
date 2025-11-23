@@ -197,7 +197,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">טוען...</p>
@@ -215,7 +215,7 @@ export default function ProfilePage() {
   const topics = []; // Placeholder for topics, as they are not fetched in this component context
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -432,7 +432,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-4"
+            className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-3xl p-4 shadow-2xl"
           >
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -470,14 +470,14 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-lg p-4"
+          className="bg-white rounded-3xl shadow-2xl p-4"
         >
           <h2 className="text-lg font-bold text-gray-900 mb-4">הגדרות חשבון</h2>
 
           <div className="space-y-3">
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start rounded-2xl"
               onClick={() => setIsEditing(true)}
             >
               <Settings className="w-5 h-5 ml-3" />
@@ -486,7 +486,7 @@ export default function ProfilePage() {
 
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start rounded-2xl"
               onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 ml-3" />
@@ -495,7 +495,7 @@ export default function ProfilePage() {
 
             <Button
               variant="outline"
-              className="w-full justify-start text-red-600 hover:bg-red-50 border-red-200"
+              className="w-full justify-start text-red-600 hover:bg-red-50 border-red-200 rounded-2xl"
               onClick={handleDeleteAccount}
             >
               <Trash2 className="w-5 h-5 ml-3" />

@@ -318,7 +318,7 @@ export default function StatisticsPage() {
 
   if (!isUserLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600 font-semibold">טוען נתונים...</p>
@@ -607,7 +607,7 @@ export default function StatisticsPage() {
               
               <div className="space-y-3">
                 {statistics.strongTopics.slice(0, 5).map((topic, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4 shadow-sm">
+                  <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-3xl p-4 shadow-2xl">
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
                         <Star className="w-5 h-5 text-green-600" />
@@ -952,7 +952,7 @@ export default function StatisticsPage() {
                     </h4>
                     <div className="space-y-2">
                       {examWeakTopics.map((topic, idx) => (
-                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-3 shadow-2xl">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-bold text-gray-900 text-sm">{topic.topic}</span>
                             <span className="text-blue-700 font-black text-lg">{topic.mistakes} טעויות</span>
