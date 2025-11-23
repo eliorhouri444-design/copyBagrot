@@ -955,7 +955,8 @@ export default function ExamsPage() {
                             <Button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(createPageUrl("WeakExamSelection"));
+                                sessionStorage.setItem('weakExamSource', attempt.exam_id);
+                                navigate(createPageUrl("CustomWeakExam"));
                               }}
                               className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
                             >

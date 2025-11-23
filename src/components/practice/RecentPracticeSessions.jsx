@@ -368,6 +368,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           e.stopPropagation();
                           setShowAllSessions(false);
                           if (isPremium) {
+                            sessionStorage.setItem('weakPracticeSource', session.id);
                             navigate(createPageUrl("CustomWeakPractice"));
                           } else {
                             navigate(createPageUrl("Premium"));

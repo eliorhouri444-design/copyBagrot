@@ -38,11 +38,18 @@ export default function CustomWeakPracticePage() {
       console.log('📊 Selected subject:', currentUser.selected_subject);
       console.log('📊 Selected units:', currentUser.selected_units);
       
+      // Check if there's a specific session ID to filter by
+      const specificSessionId = sessionStorage.getItem('weakPracticeSource');
+      if (specificSessionId) {
+        sessionStorage.removeItem('weakPracticeSource'); // Clean up
+      }
+
       const wrongAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject_id === currentUser.selected_subject &&
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
-        (a.status === "incorrect" || a.percentage < 50)
+        (a.status === "incorrect" || a.percentage < 50) &&
+        (!specificSessionId || a.session_id === specificSessionId)
       );
       
       console.log('❌ Wrong attempts filtered:', wrongAttempts.length);
