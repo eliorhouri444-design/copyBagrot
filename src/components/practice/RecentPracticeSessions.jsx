@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, CheckCircle, X, TrendingUp } from "lucide-react";
+import { BookOpen, CheckCircle, X, TrendingUp, Crown, Target } from "lucide-react";
+import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -13,7 +14,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
-export default function RecentPracticeSessions({ subject, units, userEmail }) {
+export default function RecentPracticeSessions({ subject, units, userEmail, isPremium = false }) {
   const navigate = useNavigate();
   const [showAllSessions, setShowAllSessions] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -206,49 +207,78 @@ export default function RecentPracticeSessions({ subject, units, userEmail }) {
           <div className="space-y-2">
             {practiceSessions.map((session) => {
               const passed = session.percentage >= 70;
+              const hasMistakes = session.percentage < 70;
 
               return (
-                <button
-                  key={session.id}
-                  onClick={() => {
-                    setShowAllSessions(false);
-                    setSelectedSession(session);
-                  }}
-                  className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-                      {passed ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <TrendingUp className="w-4 h-4 text-orange-600" />
-                      )}
-                    </div>
-                    <div className="text-right flex-1">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {getTopicName(session.topic_id)}
+                <div key={session.id} className="space-y-2">
+                  <button
+                    onClick={() => {
+                      setShowAllSessions(false);
+                      setSelectedSession(session);
+                    }}
+                    className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                        {passed ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <TrendingUp className="w-4 h-4 text-orange-600" />
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(session.created_date).toLocaleDateString('he-IL', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                      <div className="text-right flex-1">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {getTopicName(session.topic_id)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(session.created_date).toLocaleDateString('he-IL', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="text-right">
-                    <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
-                      {Math.round(session.percentage)}%
+                    <div className="text-right">
+                      <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+                        {Math.round(session.percentage)}%
+                      </div>
+                      <div className="text-[10px] text-gray-500">
+                        {session.total_score || 0}/{session.max_score || 0}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-gray-500">
-                      {session.total_score || 0}/{session.max_score || 0}
+                  </button>
+
+                  {hasMistakes && (
+                    <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-3 border-2 border-red-200 mr-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="w-4 h-4 text-red-600" />
+                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות מתרגול זה</h4>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2">
+                        חזור על השאלות שטעית בהן
+                      </p>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowAllSessions(false);
+                          if (isPremium) {
+                            navigate(createPageUrl("CustomWeakPractice"));
+                          } else {
+                            navigate(createPageUrl("Premium"));
+                          }
+                        }}
+                        className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
+                      >
+                        <Target className="w-3 h-3" />
+                        {isPremium ? 'תרגול טעויות' : '🔒 שדרג לפרימיום'}
+                      </Button>
                     </div>
-                  </div>
-                </button>
+                  )}
+                </div>
               );
             })}
           </div>
