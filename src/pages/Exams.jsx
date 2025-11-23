@@ -870,58 +870,82 @@ export default function ExamsPage() {
                   {examAttempts.slice(0, 2).map((attempt, idx) => {
                     const examData = allExamsMap.get(attempt.exam_id);
                     const passed = attempt.score_percent >= 56;
+                    const hasMistakes = attempt.score_percent < 56;
 
                     return (
-                      <motion.button
-                        key={attempt.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + idx * 0.1 }}
-                        whileHover={{ scale: 1.02, x: -5 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setShowAttemptDetails(attempt)}
-                        className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <motion.div
-                            className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
-                            whileHover={{ rotate: 360 }}
-                            transition={{ duration: 0.5 }}
-                          >
-                            {passed ? (
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                            ) : (
-                              <X className="w-4 h-4 text-red-600" />
-                            )}
-                          </motion.div>
-                          <div className="flex-1 text-right">
-                            <div className="text-sm font-semibold text-gray-900">
-                              {examData?.title || 'מבחן'}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {new Date(attempt.created_date).toLocaleDateString('he-IL', {
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                      <div key={attempt.id} className="space-y-2">
+                        <motion.button
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 + idx * 0.1 }}
+                          whileHover={{ scale: 1.02, x: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setShowAttemptDetails(attempt)}
+                          className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <motion.div
+                              className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              {passed ? (
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                              ) : (
+                                <X className="w-4 h-4 text-red-600" />
+                              )}
+                            </motion.div>
+                            <div className="flex-1 text-right">
+                              <div className="text-sm font-semibold text-gray-900">
+                                {examData?.title || 'מבחן'}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(attempt.created_date).toLocaleDateString('he-IL', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <motion.div
-                            className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-                          >
-                            {Math.round(attempt.score_percent)}
-                          </motion.div>
-                          <div className="text-[10px] text-gray-500">
-                            {passed ? 'עבר' : 'נכשל'}
-                          </div >
-                        </div>
-                      </motion.button>
+                          <div className="text-right">
+                            <motion.div
+                              className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
+                            >
+                              {Math.round(attempt.score_percent)}
+                            </motion.div>
+                            <div className="text-[10px] text-gray-500">
+                              {passed ? 'עבר' : 'נכשל'}
+                            </div >
+                          </div>
+                        </motion.button>
+
+                        {hasMistakes && isPremium && (
+                          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Crown className="w-4 h-4 text-orange-600" />
+                              <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-2">
+                              חזור על השאלות שטעית בהן במבחן זה
+                            </p>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(createPageUrl("WeakExamSelection"));
+                              }}
+                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
+                            >
+                              <Target className="w-3 h-3" />
+                              מבחן טעויות
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -1290,6 +1314,7 @@ export default function ExamsPage() {
             {examAttempts.map((attempt, index) => {
               const examData = allExamsMap.get(attempt.exam_id);
               const passed = attempt.score_percent >= 56;
+              const hasMistakes = attempt.score_percent < 56;
               const moduleInfo = currentModules.find((m) =>
                 m.entity === (attempt.exam_type === 'module_a' ? 'ModuleAExam' : attempt.exam_type === 'module_b' ? 'ModuleBExam' : attempt.exam_type === 'module_c' ? 'ModuleCExam' : attempt.exam_type === 'generic' ? 'GenericExam' : undefined)
                 || m.id === attempt.module_id);
@@ -1298,59 +1323,83 @@ export default function ExamsPage() {
               const isLockedForNonPremium = !isPremium && index >= 2;
 
               return (
-                <button
-                  key={attempt.id}
-                  onClick={() => {
-                    setShowAllExams(false);
-                    setShowAttemptDetails(attempt);
-                  }}
-                  className={`w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between ${
-                    isLockedForNonPremium ? 'cursor-pointer opacity-70' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className={`p-2 rounded-lg ${isLockedForNonPremium ? 'bg-gray-100' : passed ? 'bg-green-100' : 'bg-red-100'}`}>
+                <div key={attempt.id} className="space-y-2">
+                  <button
+                    onClick={() => {
+                      setShowAllExams(false);
+                      setShowAttemptDetails(attempt);
+                    }}
+                    className={`w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between ${
+                      isLockedForNonPremium ? 'cursor-pointer opacity-70' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`p-2 rounded-lg ${isLockedForNonPremium ? 'bg-gray-100' : passed ? 'bg-green-100' : 'bg-red-100'}`}>
+                        {isLockedForNonPremium ? (
+                          <Lock className="w-4 h-4 text-gray-400" />
+                        ) : passed ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <X className="w-4 h-4 text-red-600" />
+                        )}
+                      </div>
+                      <div className="text-right flex-1">
+                        <div className="text-sm font-semibold text-gray-900">
+                          {examData?.title || examTypeName}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {displaySubject} • {displayUnits} יחידות • {new Date(attempt.created_date).toLocaleDateString('he-IL', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
                       {isLockedForNonPremium ? (
-                        <Lock className="w-4 h-4 text-gray-400" />
-                      ) : passed ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <div className="flex items-center gap-1">
+                          <Lock className="w-5 h-5 text-gray-400" />
+                        </div>
                       ) : (
-                        <X className="w-4 h-4 text-red-600" />
+                        <>
+                          <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
+                            {Math.round(attempt.score_percent)}
+                          </div>
+                          <div className="text-[10px] text-gray-500">
+                            {passed ? 'עבר' : 'נכשל'}
+                          </div >
+                        </>
                       )}
                     </div>
-                    <div className="text-right flex-1">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {examData?.title || examTypeName}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {displaySubject} • {displayUnits} יחידות • {new Date(attempt.created_date).toLocaleDateString('he-IL', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </div>
-                    </div>
-                  </div>
+                  </button>
 
-                  <div className="text-right">
-                    {isLockedForNonPremium ? (
-                      <div className="flex items-center gap-1">
-                        <Lock className="w-5 h-5 text-gray-400" />
+                  {hasMistakes && isPremium && !isLockedForNonPremium && (
+                    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="w-4 h-4 text-orange-600" />
+                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                       </div>
-                    ) : (
-                      <>
-                        <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
-                          {Math.round(attempt.score_percent)}
-                        </div>
-                        <div className="text-[10px] text-gray-500">
-                          {passed ? 'עבר' : 'נכשל'}
-                        </div >
-                      </>
-                    )}
-                  </div>
-                </button>
+                      <p className="text-xs text-gray-600 mb-2">
+                        חזור על השאלות שטעית בהן במבחן זה
+                      </p>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowAllExams(false);
+                          navigate(createPageUrl("WeakExamSelection"));
+                        }}
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
+                      >
+                        <Target className="w-3 h-3" />
+                        מבחן טעויות
+                      </Button>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
