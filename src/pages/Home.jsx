@@ -422,7 +422,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
