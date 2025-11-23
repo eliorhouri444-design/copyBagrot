@@ -861,7 +861,7 @@ export default function ExamsPage() {
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
-                <h3 className="text-base font-bold">מבחנים אחרונים</h3>
+                <h3 className="text-base font-bold">בגרויות אחרונות</h3>
                 <p className="text-xs opacity-90">הביצועים שלך</p>
               </div>
               <CheckCircle className="w-7 h-7" />
