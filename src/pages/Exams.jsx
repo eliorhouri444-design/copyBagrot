@@ -1193,28 +1193,29 @@ export default function ExamsPage() {
                   .sort((a, b) => b[1] - a[1])
                   .slice(0, 3);
 
-                return sortedWeakTopics.length > 0 && (
-                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
+                return sortedWeakTopics.length > 0 && isPremium && (
+                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border-2 border-orange-200">
                     <div className="flex items-center gap-2 mb-3">
-                      <Target className="w-5 h-5 text-amber-600" />
-                      <h4 className="font-bold text-gray-900">נושאים לשיפור</h4>
+                      <Crown className="w-5 h-5 text-orange-600" />
+                      <h4 className="font-bold text-gray-900">מבחן מותאם לטעויות שלך</h4>
                     </div>
                     <div className="space-y-2">
                       {sortedWeakTopics.map(([topic, count]) => (
                         <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
                           <span className="text-sm font-semibold text-gray-900">{topic}</span>
-                          <span className="text-xs text-amber-600 font-bold">{count} טעויות</span>
+                          <span className="text-xs text-orange-600 font-bold">{count} טעויות</span>
                         </div>
                       ))}
                     </div>
                     <Button
                       onClick={() => {
                         setShowAttemptDetails(null);
-                        navigate(createPageUrl("WeakTopics"));
+                        navigate(createPageUrl("WeakExamSelection"));
                       }}
-                      className="w-full mt-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-10 text-sm font-bold"
+                      className="w-full mt-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2"
                     >
-                      תרגל נושאים אלה
+                      <Target className="w-4 h-4" />
+                      מבחן טעויות מבגרויות
                     </Button>
                   </div>
                 );
