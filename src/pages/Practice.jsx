@@ -296,6 +296,7 @@ export default function PracticePage() {
           <TopicCarousel
             subject={displaySubject}
             units={displayUnits}
+            isPremium={user?.is_premium}
             onEditTopic={user?.role === 'admin' ? handleEditTopic : null}
             onAddTopic={user?.role === 'admin' ? () => {
               console.log('🔵 onAddTopic clicked!');

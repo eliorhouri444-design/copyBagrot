@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 
-export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic }) {
+export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState([]);
@@ -343,13 +343,33 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic 
               </div>
             </div>
 
-            <Button
-              onClick={handleStartPractice}
-              className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
-            >
-              <Play className="w-5 h-5 ml-2" />
-              התחל תרגול
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={handleStartPractice}
+                className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
+              >
+                <Play className="w-5 h-5 ml-2" />
+                התחל תרגול
+              </Button>
+
+              {isPremium ? (
+                <Button
+                  onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
+                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
+                >
+                  <Target className="w-5 h-5 ml-2" />
+                  תרגול טעויות
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => navigate(createPageUrl("Premium"))}
+                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
+                >
+                  <Lock className="w-5 h-5 ml-2" />
+                  תרגול טעויות
+                </Button>
+              )}
+            </div>
           </motion.div>
         </AnimatePresence>
 

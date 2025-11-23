@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, Shuffle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
+import { Progress } from "@/components/ui/progress";
 
 export default function ModuleCarousel({ 
   modules, 
@@ -263,13 +264,33 @@ export default function ModuleCarousel({
                   <>
                     {/* מבחן אקראי - למעלה - לכולם */}
                     {currentModule.entity !== 'practice' && onRandomExam && (
-                      <Button
-                        onClick={() => onRandomExam(currentModule.id)}
-                        className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
-                      >
-                        <Shuffle className="w-5 h-5" />
-                        מבחן אקראי
-                      </Button>
+                      <div className="space-y-3">
+                        <Button
+                          onClick={() => onRandomExam(currentModule.id)}
+                          className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
+                        >
+                          <Shuffle className="w-5 h-5" />
+                          מבחן אקראי
+                        </Button>
+
+                        {(isPremium === true) ? (
+                          <Button
+                            onClick={() => navigate(createPageUrl("WeakExamSelection"))}
+                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
+                          >
+                            <Target className="w-5 h-5 ml-2" />
+                            מבחן טעויות
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => navigate(createPageUrl("Premium"))}
+                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
+                          >
+                            <Crown className="w-5 h-5 ml-2" />
+                            מבחן טעויות
+                          </Button>
+                        )}
+                      </div>
                     )}
 
                     {/* בחר מבחן ספציפי - למטה - רק לפרימיום */}
