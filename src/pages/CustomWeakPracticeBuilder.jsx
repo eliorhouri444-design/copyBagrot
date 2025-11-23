@@ -133,36 +133,20 @@ export default function CustomWeakPracticeBuilderPage() {
         return;
       }
 
-      // Build exam from practice questions
-      const examQuestions = finalQuestions.map((q, idx) => ({
-        question_number: idx + 1,
-        question_text: q.question_text,
-        question_image_url: q.question_image_url,
-        question_type: q.question_type || 'short_answer',
-        options: q.options || [],
-        correct_answer: q.correct_answer || '',
-        explanation: q.explanation || '',
-        points: q.max_score || 5,
-        topic: q.topic_id,
-        reading_text: q.reading_text
-      }));
-
-      const totalPoints = examQuestions.reduce((sum, q) => sum + q.points, 0);
-
-      const customExam = await base44.entities.GenericExam.create({
-        title: `תרגול משולב - נושאים ושאלות חלשים`,
-        description: `מבוסס על ${weakTopics.length} נושאים חלשים + שאלות שטעית בהן`,
-        subject: currentUser.selected_subject,
+      // Create a practice session with weak questions
+      const session = await base44.entities.PracticeSessionNew.create({
+        session_type: "custom",
+        subject_id: currentUser.selected_subject,
         unit_level: currentUser.selected_units,
-        duration_minutes: Math.min(60, finalQuestions.length * 3),
-        total_points: totalPoints,
-        passing_grade: 56,
-        questions: examQuestions,
-        is_generated: true,
-        module_id: "custom_weak_practice"
+        topic_id: "weak_topics_mixed",
+        questions: finalQuestions.map(q => q.question_id),
+        started_at: new Date().toISOString(),
+        is_completed: false
       });
 
-      window.location.href = createPageUrl("ExamGeneric") + `?examId=${encodeURIComponent(customExam.id)}`;
+      // Navigate to practice page with these questions
+      const questionIds = finalQuestions.map(q => q.question_id).join(',');
+      window.location.href = createPageUrl("TopicPracticeNew") + `?topicId=weak_mixed&sessionId=${session.id}&questionIds=${questionIds}`;
     } catch (error) {
       console.error("Error building practice:", error);
       setError("שגיאה ביצירת התרגול: " + error.message);
