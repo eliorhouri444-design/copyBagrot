@@ -393,16 +393,32 @@ export default function HomePage() {
       title: "תרגול מותאם",
       description: "נושאים שטעית בהם",
       color: "from-purple-500 to-pink-600",
-      onClick: () => navigate(createPageUrl("CustomWeakPracticeBuilder")),
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
       delay: 0.45
     },
     {
       icon: Target,
-      title: "בגרות מטעויות",
-      description: "מבחינות שנכשלת בהן",
+      title: "בגרות מותאמת",
+      description: "שאלות שטעית בהן",
       color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("CustomFailedExamsBuilder")),
+      onClick: () => navigate(createPageUrl("CustomWeakExam")),
       delay: 0.5
+      },
+      {
+      icon: Calendar,
+      title: "תכנון לימודים",
+      description: "ארגן את הזמן שלך",
+      color: "from-green-500 to-emerald-600",
+      onClick: () => navigate(createPageUrl("StudyPlanner")),
+      delay: 0.55
+      },
+      {
+      icon: Target,
+      title: "תרגול מותאם",
+      description: "בנה תרגול בעצמך",
+      color: "from-cyan-500 to-blue-600",
+      onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
+      delay: 0.6
       }
       ];
 
