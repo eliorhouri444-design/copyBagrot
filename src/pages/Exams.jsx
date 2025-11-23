@@ -943,28 +943,6 @@ export default function ExamsPage() {
                           </div>
                         </motion.button>
 
-                        {!isPremium && (
-                          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-3 border-2 border-amber-200 mr-2">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Crown className="w-4 h-4 text-amber-600" />
-                              <h4 className="font-bold text-gray-900 text-sm">רוצה לראות את הציון?</h4>
-                            </div>
-                            <p className="text-xs text-gray-600 mb-2">
-                              שדרג לפרימיום כדי לראות ציונים מפורטים ותרגול טעויות
-                            </p>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(createPageUrl("Premium"));
-                              }}
-                              className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
-                            >
-                              <Crown className="w-3 h-3" />
-                              שדרג לפרימיום
-                            </Button>
-                          </div>
-                        )}
-
                         {hasMistakes && isPremium && (
                           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                             <div className="flex items-center gap-2 mb-2">
