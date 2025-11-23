@@ -394,7 +394,7 @@ export default function HomePage() {
       icon: Target,
       title: "מבחן טעויות מבגרויות",
       description: "בגרות מותאמת אישית על בסיס הטעויות שלך",
-      color: "from-orange-500 to-red-600",
+      color: "from-blue-500 to-cyan-600",
       onClick: () => navigate(createPageUrl("CustomWeakExam")),
       delay: 0.45,
       isPremium: true
