@@ -148,9 +148,10 @@ export default function CustomWeakExamPage() {
 
 Question: ${question.question_text}
 Correct Answer: ${question.correct_answer || "Check based on question"}
-Student Answer: ${userAnswer}
+Answer Given: ${userAnswer}
 
-Evaluate if the student's answer is correct. Be strict but fair.
+Evaluate if the answer is correct. Be strict but fair.
+IMPORTANT: In your Hebrew feedback, do NOT refer to "the student" or any person. Focus only on the answer itself (e.g., "התשובה לא נכונה כי..." instead of "הסטודנט טעה...").
 
 Return JSON:`,
         response_json_schema: {
