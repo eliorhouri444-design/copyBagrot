@@ -57,6 +57,7 @@ import StudyPlanner from './pages/StudyPlanner';
 import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
+import CustomWeakTopicExam from './pages/CustomWeakTopicExam';
 import __Layout from './Layout.jsx';
 
 
@@ -120,6 +121,7 @@ export const PAGES = {
     "CustomPracticeBuilder": CustomPracticeBuilder,
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
+    "CustomWeakTopicExam": CustomWeakTopicExam,
 }
 
 export const pagesConfig = {
