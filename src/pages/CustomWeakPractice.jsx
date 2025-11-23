@@ -20,6 +20,7 @@ export default function CustomWeakPracticePage() {
   const [answers, setAnswers] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [sourceSession, setSourceSession] = useState(null);
 
   useEffect(() => {
     loadUserAndQuestions();
@@ -35,6 +36,13 @@ export default function CustomWeakPracticePage() {
       const specificSessionId = sessionStorage.getItem('weakPracticeSource');
       if (specificSessionId) {
         sessionStorage.removeItem('weakPracticeSource'); // Clean up
+        
+        // Load the source session details
+        const allSessions = await base44.entities.PracticeSessionNew.list();
+        const sourceSessionData = allSessions.find(s => s.id === specificSessionId);
+        if (sourceSessionData) {
+          setSourceSession(sourceSessionData);
+        }
       }
 
       // Get all WRONG practice attempts
@@ -171,7 +179,9 @@ Return JSON:`,
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">מכין את התרגול שלך...</h3>
-          <p className="text-gray-600 font-semibold">מחפש שאלות שטעית בהן בתרגולים</p>
+          <p className="text-gray-600 font-semibold">
+            {sourceSession ? `מנתח טעויות מתרגול ב${sourceSession.topic_id || 'נושא'}` : 'מחפש שאלות שטעית בהן בתרגולים'}
+          </p>
         </motion.div>
       </div>
     );
@@ -265,8 +275,13 @@ Return JSON:`,
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">תרגול טעויות</h1>
-            <p className="text-sm opacity-90">שאלה {currentIndex + 1} / {questions.length}</p>
+            <h1 className="text-lg font-bold">
+              {sourceSession ? `תרגול טעויות: ${sourceSession.topic_id || 'נושא'}` : 'תרגול טעויות'}
+            </h1>
+            <p className="text-sm opacity-90">
+              שאלה {currentIndex + 1} / {questions.length}
+              {sourceSession && ` • ציון מקורי: ${Math.round(sourceSession.percentage || 0)}%`}
+            </p>
           </div>
 
           <div className="w-10" />
@@ -288,12 +303,37 @@ Return JSON:`,
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-600 font-medium">שאלה שטעית בה</div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {sourceSession ? 'שאלה מהתרגול המקורי' : 'שאלה שטעית בה'}
+                </div>
                 {question._metadata && (
                   <div className="text-xs text-red-600">⚡ טעית {question._metadata.failures} פעמים</div>
                 )}
               </div>
             </div>
+
+            {sourceSession && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 mb-3 border-2 border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-lg">📚</div>
+                  <div className="text-xs font-bold text-blue-900">תרגול מקורי: {sourceSession.topic_id || 'נושא'}</div>
+                </div>
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                    ציון מקורי: {Math.round(sourceSession.percentage || 0)}%
+                  </span>
+                  <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                    {new Date(sourceSession.created_date).toLocaleDateString('he-IL', {
+                      day: 'numeric',
+                      month: 'short'
+                    })}
+                  </span>
+                  <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
+                    {questions.length} טעויות בתרגול זה
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-xl p-4">
               <p className="text-base text-gray-900 leading-relaxed whitespace-pre-wrap">

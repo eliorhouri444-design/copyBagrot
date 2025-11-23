@@ -26,6 +26,9 @@ export default function CustomWeakExamPage() {
     loadUserAndQuestions();
   }, []);
 
+  const [sourceExam, setSourceExam] = useState(null);
+  const [sourceAttempt, setSourceAttempt] = useState(null);
+
   const loadUserAndQuestions = async () => {
     try {
       const currentUser = await base44.auth.me();
@@ -45,6 +48,12 @@ export default function CustomWeakExamPage() {
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
         (!specificExamId || a.exam_id === specificExamId)
       );
+
+      // Store source attempt info if filtering by specific exam
+      if (specificExamId && userExamAttempts.length > 0) {
+        const sourceAttemptData = userExamAttempts[0];
+        setSourceAttempt(sourceAttemptData);
+      }
 
       // Collect all wrong answers from all exam attempts
       const wrongQuestionIds = new Set();
@@ -83,6 +92,14 @@ export default function CustomWeakExamPage() {
 
       const allExams = [...genericExams, ...moduleAExams, ...moduleBExams, ...moduleCExams];
       
+      // Find and store the source exam if we're filtering by specific exam
+      if (specificExamId) {
+        const sourceExamData = allExams.find(e => e.id === specificExamId);
+        if (sourceExamData) {
+          setSourceExam(sourceExamData);
+        }
+      }
+      
       // Extract questions from wrong answers
       const weakQuestions = [];
       wrongQuestionIds.forEach(questionKey => {
@@ -96,6 +113,7 @@ export default function CustomWeakExamPage() {
             reading_text: question.reading_text || exam.reading_text,
             exam_id: details.exam_id,
             exam_title: exam.title || 'מבחן בגרות',
+            question_number: details.question_index + 1,
             _metadata: {
               failures: details.errors,
               attempts: details.errors,
@@ -223,7 +241,9 @@ Return JSON:`,
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
-          <p className="text-gray-600 font-semibold">מחפש טעויות מבגרויות קודמות</p>
+          <p className="text-gray-600 font-semibold">
+            {sourceExam ? `מנתח טעויות מ: ${sourceExam.title}` : 'מחפש טעויות מבגרויות קודמות'}
+          </p>
         </motion.div>
       </div>
     );
@@ -305,10 +325,15 @@ Return JSON:`,
 
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
-              <h1 className="text-lg font-bold">מבחן טעויות מבגרויות</h1>
+              <h1 className="text-lg font-bold">
+                {sourceExam ? `מבחן טעויות: ${sourceExam.title}` : 'מבחן טעויות מבגרויות'}
+              </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
-            <p className="text-sm opacity-90">שאלה {currentIndex + 1} / {questions.length}</p>
+            <p className="text-sm opacity-90">
+              שאלה {currentIndex + 1} / {questions.length}
+              {sourceAttempt && ` • ציון מקורי: ${Math.round(sourceAttempt.score_percent)}`}
+            </p>
           </div>
 
           <div className="w-10" />
@@ -330,12 +355,38 @@ Return JSON:`,
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-600 font-medium">שאלה מבגרות קודמות</div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {sourceExam ? `שאלה ${question.question_number} מהמבחן המקורי` : 'שאלה מבגרות קודמות'}
+                </div>
                 <div className="text-xs text-orange-600">⚡ שאלה שטעית בה במבחן</div>
               </div>
             </div>
 
-            {question._metadata && (
+            {sourceExam && (
+              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-purple-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-lg">📋</div>
+                  <div className="text-xs font-bold text-purple-900">{sourceExam.title}</div>
+                </div>
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  {sourceAttempt && (
+                    <>
+                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                        ציון מקורי: {Math.round(sourceAttempt.score_percent)}
+                      </span>
+                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                        {sourceAttempt.earned_points}/{sourceAttempt.total_points} נקודות
+                      </span>
+                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
+                        {questions.length} טעויות במבחן זה
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!sourceExam && question._metadata && (
               <div className="bg-white rounded-xl p-3 mb-3">
                 <div className="text-xs text-gray-600 font-semibold mb-2">📊 למה השאלה הזו:</div>
                 <div className="flex items-center gap-2 text-xs text-gray-700 flex-wrap">
