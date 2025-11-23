@@ -31,19 +31,20 @@ export default function CustomWeakPracticePage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Get all WRONG practice attempts
-      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
-      console.log('📊 Total attempts found:', attempts.length);
-      console.log('📊 User email:', currentUser.email);
-      console.log('📊 Selected subject:', currentUser.selected_subject);
-      console.log('📊 Selected units:', currentUser.selected_units);
-      
       // Check if there's a specific session ID to filter by
       const specificSessionId = sessionStorage.getItem('weakPracticeSource');
       if (specificSessionId) {
         sessionStorage.removeItem('weakPracticeSource'); // Clean up
       }
 
+      // Get all WRONG practice attempts
+      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
+      console.log('📊 Total attempts found:', attempts.length);
+      console.log('📊 User email:', currentUser.email);
+      console.log('📊 Selected subject:', currentUser.selected_subject);
+      console.log('📊 Selected units:', currentUser.selected_units);
+      console.log('📊 Specific session ID:', specificSessionId);
+      
       const wrongAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject_id === currentUser.selected_subject &&
