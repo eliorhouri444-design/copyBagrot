@@ -116,6 +116,7 @@ export default function VocabularyPracticePage() {
         await base44.entities.AttemptNew.create({
           question_id: question.id,
           subject_id: question.subject_id,
+          topic_id: urlParams.get("topicId") || `vocabulary_${category}`,
           session_id: sessionId,
           user_answer_text: userAnswer,
           score: 100,
@@ -173,6 +174,7 @@ Return JSON:`,
       await base44.entities.AttemptNew.create({
         question_id: question.id,
         subject_id: question.subject_id,
+        topic_id: urlParams.get("topicId") || `vocabulary_${category}`,
         session_id: sessionId,
         user_answer_text: userAnswer,
         score: aiResponse.similarity_score,
@@ -204,7 +206,22 @@ Return JSON:`,
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    const question = questions[currentIndex];
+    
+    // Record skip as incorrect attempt
+    await base44.entities.AttemptNew.create({
+      question_id: question.id,
+      subject_id: question.subject_id,
+      topic_id: urlParams.get("topicId") || `vocabulary_${category}`,
+      session_id: sessionId,
+      user_answer_text: "",
+      score: 0,
+      max_score: 100,
+      percentage: 0,
+      status: "incorrect"
+    });
+    
     setResults(prev => [...prev, { correct: false, score: 0 }]);
     handleNext();
   };
