@@ -205,7 +205,7 @@ export default function OnboardingPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-gray-50 rounded-2xl p-5"
+                    className="bg-gray-50 rounded-2xl p-3"
                   >
                     <UnitsSelector
                       subject={subject}
@@ -239,9 +239,9 @@ export default function OnboardingPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-gray-50 rounded-2xl p-5"
+                    className="bg-gray-50 rounded-2xl p-3"
                   >
-                    <h3 className="text-base font-bold text-gray-900 mb-3 text-center">
+                    <h3 className="text-sm font-bold text-gray-900 mb-2 text-center">
                       {subject} - {onboardingData.subjectUnits[subject]} יחידות
                     </h3>
                     <GoalSelector
