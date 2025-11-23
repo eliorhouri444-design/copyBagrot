@@ -22,22 +22,22 @@ export default function AvailabilitySelector({ selectedTime, onSelectTime }) {
           whileHover={{ scale: 1.05, y: -4 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => onSelectTime(time.id)}
-          className={`p-6 rounded-2xl border-2 transition-all animate-hover-card ${
+          className={`p-4 rounded-2xl border-2 transition-all animate-hover-card ${
             selectedTime === time.id
               ? 'border-blue-500 bg-blue-50 shadow-lg'
               : 'border-gray-200 bg-white hover:border-blue-300'
           }`}
         >
-          <div className="text-5xl mb-3">{time.emoji}</div>
-          <div className="font-bold text-gray-900 text-lg mb-1">{time.label}</div>
-          <div className="text-sm text-gray-600">{time.questions}</div>
+          <div className="text-3xl mb-2">{time.emoji}</div>
+          <div className="font-bold text-gray-900 text-base mb-1">{time.label}</div>
+          <div className="text-xs text-gray-600">{time.questions}</div>
           {selectedTime === time.id && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="mt-3 animate-task-bounce"
+              className="mt-2 animate-task-bounce"
             >
-              <CheckCircle className="w-6 h-6 text-blue-600 mx-auto" />
+              <CheckCircle className="w-5 h-5 text-blue-600 mx-auto" />
             </motion.div>
           )}
         </motion.button>

@@ -28,7 +28,7 @@ export default function SubjectSelector({ selectedSubjects, onToggleSubject }) {
             whileHover={isLocked ? {} : { scale: 1.02, x: -4 }}
             whileTap={isLocked ? {} : { scale: 0.98 }}
             onClick={() => !isLocked && onToggleSubject(subject.id)}
-            className={`w-full p-5 rounded-2xl border-2 transition-all flex items-center justify-between animate-hover-card ${
+            className={`w-full p-3 rounded-2xl border-2 transition-all flex items-center justify-between animate-hover-card ${
               isLocked
                 ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
                 : isSelected
@@ -36,20 +36,20 @@ export default function SubjectSelector({ selectedSubjects, onToggleSubject }) {
                   : 'border-gray-200 bg-white hover:border-blue-300'
             }`}
           >
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isLocked ? 'from-gray-300 to-gray-400' : subject.color} flex items-center justify-center shadow-lg`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${isLocked ? 'from-gray-300 to-gray-400' : subject.color} flex items-center justify-center shadow-lg`}>
                 {isLocked ? (
-                  <Lock className="w-6 h-6 text-white" />
+                  <Lock className="w-5 h-5 text-white" />
                 ) : (
-                  <Icon className="w-6 h-6 text-white" />
+                  <Icon className="w-5 h-5 text-white" />
                 )}
               </div>
               <div>
-                <div className={`font-bold text-lg ${isLocked ? 'text-gray-500' : 'text-gray-900'}`}>
+                <div className={`font-bold text-base ${isLocked ? 'text-gray-500' : 'text-gray-900'}`}>
                   {subject.name}
                 </div>
                 {isLocked && (
-                  <div className="text-xs text-gray-500 mt-0.5">בקרוב</div>
+                  <div className="text-xs text-gray-500">בקרוב</div>
                 )}
               </div>
             </div>
@@ -59,7 +59,7 @@ export default function SubjectSelector({ selectedSubjects, onToggleSubject }) {
                 animate={{ scale: 1 }}
                 className="animate-task-bounce"
               >
-                <CheckCircle className="w-7 h-7 text-blue-600" />
+                <CheckCircle className="w-6 h-6 text-blue-600" />
               </motion.div>
             )}
           </motion.button>
