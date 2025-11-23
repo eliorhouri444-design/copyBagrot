@@ -27,11 +27,19 @@ Deno.serve(async (req) => {
         user_email: userEmail
       });
       
+      // Get learning profile for smart notifications
+      const profiles = await base44.asServiceRole.entities.UserLearningProfile.filter({
+        user_email: userEmail,
+        subject_id: user.selected_subject
+      });
+      
+      const profile = profiles[0];
+      const daysLeft = profile?.days_until_exam || 90;
+      
       // Case 1: No activity today at 20:00
       if (todayTasks.length === 0 || todayTasks[0].completed_questions === 0) {
         if (now.getHours() >= 20) {
           try {
-            // Get template
             const templates = await base44.asServiceRole.entities.MessageTemplate.filter({
               template_id: 'not_active_1d'
             });
@@ -39,14 +47,20 @@ Deno.serve(async (req) => {
             if (templates.length > 0 && templates[0].is_active) {
               const template = templates[0];
               
-              // Send push notification
+              // Customize message based on days left
+              let customMessage = template.message_text;
+              if (daysLeft <= 14) {
+                customMessage = `⚠️ נותרו ${daysLeft} ימים לבגרות! לא למדת היום - זה קריטי להמשיך.`;
+              } else if (daysLeft <= 30) {
+                customMessage = `נותרו ${daysLeft} ימים לבגרות. לא סיימת את היעד היומי - כדאי להשלים.`;
+              }
+              
               if (template.send_push) {
-                // In production, this would integrate with push notification service
                 await base44.asServiceRole.entities.NotificationLog.create({
                   user_email: userEmail,
                   template_id: template.template_id,
                   message_type: 'push',
-                  message_text: template.message_text,
+                  message_text: customMessage,
                   status: 'sent',
                   sent_date: new Date().toISOString()
                 });
@@ -56,6 +70,39 @@ Deno.serve(async (req) => {
             }
           } catch (error) {
             console.error(`Error sending notification to ${userEmail}:`, error);
+            results.errors++;
+          }
+        }
+      }
+      
+      // Case 1.5: Exceeded daily goal - encouragement
+      if (todayTasks.length > 0 && todayTasks[0].completed_questions > todayTasks[0].daily_goal) {
+        const existingEncouragement = await base44.asServiceRole.entities.NotificationLog.filter({
+          user_email: userEmail,
+          template_id: 'exceeded_goal'
+        });
+        
+        const alreadySentToday = existingEncouragement.some(notif => {
+          const notifDate = notif.sent_date?.split('T')[0];
+          return notifDate === today;
+        });
+        
+        if (!alreadySentToday) {
+          try {
+            const overPerformance = todayTasks[0].completed_questions - todayTasks[0].daily_goal;
+            const message = `🔥 אתה מעל התכנון! עשית ${overPerformance} שאלות נוספות היום. המשך ככה ותסיים את כל החומר לפני המבחן!`;
+            
+            await base44.asServiceRole.entities.NotificationLog.create({
+              user_email: userEmail,
+              template_id: 'exceeded_goal',
+              message_type: 'push',
+              message_text: message,
+              status: 'sent',
+              sent_date: new Date().toISOString()
+            });
+            results.sent++;
+          } catch (error) {
+            console.error(`Error sending encouragement to ${userEmail}:`, error);
             results.errors++;
           }
         }

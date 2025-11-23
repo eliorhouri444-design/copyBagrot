@@ -30,6 +30,41 @@ Deno.serve(async (req) => {
         continue; // Skip if already created
       }
       
+      // Get or create learning profile
+      let learningProfile = await base44.asServiceRole.entities.UserLearningProfile.filter({
+        user_email: userEmail,
+        subject_id: subject
+      });
+      
+      if (learningProfile.length === 0) {
+        // Create default profile
+        learningProfile = [await base44.asServiceRole.entities.UserLearningProfile.create({
+          user_email: userEmail,
+          subject_id: subject,
+          unit_level: parseInt(unitLevel),
+          target_score: 85,
+          exam_date: user.exam_date || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          current_mastery: 0,
+          daily_availability_minutes: 45,
+          learning_pace: 'normal',
+          weak_topics: [],
+          completed_topics: []
+        })];
+      }
+      
+      const profile = learningProfile[0];
+      
+      // Calculate days until exam
+      const examDate = new Date(profile.exam_date);
+      const daysLeft = Math.max(1, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24)));
+      
+      // Calculate difficulty factor
+      const difficultyFactor = unitLevel === 5 ? 1.3 : unitLevel === 4 ? 1.15 : 1.0;
+      
+      // Calculate target score factor
+      const targetScore = profile.target_score || 85;
+      const targetScoreFactor = targetScore >= 95 ? 1.35 : targetScore >= 80 ? 1.15 : 1.0;
+      
       // Calculate streak
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -66,10 +101,27 @@ Deno.serve(async (req) => {
         .filter(([_, stats]) => stats.total >= 3 && (stats.correct / stats.total) < 0.7)
         .map(([topic]) => topic);
       
-      // Calculate daily goal
+      // Calculate remaining material
+      const remainingMaterial = (100 - (profile.current_mastery || 0)) / 100;
+      
+      // Calculate daily required learning using the formula
+      const dailyRequiredPercent = (remainingMaterial / daysLeft) * difficultyFactor * targetScoreFactor;
+      
+      // Convert to questions (assume 100 questions = 100% mastery)
+      let calculatedGoal = Math.round(dailyRequiredPercent * 100);
+      
+      // Apply min/max bounds with streak bonus
       const baseGoal = unitLevel === 5 ? 40 : unitLevel === 4 ? 30 : 20;
-      const maxGoal = unitLevel === 5 ? 60 : unitLevel === 4 ? 50 : 40;
-      const dailyGoal = Math.min(maxGoal, baseGoal + streakDays * 0.5);
+      const maxGoal = unitLevel === 5 ? 70 : unitLevel === 4 ? 60 : 50;
+      const minGoal = 10;
+      
+      let dailyGoal = Math.max(minGoal, Math.min(maxGoal, calculatedGoal));
+      
+      // Streak bonus (but not too aggressive)
+      dailyGoal = Math.min(maxGoal, dailyGoal + Math.floor(streakDays * 0.3));
+      
+      // If less than 3 weeks until exam - add simulation
+      const needsSimulation = daysLeft <= 21;
       
       // Create tasks
       const tasks = [];
@@ -96,6 +148,17 @@ Deno.serve(async (req) => {
         status: 'pending'
       });
       
+      // Simulation task if close to exam
+      if (needsSimulation) {
+        tasks.push({
+          task_id: `exam_${Date.now()}_1`,
+          task_type: 'exam',
+          topic_id: null,
+          question_count: 0,
+          status: 'pending'
+        });
+      }
+      
       // Bonus task if streak > 3
       if (streakDays >= 3) {
         tasks.push({
@@ -106,6 +169,16 @@ Deno.serve(async (req) => {
           status: 'pending'
         });
       }
+      
+      // Update learning profile
+      await base44.asServiceRole.entities.UserLearningProfile.update(profile.id, {
+        days_until_exam: daysLeft,
+        remaining_material_percent: remainingMaterial * 100,
+        difficulty_factor: difficultyFactor,
+        target_score_factor: targetScoreFactor,
+        daily_goal_questions: dailyGoal,
+        last_recalculated: new Date().toISOString()
+      });
       
       // Create DailyPractice record
       const dailyPractice = await base44.asServiceRole.entities.DailyPractice.create({
