@@ -31,30 +31,87 @@ export default function CustomWeakExamPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Get all failed attempts
-      const attempts = await base44.entities.AttemptNew.list("-created_date", 200);
-      const failedAttempts = attempts.filter(a => 
+      // Get all practice attempts
+      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
+      const userAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
-        a.subject_id === currentUser.selected_subject &&
-        (a.status === "incorrect" || a.percentage < 60)
+        a.subject_id === currentUser.selected_subject
       );
 
-      // Get unique question IDs that were failed
-      const questionIds = [...new Set(failedAttempts.map(a => a.question_id).filter(Boolean))];
+      // Build question stats with priority scoring
+      const questionStats = {};
+      userAttempts.forEach(attempt => {
+        const qid = attempt.question_id;
+        if (!qid) return;
+
+        if (!questionStats[qid]) {
+          questionStats[qid] = {
+            question_id: qid,
+            topic: attempt.topic_id,
+            attempts: 0,
+            successes: 0,
+            lastAttempt: attempt.created_date,
+            difficulty: 3 // default
+          };
+        }
+
+        questionStats[qid].attempts++;
+        if (attempt.status === "correct" || attempt.percentage >= 70) {
+          questionStats[qid].successes++;
+        }
+      });
+
+      // Calculate priority score for each question
+      const now = new Date();
+      const scoredQuestions = Object.values(questionStats).map(stat => {
+        const failures = stat.attempts - stat.successes;
+        const lastDate = new Date(stat.lastAttempt);
+        const daysSince = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+        const recencyFactor = Math.min(2, 1 + (daysSince / 30)); // Max 2x after 30 days
+        
+        const score = failures * stat.difficulty * recencyFactor;
+        
+        return {
+          ...stat,
+          score,
+          failures
+        };
+      })
+      .filter(q => q.failures > 0) // Only questions with failures
+      .sort((a, b) => b.score - a.score); // Highest priority first
+
+      // Get top question IDs
+      const topQuestionIds = scoredQuestions.slice(0, 30).map(q => q.question_id);
       
-      // Load ALL those questions - matching by question_id field
+      // Load questions from bank
       const allQuestions = await base44.entities.QuestionBank.list();
       const weakQuestions = allQuestions.filter(q => 
-        questionIds.includes(q.question_id) && 
+        topQuestionIds.includes(q.question_id) && 
         q.is_active === true &&
-        q.subject_id === currentUser.selected_subject &&
-        !q.reading_text && // לא שאלות עם טקסט קריאה
-        !q.topic_id?.includes('extended_reading') // לא קריאה מורחבת
+        q.subject_id === currentUser.selected_subject
       );
 
-      // Shuffle and take up to 20
-      const shuffled = weakQuestions.sort(() => Math.random() - 0.5).slice(0, 20);
-      setQuestions(shuffled);
+      // Sort by priority score
+      const sortedQuestions = weakQuestions.sort((a, b) => {
+        const scoreA = scoredQuestions.find(s => s.question_id === a.question_id)?.score || 0;
+        const scoreB = scoredQuestions.find(s => s.question_id === b.question_id)?.score || 0;
+        return scoreB - scoreA;
+      }).slice(0, 20);
+
+      // Enrich with metadata
+      const enrichedQuestions = sortedQuestions.map(q => {
+        const stat = scoredQuestions.find(s => s.question_id === q.question_id);
+        return {
+          ...q,
+          _metadata: {
+            failures: stat?.failures || 0,
+            attempts: stat?.attempts || 0,
+            lastScore: stat ? Math.round((stat.successes / stat.attempts) * 100) : 0
+          }
+        };
+      });
+
+      setQuestions(enrichedQuestions);
     } catch (error) {
       console.error("Error loading questions:", error);
     }
@@ -265,11 +322,37 @@ Return JSON:`,
               <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Target className="w-6 h-6 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <div className="text-sm text-gray-600 font-medium">שאלה שטעית בה בעבר</div>
                 <div className="text-xs text-orange-600">⚡ חזק את הידע שלך</div>
               </div>
             </div>
+
+            {question._metadata && (
+              <div className="bg-white rounded-xl p-3 mb-3">
+                <div className="text-xs text-gray-600 font-semibold mb-2">📊 למה השאלה הזו:</div>
+                <div className="flex items-center gap-2 text-xs text-gray-700">
+                  <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
+                    {question._metadata.failures} טעויות
+                  </span>
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">
+                    {question._metadata.attempts} ניסיונות
+                  </span>
+                  <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-lg">
+                    ציון אחרון: {question._metadata.lastScore}%
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {question.reading_text && (
+              <div className="bg-blue-50 rounded-xl p-4 mb-4 border-2 border-blue-200">
+                <div className="text-xs font-bold text-blue-900 mb-2">📖 טקסט הקריאה:</div>
+                <div className="text-sm text-gray-800 leading-relaxed max-h-48 overflow-y-auto">
+                  {question.reading_text}
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-xl p-4">
               <p className="text-base text-gray-900 leading-relaxed whitespace-pre-wrap">
