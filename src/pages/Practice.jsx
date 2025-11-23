@@ -363,7 +363,7 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 cursor-not-allowed'} text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg`}
+                  className={`w-full ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 cursor-not-allowed'} text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-2xl rounded-2xl`}
                 >
                   {user?.is_premium ? (
                     <>
@@ -397,7 +397,7 @@ export default function PracticePage() {
                 </div>
                 <Button
                   onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
-                  className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm"
+                  className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm rounded-2xl"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   נהל
@@ -413,7 +413,7 @@ export default function PracticePage() {
                 </div>
                 <Button
                   onClick={() => navigate(createPageUrl("AdminTopics"))}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm rounded-2xl"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   נהל

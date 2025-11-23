@@ -842,7 +842,7 @@ export default function ExamsPage() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-2xl rounded-2xl"
                 >
                   <Target className="w-5 h-5" />
                   <span>בחר סוג מבחן</span>
@@ -975,7 +975,7 @@ export default function ExamsPage() {
                     <Button
                       onClick={() => setShowAllExams(true)}
                       variant="outline"
-                      className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                      className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50 rounded-2xl"
                     >
                       צפה בכל המבחנים ({examAttempts.length})
                     </Button>
@@ -995,7 +995,7 @@ export default function ExamsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border-2 border-amber-200 shadow-md"
+            className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-4 border-2 border-amber-200 shadow-2xl"
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1009,7 +1009,7 @@ export default function ExamsPage() {
               </div>
               <Button
                 onClick={() => navigate(createPageUrl("Premium"))}
-                className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-xs font-bold"
+                className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-xs font-bold rounded-2xl"
               >
                 <Crown className="w-4 h-4 mr-1" />
                 <span className="font-bold">שדרג</span>
@@ -1025,7 +1025,7 @@ export default function ExamsPage() {
             transition={{ delay: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
           >
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-2 border-green-200 shadow-md">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl p-4 border-2 border-green-200 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">הוסף שאלון</h3>
@@ -1041,7 +1041,7 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200 shadow-md">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-3xl p-4 border-2 border-purple-200 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">ניהול מבחנים</h3>
@@ -1057,7 +1057,7 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 border-2 border-indigo-200 shadow-md">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-4 border-2 border-indigo-200 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-gray-900 mb-1">סדר מודולים</h3>

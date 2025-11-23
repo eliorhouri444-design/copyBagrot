@@ -451,7 +451,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-3 bg-white/20 backdrop-blur-sm rounded-xl p-2.5 border-2 border-white/30"
+              className="mt-3 bg-white/20 backdrop-blur-sm rounded-2xl p-2.5 border-2 border-white/30"
             >
               <div className="flex items-center justify-center gap-2 text-white">
                 <Clock className="w-4 h-4" />
@@ -534,7 +534,7 @@ export default function HomePage() {
             <div className="p-4">
               <Button
                 onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold"
+                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold rounded-2xl"
               >
                 <BookOpen className="w-5 h-5 ml-2" />
                 התחל תרגול
@@ -605,7 +605,7 @@ export default function HomePage() {
               <Button
                 onClick={handleStartRandomExam}
                 disabled={isStartingExam}
-                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold"
+                className="w-full bg-blue-600 hover:bg-blue-700 h-12 font-bold rounded-2xl"
               >
                 {isStartingExam ? (
                   <Loader2 className="w-5 h-5 ml-2 animate-spin" />
