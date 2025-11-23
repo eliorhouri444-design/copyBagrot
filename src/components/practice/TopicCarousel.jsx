@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 
-export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
+export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState([]);
@@ -24,38 +24,27 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         setTopics(parsedCache);
         setCachedTopics(parsedCache);
         setIsLoading(false);
-        // טען ברקע לעדכון
-        loadTopics(true);
       } catch (e) {
         console.error('Cache parse error:', e);
-        loadTopics(false);
       }
-    } else {
-      loadTopics(false);
-    }
-  }, [subject, units]);
-
-  const loadTopics = async (isBackgroundRefresh = false) => {
-    if (!isBackgroundRefresh) {
-      setIsLoading(true);
     }
     
-    try {
-      // טעינה מקבילית של כל הנתונים בבת אחת
-      const [customTopics, allQuestions, allVocabQuestions, user, attempts] = await Promise.all([
-        base44.entities.TopicNew.list(),
-        base44.entities.QuestionBank.list(),
-        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.list() : Promise.resolve([]),
-        base44.auth.me(),
-        base44.entities.AttemptNew.list()
-      ]);
+    loadTopics();
+  }, [subject, units]);
 
+  const loadTopics = async () => {
+    setIsLoading(true);
+    try {
+      // Load custom topics first
+      const customTopics = await base44.entities.TopicNew.list();
       const relevantCustomTopics = customTopics.filter(t => 
         t.subject_id === subject && 
         t.unit_level === parseInt(units) && 
         t.is_active === true
       );
 
+      // Load questions
+      const allQuestions = await base44.entities.QuestionBank.list();
       const relevantQuestions = allQuestions.filter(q => 
         q.subject_id === subject && 
         parseInt(q.unit_level) === parseInt(units) && 
@@ -63,6 +52,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         q.topic_id
       );
 
+      // Load vocabulary questions if English
+      const allVocabQuestions = subject === 'אנגלית' ? await base44.entities.VocabularyQuestion.list() : [];
       const relevantVocabQuestions = allVocabQuestions.filter(q => 
         q.subject_id === subject && 
         parseInt(q.unit_level) === parseInt(units) && 
@@ -165,6 +156,12 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         return b.actualQuestionCount - a.actualQuestionCount;
       });
 
+      // טעינה מקבילה של user ו-attempts
+      const [user, attempts] = await Promise.all([
+        base44.auth.me(),
+        base44.entities.AttemptNew.list()
+      ]);
+      
       const relevantAttempts = attempts.filter(a => 
         a.created_by === user.email && 
         a.subject_id === subject
@@ -206,9 +203,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         setTopics([]);
       }
     } finally {
-      if (!isBackgroundRefresh) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   };
 
@@ -348,33 +343,13 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Button
-                onClick={handleStartPractice}
-                className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
-              >
-                <Play className="w-5 h-5 ml-2" />
-                התחל תרגול
-              </Button>
-
-              {isPremium ? (
-                <Button
-                  onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
-                >
-                  <Target className="w-5 h-5 ml-2" />
-                  תרגול טעויות
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
-                >
-                  <Lock className="w-5 h-5 ml-2" />
-                  תרגול טעויות
-                </Button>
-              )}
-            </div>
+            <Button
+              onClick={handleStartPractice}
+              className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 rounded-xl"
+            >
+              <Play className="w-5 h-5 ml-2" />
+              התחל תרגול
+            </Button>
           </motion.div>
         </AnimatePresence>
 
