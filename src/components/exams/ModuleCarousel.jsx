@@ -275,7 +275,7 @@ export default function ModuleCarousel({
 
                         {(isPremium === true) ? (
                           <Button
-                            onClick={() => navigate(createPageUrl("WeakExamSelection"))}
+                            onClick={() => navigate(createPageUrl("CustomWeakExam"))}
                             className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
                           >
                             <Target className="w-5 h-5 ml-2" />
