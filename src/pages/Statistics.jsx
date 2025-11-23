@@ -632,73 +632,55 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-5"
             >
-              <div className="flex items-center gap-2 mb-5">
-                <Target className="w-6 h-6 text-blue-600" />
-                <h3 className="text-lg font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
               </div>
 
               {/* Topics Table */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-blue-600" />
                   נושאי תרגול
                 </h4>
-                <div className="space-y-2 max-h-80 overflow-y-auto">
+                <div className="space-y-2">
                   {allTopics.map((topic, idx) => {
                     const topicData = statistics.topicArray.find(t => t.topic === topic.topic_id);
                     const accuracy = topicData?.accuracy || 0;
                     const total = topicData?.total || 0;
-                    const isWeak = accuracy < 70 && total > 0;
                     
                     return (
-                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-gray-900 text-sm mb-1 truncate">
-                              {topic.icon || '📚'} {topic.name}
-                            </div>
-                            <div className="w-full bg-blue-200 rounded-full h-2 mb-1">
-                              <div 
-                                className={`h-2 rounded-full ${
-                                  accuracy >= 80 ? 'bg-green-500' :
-                                  accuracy >= 60 ? 'bg-blue-500' :
-                                  'bg-orange-500'
-                                }`}
-                                style={{ width: `${Math.min(accuracy, 100)}%` }}
-                              />
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              {total > 0 ? (
-                                <>{topicData.correct} נכון • {topicData.incorrect} טעויות • {total} סה"כ</>
-                              ) : (
-                                <>לא תורגל עדיין</>
-                              )}
-                            </div>
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="font-bold text-gray-900 text-sm truncate flex-1">
+                            {topic.icon || '📚'} {topic.name}
                           </div>
-                          
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className={`text-lg font-bold ${
-                              accuracy >= 80 ? 'text-green-600' :
-                              accuracy >= 60 ? 'text-blue-600' :
-                              total > 0 ? 'text-orange-600' : 'text-gray-400'
-                            }`}>
-                              {total > 0 ? `${Math.round(accuracy)}%` : '—'}
-                            </span>
-                            {isWeak && (
-                              <Button
-                                onClick={() => {
-                                  sessionStorage.setItem('selectedTopicForPractice', topic.topic_id);
-                                  navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic_id)}`);
-                                }}
-                                className="h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-3 rounded-lg whitespace-nowrap"
-                              >
-                                <BookOpen className="w-3 h-3 ml-1" />
-                                תרגל
-                              </Button>
-                            )}
-                          </div>
+                          <span className={`text-base font-bold flex-shrink-0 ${
+                            accuracy >= 80 ? 'text-green-600' :
+                            accuracy >= 60 ? 'text-blue-600' :
+                            total > 0 ? 'text-orange-600' : 'text-gray-400'
+                          }`}>
+                            {total > 0 ? `${Math.round(accuracy)}%` : '—'}
+                          </span>
+                        </div>
+                        <div className="w-full bg-blue-200 rounded-full h-2 mb-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              accuracy >= 80 ? 'bg-green-500' :
+                              accuracy >= 60 ? 'bg-blue-500' :
+                              'bg-orange-500'
+                            }`}
+                            style={{ width: `${Math.min(accuracy, 100)}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {total > 0 ? (
+                            <>{topicData.correct} נכון • {topicData.incorrect} טעויות • {total} סה"כ</>
+                          ) : (
+                            <>לא תורגל עדיין</>
+                          )}
                         </div>
                       </div>
                     );
@@ -736,70 +718,36 @@ export default function StatisticsPage() {
                       <FileCheck className="w-4 h-4 text-blue-600" />
                       שאלוני בגרות
                     </h4>
-                    <div className="space-y-2 max-h-80 overflow-y-auto">
-                      {moduleArray.map((module, idx) => {
-                        const isWeak = module.avgScore < 70;
-                        
-                        return (
-                          <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 text-sm mb-1">
-                                  📋 שאלון {module.module}
-                                </div>
-                                <div className="w-full bg-blue-200 rounded-full h-2 mb-1">
-                                  <div 
-                                    className={`h-2 rounded-full ${
-                                      module.avgScore >= 80 ? 'bg-green-500' :
-                                      module.avgScore >= 60 ? 'bg-blue-500' :
-                                      'bg-orange-500'
-                                    }`}
-                                    style={{ width: `${Math.min(module.avgScore, 100)}%` }}
-                                  />
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                  {module.passed} עבר • {module.total - module.passed} נכשל • {module.total} סה"כ
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className={`text-lg font-bold ${
-                                  module.avgScore >= 80 ? 'text-green-600' :
-                                  module.avgScore >= 60 ? 'text-blue-600' :
-                                  'text-orange-600'
-                                }`}>
-                                  {Math.round(module.avgScore)}%
-                                </span>
-                                {isWeak && (
-                                  <Button
-                                    onClick={() => {
-                                      if (user?.is_premium) {
-                                        sessionStorage.setItem('weakExamModule', module.module);
-                                        navigate(createPageUrl("CustomWeakExam"));
-                                      } else {
-                                        navigate(createPageUrl("Premium"));
-                                      }
-                                    }}
-                                    className={`h-8 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-xs font-bold px-3 rounded-lg whitespace-nowrap`}
-                                  >
-                                    {user?.is_premium ? (
-                                      <>
-                                        <FileCheck className="w-3 h-3 ml-1" />
-                                        מבחן
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Crown className="w-3 h-3 ml-1" />
-                                        שדרג
-                                      </>
-                                    )}
-                                  </Button>
-                                )}
-                              </div>
+                    <div className="space-y-2">
+                      {moduleArray.map((module, idx) => (
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="font-bold text-gray-900 text-sm">
+                              📋 שאלון {module.module}
                             </div>
+                            <span className={`text-base font-bold flex-shrink-0 ${
+                              module.avgScore >= 80 ? 'text-green-600' :
+                              module.avgScore >= 60 ? 'text-blue-600' :
+                              'text-orange-600'
+                            }`}>
+                              {Math.round(module.avgScore)}%
+                            </span>
                           </div>
-                        );
-                      })}
+                          <div className="w-full bg-blue-200 rounded-full h-2 mb-2">
+                            <div 
+                              className={`h-2 rounded-full ${
+                                module.avgScore >= 80 ? 'bg-green-500' :
+                                module.avgScore >= 60 ? 'bg-blue-500' :
+                                'bg-orange-500'
+                              }`}
+                              style={{ width: `${Math.min(module.avgScore, 100)}%` }}
+                            />
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {module.passed} עבר • {module.total - module.passed} נכשל • {module.total} סה"כ
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 );
