@@ -329,7 +329,7 @@ export default function PracticePage() {
           transition={{ delay: 0.2 }}
         >
           <div className="bg-gradient-to-br from-blue-50 to-amber-50 rounded-3xl shadow-2xl overflow-hidden border-2 border-blue-200">
-            <div className="bg-gradient-to-r from-blue-600 to-amber-500 p-4">
+            <div className="bg-blue-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
                 <h3 className="text-lg font-bold">תרגול פרימיום מותאם אישית</h3>
                 <Crown className="w-5 h-5 text-yellow-300" />
