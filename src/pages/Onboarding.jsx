@@ -149,7 +149,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center justify-center p-4 animate-background-flow">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center justify-center p-4 pb-24 animate-background-flow">
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -352,17 +352,17 @@ export default function OnboardingPage() {
             className="w-full h-16 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-lg shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreating ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <Loader2 className="w-6 h-6 animate-spin" />
                 <span>בונה תכנית לימוד...</span>
               </span>
             ) : stage === 5 ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <Sparkles className="w-6 h-6" />
                 <span>צור תכנית אישית</span>
               </span>
             ) : (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <span>הבא</span>
                 <ChevronLeft className="w-6 h-6" />
               </span>
