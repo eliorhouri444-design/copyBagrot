@@ -7,6 +7,7 @@ import { BookOpen, Target, AlertCircle, Crown, User, TrendingUp, FileCheck, Cloc
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
+import RecentPracticeSessions from "@/components/practice/RecentPracticeSessions";
 import { differenceInDays, differenceInHours } from "date-fns";
 
 export default function HomePage() {
@@ -447,49 +448,49 @@ export default function HomePage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`${headerColor} rounded-b-[3rem] p-8 shadow-2xl mb-8 relative overflow-hidden`}
+        className={`${headerColor} rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden`}
       >
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-32 -translate-x-32" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
 
         <div className="relative z-10">
           <button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-4 hover:bg-white/10 rounded-2xl p-3 transition-colors w-full"
+            className="flex items-center gap-3 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
           >
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
-              <User className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
+              <User className="w-6 h-6 text-white" />
             </div>
             <div className="text-right flex-1">
-              <h1 className="text-2xl font-bold text-white mb-1">שלום, {displayName}!</h1>
+              <h1 className="text-xl font-bold text-white">שלום, {displayName}!</h1>
               <p className="text-sm text-white/90">{displaySubject} • {displayUnits} יחידות</p>
             </div>
           </button>
         </div>
       </motion.div>
 
-      <div className="px-6 space-y-6 max-w-screen-lg mx-auto">
+      <div className="px-6 space-y-6 max-w-screen-lg mx-auto pb-6">
         {/* ספירה לאחור לבגרות */}
         {timeUntilExam && timeUntilExam.days >= 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-r from-red-500 to-orange-600 rounded-3xl p-7 shadow-2xl text-white"
+            className="bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl p-6 shadow-xl text-white"
           >
             <div className="flex items-center justify-between">
               <div className="text-right flex-1">
-                <div className="text-sm opacity-90 mb-2">⏰ זמן עד הבגרות</div>
-                <div className="text-5xl font-black mb-2">
+                <div className="text-sm opacity-90 mb-1">⏰ זמן עד הבגרות</div>
+                <div className="text-4xl font-black mb-1">
                   {timeUntilExam.days} ימים
                 </div>
                 <div className="text-sm opacity-80">
                   {displaySubject} • {displayUnits} יחידות
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-3">
-                <Clock className="w-16 h-16" />
-                <Flame className="w-8 h-8 animate-pulse" />
+              <div className="flex flex-col items-center gap-2">
+                <Clock className="w-14 h-14" />
+                <Flame className="w-7 h-7 animate-pulse" />
               </div>
             </div>
           </motion.div>
@@ -501,37 +502,37 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white rounded-3xl shadow-xl overflow-hidden"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-5">
-              <div className="flex items-center gap-3 text-white">
-                <Target className="w-6 h-6" />
-                <h3 className="text-lg font-bold">מה צריך לעשות היום כדי להצליח?</h3>
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4">
+              <div className="flex items-center gap-2 text-white">
+                <Target className="w-5 h-5" />
+                <h3 className="text-base font-bold">מה צריך לעשות היום כדי להצליח?</h3>
               </div>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-5 space-y-3">
               {questionsNeeded > 0 && dailyQuestionsNeeded > 0 && (
-                <div className="bg-blue-50 rounded-2xl p-5 border-2 border-blue-200">
+                <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="text-base font-bold text-gray-900">תרגול יומי</div>
-                    <div className="text-3xl font-black text-blue-600">{dailyQuestionsNeeded}</div>
+                    <div className="text-sm font-bold text-gray-900">תרגול יומי</div>
+                    <div className="text-2xl font-black text-blue-600">{dailyQuestionsNeeded}</div>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs text-gray-600">
                     שאלות ביום - סה"כ נותרו {questionsNeeded} שאלות ל-{daysLeft} ימים
                   </div>
                 </div>
               )}
 
               {examsNeeded > 0 && dailyExamsNeeded > 0 && (
-                <div className="bg-green-50 rounded-2xl p-5 border-2 border-green-200">
+                <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="text-base font-bold text-gray-900">בגרויות מלאות</div>
-                    <div className="text-3xl font-black text-green-600">
+                    <div className="text-sm font-bold text-gray-900">בגרויות מלאות</div>
+                    <div className="text-2xl font-black text-green-600">
                       {dailyExamsNeeded > 0.5 ? `${dailyExamsNeeded}` : '1 בשבוע'}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs text-gray-600">
                     {dailyExamsNeeded > 0.5 
                       ? `בגרויות ביום - נותרו ${examsNeeded} מבחנים` 
                       : `נותרו ${examsNeeded} מבחנים בגרות`}
@@ -540,19 +541,19 @@ export default function HomePage() {
               )}
 
               {todayGoal && (
-                <div className="bg-amber-50 rounded-2xl p-5 border-2 border-amber-200">
+                <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="text-base font-bold text-gray-900">זמן למידה יומי</div>
-                    <div className="text-3xl font-black text-amber-600">{todayGoal}</div>
+                    <div className="text-sm font-bold text-gray-900">זמן למידה יומי</div>
+                    <div className="text-2xl font-black text-amber-600">{todayGoal}</div>
                   </div>
-                  <div className="text-sm text-gray-600">דקות ביום</div>
-                  <div className="h-3 bg-amber-100 rounded-full overflow-hidden mt-3">
+                  <div className="text-xs text-gray-600">דקות ביום</div>
+                  <div className="h-2 bg-amber-100 rounded-full overflow-hidden mt-2">
                     <div
                       className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
                       style={{ width: `${todayPercentage}%` }}
                     />
                   </div>
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-xs text-gray-500 mt-1">
                     {todayProgress} / {todayGoal} דקות היום
                   </div>
                 </div>
@@ -566,13 +567,13 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-xl overflow-hidden"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-5">
-            <h3 className="text-xl font-bold text-white text-center">גישה מהירה</h3>
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+            <h3 className="text-base font-bold text-white text-center">גישה מהירה</h3>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 p-5">
+          <div className="grid grid-cols-2 gap-3 p-4">
             {quickAccessCards.map((card, idx) => {
               const Icon = card.icon;
               const isLocked = card.isPremium && !user?.is_premium;
@@ -582,21 +583,35 @@ export default function HomePage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: card.delay, duration: 0.3 }}
-                  whileHover={{ scale: isLocked ? 1 : 1.05, y: -5 }}
-                  whileTap={{ scale: isLocked ? 1 : 0.95 }}
+                  whileHover={{ scale: isLocked ? 1 : 1.03 }}
+                  whileTap={{ scale: isLocked ? 1 : 0.97 }}
                   onClick={isLocked ? () => navigate(createPageUrl("Premium")) : card.onClick}
-                  className={`bg-gradient-to-r ${card.color} rounded-2xl p-5 shadow-xl text-white text-center hover:shadow-2xl transition-all relative ${isLocked ? 'opacity-75' : ''}`}
+                  className={`bg-gradient-to-r ${card.color} rounded-xl p-4 shadow-md text-white text-right hover:shadow-lg transition-all relative ${isLocked ? 'opacity-75' : ''}`}
                 >
                   {card.isPremium && (
-                    <Crown className="w-4 h-4 absolute top-3 left-3 text-yellow-300" />
+                    <Crown className="w-3 h-3 absolute top-2 left-2 text-yellow-300" />
                   )}
-                  <Icon className="w-10 h-10 mb-3 mx-auto" />
-                  <h3 className="text-sm font-bold mb-1">{card.title}</h3>
-                  <p className="text-xs opacity-90 leading-tight">{card.description}</p>
+                  <Icon className="w-7 h-7 mb-2" />
+                  <h3 className="text-xs font-bold mb-0.5">{card.title}</h3>
+                  <p className="text-[10px] opacity-90 leading-tight">{card.description}</p>
                 </motion.button>
               );
             })}
           </div>
+        </motion.div>
+
+        {/* תרגולים אחרונים */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <RecentPracticeSessions 
+            subject={displaySubject} 
+            units={displayUnits}
+            userEmail={user?.email}
+            isPremium={user?.is_premium}
+          />
         </motion.div>
 
         {/* ההתקדמות הכוללת */}
@@ -604,25 +619,25 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-white rounded-3xl shadow-xl overflow-hidden"
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-5">
-              <div className="flex items-center gap-3 text-white">
-                <TrendingUp className="w-6 h-6" />
-                <h3 className="text-xl font-bold">ההתקדמות הכוללת שלך</h3>
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4">
+              <div className="flex items-center gap-2 text-white">
+                <TrendingUp className="w-5 h-5" />
+                <h3 className="text-base font-bold">ההתקדמות הכוללת שלך</h3>
               </div>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-5 space-y-4">
               <div>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-base text-gray-700 font-semibold">תרגולים</span>
-                  <span className="text-base font-bold text-blue-600">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-700 font-medium">תרגולים</span>
+                  <span className="text-sm font-bold text-blue-600">
                     {currentSubjectStats.practiceSessionsCount} / {studyGoals.recommended_totals.total_practice_before_exam}
                   </span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
                     style={{ width: `${totalProgress}%` }}
@@ -631,13 +646,13 @@ export default function HomePage() {
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-base text-gray-700 font-semibold">בגרויות</span>
-                  <span className="text-base font-bold text-green-600">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-700 font-medium">בגרויות</span>
+                  <span className="text-sm font-bold text-green-600">
                     {currentSubjectStats.examsCompleted} / {studyGoals.recommended_totals.total_exams_before_exam}
                   </span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
                     style={{ width: `${examProgress}%` }}
@@ -646,16 +661,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="px-6 pb-6">
+            <div className="px-5 pb-5">
               <Button
                 onClick={handleStartRandomExam}
                 disabled={isStartingExam}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-14 text-lg font-bold rounded-2xl shadow-lg"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 h-12 text-base font-bold rounded-xl shadow-md"
               >
                 {isStartingExam ? (
-                  <Loader2 className="w-6 h-6 ml-2 animate-spin" />
+                  <Loader2 className="w-5 h-5 ml-2 animate-spin" />
                 ) : (
-                  <FileCheck className="w-6 h-6 ml-2" />
+                  <FileCheck className="w-5 h-5 ml-2" />
                 )}
                 התחל בגרות אקראית
               </Button>
