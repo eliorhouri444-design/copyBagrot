@@ -330,10 +330,44 @@ export default function PracticePage() {
             transition={{ delay: 0.2 }}
             className="space-y-3"
           >
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-md overflow-hidden border-2 border-blue-200">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+                <div className="text-center text-white flex items-center justify-center gap-2">
+                  <h3 className="text-lg font-bold">תרגול פרימיום</h3>
+                  <Crown className="w-5 h-5 text-yellow-300" />
+                </div>
+              </div>
+
+              <div className="p-5 text-center">
+                <p className="text-gray-700 text-sm mb-4">
+                  תכונות ייחודיות למנויי פרימיום - תרגול חכם ומותאם במיוחד בשבילך
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white rounded-xl p-3 border-2 border-blue-100">
+                    <div className="text-2xl mb-1">🎯</div>
+                    <div className="text-xs font-bold text-gray-900">תרגול טעויות</div>
+                  </div>
+                  <div className="bg-white rounded-xl p-3 border-2 border-blue-100">
+                    <div className="text-2xl mb-1">🔥</div>
+                    <div className="text-xs font-bold text-gray-900">נושאים חלשים</div>
+                  </div>
+                </div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <Target className="w-5 h-5" />
+                    <span>תרגול מותאם אישית</span>
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-2xl shadow-md overflow-hidden">
               <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-4">
                 <div className="text-center text-white flex items-center justify-center gap-2">
-                  <h3 className="text-lg font-bold">תרגול מותאם אישית</h3>
+                  <h3 className="text-lg font-bold">בניית תרגול בעצמך</h3>
                   <Crown className="w-5 h-5 text-yellow-300" />
                 </div>
               </div>
@@ -354,29 +388,7 @@ export default function PracticePage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-              <div className="bg-gradient-to-r from-cyan-500 to-blue-600 p-4">
-                <div className="text-center text-white flex items-center justify-center gap-2">
-                  <h3 className="text-lg font-bold">תרגול מותאם אישית</h3>
-                  <Crown className="w-5 h-5 text-yellow-300" />
-                </div>
-              </div>
 
-              <div className="p-5 text-center">
-                <p className="text-gray-700 text-sm mb-4">
-                  בנה תרגול מותאם אישית לפי הנושאים והקושי שאתה רוצה
-                </p>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={() => navigate(createPageUrl("CustomPracticeBuilder"))}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
-                  >
-                    <Target className="w-5 h-5" />
-                    <span>בנה תרגול בעצמך</span>
-                  </Button>
-                </motion.div>
-              </div>
-            </div>
           </motion.div>
         )}
 
