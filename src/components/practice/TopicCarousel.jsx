@@ -15,9 +15,9 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const [cachedTopics, setCachedTopics] = useState(null);
 
   useEffect(() => {
-    // טעינה ראשונית מיידית מ-cache
     const cacheKey = `topics_${subject}_${units}`;
     const cached = sessionStorage.getItem(cacheKey);
+    
     if (cached) {
       try {
         const parsedCache = JSON.parse(cached);
@@ -29,7 +29,13 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       }
     }
     
-    loadTopics();
+    // טען רק אם אין cache או אם עברו יותר מ-2 דקות
+    const lastUpdate = sessionStorage.getItem(`${cacheKey}_time`);
+    const shouldUpdate = !cached || !lastUpdate || (Date.now() - parseInt(lastUpdate) > 120000);
+    
+    if (shouldUpdate) {
+      loadTopics();
+    }
   }, [subject, units]);
 
   const loadTopics = async () => {
@@ -203,10 +209,10 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       });
 
       setTopics(topicsWithStats);
-      
-      // שמירה ב-cache
+
       const cacheKey = `topics_${subject}_${units}`;
       sessionStorage.setItem(cacheKey, JSON.stringify(topicsWithStats));
+      sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
 
     } catch (error) {
       console.error("Error loading topics:", error);
