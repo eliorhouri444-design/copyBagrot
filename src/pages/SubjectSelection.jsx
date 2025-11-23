@@ -149,8 +149,8 @@ export default function SubjectSelectionPage() {
                           {subject.units.map((units) => (
                             <motion.button
                               key={units}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
+                              whileHover={{ scale: 1.05, y: -2 }}
+                              whileTap={{ scale: 0.95 }}
                               onClick={() => handleUnitSelect(units)}
                               disabled={isLoading}
                               className={`w-full h-14 rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 bg-gradient-to-r ${subject.color} text-white hover:shadow-lg`}
