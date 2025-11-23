@@ -1323,8 +1323,6 @@ export default function ExamsPage() {
                 || m.id === attempt.module_id);
               const examTypeName = moduleInfo ? moduleInfo.title : 'מבחן בגרות';
 
-              const isLockedForNonPremium = !isPremium && index >= 2;
-
               return (
                 <div key={attempt.id} className="space-y-2">
                   <button
@@ -1332,15 +1330,11 @@ export default function ExamsPage() {
                       setShowAllExams(false);
                       setShowAttemptDetails(attempt);
                     }}
-                    className={`w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between ${
-                      isLockedForNonPremium ? 'cursor-pointer opacity-70' : ''
-                    }`}
+                    className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className={`p-2 rounded-lg ${isLockedForNonPremium ? 'bg-gray-100' : passed ? 'bg-green-100' : 'bg-red-100'}`}>
-                        {isLockedForNonPremium ? (
-                          <Lock className="w-4 h-4 text-gray-400" />
-                        ) : passed ? (
+                      <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}>
+                        {passed ? (
                           <CheckCircle className="w-4 h-4 text-green-600" />
                         ) : (
                           <X className="w-4 h-4 text-red-600" />
@@ -1363,24 +1357,16 @@ export default function ExamsPage() {
                     </div>
 
                     <div className="text-right">
-                      {isLockedForNonPremium ? (
-                        <div className="flex items-center gap-1">
-                          <Lock className="w-5 h-5 text-gray-400" />
-                        </div>
-                      ) : (
-                        <>
-                          <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
-                            {Math.round(attempt.score_percent)}
-                          </div>
-                          <div className="text-[10px] text-gray-500">
-                            {passed ? 'עבר' : 'נכשל'}
-                          </div >
-                        </>
-                      )}
+                      <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}>
+                        {Math.round(attempt.score_percent)}
+                      </div>
+                      <div className="text-[10px] text-gray-500">
+                        {passed ? 'עבר' : 'נכשל'}
+                      </div>
                     </div>
                   </button>
 
-                  {hasMistakes && isPremium && !isLockedForNonPremium && (
+                  {hasMistakes && (
                     <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                       <div className="flex items-center gap-2 mb-2">
                         <Crown className="w-4 h-4 text-orange-600" />
@@ -1393,12 +1379,25 @@ export default function ExamsPage() {
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowAllExams(false);
-                          navigate(createPageUrl("WeakExamSelection"));
+                          if (isPremium) {
+                            navigate(createPageUrl("CustomWeakExam"));
+                          } else {
+                            navigate(createPageUrl("Premium"));
+                          }
                         }}
                         className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
                       >
-                        <Target className="w-3 h-3" />
-                        מבחן טעויות
+                        {isPremium ? (
+                          <>
+                            <Target className="w-3 h-3" />
+                            <span>מבחן טעויות</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3 h-3" />
+                            <span>שדרג לפרימיום</span>
+                          </>
+                        )}
                       </Button>
                     </div>
                   )}
