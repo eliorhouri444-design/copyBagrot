@@ -167,18 +167,24 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         a.subject_id === subject
       );
 
-      const topicsWithStats = topicsArray.map(topic => {
+      const topicsWithStats = topicsArray
+        .filter(topic => {
+          // Filter out unwanted topics
+          const unwantedTopics = ['vocabulary_general', 'unknown'];
+          return !unwantedTopics.includes(topic.topic_id);
+        })
+        .map(topic => {
         const topicAttempts = relevantAttempts.filter(a => a.topic_id === topic.topic_id);
-        
+
         // Count unique questions answered
         const uniqueQuestions = new Set(topicAttempts.map(a => a.question_id));
         const uniqueAnswered = uniqueQuestions.size;
-        
+
         const correct = topicAttempts.filter(a => a.status === 'correct').length;
         const wrong = topicAttempts.filter(a => a.status === 'incorrect').length;
         const partial = topicAttempts.filter(a => a.status === 'partial').length;
         const total = topicAttempts.length;
-        
+
         // Calculate progress based on unique questions vs total available
         const actualTotal = topic.actualQuestionCount || topic.questionCount;
         const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round((uniqueAnswered / actualTotal) * 100) : 0;
