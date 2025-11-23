@@ -269,7 +269,7 @@ Return JSON:`,
               <Trophy className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">מבחן טעויות מבגרויות</p>
+            <p className="text-gray-600">מבחן מותאם מבגרויות</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-6 border-2 border-orange-200">
@@ -327,7 +327,7 @@ Return JSON:`,
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-lg font-bold">
-                {sourceExam ? `מבחן טעויות: ${sourceExam.title}` : 'מבחן טעויות מבגרויות'}
+                {sourceExam ? `מבחן מותאם: ${sourceExam.title}` : 'מבחן מותאם מבגרויות'}
               </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>

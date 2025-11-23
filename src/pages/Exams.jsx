@@ -830,7 +830,7 @@ export default function ExamsPage() {
           >
             <div className="bg-gradient-to-r from-orange-500 to-red-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
-                <h3 className="text-lg font-bold">תרגול טעויות בבגרות</h3>
+                <h3 className="text-lg font-bold">מבחן מותאם בבגרות</h3>
                 <Crown className="w-5 h-5 text-yellow-300" />
               </div>
             </div>
@@ -947,7 +947,7 @@ export default function ExamsPage() {
                           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-4 h-4 text-orange-600" />
-                              <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
+                              <h4 className="font-bold text-gray-900 text-sm">מבחן מותאם ממבחן זה</h4>
                             </div>
                             <p className="text-xs text-gray-600 mb-2">
                               חזור על השאלות שטעית בהן במבחן זה
@@ -961,7 +961,7 @@ export default function ExamsPage() {
                               className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
                             >
                               <Target className="w-3 h-3" />
-                              מבחן טעויות
+                              מבחן מותאם
                             </Button>
                           </div>
                         )}
@@ -1472,7 +1472,7 @@ export default function ExamsPage() {
                     <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                       <div className="flex items-center gap-2 mb-2">
                         <Crown className="w-4 h-4 text-orange-600" />
-                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
+                        <h4 className="font-bold text-gray-900 text-sm">מבחן מותאם ממבחן זה</h4>
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         חזור על השאלות שטעית בהן במבחן זה
@@ -1492,7 +1492,7 @@ export default function ExamsPage() {
                         {isPremium ? (
                           <>
                             <Target className="w-3 h-3" />
-                            <span>מבחן טעויות</span>
+                            <span>מבחן מותאם</span>
                           </>
                         ) : (
                           <>

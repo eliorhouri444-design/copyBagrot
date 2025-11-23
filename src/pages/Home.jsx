@@ -392,7 +392,7 @@ export default function HomePage() {
     },
     {
       icon: Target,
-      title: "תרגול טעויות",
+      title: "תרגול מותאם",
       description: "חזור על השאלות שטעית בהן",
       color: "from-blue-500 to-cyan-600",
       onClick: () => navigate(createPageUrl("CustomWeakPractice")),
@@ -401,7 +401,7 @@ export default function HomePage() {
     },
     {
       icon: Target,
-      title: "מבחן טעויות מבגרויות",
+      title: "מבחן מותאם מבגרויות",
       description: "בגרות מותאמת אישית על בסיס הטעויות שלך",
       color: "from-orange-500 to-red-600",
       onClick: () => navigate(createPageUrl("WeakExamSelection")),
