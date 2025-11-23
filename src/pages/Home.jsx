@@ -392,25 +392,16 @@ export default function HomePage() {
     },
     {
       icon: Target,
-      title: "תרגול מותאם אישית",
-      description: "בנה תרגול בעצמך",
-      color: "from-cyan-500 to-blue-600",
-      onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
+      title: "תרגול טעויות",
+      description: "חזור על השאלות שטעית בהן",
+      color: "from-blue-500 to-cyan-600",
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
       delay: 0.45,
       isPremium: true
     },
     {
       icon: Target,
       title: "תרגול טעויות",
-      description: "חזור על השאלות שטעית בהן",
-      color: "from-blue-500 to-cyan-600",
-      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
-      delay: 0.5,
-      isPremium: true
-    },
-    {
-      icon: Target,
-      title: "תרגול טעויות בבגרות",
       description: "מבחן שמבוסס על השאלות שבהן טעית בעבר",
       color: "from-orange-500 to-red-600",
       onClick: () => navigate(createPageUrl("CustomWeakExam")),
