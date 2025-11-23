@@ -949,9 +949,9 @@ export default function ExamsPage() {
                               <Crown className="w-4 h-4 text-orange-600" />
                               <h4 className="font-bold text-gray-900 text-sm">בגרות מותאמת עבורך</h4>
                             </div>
-                            <p className="text-xs text-gray-600 mb-2">
-                              חזור על השאלות שטעית בהן במבחן זה
-                            </p>
+                            <p className="text-xs text-gray-600 mb-2">חזרה על השאלות שטעית בהן
+
+                        </p>
                             <Button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -960,7 +960,8 @@ export default function ExamsPage() {
                           }}
                           className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
 
-                              בגרות אישית
+                              <Target className="w-3 h-3" />
+                              מבחן טעויות
                             </Button>
                           </div>
                       }
