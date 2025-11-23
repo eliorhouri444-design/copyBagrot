@@ -32,12 +32,17 @@ export default function CustomWeakPracticePage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      // Check if there's a specific topic to filter by
+      const specificTopicId = sessionStorage.getItem('weakPracticeTopic');
+      if (specificTopicId) {
+        sessionStorage.removeItem('weakPracticeTopic');
+      }
+
       // Check if there's a specific session ID to filter by
       const specificSessionId = sessionStorage.getItem('weakPracticeSource');
       if (specificSessionId) {
-        sessionStorage.removeItem('weakPracticeSource'); // Clean up
+        sessionStorage.removeItem('weakPracticeSource');
         
-        // Load the source session details
         const allSessions = await base44.entities.PracticeSessionNew.list();
         const sourceSessionData = allSessions.find(s => s.id === specificSessionId);
         if (sourceSessionData) {
@@ -51,15 +56,20 @@ export default function CustomWeakPracticePage() {
       console.log('📊 User email:', currentUser.email);
       console.log('📊 Selected subject:', currentUser.selected_subject);
       console.log('📊 Selected units:', currentUser.selected_units);
+      console.log('📊 Specific topic ID:', specificTopicId);
       console.log('📊 Specific session ID:', specificSessionId);
       
-      const wrongAttempts = attempts.filter(a => 
+      let wrongAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject_id === currentUser.selected_subject &&
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
         (a.status === "incorrect" || a.percentage < 50) &&
         (!specificSessionId || a.session_id === specificSessionId)
       );
+
+      if (specificTopicId) {
+        wrongAttempts = wrongAttempts.filter(a => a.topic_id === specificTopicId);
+      }
       
       console.log('❌ Wrong attempts filtered:', wrongAttempts.length);
 
