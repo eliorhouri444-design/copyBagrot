@@ -393,9 +393,9 @@ export default function HomePage() {
     {
       icon: Target,
       title: "תרגול טעויות",
-      description: "תרגול שמבוסס על טעויות קודמות, כדי לחזק בדיוק את מה שצריך",
+      description: "חזור על השאלות שטעית בהן",
       color: "from-blue-500 to-cyan-600",
-      onClick: () => navigate(createPageUrl("CustomWeakExam")),
+      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
       delay: 0.45,
       isPremium: true
     },
