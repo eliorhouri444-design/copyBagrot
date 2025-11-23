@@ -55,7 +55,7 @@ function LayoutContent({ children, currentPageName }) {
   const allNavItems = [...navItems, ...adminNavItems];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-16">
+    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100">
       <style>
         {`
           :root {
