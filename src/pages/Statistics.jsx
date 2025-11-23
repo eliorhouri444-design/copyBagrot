@@ -891,7 +891,7 @@ export default function StatisticsPage() {
                   </h4>
                   <div className="space-y-2">
                     {statistics.weakTopics.slice(0, 3).map((topic, idx) => (
-                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-3 shadow-2xl">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-bold text-gray-900 text-sm">{topic.name || topic.topic}</span>
                           <span className="text-blue-700 font-black text-lg">{Math.round(topic.accuracy)}%</span>
@@ -906,7 +906,7 @@ export default function StatisticsPage() {
                               sessionStorage.setItem('selectedTopicForPractice', topic.topic);
                               navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
                             }}
-                            className="h-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-3 rounded-lg"
+                            className="h-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-3 rounded-2xl"
                           >
                             <BookOpen className="w-3 h-3 ml-1" />
                             תרגל
@@ -970,7 +970,7 @@ export default function StatisticsPage() {
                                   navigate(createPageUrl("Premium"));
                                 }
                               }}
-                              className={`h-7 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-xs font-bold px-3 rounded-lg`}
+                              className={`h-7 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-xs font-bold px-3 rounded-2xl`}
                             >
                               {user?.is_premium ? (
                                 <>

@@ -268,7 +268,7 @@ export default function ProfilePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+          className="bg-white rounded-3xl shadow-2xl overflow-hidden"
         >
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
             <div className="flex items-center justify-between text-white">
@@ -314,7 +314,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
           >
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
               <div className="flex items-center justify-between text-white">
@@ -596,7 +596,7 @@ export default function ProfilePage() {
             {user?.subscription_type === 'monthly' && (
               <Button
                 onClick={() => navigate(createPageUrl("Premium"))}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-600"
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl"
               >
                 שדרג למנוי שנתי וחסוך 50 אחוזים
               </Button>
@@ -604,7 +604,7 @@ export default function ProfilePage() {
 
             <Button
               variant="outline"
-              className="w-full text-red-600 hover:bg-red-50"
+              className="w-full text-red-600 hover:bg-red-50 rounded-2xl"
               onClick={() => {
                 setShowSubscriptionDialog(false);
                 setShowCancelDialog(true);
