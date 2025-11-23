@@ -19,6 +19,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import AdManager from "../components/ads/AdManager";
+import RatingDialog from "../components/ads/RatingDialog";
 
 const QUESTIONS_PER_SET = 10;
 const WRITING_QUESTIONS_PER_SET = 3;
@@ -61,12 +62,29 @@ export default function TopicPracticeNewPage() {
   const [showRewriteOptions, setShowRewriteOptions] = useState(false);
   const [showSentenceAnalysis, setShowSentenceAnalysis] = useState(false);
   const [showVocabularyHelp, setShowVocabularyHelp] = useState(false);
+  const [adSettings, setAdSettings] = useState(null);
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        
+        // Load ad settings
+        const settings = await base44.entities.UserAdSettings.list();
+        if (settings.length > 0) {
+          setAdSettings(settings[0]);
+        } else {
+          const newSettings = await base44.entities.UserAdSettings.create({
+            free_attempts: 3,
+            has_seen_info_today: false,
+            ads_viewed_today: 0,
+            has_rated: false,
+            last_reset_date: new Date().toISOString().split('T')[0]
+          });
+          setAdSettings(newSettings);
+        }
       } catch (error) {
         console.error("Error loading user:", error);
       }
@@ -623,20 +641,30 @@ Return JSON:`,
     }
 
     const isPremiumUser = user?.is_premium;
-    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
     
     if (isPremiumUser) {
       // Premium users go directly to next set
-      setAnswers({});
-      setResults({});
-      setCurrentQuestionIndex(0);
-      setShowReadingText(true);
-      setShowListeningIntro(isListening && listeningText);
-      window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
+      continueToNextSet(nextSet);
     } else {
-      // Free users see ad confirmation
-      setShowAdConfirmDialog(true);
+      // Check if user has rated
+      if (!adSettings?.has_rated) {
+        // Show rating dialog for bonus
+        setShowRatingDialog(true);
+      } else {
+        // User already rated, show ad
+        setShowAdDialog(true);
+      }
     }
+  };
+
+  const continueToNextSet = (nextSet) => {
+    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
+    setAnswers({});
+    setResults({});
+    setCurrentQuestionIndex(0);
+    setShowReadingText(true);
+    setShowListeningIntro(isListening && listeningText);
+    window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
   };
 
   const handleConfirmWatchAd = () => {
@@ -647,13 +675,35 @@ Return JSON:`,
   const handleAdComplete = () => {
     setShowAdDialog(false);
     const nextSet = setNumber + 1;
-    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
-    setAnswers({});
-    setResults({});
-    setCurrentQuestionIndex(0);
-    setShowReadingText(true);
-    setShowListeningIntro(isListening && listeningText);
-    window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
+    continueToNextSet(nextSet);
+  };
+
+  const handleSubmitRating = async (rating) => {
+    try {
+      if (rating === 5) {
+        // Give 1 day ad-free
+        const bonusEndDate = new Date();
+        bonusEndDate.setDate(bonusEndDate.getDate() + 1);
+        
+        await base44.entities.UserAdSettings.update(adSettings.id, {
+          has_rated: true,
+          rating_date: new Date().toISOString(),
+          bonus_active_until: bonusEndDate.toISOString().split('T')[0]
+        });
+        
+        setShowRatingDialog(false);
+        alert("🎉 תודה על הדירוג! קיבלת יום אחד ללא פרסומות!");
+        const nextSet = setNumber + 1;
+        continueToNextSet(nextSet);
+      } else {
+        // Show ad instead
+        setShowRatingDialog(false);
+        setShowAdDialog(true);
+      }
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      alert("שגיאה בשמירת הדירוג");
+    }
   };
 
   const finishPractice = async () => {
@@ -1291,7 +1341,14 @@ Return JSON:`,
         </DialogContent>
       </Dialog>
 
-      {/* Rest of the dialogs remain the same */}
+      {/* Rating Dialog */}
+      <RatingDialog
+        open={showRatingDialog}
+        onOpenChange={setShowRatingDialog}
+        onSubmitRating={handleSubmitRating}
+      />
+
+      {/* Continue Dialog */}
       <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
         <DialogContent dir="rtl" className="sm:max-w-md">
           <DialogHeader>
@@ -1347,87 +1404,29 @@ Return JSON:`,
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showAdConfirmDialog} onOpenChange={setShowAdConfirmDialog}>
-        <DialogContent dir="rtl" className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">המשך לסט הבא</DialogTitle>
-            <DialogDescription>
-              כדי להמשיך לסט הבא, נדרש לצפות בסרטון קצר
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
-            <div className="text-center space-y-2">
-              <div className="text-4xl mb-2">📺</div>
-              <p className="text-gray-700 text-sm">
-                צפה בסרטון קצר והמשך לתרגל עוד {QUESTIONS_PER_SET} שאלות
-              </p>
-              <p className="text-xs text-gray-500">
-                או שדרג לפרימיום לתרגול ללא הגבלה
-              </p>
-            </div>
-          </div>
-
-          <DialogFooter className="flex flex-col gap-2">
-            <Button
-              onClick={handleConfirmWatchAd}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-            >
-              צפה בסרטון והמשך
-            </Button>
-            <Button
-              onClick={() => navigate(createPageUrl("Premium"))}
-              className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600"
-            >
-              <Crown className="w-4 h-4 ml-2" />
-              שדרג לפרימיום
-            </Button>
-            <Button variant="outline" onClick={finishPractice} className="w-full">
-              סיים תרגול
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>
         <DialogContent dir="rtl" className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>המשך לסט הבא</DialogTitle>
+            <DialogTitle className="text-xl font-bold">צפה בסרטון והמשך</DialogTitle>
             <DialogDescription>
-              {setNumber >= FREE_USER_MAX_SETS ? 
-                `הגעת למגבלה של ${FREE_USER_MAX_SETS} סטים חינמיים` : 
-                'צפה בסרטון כדי להמשיך'
-              }
+              סרטון קצר של 5 שניות והמשך לתרגל
             </DialogDescription>
           </DialogHeader>
 
           <div className="text-center py-4">
-            {setNumber >= FREE_USER_MAX_SETS ? (
-              <>
-                <p className="text-gray-700 mb-4">
-                  שדרג לפרימיום כדי לתרגל ללא הגבלה
-                </p>
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full bg-gradient-to-r from-amber-500 to-yellow-500"
-                >
-                  <Crown className="w-4 h-4 ml-2" />
-                  שדרג עכשוב
-                </Button>
-              </>
-            ) : (
-              <AdManager onContinue={handleAdComplete}>
-                <div className="bg-blue-50 rounded-xl p-6">
-                  <div className="text-4xl mb-3">📺</div>
-                  <p className="text-gray-700">צופה בסרטון...</p>
-                </div>
-              </AdManager>
-            )}
+            <AdManager onContinue={handleAdComplete}>
+              <div className="bg-blue-50 rounded-xl p-6">
+                <div className="text-4xl mb-3">📺</div>
+                <p className="text-gray-700">צופה בסרטון...</p>
+              </div>
+            </AdManager>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={finishPractice}>
-              סיים תרגול
+            <Button variant="outline" onClick={() => setShowAdDialog(false)}>
+              ביטול
             </Button>
           </DialogFooter>
         </DialogContent>
