@@ -312,6 +312,12 @@ export default function PracticePage() {
           />
         </motion.div>
 
+        <RecentPracticeSessions 
+          subject={displaySubject} 
+          units={displayUnits}
+          userEmail={user?.email}
+        />
+
         {user?.is_premium && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
