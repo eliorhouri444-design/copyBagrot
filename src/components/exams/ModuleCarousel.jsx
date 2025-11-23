@@ -6,10 +6,10 @@ import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 
-export default function ModuleCarousel({ 
-  modules, 
+export default function ModuleCarousel({
+  modules,
   onSelectExam,
-  onRandomExam, 
+  onRandomExam,
   onEditModule,
   isPremium,
   onUpgrade,
@@ -19,11 +19,11 @@ export default function ModuleCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? modules.length - 1 : prev - 1));
+    setCurrentIndex((prev) => prev === 0 ? modules.length - 1 : prev - 1);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev === modules.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => prev === modules.length - 1 ? 0 : prev + 1);
   };
 
   const handleModuleClick = (module) => {
@@ -37,17 +37,17 @@ export default function ModuleCarousel({
   const currentModule = modules[currentIndex];
 
   const moduleStats = useMemo(() => {
-  if (!examAttempts || examAttempts.length === 0) {
-    return {
-      totalAttempts: 0,
-      passedAttempts: 0,
-      avgScore: 0,
-      progress: 0,
-      maxExams: (isPremium === true) ? 100 : 5
-    };
-  }
+    if (!examAttempts || examAttempts.length === 0) {
+      return {
+        totalAttempts: 0,
+        passedAttempts: 0,
+        avgScore: 0,
+        progress: 0,
+        maxExams: isPremium === true ? 100 : 5
+      };
+    }
 
-    const moduleAttempts = examAttempts.filter(attemptItem => {
+    const moduleAttempts = examAttempts.filter((attemptItem) => {
       if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
       if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
       if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
@@ -56,13 +56,13 @@ export default function ModuleCarousel({
     });
 
     const totalAttempts = moduleAttempts.length;
-    const passedAttempts = moduleAttempts.filter(attemptItem => (attemptItem.score_percent || 0) >= 56).length;
-    const avgScore = totalAttempts > 0 
-      ? Math.round(moduleAttempts.reduce((sum, attemptItem) => sum + (attemptItem.score_percent || 0), 0) / totalAttempts)
-      : 0;
+    const passedAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 56).length;
+    const avgScore = totalAttempts > 0 ?
+    Math.round(moduleAttempts.reduce((sum, attemptItem) => sum + (attemptItem.score_percent || 0), 0) / totalAttempts) :
+    0;
 
-    const maxExams = (isPremium === true) ? 100 : 5;
-    const progress = Math.min(100, (totalAttempts / maxExams) * 100);
+    const maxExams = isPremium === true ? 100 : 5;
+    const progress = Math.min(100, totalAttempts / maxExams * 100);
 
     return {
       totalAttempts,
@@ -101,8 +101,8 @@ export default function ModuleCarousel({
             } else if (info.offset.x < -threshold && modules.length > 1) {
               handleNext();
             }
-          }}
-        >
+          }}>
+
           <div className={`bg-white rounded-3xl shadow-xl overflow-hidden ${isLocked ? 'opacity-75' : ''}`}>
             {/* Header with gradient */}
             <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} p-6 text-white relative overflow-hidden`}>
@@ -114,8 +114,8 @@ export default function ModuleCarousel({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                  className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0"
-                >
+                  className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
+
                   <FileText className="w-8 h-8 text-white" />
                 </motion.div>
                 
@@ -124,45 +124,45 @@ export default function ModuleCarousel({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="text-2xl font-bold mb-1"
-                  >
+                    className="text-2xl font-bold mb-1">
+
                     {currentModule.title}
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="text-white/90 text-sm"
-                  >
+                    className="text-white/90 text-sm">
+
                     {currentModule.description}
                   </motion.p>
                   
-                  {isLocked && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5 }}
-                      className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2"
-                    >
+                  {isLocked &&
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
+
                       <Crown className="w-3 h-3" />
                       פרימיום
                     </motion.div>
-                  )}
+                  }
                 </div>
 
-                {onEditModule && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditModule(currentModule);
-                    }}
-                    className="text-white hover:bg-white/20 flex-shrink-0"
-                  >
+                {onEditModule &&
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditModule(currentModule);
+                  }}
+                  className="text-white hover:bg-white/20 flex-shrink-0">
+
                     <Edit2 className="w-5 h-5" />
                   </Button>
-                )}
+                }
               </div>
             </div>
 
@@ -173,8 +173,8 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-gray-700 text-sm leading-relaxed"
-              >
+                className="text-gray-700 text-sm leading-relaxed">
+
                 {currentModule.details}
               </motion.p>
 
@@ -183,10 +183,10 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200"
-              >
+                className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
+
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-bold text-gray-900">התקדמות במודול</span>
+                  <span className="text-sm font-bold text-gray-900">התקדמות בשאלון</span>
                   <span className="text-lg font-bold" style={{ color: getProgressColor(moduleStats.progress) }}>
                     {moduleStats.progress}%
                   </span>
@@ -202,8 +202,8 @@ export default function ModuleCarousel({
                     className="h-full transition-all"
                     style={{
                       backgroundColor: getProgressColor(moduleStats.progress)
-                    }}
-                  />
+                    }} />
+
                 </div>
               </motion.div>
 
@@ -212,8 +212,8 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="grid grid-cols-3 gap-3"
-              >
+                className="grid grid-cols-3 gap-3">
+
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 text-center border border-blue-200">
                   <div className="text-2xl font-bold text-blue-600">{moduleStats.totalAttempts}</div>
                   <div className="text-xs text-blue-700 font-medium">ניסיונות</div>
@@ -233,8 +233,8 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex items-center justify-between text-sm text-gray-600 pt-2 border-t border-gray-200"
-              >
+                className="flex items-center justify-between text-sm text-gray-600 pt-2 border-t border-gray-200">
+
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   <span>{currentModule.duration} דקות</span>
@@ -250,95 +250,97 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="space-y-3 pt-2"
-              >
-                {isLocked ? (
-                  <Button
-                    onClick={onUpgrade}
-                    className="w-full h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-base font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl"
-                  >
+                className="space-y-3 pt-2">
+
+                {isLocked ?
+                <Button
+                  onClick={onUpgrade}
+                  className="w-full h-14 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-base font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl">
+
                     <Crown className="w-5 h-5" />
                     שדרג לפרימיום
-                  </Button>
-                ) : (
-                  <>
+                  </Button> :
+
+                <>
                     {/* מבחן אקראי - למעלה - לכולם */}
-                    {currentModule.entity !== 'practice' && onRandomExam && (
-                      <div className="space-y-3">
+                    {currentModule.entity !== 'practice' && onRandomExam &&
+                  <div className="space-y-3">
                         <Button
-                          onClick={() => onRandomExam(currentModule.id)}
-                          className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
-                        >
+                      onClick={() => onRandomExam(currentModule.id)}
+                      className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}>
+
                           <Shuffle className="w-5 h-5" />
-                          בגרות אקראית
+                          מבחן אקראי
                         </Button>
 
-                        {(isPremium === true) ? (
-                          <Button
-                            onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
-                          >
-                            בגרות אישית
+                        {isPremium === true ?
+                    <Button
+                      onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                      className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white">
+
+                            <Target className="w-5 h-5 ml-2" />
+                            מבחן טעויות
+                          </Button> :
+
+                    <Button
+                      onClick={() => navigate(createPageUrl("Premium"))}
+                      className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60">
+
+                            <Crown className="w-5 h-5 ml-2" />
+                            מבחן טעויות
                           </Button>
-                        ) : (
-                          <Button
-                            onClick={() => navigate(createPageUrl("Premium"))}
-                            className="w-full h-12 text-base font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
-                          >
-                            בגרות אישית
-                          </Button>
-                        )}
+                    }
                       </div>
-                    )}
+                  }
 
                     {/* בחר מבחן ספציפי - למטה - רק לפרימיום */}
-                    {currentModule.entity !== 'practice' && (
-                      <>
-                        {(isPremium === true) ? (
-                          <Button
-                            onClick={() => handleModuleClick(currentModule)}
-                            variant="outline"
-                            className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl"
-                          >
+                    {currentModule.entity !== 'practice' &&
+                  <>
+                        {isPremium === true ?
+                    <Button
+                      onClick={() => handleModuleClick(currentModule)}
+                      variant="outline"
+                      className="w-full h-12 text-sm font-semibold border-2 hover:bg-gray-50 rounded-xl">
+
                             בחר מבחן ספציפי (מעל 100 מבחנים)
-                          </Button>
-                        ) : (
-                          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 border-2 border-amber-200">
+                          </Button> :
+
+                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 border-2 border-amber-200">
                             <div className="text-center mb-2">
                               <h4 className="text-xs font-bold text-gray-900 mb-0.5">מוגבל ל-5 מבחנים</h4>
                               <p className="text-[10px] text-gray-600">מוגבל ל-5 המבחנים הראשונים</p>
                             </div>
                             <Button
-                              onClick={() => handleModuleClick(currentModule)}
-                              variant="outline"
-                              className="w-full h-10 text-xs font-semibold border-2 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl mb-2"
-                            >
+                        onClick={() => handleModuleClick(currentModule)}
+                        variant="outline"
+                        className="w-full h-10 text-xs font-semibold border-2 border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl mb-2">
+
                               בחר מבחן (מוגבל ל-5)
                             </Button>
                             <Button
-                              onClick={onUpgrade}
-                              className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl"
-                            >
+                        onClick={onUpgrade}
+                        className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl">
+
                               <Crown className="w-4 h-4" />
                               לגישה מלאה 100+ מבחנים
                             </Button>
                           </div>
-                        )}
+                    }
                       </>
-                    )}
+                  }
 
                     {/* אם זה תרגול */}
-                    {currentModule.entity === 'practice' && (
-                      <Button
-                        onClick={() => handleModuleClick(currentModule)}
-                        className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}
-                      >
+                    {currentModule.entity === 'practice' &&
+                  <Button
+                    onClick={() => handleModuleClick(currentModule)}
+                    className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 rounded-xl`}>
+
                         התחל תרגול
                         <Play className="w-5 h-5" />
                       </Button>
-                    )}
+                  }
                   </>
-                )}
+                }
               </motion.div>
             </div>
           </div>
@@ -351,8 +353,8 @@ export default function ModuleCarousel({
           variant="outline"
           size="icon"
           onClick={handlePrevious}
-          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto -translate-x-2"
-        >
+          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto -translate-x-2">
+
           <ChevronRight className="w-6 h-6" />
         </Button>
 
@@ -360,26 +362,26 @@ export default function ModuleCarousel({
           variant="outline"
           size="icon"
           onClick={handleNext}
-          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto translate-x-2"
-        >
+          className="rounded-full shadow-xl bg-white hover:bg-gray-50 w-12 h-12 pointer-events-auto translate-x-2">
+
           <ChevronLeft className="w-6 h-6" />
         </Button>
       </div>
 
       {/* Dots indicator */}
       <div className="flex justify-center gap-2 mt-6">
-        {modules.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentIndex(idx)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              idx === currentIndex 
-                ? 'w-8 bg-blue-600' 
-                : 'w-2 bg-gray-300 hover:bg-gray-400'
-            }`}
-          />
-        ))}
+        {modules.map((_, idx) =>
+        <button
+          key={idx}
+          onClick={() => setCurrentIndex(idx)}
+          className={`h-2 rounded-full transition-all duration-300 ${
+          idx === currentIndex ?
+          'w-8 bg-blue-600' :
+          'w-2 bg-gray-300 hover:bg-gray-400'}`
+          } />
+
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 }
