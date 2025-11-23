@@ -393,7 +393,7 @@ export default function HomePage() {
       title: "תרגול מותאם",
       description: "נושאים שטעית בהם",
       color: "from-purple-500 to-pink-600",
-      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
+      onClick: () => navigate(createPageUrl("CustomWeakPracticeBuilder")),
       delay: 0.45
     },
     {

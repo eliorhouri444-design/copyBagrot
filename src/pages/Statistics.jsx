@@ -782,7 +782,7 @@ export default function StatisticsPage() {
               <div className="grid grid-cols-1 gap-3">
                 {statistics.weakTopics.length > 0 && (
                   <Button
-                    onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+                    onClick={() => navigate(createPageUrl("CustomWeakPracticeBuilder"))}
                     className="h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
                   >
                     <div className="flex items-center gap-3 flex-1">

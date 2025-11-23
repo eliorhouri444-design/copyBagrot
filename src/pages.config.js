@@ -52,11 +52,11 @@ import Statistics from './pages/Statistics';
 import Vocabulary from './pages/Vocabulary';
 import VocabularyPractice from './pages/VocabularyPractice';
 import CustomWeakExam from './pages/CustomWeakExam';
-import CustomWeakPractice from './pages/CustomWeakPractice';
 import StudyPlanner from './pages/StudyPlanner';
 import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
 import CustomWeakExamBuilder from './pages/CustomWeakExamBuilder';
 import CustomFailedExamsBuilder from './pages/CustomFailedExamsBuilder';
+import CustomWeakPracticeBuilder from './pages/CustomWeakPracticeBuilder';
 import __Layout from './Layout.jsx';
 
 
@@ -115,11 +115,11 @@ export const PAGES = {
     "Vocabulary": Vocabulary,
     "VocabularyPractice": VocabularyPractice,
     "CustomWeakExam": CustomWeakExam,
-    "CustomWeakPractice": CustomWeakPractice,
     "StudyPlanner": StudyPlanner,
     "CustomPracticeBuilder": CustomPracticeBuilder,
     "CustomWeakExamBuilder": CustomWeakExamBuilder,
     "CustomFailedExamsBuilder": CustomFailedExamsBuilder,
+    "CustomWeakPracticeBuilder": CustomWeakPracticeBuilder,
 }
 
 export const pagesConfig = {
