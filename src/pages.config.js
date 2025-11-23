@@ -59,6 +59,7 @@ import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import CustomWeakTopicExam from './pages/CustomWeakTopicExam';
 import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
+import DailyPractice from './pages/DailyPractice';
 import __Layout from './Layout.jsx';
 
 
@@ -124,6 +125,7 @@ export const PAGES = {
     "WeakExamSelection": WeakExamSelection,
     "CustomWeakTopicExam": CustomWeakTopicExam,
     "AdminNotificationTemplates": AdminNotificationTemplates,
+    "DailyPractice": DailyPractice,
 }
 
 export const pagesConfig = {
