@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target } from "lucide-react";
+import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -342,26 +342,16 @@ export default function PracticePage() {
               </div>
             </div>
 
-            <div className="p-5 text-center">
-              <p className="text-gray-700 text-sm mb-4 font-semibold">
+            <div className="p-5">
+              <p className="text-gray-700 text-sm mb-4 font-semibold text-center">
                 תכונות ייחודיות למנויי פרימיום - תרגול חכם ומותאם במיוחד בשבילך
               </p>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-white rounded-xl p-3 border-2 border-blue-100">
-                  <div className="text-2xl mb-1">🎯</div>
-                  <div className="text-xs font-bold text-gray-900">תרגול טעויות</div>
-                </div>
-                <div className="bg-white rounded-xl p-3 border-2 border-blue-100">
-                  <div className="text-2xl mb-1">🔥</div>
-                  <div className="text-xs font-bold text-gray-900">נושאים חלשים</div>
-                </div>
-                <div className="bg-white rounded-xl p-3 border-2 border-blue-100">
-                  <div className="text-2xl mb-1">⚡</div>
-                  <div className="text-xs font-bold text-gray-900">בניה עצמאית</div>
-                </div>
-              </div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
+              
+              <div className="space-y-3">
+                {/* תרגול על בסיס טעויות */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     if (user?.is_premium) {
                       navigate(createPageUrl("WeakAreaSelection"));
@@ -369,21 +359,69 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 cursor-not-allowed'} text-white h-12 text-sm font-bold flex items-center justify-center gap-2 shadow-2xl rounded-2xl`}
+                  className={`w-full p-4 rounded-xl border-2 text-right transition-all ${
+                    user?.is_premium 
+                      ? 'bg-white border-blue-200 hover:border-blue-400 hover:shadow-md' 
+                      : 'bg-gray-50 border-gray-300 opacity-60 cursor-not-allowed'
+                  }`}
                 >
-                  {user?.is_premium ? (
-                    <>
-                      <Target className="w-5 h-5" />
-                      <span>תרגול מותאם אישית</span>
-                    </>
-                  ) : (
-                    <>
-                      <Crown className="w-5 h-5" />
-                      <span>שדרג לפרימיום לגישה</span>
-                    </>
-                  )}
-                </Button>
-              </motion.div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-bold text-gray-900 text-sm mb-1">תרגול טעויות ונושאים חלשים</div>
+                      <div className="text-xs text-gray-600">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
+                    </div>
+                    {!user?.is_premium && (
+                      <Crown className="w-5 h-5 text-amber-500" />
+                    )}
+                  </div>
+                </motion.button>
+
+                {/* בניה עצמאית */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (user?.is_premium) {
+                      navigate(createPageUrl("CustomPracticeBuilder"));
+                    } else {
+                      navigate(createPageUrl("Premium"));
+                    }
+                  }}
+                  className={`w-full p-4 rounded-xl border-2 text-right transition-all ${
+                    user?.is_premium 
+                      ? 'bg-white border-purple-200 hover:border-purple-400 hover:shadow-md' 
+                      : 'bg-gray-50 border-gray-300 opacity-60 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <Settings className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-bold text-gray-900 text-sm mb-1">בניה עצמאית של תרגול</div>
+                      <div className="text-xs text-gray-600">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
+                    </div>
+                    {!user?.is_premium && (
+                      <Crown className="w-5 h-5 text-amber-500" />
+                    )}
+                  </div>
+                </motion.button>
+              </div>
+
+              {!user?.is_premium && (
+                <div className="mt-4 text-center">
+                  <Button
+                    onClick={() => navigate(createPageUrl("Premium"))}
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-10 text-sm font-bold rounded-xl px-6"
+                  >
+                    <Crown className="w-4 h-4 ml-2" />
+                    שדרג לפרימיום
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
