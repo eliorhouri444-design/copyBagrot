@@ -762,8 +762,9 @@ export default function ExamsPage() {
         <span className="sr-only">טוען...</span>
       </div>
     );
-    }
+  }
 
+  return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
