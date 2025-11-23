@@ -147,7 +147,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail }) {
       </motion.div>
 
       <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
-        <DialogContent dir="rtl" className="sm:max-w-md">
+        <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl">פרטי התרגול</DialogTitle>
           </DialogHeader>
@@ -155,18 +155,27 @@ export default function RecentPracticeSessions({ subject, units, userEmail }) {
           {selectedSession && (
             <div className="space-y-4">
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
-                <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
                       {Math.round(selectedSession.percentage)}%
                     </div>
-                    <div className="text-xs text-gray-600">ציון</div>
+                    <div className="text-xs text-gray-600">ציון סופי</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
                       {selectedSession.total_score || 0}/{selectedSession.max_score || 0}
                     </div>
                     <div className="text-xs text-gray-600">נקודות</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {new Date(selectedSession.created_date).toLocaleDateString('he-IL', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                    </div>
+                    <div className="text-xs text-gray-600">תאריך</div>
                   </div>
                 </div>
               </div>
@@ -175,19 +184,6 @@ export default function RecentPracticeSessions({ subject, units, userEmail }) {
                 <div className="text-sm text-gray-700">
                   <div className="font-bold text-blue-900 mb-2">📚 נושא התרגול</div>
                   <div>{getTopicName(selectedSession.topic_id)}</div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="text-xs text-gray-600 mb-1">תאריך ביצוע</div>
-                <div className="text-sm font-semibold text-gray-900">
-                  {new Date(selectedSession.created_date).toLocaleDateString('he-IL', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
                 </div>
               </div>
             </div>

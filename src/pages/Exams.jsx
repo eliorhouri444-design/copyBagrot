@@ -1105,164 +1105,122 @@ export default function ExamsPage() {
             <DialogTitle className="text-xl">פרטי המבחן</DialogTitle>
           </DialogHeader>
 
-          {showAttemptDetails && (() => {
-            const attemptIndex = examAttempts.findIndex((a) => a.id === showAttemptDetails.id);
-            const isAttemptLockedForNonPremium = !isPremium && attemptIndex >= 2;
-
-            return (
-              <div className="space-y-4">
-                {isAttemptLockedForNonPremium ? (
-                  <div className="text-center py-8">
-                    <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Lock className="w-10 h-10 text-white" />
+          {showAttemptDetails && (
+            <div className="space-y-4">
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {Math.round(showAttemptDetails.score_percent)}
                     </div>
-                    <h3 className="font-bold text-gray-900 text-xl mb-2">תובנות אישיות וניתוח מתקדם</h3>
-                    <p className="text-gray-700 text-sm mb-6 leading-relaxed">
-                      שדרג לפרימיום כדי לראות את הציון והדוח המפורט של הביצועים שלך
-                    </p>
-                    <div className="space-y-3">
-                      <Button
-                        onClick={() => {
-                          setShowAttemptDetails(null);
-                          navigate(createPageUrl("Premium"));
-                        }}
-                        className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-14 text-base font-bold flex items-center justify-center gap-2"
-                      >
-                        <Crown className="w-5 h-5" />
-                        <span>שדרג לפרימיום</span>
-                      </Button>
-
-                      <Button
-                        onClick={() => {
-                          setShowAttemptDetails(null);
-                          navigate(createPageUrl("WatchAd"));
-                        }}
-                        variant="outline"
-                        className="w-full h-12 text-sm font-semibold border-2 border-amber-200 text-amber-600 hover:bg-amber-50"
-                      >
-                        צפה בסרטון ופתח את פרטי המבחן
-                      </Button>
-                    </div>
+                    <div className="text-xs text-gray-600">ציון סופי</div>
                   </div>
-                ) : (
-                  <>
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900">
-                            {Math.round(showAttemptDetails.score_percent)}
-                          </div>
-                          <div className="text-xs text-gray-600">ציון סופי</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900">
-                            {showAttemptDetails.earned_points}/{showAttemptDetails.total_points}
-                          </div>
-                          <div className="text-xs text-gray-600">נקודות</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900">
-                            {new Date(showAttemptDetails.created_date).toLocaleDateString('he-IL', {
-                              day: 'numeric',
-                              month: 'short'
-                            })}
-                          </div>
-                          <div className="text-xs text-gray-600">תאריך</div>
-                        </div>
-                      </div>
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {showAttemptDetails.earned_points}/{showAttemptDetails.total_points}
                     </div>
-
-                    <div>
-                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-blue-600" />
-                        סקירת תשובות
-                      </h3>
-
-                      <div className="space-y-3">
-                        {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) => (
-                          <div
-                            key={idx}
-                            className={`rounded-xl p-4 border-2 ${
-                              answer.is_correct
-                                ? 'bg-green-50 border-green-200'
-                                : 'bg-red-50 border-red-200'
-                            }`}
-                          >
-                            <div className="font-semibold text-gray-900 mb-2">שאלה {idx + 1}</div>
-                            <div className="flex gap-2 text-sm mb-2">
-                              <span className={answer.is_correct ? 'text-green-700' : 'text-red-700'}>
-                                תשובתך: {answer.user_answer}
-                              </span>
-                            </div>
-                            {!answer.is_correct && answer.correct_answer && (
-                              <div className="text-sm text-green-700 font-semibold mt-1">
-                                תשובה נכונה: {answer.correct_answer}
-                              </div>
-                            )}
-                            {answer.explanation && (
-                              <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
-                                <div className="font-semibold text-blue-600 mb-1">הסבר:</div>
-                                {answer.explanation}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-
-                        {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) && (
-                          <div className="text-center text-gray-500 text-sm py-4">
-                            נתונים מפורטים יופיעו לאחר ביצוע המבחן
-                          </div>
-                        )}
-                      </div>
+                    <div className="text-xs text-gray-600">נקודות</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {new Date(showAttemptDetails.created_date).toLocaleDateString('he-IL', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
                     </div>
-
-                    {showAttemptDetails.answers && showAttemptDetails.answers.length > 0 && (() => {
-                      const wrongAnswers = showAttemptDetails.answers.filter(a => !a.is_correct);
-                      const weakTopicsFromExam = {};
-
-                      wrongAnswers.forEach(answer => {
-                        const topicKey = answer.topic_key || 'general';
-                        if (!weakTopicsFromExam[topicKey]) {
-                          weakTopicsFromExam[topicKey] = 0;
-                        }
-                        weakTopicsFromExam[topicKey]++;
-                      });
-
-                      const sortedWeakTopics = Object.entries(weakTopicsFromExam)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 3);
-
-                      return sortedWeakTopics.length > 0 && (
-                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Target className="w-5 h-5 text-amber-600" />
-                            <h4 className="font-bold text-gray-900">נושאים לשיפור</h4>
-                          </div>
-                          <div className="space-y-2">
-                            {sortedWeakTopics.map(([topic, count]) => (
-                              <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
-                                <span className="text-sm font-semibold text-gray-900">{topic}</span>
-                                <span className="text-xs text-amber-600 font-bold">{count} טעויות</span>
-                              </div>
-                            ))}
-                          </div>
-                          <Button
-                            onClick={() => {
-                              setShowAttemptDetails(null);
-                              navigate(createPageUrl("WeakTopics"));
-                            }}
-                            className="w-full mt-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-10 text-sm font-bold"
-                          >
-                            תרגל נושאים אלה
-                          </Button>
-                        </div>
-                      );
-                    })()}
-                  </>
-                )}
+                    <div className="text-xs text-gray-600">תאריך</div>
+                  </div>
+                </div>
               </div>
-            );
-          })()}
+
+              <div>
+                <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  סקירת תשובות
+                </h3>
+
+                <div className="space-y-3">
+                  {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) => (
+                    <div
+                      key={idx}
+                      className={`rounded-xl p-4 border-2 ${
+                        answer.is_correct
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-red-50 border-red-200'
+                      }`}
+                    >
+                      <div className="font-semibold text-gray-900 mb-2">שאלה {idx + 1}</div>
+                      <div className="flex gap-2 text-sm mb-2">
+                        <span className={answer.is_correct ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
+                          תשובתך: {answer.user_answer || 'לא נענה'}
+                        </span>
+                      </div>
+                      {!answer.is_correct && answer.correct_answer && (
+                        <div className="text-sm text-green-700 font-semibold mt-1">
+                          תשובה נכונה: {answer.correct_answer}
+                        </div>
+                      )}
+                      {answer.explanation && (
+                        <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
+                          <div className="font-semibold text-blue-600 mb-1">הסבר:</div>
+                          {answer.explanation}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) && (
+                    <div className="text-center text-gray-500 text-sm py-4">
+                      נתונים מפורטים יופיעו לאחר ביצוע המבחן
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {showAttemptDetails.answers && showAttemptDetails.answers.length > 0 && (() => {
+                const wrongAnswers = showAttemptDetails.answers.filter(a => !a.is_correct);
+                const weakTopicsFromExam = {};
+
+                wrongAnswers.forEach(answer => {
+                  const topicKey = answer.topic_key || 'כללי';
+                  if (!weakTopicsFromExam[topicKey]) {
+                    weakTopicsFromExam[topicKey] = 0;
+                  }
+                  weakTopicsFromExam[topicKey]++;
+                });
+
+                const sortedWeakTopics = Object.entries(weakTopicsFromExam)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 3);
+
+                return sortedWeakTopics.length > 0 && (
+                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="w-5 h-5 text-amber-600" />
+                      <h4 className="font-bold text-gray-900">נושאים לשיפור</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {sortedWeakTopics.map(([topic, count]) => (
+                        <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
+                          <span className="text-sm font-semibold text-gray-900">{topic}</span>
+                          <span className="text-xs text-amber-600 font-bold">{count} טעויות</span>
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setShowAttemptDetails(null);
+                        navigate(createPageUrl("WeakTopics"));
+                      }}
+                      className="w-full mt-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-10 text-sm font-bold"
+                    >
+                      תרגל נושאים אלה
+                    </Button>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
 
           <DialogFooter>
             <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
