@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, CheckCircle, X, TrendingUp, Crown, Target } from "lucide-react";
+import { BookOpen, CheckCircle, X, TrendingUp, Crown, Target, Lock, Play } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter
 } from "@/components/ui/dialog";
 
@@ -18,6 +19,8 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
   const navigate = useNavigate();
   const [showAllSessions, setShowAllSessions] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [showAdDialog, setShowAdDialog] = useState(null);
+  const [unlockedSessions, setUnlockedSessions] = useState(new Set());
 
   const { data: practiceSessions = [] } = useQuery({
     queryKey: ['practice-sessions', subject, units, userEmail],
@@ -86,7 +89,13 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                   transition={{ delay: 0.3 + idx * 0.1 }}
                   whileHover={{ scale: 1.02, x: -5 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedSession(session)}
+                  onClick={() => {
+                    if (isPremium || unlockedSessions.has(session.id)) {
+                      setSelectedSession(session);
+                    } else {
+                      setShowAdDialog(session);
+                    }
+                  }}
                   className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3 flex-1">
@@ -116,17 +125,25 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                     </div>
                   </div>
                   <div className="text-right">
-                    <motion.div
-                      className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
-                    >
-                      {Math.round(session.percentage)}%
-                    </motion.div>
-                    <div className="text-[10px] text-gray-500">
-                      {session.total_score || 0}/{session.max_score || 0}
-                    </div>
+                    {isPremium ? (
+                      <>
+                        <motion.div
+                          className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}
+                        >
+                          {Math.round(session.percentage)}%
+                        </motion.div>
+                        <div className="text-[10px] text-gray-500">
+                          {session.total_score || 0}/{session.max_score || 0}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <Lock className="w-5 h-5 text-gray-400" />
+                      </div>
+                    )}
                   </div>
                 </motion.button>
               );
@@ -147,10 +164,83 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
         </div>
       </motion.div>
 
+      <Dialog open={!!showAdDialog} onOpenChange={() => { setShowAdDialog(null); }}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">צפייה בציון התרגול</DialogTitle>
+            <DialogDescription>
+              בחר אופציה לצפייה בפרטי התרגול והציון
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 text-center">
+              <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
+              </p>
+              <Button
+                onClick={async () => {
+                  alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  setUnlockedSessions(prev => new Set([...prev, showAdDialog.id]));
+                  setSelectedSession(showAdDialog);
+                  setShowAdDialog(null);
+                }}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                צפה בפרסומת
+              </Button>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">או</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
+              </p>
+              <Button
+                onClick={() => {
+                  setShowAdDialog(null);
+                  navigate(createPageUrl("Premium"));
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold"
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                שדרג עכשיו
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdDialog(null)} className="w-full">
+              ביטול
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
         <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl">פרטי התרגול</DialogTitle>
+            {!isPremium && (
+              <DialogDescription className="flex items-center gap-2 text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                נפתח לאחר צפייה בפרסומת
+              </DialogDescription>
+            )}
           </DialogHeader>
 
           {selectedSession && (
@@ -214,7 +304,11 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                   <button
                     onClick={() => {
                       setShowAllSessions(false);
-                      setSelectedSession(session);
+                      if (isPremium || unlockedSessions.has(session.id)) {
+                        setSelectedSession(session);
+                      } else {
+                        setShowAdDialog(session);
+                      }
                     }}
                     className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
                   >
@@ -243,12 +337,20 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                     </div>
 
                     <div className="text-right">
-                      <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
-                        {Math.round(session.percentage)}%
-                      </div>
-                      <div className="text-[10px] text-gray-500">
-                        {session.total_score || 0}/{session.max_score || 0}
-                      </div>
+                      {isPremium ? (
+                        <>
+                          <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+                            {Math.round(session.percentage)}%
+                          </div>
+                          <div className="text-[10px] text-gray-500">
+                            {session.total_score || 0}/{session.max_score || 0}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <Lock className="w-5 h-5 text-gray-400" />
+                        </div>
+                      )}
                     </div>
                   </button>
 
