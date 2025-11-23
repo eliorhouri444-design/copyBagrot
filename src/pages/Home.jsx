@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2, Zap } from "lucide-react";
+import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2, Zap, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
