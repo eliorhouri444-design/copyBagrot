@@ -626,7 +626,7 @@ export default function StatisticsPage() {
             </motion.div>
           )}
 
-          {/* Weak Topics */}
+          {/* Weak Topics to Practice */}
           {statistics.weakTopics.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -635,41 +635,44 @@ export default function StatisticsPage() {
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
-                <AlertCircle className="w-6 h-6 text-orange-600" />
-                <h3 className="text-lg font-bold text-gray-900">נקודות לשיפור 🎯</h3>
+                <Target className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
               </div>
               
-              <div className="space-y-3 mb-4">
+              <div className="space-y-3">
                 {statistics.weakTopics.slice(0, 5).map((topic, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-2xl p-4 shadow-sm">
+                  <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
-                        <Zap className="w-5 h-5 text-orange-600" />
+                        <Target className="w-5 h-5 text-blue-600" />
                         <span className="font-bold text-gray-900">{topic.name || topic.topic}</span>
                       </div>
-                      <span className="text-orange-700 font-black text-xl">{Math.round(topic.accuracy)}%</span>
+                      <span className="text-blue-700 font-black text-xl">{Math.round(topic.accuracy)}%</span>
                     </div>
-                    <Progress value={topic.accuracy} className="h-2.5 bg-orange-200" />
-                    <div className="flex justify-between items-center mt-2 text-xs text-gray-600">
-                      <span>{topic.incorrect} ✗ {topic.partial > 0 && `• ${topic.partial} ~`}</span>
-                      <span>{topic.total} תרגולים</span>
+                    <Progress value={topic.accuracy} className="h-2.5 bg-blue-200" />
+                    <div className="flex justify-between items-center mt-3">
+                      <div className="text-xs text-gray-600">
+                        {topic.incorrect} טעויות • {topic.total} תרגולים
+                      </div>
+                      <Button
+                        onClick={() => {
+                          sessionStorage.setItem('selectedTopicForPractice', topic.topic);
+                          navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
+                        }}
+                        className="h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-4 rounded-lg"
+                      >
+                        <BookOpen className="w-3 h-3 ml-1" />
+                        תרגל
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
-
-              <Button
-                onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-bold shadow-lg rounded-xl"
-              >
-                <Zap className="w-5 h-5 ml-2" />
-                תרגל את הנושאים החלשים
-              </Button>
             </motion.div>
           )}
 
-          {/* All Topics Performance */}
-          {statistics.topicArray.length > 0 && (
+          {/* What to Improve - Combined Topics & Exams */}
+          {(statistics.topicArray.length > 0 || examAttempts.length > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -677,84 +680,119 @@ export default function StatisticsPage() {
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
-                <BarChart3 className="w-6 h-6 text-purple-600" />
-                <h3 className="text-lg font-bold text-gray-900">ביצועים לפי נושא</h3>
+                <Target className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">תרגל נושאים שאתה חלש בהם</h3>
               </div>
               
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {statistics.topicArray.map((topic, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-900">{topic.name || topic.topic}</span>
-                      <span className={`text-sm font-bold ${
-                        topic.accuracy >= 80 ? 'text-green-600' :
-                        topic.accuracy >= 60 ? 'text-blue-600' :
-                        'text-orange-600'
-                      }`}>
-                        {Math.round(topic.accuracy)}%
-                      </span>
-                    </div>
-                    <Progress 
-                      value={topic.accuracy} 
-                      className={`h-1.5 ${
-                        topic.accuracy >= 80 ? 'bg-green-100' :
-                        topic.accuracy >= 60 ? 'bg-blue-100' :
-                        'bg-orange-100'
-                      }`}
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>{topic.correct} ✓ {topic.partial > 0 && `• ${topic.partial} ~`} • {topic.incorrect} ✗</span>
-                      <span>ממוצע: {Math.round(topic.avgScore)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Failed Exams */}
-          {statistics.failedExams.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
-            >
-              <div className="flex items-center gap-2 mb-5">
-                <XCircle className="w-6 h-6 text-red-600" />
-                <h3 className="text-lg font-bold text-gray-900">בגרויות שנכשלו - למד מהן</h3>
-              </div>
-              
-              <div className="space-y-3">
-                {statistics.failedExams.slice(0, 5).map((exam, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300 rounded-2xl p-4 shadow-sm">
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-900 text-sm mb-1">
-                          {new Date(exam.created_date).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          חסר: {exam.passing_grade - Math.round(exam.score_percent)} נקודות
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-black text-red-600">
-                          {Math.round(exam.score_percent)}
+              {/* Weak Topics from Practice */}
+              {statistics.weakTopics.length > 0 && (
+                <div className="mb-5">
+                  <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    נושאים לשיפור מתרגולים
+                  </h4>
+                  <div className="space-y-2">
+                    {statistics.weakTopics.slice(0, 3).map((topic, idx) => (
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-bold text-gray-900 text-sm">{topic.name || topic.topic}</span>
+                          <span className="text-blue-700 font-black text-lg">{Math.round(topic.accuracy)}%</span>
                         </div>
-                        <div className="text-xs text-gray-500">/{exam.passing_grade}</div>
+                        <Progress value={topic.accuracy} className="h-2 bg-blue-200" />
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="text-xs text-gray-600">
+                            {topic.incorrect} טעויות • {topic.total} תרגולים
+                          </div>
+                          <Button
+                            onClick={() => {
+                              sessionStorage.setItem('selectedTopicForPractice', topic.topic);
+                              navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
+                            }}
+                            className="h-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-3 rounded-lg"
+                          >
+                            <BookOpen className="w-3 h-3 ml-1" />
+                            תרגל
+                          </Button>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Weak Topics from Exams */}
+              {(() => {
+                const examMistakesByTopic = {};
+                examAttempts.forEach(attempt => {
+                  if (attempt.answers && Array.isArray(attempt.answers)) {
+                    attempt.answers.forEach(answer => {
+                      if (!answer.is_correct && answer.topic_key) {
+                        if (!examMistakesByTopic[answer.topic_key]) {
+                          examMistakesByTopic[answer.topic_key] = { count: 0, total: 0 };
+                        }
+                        examMistakesByTopic[answer.topic_key].count++;
+                        examMistakesByTopic[answer.topic_key].total++;
+                      }
+                    });
+                  }
+                });
+
+                const examWeakTopics = Object.entries(examMistakesByTopic)
+                  .map(([topic, data]) => ({
+                    topic,
+                    mistakes: data.count,
+                    total: data.total
+                  }))
+                  .sort((a, b) => b.mistakes - a.mistakes)
+                  .slice(0, 3);
+
+                return examWeakTopics.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                      <FileCheck className="w-4 h-4" />
+                      נושאים לשיפור מבגרויות
+                    </h4>
+                    <div className="space-y-2">
+                      {examWeakTopics.map((topic, idx) => (
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3 shadow-sm">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-gray-900 text-sm">{topic.topic}</span>
+                            <span className="text-blue-700 font-black text-lg">{topic.mistakes} טעויות</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-xs text-gray-600">
+                              {topic.total} שאלות במבחנים
+                            </div>
+                            <Button
+                              onClick={() => {
+                                if (user?.is_premium) {
+                                  sessionStorage.setItem('selectedTopicForPractice', topic.topic);
+                                  navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic)}`);
+                                } else {
+                                  navigate(createPageUrl("Premium"));
+                                }
+                              }}
+                              className={`h-7 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-xs font-bold px-3 rounded-lg`}
+                            >
+                              {user?.is_premium ? (
+                                <>
+                                  <BookOpen className="w-3 h-3 ml-1" />
+                                  תרגל
+                                </>
+                              ) : (
+                                <>
+                                  <Crown className="w-3 h-3 ml-1" />
+                                  שדרג
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <Button
-                onClick={() => navigate(createPageUrl("Exams"))}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-bold shadow-lg mt-4 rounded-xl"
-              >
-                <Flame className="w-5 h-5 ml-2" />
-                נסה שוב את הבגרויות
-              </Button>
+                );
+              })()}
             </motion.div>
           )}
 
