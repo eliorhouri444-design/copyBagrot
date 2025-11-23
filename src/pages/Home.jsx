@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Target, AlertCircle, Calculator, Crown, User, TrendingUp, FileCheck, Clock, Flame, TrendingDown, Loader2, Zap, Calendar } from "lucide-react";
+import { BookOpen, Target, AlertCircle, Crown, User, TrendingUp, FileCheck, Clock, Flame, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
@@ -378,7 +378,8 @@ export default function HomePage() {
       description: "התחל תרגול עכשיו",
       color: "from-blue-500 to-blue-600",
       onClick: () => navigate(createPageUrl("Practice")),
-      delay: 0.3
+      delay: 0.3,
+      isPremium: false
     },
     {
       icon: FileCheck,
@@ -386,41 +387,19 @@ export default function HomePage() {
       description: "תרגל במבחנים מלאים",
       color: "from-green-500 to-green-600",
       onClick: () => navigate(createPageUrl("Exams")),
-      delay: 0.4
-    },
-    {
-      icon: Zap,
-      title: "תרגול מותאם",
-      description: "נושאים שטעית בהם",
-      color: "from-purple-500 to-pink-600",
-      onClick: () => navigate(createPageUrl("CustomWeakPractice")),
-      delay: 0.45
+      delay: 0.4,
+      isPremium: false
     },
     {
       icon: Target,
-      title: "בגרות מותאמת",
-      description: "שאלות שטעית בהן",
-      color: "from-orange-500 to-red-600",
-      onClick: () => navigate(createPageUrl("CustomWeakExam")),
-      delay: 0.5
-      },
-      {
-      icon: Calendar,
-      title: "תכנון לימודים",
-      description: "ארגן את הזמן שלך",
-      color: "from-green-500 to-emerald-600",
-      onClick: () => navigate(createPageUrl("StudyPlanner")),
-      delay: 0.55
-      },
-      {
-      icon: Target,
-      title: "תרגול מותאם",
+      title: "תרגול מותאם אישית",
       description: "בנה תרגול בעצמך",
       color: "from-cyan-500 to-blue-600",
       onClick: () => navigate(createPageUrl("CustomPracticeBuilder")),
-      delay: 0.6
-      }
-      ];
+      delay: 0.45,
+      isPremium: false
+    }
+  ];
 
   if (!isUserLoaded) {
     return (
@@ -655,8 +634,11 @@ export default function HomePage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={card.onClick}
-                className={`bg-gradient-to-r ${card.color} rounded-2xl p-4 shadow-lg text-white text-right hover:shadow-xl transition-all`}
+                className={`bg-gradient-to-r ${card.color} rounded-2xl p-4 shadow-lg text-white text-right hover:shadow-xl transition-all relative`}
               >
+                {card.isPremium && (
+                  <Crown className="w-4 h-4 absolute top-2 left-2 text-yellow-300" />
+                )}
                 <Icon className="w-8 h-8 mb-2" />
                 <h3 className="text-sm font-bold mb-1">{card.title}</h3>
                 <p className="text-xs opacity-90">{card.description}</p>

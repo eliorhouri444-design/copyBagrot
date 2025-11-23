@@ -216,9 +216,9 @@ Return JSON:`,
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
           <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-gray-900 mb-2">אין שאלות זמינות</h3>
-          <p className="text-gray-600 mb-6">נראה שלא נכשלת בשאלות עדיין, או שאתה מעולה! 🌟</p>
-          <Button onClick={() => navigate(createPageUrl("Statistics"))} className="w-full">
-            חזרה לסטטיסטיקה
+          <p className="text-gray-600 mb-6">נראה שלא טעית בשאלות עדיין, או שאתה מעולה! 🌟</p>
+          <Button onClick={() => navigate(createPageUrl("Exams"))} className="w-full">
+            חזרה לבגרויות
           </Button>
         </div>
       </div>
@@ -244,7 +244,7 @@ Return JSON:`,
               <Trophy className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">בגרות מותאמת אישית</p>
+            <p className="text-gray-600">תרגול טעויות בבגרות</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-6 border-2 border-orange-200">
@@ -269,11 +269,11 @@ Return JSON:`,
               נסה שוב
             </Button>
             <Button
-              onClick={() => navigate(createPageUrl("Statistics"))}
+              onClick={() => navigate(createPageUrl("Exams"))}
               variant="outline"
               className="w-full h-14 text-lg font-bold border-2"
             >
-              חזרה לסטטיסטיקה
+              חזרה לבגרויות
             </Button>
           </div>
         </motion.div>
@@ -293,14 +293,17 @@ Return JSON:`,
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate(createPageUrl("Statistics"))}
+            onClick={() => navigate(createPageUrl("Exams"))}
             className="text-white hover:bg-white/20"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
 
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">בגרות מותאמת אישית</h1>
+            <div className="flex items-center justify-center gap-2">
+              <h1 className="text-lg font-bold">תרגול טעויות בבגרות</h1>
+              <Crown className="w-5 h-5 text-yellow-300" />
+            </div>
             <p className="text-sm opacity-90">שאלה {currentIndex + 1} / {questions.length}</p>
           </div>
 

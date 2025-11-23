@@ -776,20 +776,21 @@ export default function StatisticsPage() {
             >
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <Target className="w-6 h-6 text-purple-600" />
-                למידה מותאמת אישית
+                תרגול טעויות 🎯
               </h3>
 
               <div className="grid grid-cols-1 gap-3">
                 {statistics.weakTopics.length > 0 && (
                   <Button
                     onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-                    className="h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
+                    className="h-20 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden"
                   >
+                    <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
                     <div className="flex items-center gap-3 flex-1">
-                      <Zap className="w-6 h-6" />
+                      <Target className="w-8 h-8" />
                       <div className="text-right">
-                        <div className="text-sm font-bold">תרגול מותאם אישית</div>
-                        <div className="text-xs opacity-90">תרגל {statistics.weakTopics.length} נושאים חלשים</div>
+                        <div className="text-base font-bold">תרגול טעויות</div>
+                        <div className="text-xs opacity-90">בנה תרגול מכל השאלות שטעית בהן</div>
                       </div>
                     </div>
                     <ChevronLeft className="w-5 h-5" />
@@ -799,13 +800,14 @@ export default function StatisticsPage() {
                 {statistics.failedExams.length > 0 && (
                   <Button
                     onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-                    className="h-16 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6"
+                    className="h-20 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden"
                   >
+                    <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
                     <div className="flex items-center gap-3 flex-1">
-                      <Target className="w-6 h-6" />
+                      <Target className="w-8 h-8" />
                       <div className="text-right">
-                        <div className="text-sm font-bold">בגרות מותאמת אישית</div>
-                        <div className="text-xs opacity-90">שאלות שטעית בהן בעבר</div>
+                        <div className="text-base font-bold">תרגול טעויות בבגרות</div>
+                        <div className="text-xs opacity-90">מבחן שמבוסס על השאלות שבהן טעית בעבר</div>
                       </div>
                     </div>
                     <ChevronLeft className="w-5 h-5" />
