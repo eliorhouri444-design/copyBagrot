@@ -796,68 +796,7 @@ export default function StatisticsPage() {
             </motion.div>
           )}
 
-          {/* Personalized Learning */}
-          {(statistics.weakTopics.length > 0 || statistics.failedExams.length > 0) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 }}
-              className="space-y-3"
-            >
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Target className="w-6 h-6 text-purple-600" />
-                תרגול טעויות 🎯
-              </h3>
 
-              <div className="grid grid-cols-1 gap-3">
-                {statistics.weakTopics.length > 0 && (
-                  <Button
-                    onClick={() => {
-                      if (user?.is_premium) {
-                        navigate(createPageUrl("CustomWeakPractice"));
-                      } else {
-                        navigate(createPageUrl("Premium"));
-                      }
-                    }}
-                    className={`h-20 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden`}
-                  >
-                    <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
-                    <div className="flex items-center gap-3 flex-1">
-                      <Target className="w-8 h-8" />
-                      <div className="text-right">
-                        <div className="text-base font-bold">תרגול טעויות</div>
-                        <div className="text-xs opacity-90">{user?.is_premium ? 'בנה תרגול מכל השאלות שטעית בהן' : '🔒 שדרג לפרימיום'}</div>
-                      </div>
-                    </div>
-                    <ChevronLeft className="w-5 h-5" />
-                  </Button>
-                )}
-
-                {statistics.failedExams.length > 0 && (
-                  <Button
-                    onClick={() => {
-                      if (user?.is_premium) {
-                        navigate(createPageUrl("CustomWeakExam"));
-                      } else {
-                        navigate(createPageUrl("Premium"));
-                      }
-                    }}
-                    className={`h-20 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} rounded-2xl shadow-lg font-bold text-base justify-start px-6 relative overflow-hidden`}
-                  >
-                    <Crown className="w-5 h-5 absolute top-2 left-2 text-yellow-300" />
-                    <div className="flex items-center gap-3 flex-1">
-                      <Target className="w-8 h-8" />
-                      <div className="text-right">
-                        <div className="text-base font-bold">תרגול טעויות בבגרות</div>
-                        <div className="text-xs opacity-90">{user?.is_premium ? 'מבחן שמבוסס על השאלות שבהן טעית בעבר' : '🔒 שדרג לפרימיום'}</div>
-                      </div>
-                    </div>
-                    <ChevronLeft className="w-5 h-5" />
-                  </Button>
-                )}
-              </div>
-            </motion.div>
-          )}
 
           {/* Action Buttons */}
           <motion.div

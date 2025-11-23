@@ -66,7 +66,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
         transition={{ delay: 0.15 }}
         className="bg-white rounded-2xl shadow-md overflow-hidden mt-6"
       >
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
           <div className="flex items-center gap-3 text-white">
             <div className="flex-1 text-right">
               <h3 className="text-base font-bold">תרגולים אחרונים</h3>
@@ -155,7 +155,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
               <Button
                 onClick={() => setShowAllSessions(true)}
                 variant="outline"
-                className="w-full mt-3 h-10 text-sm font-semibold border-2 border-green-200 text-green-600 hover:bg-green-50"
+                className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50"
               >
                 צפה בכל התרגולים ({practiceSessions.length})
               </Button>
