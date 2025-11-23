@@ -640,56 +640,91 @@ export default function StatisticsPage() {
               </div>
 
               {/* Topics Table */}
-              <div className="mb-5">
-                <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-blue-600" />
+              <div className="mb-4">
+                <h4 className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-600" />
                   נושאי תרגול
                 </h4>
-                <div className="space-y-2">
-                  {allTopics.map((topic, idx) => {
-                    const topicData = statistics.topicArray.find(t => t.topic === topic.topic_id);
-                    const accuracy = topicData?.accuracy || 0;
-                    const total = topicData?.total || 0;
-                    
-                    return (
-                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <div className="font-bold text-gray-900 text-sm truncate flex-1">
-                            {topic.icon || '📚'} {topic.name}
+                <div className="space-y-1.5">
+                  {allTopics
+                    .sort((a, b) => (a.order || 0) - (b.order || 0))
+                    .map((topic, idx) => {
+                      const topicData = statistics.topicArray.find(t => t.topic === topic.topic_id);
+                      const accuracy = topicData?.accuracy || 0;
+                      const total = topicData?.total || 0;
+                      
+                      return (
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-2">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className="font-semibold text-gray-900 text-xs truncate flex-1">
+                              {topic.name}
+                            </div>
+                            <span className={`text-sm font-bold flex-shrink-0 ${
+                              accuracy >= 80 ? 'text-green-600' :
+                              accuracy >= 60 ? 'text-blue-600' :
+                              total > 0 ? 'text-orange-600' : 'text-gray-400'
+                            }`}>
+                              {total > 0 ? `${Math.round(accuracy)}%` : '—'}
+                            </span>
                           </div>
-                          <span className={`text-base font-bold flex-shrink-0 ${
-                            accuracy >= 80 ? 'text-green-600' :
-                            accuracy >= 60 ? 'text-blue-600' :
-                            total > 0 ? 'text-orange-600' : 'text-gray-400'
-                          }`}>
-                            {total > 0 ? `${Math.round(accuracy)}%` : '—'}
-                          </span>
+                          <div className="w-full bg-blue-200 rounded-full h-1.5">
+                            <div 
+                              className={`h-1.5 rounded-full ${
+                                accuracy >= 80 ? 'bg-green-500' :
+                                accuracy >= 60 ? 'bg-blue-500' :
+                                'bg-orange-500'
+                              }`}
+                              style={{ width: `${Math.min(accuracy, 100)}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full bg-blue-200 rounded-full h-2 mb-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              accuracy >= 80 ? 'bg-green-500' :
-                              accuracy >= 60 ? 'bg-blue-500' :
-                              'bg-orange-500'
-                            }`}
-                            style={{ width: `${Math.min(accuracy, 100)}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {total > 0 ? (
-                            <>{topicData.correct} נכון • {topicData.incorrect} טעויות • {total} סה"כ</>
-                          ) : (
-                            <>לא תורגל עדיין</>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               </div>
 
               {/* Modules Table */}
               {(() => {
+                const defaultModulesStructure = {
+                  "אנגלית": {
+                    3: [
+                      { id: "C", order: 0 },
+                      { id: "A", order: 1 },
+                      { id: "B", order: 2 }
+                    ],
+                    4: [
+                      { id: "C", order: 0 },
+                      { id: "D", order: 1 },
+                      { id: "E", order: 2 }
+                    ],
+                    5: [
+                      { id: "E", order: 0 },
+                      { id: "F", order: 1 },
+                      { id: "G", order: 2 }
+                    ]
+                  },
+                  "מתמטיקה": {
+                    3: [
+                      { id: "801", order: 0 },
+                      { id: "802", order: 1 }
+                    ],
+                    4: [
+                      { id: "803", order: 0 },
+                      { id: "804", order: 1 }
+                    ],
+                    5: [
+                      { id: "805", order: 0 },
+                      { id: "806", order: 1 }
+                    ]
+                  },
+                  "פיזיקה": {
+                    5: [
+                      { id: "581", order: 0 },
+                      { id: "582", order: 1 }
+                    ]
+                  }
+                };
+
                 const moduleStats = {};
                 examAttempts.forEach(attempt => {
                   const moduleId = attempt.module_id || 'לא ידוע';
@@ -703,48 +738,49 @@ export default function StatisticsPage() {
                   }
                 });
 
-                const moduleArray = Object.entries(moduleStats)
-                  .map(([module, stats]) => ({
-                    module,
-                    avgScore: stats.total > 0 ? stats.totalScore / stats.total : 0,
-                    total: stats.total,
-                    passed: stats.passed
-                  }))
-                  .sort((a, b) => a.avgScore - b.avgScore);
+                const moduleOrder = defaultModulesStructure[displaySubject]?.[displayUnits] || [];
+                const moduleArray = moduleOrder
+                  .map(({ id }) => {
+                    const stats = moduleStats[id];
+                    return {
+                      module: id,
+                      avgScore: stats ? (stats.total > 0 ? stats.totalScore / stats.total : 0) : 0,
+                      total: stats?.total || 0,
+                      passed: stats?.passed || 0
+                    };
+                  });
 
                 return moduleArray.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                      <FileCheck className="w-4 h-4 text-blue-600" />
+                    <h4 className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-blue-600" />
                       שאלוני בגרות
                     </h4>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {moduleArray.map((module, idx) => (
-                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-3">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <div className="font-bold text-gray-900 text-sm">
-                              📋 שאלון {module.module}
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-2">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className="font-semibold text-gray-900 text-xs">
+                              שאלון {module.module}
                             </div>
-                            <span className={`text-base font-bold flex-shrink-0 ${
+                            <span className={`text-sm font-bold flex-shrink-0 ${
+                              module.total === 0 ? 'text-gray-400' :
                               module.avgScore >= 80 ? 'text-green-600' :
                               module.avgScore >= 60 ? 'text-blue-600' :
                               'text-orange-600'
                             }`}>
-                              {Math.round(module.avgScore)}%
+                              {module.total > 0 ? `${Math.round(module.avgScore)}%` : '—'}
                             </span>
                           </div>
-                          <div className="w-full bg-blue-200 rounded-full h-2 mb-2">
+                          <div className="w-full bg-blue-200 rounded-full h-1.5">
                             <div 
-                              className={`h-2 rounded-full ${
+                              className={`h-1.5 rounded-full ${
                                 module.avgScore >= 80 ? 'bg-green-500' :
                                 module.avgScore >= 60 ? 'bg-blue-500' :
                                 'bg-orange-500'
                               }`}
                               style={{ width: `${Math.min(module.avgScore, 100)}%` }}
                             />
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {module.passed} עבר • {module.total - module.passed} נכשל • {module.total} סה"כ
                           </div>
                         </div>
                       ))}
