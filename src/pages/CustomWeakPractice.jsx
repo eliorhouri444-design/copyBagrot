@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Target, CheckCircle, XCircle, ChevronLeft, Trophy } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle, XCircle, ChevronLeft, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,12 +33,19 @@ export default function CustomWeakPracticePage() {
 
       // Get all WRONG practice attempts
       const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
+      console.log('📊 Total attempts found:', attempts.length);
+      console.log('📊 User email:', currentUser.email);
+      console.log('📊 Selected subject:', currentUser.selected_subject);
+      console.log('📊 Selected units:', currentUser.selected_units);
+      
       const wrongAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject_id === currentUser.selected_subject &&
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
         (a.status === "incorrect" || a.percentage < 50)
       );
+      
+      console.log('❌ Wrong attempts filtered:', wrongAttempts.length);
 
       console.log('Found wrong attempts:', wrongAttempts.length);
 
@@ -217,7 +224,7 @@ Return JSON:`,
               onClick={() => window.location.reload()}
               className="w-full h-14 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-lg font-bold shadow-lg"
             >
-              <Target className="w-5 h-5 ml-2" />
+              <BookOpen className="w-5 h-5 ml-2" />
               נסה שוב
             </Button>
             <Button
@@ -270,7 +277,7 @@ Return JSON:`,
           <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-t-3xl border-b-2 border-red-100">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Target className="w-6 h-6 text-white" />
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600 font-medium">שאלה שטעית בה</div>
