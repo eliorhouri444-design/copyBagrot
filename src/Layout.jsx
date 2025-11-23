@@ -69,9 +69,41 @@ function LayoutContent({ children, currentPageName }) {
             --bg-light: #F9FAFB;
             --border-light: #E5E7EB;
           }
-          
+
           * {
             font-family: 'Segoe UI', 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
+          }
+
+          /* New Animation Classes */
+          .animate-hover-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+          }
+
+          .animate-hover-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+          }
+
+          @keyframes task-bounce {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.05); }
+            50% { transform: scale(0.95); }
+            75% { transform: scale(1.02); }
+          }
+
+          .animate-task-bounce {
+            animation: task-bounce 0.6s ease-in-out;
+          }
+
+          @keyframes background-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+
+          .animate-background-flow {
+            background-size: 200% 200%;
+            animation: background-flow 15s ease infinite;
           }
           
           .base44-auth-container {
