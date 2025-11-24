@@ -142,10 +142,13 @@ export default function StatisticsPage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
-        <div className="text-center">
-          <h1 className="text-[18px] font-bold text-white mb-0.5">הנתונים שלי</h1>
-          <p className="text-[12px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+        <div className="text-right flex-1">
+          <h1 className="text-[16px] font-bold text-white">הנתונים שלי</h1>
+          <p className="text-[11px] text-white/70">{displaySubject} • {displayUnits} יחידות</p>
+        </div>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <TrendingUp className="w-5 h-5 text-white" />
         </div>
       </div>
 
@@ -174,7 +177,7 @@ export default function StatisticsPage() {
               <CardTitle icon={Target}>מדד מוכנות</CardTitle>
               
               <div className="text-center mb-4">
-                <div className="text-7xl font-black text-[#1E4BA1] mb-2">{readinessData.scores.overall}%</div>
+                <div className="text-7xl font-black text-[#3B82F6] mb-2">{readinessData.scores.overall}%</div>
                 <div className="text-[13px] text-[#6E6E6E]">מוכנות לבגרות</div>
               </div>
               <Progress value={readinessData.scores.overall} className="h-3 mb-4" />
@@ -191,19 +194,19 @@ export default function StatisticsPage() {
               {showDetailedView && (
                 <div className="grid grid-cols-2 gap-2 mt-4">
                   <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] text-center">
-                    <div className="text-2xl font-black text-[#1E4BA1]">{readinessData.scores.mastery}%</div>
+                    <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</div>
                     <div className="text-[13px] text-[#6E6E6E]">שליטה בחומר</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] text-center">
-                    <div className="text-2xl font-black text-[#9333EA]">{readinessData.scores.practice}%</div>
+                    <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</div>
                     <div className="text-[13px] text-[#6E6E6E]">תרגול</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] text-center">
-                    <div className="text-2xl font-black text-[#10B981]">{readinessData.scores.exams}%</div>
+                    <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</div>
                     <div className="text-[13px] text-[#6E6E6E]">בגרויות</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] text-center">
-                    <div className="text-2xl font-black text-[#F59E0B]">{readinessData.scores.speed}%</div>
+                    <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</div>
                     <div className="text-[13px] text-[#6E6E6E]">מהירות</div>
                   </div>
                 </div>
@@ -219,15 +222,15 @@ export default function StatisticsPage() {
               <div className="space-y-2 mb-3">
                 <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
                   <span className="text-[15px] font-semibold text-[#2B2B2B]">בגרויות</span>
-                  <span className="text-3xl font-black text-[#1E4BA1]">{readinessData.remaining.exams}</span>
+                  <span className="text-3xl font-black text-[#3B82F6]">{readinessData.remaining.exams}</span>
                 </div>
                 <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
                   <span className="text-[15px] font-semibold text-[#2B2B2B]">שאלות</span>
-                  <span className="text-3xl font-black text-[#1E4BA1]">{readinessData.remaining.practice}</span>
+                  <span className="text-3xl font-black text-[#3B82F6]">{readinessData.remaining.practice}</span>
                 </div>
                 <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
                   <span className="text-[15px] font-semibold text-[#2B2B2B]">נושאים</span>
-                  <span className="text-3xl font-black text-[#1E4BA1]">{readinessData.remaining.weakTopics}</span>
+                  <span className="text-3xl font-black text-[#3B82F6]">{readinessData.remaining.weakTopics}</span>
                 </div>
               </div>
 
@@ -283,13 +286,13 @@ export default function StatisticsPage() {
                   }}
                   formatter={(value) => [`${value} דקות`]}
                 />
-                <Bar dataKey="minutes" fill="#1E4BA1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="minutes" fill="#3B82F6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
 
             <div className="text-center mt-3">
               <span className="text-[13px] text-[#6E6E6E]">השבוע: </span>
-              <span className="text-2xl font-black text-[#1E4BA1]">
+              <span className="text-2xl font-black text-[#3B82F6]">
                 {statistics.last7Days.reduce((sum, d) => sum + d.minutes, 0)}
               </span>
               <span className="text-[13px] text-[#6E6E6E]"> דקות</span>

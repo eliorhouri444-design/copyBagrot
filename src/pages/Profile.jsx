@@ -269,14 +269,14 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
-            <User className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="text-[18px] font-bold text-white mb-0.5">{user?.full_name || 'תלמיד'}</h1>
-          <p className="text-[12px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+        <div className="text-right flex-1">
+          <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
+          <p className="text-[11px] text-white/70">{displaySubject} • {displayUnits} יחידות</p>
         </div>
+        <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
+          <Settings className="w-5 h-5 text-white" />
+        </button>
       </div>
 
       <div className="px-5 space-y-6">
@@ -286,9 +286,9 @@ export default function ProfilePage() {
             <CardTitle>הדרך שלך לבגרות</CardTitle>
             
             <div className="grid grid-cols-3 gap-3 mb-3">
-              <StatCard value={`${readinessData.scores.mastery}%`} label="שליטה בחומר" color="#1E4BA1" />
-              <StatCard value={`${readinessData.scores.practice}%`} label="תרגול" color="#9333EA" />
-              <StatCard value={`${readinessData.scores.exams}%`} label="בגרויות" color="#10B981" />
+              <StatCard value={`${readinessData.scores.mastery}%`} label="שליטה בחומר" color="#3B82F6" />
+              <StatCard value={`${readinessData.scores.practice}%`} label="תרגול" color="#3B82F6" />
+              <StatCard value={`${readinessData.scores.exams}%`} label="בגרויות" color="#3B82F6" />
             </div>
 
             <Button
@@ -305,28 +305,28 @@ export default function ProfilePage() {
                 <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="flex items-center justify-between">
                     <span className="text-[15px] font-semibold text-[#2B2B2B]">שליטה בחומר</span>
-                    <span className="text-2xl font-black text-[#1E4BA1]">{readinessData.scores.mastery}%</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</span>
                   </div>
                   <Progress value={readinessData.scores.mastery} className="h-2 mt-2" />
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="flex items-center justify-between">
                     <span className="text-[15px] font-semibold text-[#2B2B2B]">תרגול</span>
-                    <span className="text-2xl font-black text-[#9333EA]">{readinessData.scores.practice}%</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</span>
                   </div>
                   <Progress value={readinessData.scores.practice} className="h-2 mt-2" />
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="flex items-center justify-between">
                     <span className="text-[15px] font-semibold text-[#2B2B2B]">בגרויות</span>
-                    <span className="text-2xl font-black text-[#10B981]">{readinessData.scores.exams}%</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</span>
                   </div>
                   <Progress value={readinessData.scores.exams} className="h-2 mt-2" />
                 </div>
                 <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="flex items-center justify-between">
                     <span className="text-[15px] font-semibold text-[#2B2B2B]">מהירות</span>
-                    <span className="text-2xl font-black text-[#F59E0B]">{readinessData.scores.speed}%</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</span>
                   </div>
                   <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
                 </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
@@ -109,10 +109,13 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
-        <div className="text-center">
-          <h1 className="text-[18px] font-bold text-white mb-0.5">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
-          <p className="text-[12px] text-white/80">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+        <div className="text-right flex-1">
+          <h1 className="text-[16px] font-bold text-white">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
+          <p className="text-[11px] text-white/70">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+        </div>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <User className="w-5 h-5 text-white" />
         </div>
       </div>
 
@@ -122,9 +125,9 @@ export default function HomePage() {
           <CardTitle>מה המצב שלך</CardTitle>
           
           <div className="grid grid-cols-3 gap-3 mb-3">
-            <StatCard value={`${readinessData?.scores.overall || 0}%`} label="מוכנות" color="#1E4BA1" />
-            <StatCard value={daysUntilExam} label="ימים לבגרות" color="#9333EA" />
-            <StatCard value={user?.target_score || 85} label="ציון מטרה" color="#10B981" />
+            <StatCard value={`${readinessData?.scores.overall || 0}%`} label="מוכנות" color="#3B82F6" />
+            <StatCard value={daysUntilExam} label="ימים לבגרות" color="#3B82F6" />
+            <StatCard value={user?.target_score || 85} label="ציון מטרה" color="#3B82F6" />
           </div>
 
           <Button
@@ -140,19 +143,19 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-2 mt-3">
               <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                 <div className="text-sm text-[#6E6E6E] mb-1">שליטה</div>
-                <div className="text-2xl font-black text-[#1E4BA1]">{readinessData.scores.mastery}%</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</div>
               </div>
               <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                 <div className="text-sm text-[#6E6E6E] mb-1">תרגול</div>
-                <div className="text-2xl font-black text-[#9333EA]">{readinessData.scores.practice}%</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</div>
               </div>
               <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                 <div className="text-sm text-[#6E6E6E] mb-1">בגרויות</div>
-                <div className="text-2xl font-black text-[#10B981]">{readinessData.scores.exams}%</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</div>
               </div>
               <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                 <div className="text-sm text-[#6E6E6E] mb-1">מהירות</div>
-                <div className="text-2xl font-black text-[#F59E0B]">{readinessData.scores.speed}%</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</div>
               </div>
             </div>
           )}
@@ -236,7 +239,7 @@ export default function HomePage() {
                 <div className="font-bold text-[15px] text-[#2B2B2B]">{user?.selected_subject || 'אנגלית'}</div>
                 <div className="text-[13px] text-[#6E6E6E]">{user?.selected_units || 3} יחידות</div>
               </div>
-              <div className="text-3xl font-black text-[#1E4BA1]">
+              <div className="text-3xl font-black text-[#3B82F6]">
                 {readinessData?.scores.overall || 0}%
               </div>
             </div>
