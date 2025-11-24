@@ -6,29 +6,13 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 
-export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium, onShowAd }) {
+export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingTopic, setIsCheckingTopic] = useState(false);
   const [cachedTopics, setCachedTopics] = useState(null);
-  const [todayPracticeCount, setTodayPracticeCount] = useState(0);
-  const FREE_DAILY_PRACTICE = 1; // תרגול אחד בחינם ליום
-
-  // בדוק כמה תרגולים עשה היום
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const storageKey = `practice_count_${today}`;
-    const count = parseInt(localStorage.getItem(storageKey) || '0');
-    setTodayPracticeCount(count);
-    
-    // נקה ימים ישנים
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = `practice_count_${yesterday.toISOString().split('T')[0]}`;
-    localStorage.removeItem(yesterdayKey);
-  }, []);
 
   useEffect(() => {
     const cacheKey = `topics_${subject}_${units}`;
@@ -250,37 +234,10 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
     }
   };
 
-  const incrementPracticeCount = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const storageKey = `practice_count_${today}`;
-    const newCount = todayPracticeCount + 1;
-    localStorage.setItem(storageKey, newCount.toString());
-    setTodayPracticeCount(newCount);
-  };
-
   const handleStartPractice = async () => {
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
-    // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה תרגול היום)
-    if (!isPremium && todayPracticeCount >= FREE_DAILY_PRACTICE) {
-      // צריך לראות פרסומת קודם
-      if (onShowAd) {
-        onShowAd(() => {
-          // אחרי הפרסומת - המשך לתרגול
-          incrementPracticeCount();
-          navigateToPractice(topic, topicIdParam);
-        });
-      }
-      return;
-    }
-
-    // תרגול חינמי או פרימיום
-    incrementPracticeCount();
-    navigateToPractice(topic, topicIdParam);
-  };
-
-  const navigateToPractice = (topic, topicIdParam) => {
     console.log(`🔍 Starting practice for: ${topic.topic_id}`);
     console.log(`📖 Is Vocabulary: ${topic.isVocabulary}`);
     console.log(`📖 Is Extended Reading: ${topic.isExtendedReading}`);
@@ -416,19 +373,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             }
 
             <div className="space-y-2">
-              {/* הודעה על תרגולים נותרים */}
-              {!isPremium && (
-                <div className="text-center text-[11px] text-gray-500 mb-1">
-                  {todayPracticeCount < FREE_DAILY_PRACTICE ? (
-                    <span className="text-green-600 font-semibold">✓ תרגול חינמי זמין היום</span>
-                  ) : (
-                    <span className="text-amber-600 font-semibold">📺 נדרשת צפייה בפרסומת</span>
-                  )}
-                </div>
-              )}
-
               <Button
-                onClick={handleStartPractice} className="bg-[#3B82F6] text-[#fafafa] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700">
+                onClick={handleStartPractice} className="bg-[#3B82F6] text-[#fafafa] px-4 py-2 font-bold rounded-[14px] \u05E4\u05E8\u05D9\u05DE\u05D9\u05D5\u05DD \u05DE\u05D5\u05EA\u05D0\u05DD \u05D0\u05D9\u05E9\u05D9\u05EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700">
 
 
                 <Play className="w-4 h-4 ml-2" />
