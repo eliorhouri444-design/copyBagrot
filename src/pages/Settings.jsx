@@ -306,24 +306,34 @@ export default function SettingsPage() {
       return;
     }
     
-    // Open store based on platform
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const storeUrl = isIOS 
-      ? "https://apps.apple.com/app/YOUR_APP_ID" 
-      : "https://play.google.com/store/apps/details?id=YOUR_PACKAGE_NAME";
+    // Detect device and open appropriate store
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isAndroid = /android/i.test(userAgent);
     
-    window.open(storeUrl, "_blank");
+    if (isIOS) {
+      // Apple App Store - replace with your actual App Store ID
+      window.open("https://apps.apple.com/app/bagrut-plus/id123456789", "_blank");
+    } else if (isAndroid) {
+      // Google Play Store - replace with your actual package name
+      window.open("https://play.google.com/store/apps/details?id=com.bagrutplus.app", "_blank");
+    } else {
+      // Desktop - show message
+      alert("תודה על הדירוג! 🌟");
+    }
     
     try {
-      const adFreeUntil = new Date();
-      adFreeUntil.setDate(adFreeUntil.getDate() + 1);
+      // Calculate new ad-free date (add to existing if applicable)
+      const currentAdFree = user?.ad_free_until ? new Date(user.ad_free_until) : new Date();
+      const baseDate = currentAdFree > new Date() ? currentAdFree : new Date();
+      baseDate.setDate(baseDate.getDate() + 1);
       
       await base44.auth.updateMe({ 
         has_rated: true,
         rating: 5,
-        ad_free_until: adFreeUntil.toISOString()
+        ad_free_until: baseDate.toISOString()
       });
-      setUser({ ...user, has_rated: true, rating: 5, ad_free_until: adFreeUntil.toISOString() });
+      setUser({ ...user, has_rated: true, rating: 5, ad_free_until: baseDate.toISOString() });
       setRatingSubmitted(true);
       
       setTimeout(() => {
