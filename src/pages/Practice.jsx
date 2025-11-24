@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target, Settings } from "lucide-react";
+import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target, Settings, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +30,8 @@ export default function PracticePage() {
   const [editingTopicData, setEditingTopicData] = useState(null);
   const [showReorderDialog, setShowReorderDialog] = useState(false);
   const [reorderTopics, setReorderTopics] = useState([]);
+  const [showAdDialog, setShowAdDialog] = useState(false);
+  const [adCallback, setAdCallback] = useState(null);
   const [cachedData, setCachedData] = useState(() => {
     if (typeof window !== 'undefined') {
       return {
@@ -300,7 +302,11 @@ export default function PracticePage() {
               });
               console.log('🔵 Opening dialog...');
               setShowTopicEditDialog(true);
-            } : null} />
+            } : null}
+            onShowAd={(callback) => {
+              setAdCallback(() => callback);
+              setShowAdDialog(true);
+            }} />
 
         </motion.div>
 
@@ -607,6 +613,75 @@ export default function PracticePage() {
             <Button onClick={handleSaveTopicEdit} className="bg-blue-600 hover:bg-blue-700">
               <Save className="w-4 h-4 mr-2" />
               שמור שינויים
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ad Dialog for Practice */}
+      <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">צפייה בפרסומת</DialogTitle>
+            <DialogDescription>
+              התרגול החינמי היומי שלך נוצל. צפה בפרסומת כדי להמשיך לתרגל.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 text-center">
+              <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                צפה בפרסומת קצרה כדי לפתוח תרגול נוסף
+              </p>
+              <Button
+                onClick={async () => {
+                  alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
+                  await new Promise((resolve) => setTimeout(resolve, 2000));
+                  setShowAdDialog(false);
+                  if (adCallback) {
+                    adCallback();
+                  }
+                }}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold">
+
+                <Play className="w-5 h-5 mr-2" />
+                צפה בפרסומת
+              </Button>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">או</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                תרגול בלתי מוגבל - ללא פרסומות!
+              </p>
+              <Button
+                onClick={() => {
+                  setShowAdDialog(false);
+                  navigate(createPageUrl("Premium"));
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold">
+
+                <Crown className="w-5 h-5 mr-2" />
+                שדרג עכשיו
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdDialog(false)} className="w-full">
+              ביטול
             </Button>
           </DialogFooter>
         </DialogContent>
