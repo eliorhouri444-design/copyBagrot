@@ -237,23 +237,51 @@ export default function DailyPlanCard({
       .slice(0, 3);
   }, [modules, examAttempts]);
 
-  const completedCount = completedTasks.length;
+  // חישוב התקדמות אוטומטית מהמשימות
+  const completedCount = dailyTasks.tasks.filter(t => t.isCompleted).length;
   const totalTasks = dailyTasks.tasks.length;
   const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
+  const handleTaskClick = (task) => {
+    // ניווט לפי סוג המשימה
+    if (task.type === "practice") {
+      if (recommendedTopics.length > 0) {
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
+      } else {
+        navigate(createPageUrl("Practice"));
+      }
+    } else if (task.type === "learn") {
+      if (recommendedTopics.length > 0) {
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
+      } else {
+        navigate(createPageUrl("Practice"));
+      }
+    } else if (task.type === "review") {
+      navigate(createPageUrl("CustomWeakPractice"));
+    } else if (task.type === "exam") {
+      if (recommendedExams.length > 0) {
+        sessionStorage.setItem('selectedModuleId', recommendedExams[0].id);
+        navigate(createPageUrl("Exams"));
+      } else {
+        navigate(createPageUrl("Exams"));
+      }
+    }
+  };
+
   const handleStartTasks = () => {
-    // מתחיל בתרגול הראשון
-    if (recommendedTopics.length > 0) {
-      sessionStorage.setItem('selectedTopicId', recommendedTopics[0].topic_id);
-      navigate(createPageUrl("Practice"));
+    // מתחיל במשימה הראשונה שלא הושלמה
+    const firstIncomplete = dailyTasks.tasks.find(t => !t.isCompleted);
+    if (firstIncomplete) {
+      handleTaskClick(firstIncomplete);
+    } else if (recommendedTopics.length > 0) {
+      navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
     } else {
       navigate(createPageUrl("Practice"));
     }
   };
 
   const handleTopicClick = (topic) => {
-    sessionStorage.setItem('selectedTopicId', topic.topic_id);
-    navigate(createPageUrl("Practice"));
+    navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(topic.topic_id)}&set=1`);
   };
 
   const handleExamClick = (module) => {
