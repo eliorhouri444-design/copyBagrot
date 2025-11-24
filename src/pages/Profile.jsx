@@ -58,8 +58,7 @@ export default function ProfilePage() {
   const [showDetailsView, setShowDetailsView] = useState(false);
 
   const subjects = [
-    "מתמטיקה", "פיזיקה", "ביולוגיה", "היסטוריה",
-    "אזרחות", "ספרות", "לשון", "אנגלית", "ערבית"
+    "אנגלית", "מתמטיקה"
   ];
 
   const cancelReasons = [
