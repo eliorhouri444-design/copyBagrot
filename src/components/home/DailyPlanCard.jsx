@@ -18,7 +18,37 @@ export default function DailyPlanCard({
 }) {
   const navigate = useNavigate();
 
-  // חישוב המשימות היומיות הדינמיות
+  // חישוב התקדמות יומית מתוך הניסיונות של היום
+  const todayProgress = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // שאלות שנפתרו היום
+    const todayPractice = practiceAttempts.filter(a => 
+      a.created_date && a.created_date.startsWith(today)
+    );
+    const questionsToday = todayPractice.length;
+    
+    // נושאים שתורגלו היום (ייחודיים)
+    const uniqueTopicsToday = new Set(todayPractice.map(a => a.topic_id).filter(Boolean));
+    const topicsToday = uniqueTopicsToday.size;
+    
+    // טעויות שנחזרו היום (שאלות שנענו נכון אחרי שהיו שגויות)
+    const incorrectQuestionIds = new Set(
+      practiceAttempts.filter(a => a.status === "incorrect").map(a => a.question_id)
+    );
+    const reviewedToday = todayPractice.filter(a => 
+      a.status === "correct" && incorrectQuestionIds.has(a.question_id)
+    ).length;
+    
+    // בחינות שבוצעו היום
+    const examsToday = examAttempts.filter(e => 
+      e.created_date && e.created_date.startsWith(today) && e.is_completed
+    ).length;
+    
+    return { questionsToday, topicsToday, reviewedToday, examsToday };
+  }, [practiceAttempts, examAttempts]);
+
+  // חישוב המשימות היומיות הדינמיות עם התקדמות
   const dailyTasks = useMemo(() => {
     if (!readinessData) return { tasks: [], solveQuestions: 0, learnTopics: 0, fixErrors: 0, examsToday: 0 };
 
@@ -28,69 +58,109 @@ export default function DailyPlanCard({
     const remainingQuestions = readinessData.remaining?.practice || 0;
 
     // SolveQuestions = RemainingQuestions / DaysUntilExam
-    const solveQuestions = Math.max(
+    const solveQuestionsTarget = Math.max(
       readinessData.daily?.questions || 10,
       Math.ceil(remainingQuestions / Math.max(1, daysUntilExam))
     );
 
     // LearnTopics = WeakTopicsCount / DaysUntilExam * 2
-    const learnTopics = weakTopicsCount > 0 
+    const learnTopicsTarget = weakTopicsCount > 0 
       ? Math.max(1, Math.ceil((weakTopicsCount / Math.max(1, daysUntilExam)) * 2))
       : readinessData.daily?.topics || 1;
 
     // FixErrors = TotalErrors / 3
-    const fixErrors = Math.max(3, Math.ceil(errorCount / 3));
+    const fixErrorsTarget = Math.max(3, Math.ceil(errorCount / 3));
 
     // ExamsToday: אם DaysToExam <= 3 → 1 סימולציה חובה, אם <= 7 → כל 2 ימים
-    let examsToday = 0;
+    let examsTodayTarget = 0;
     if (daysUntilExam <= 3) {
-      examsToday = 1;
+      examsTodayTarget = 1;
     } else if (daysUntilExam <= 7) {
-      examsToday = daysUntilExam % 2 === 0 ? 1 : 0;
+      examsTodayTarget = daysUntilExam % 2 === 0 ? 1 : 0;
     } else {
-      examsToday = readinessData.daily?.examsPerWeek > 0 ? (daysUntilExam % 3 === 0 ? 1 : 0) : 0;
+      examsTodayTarget = readinessData.daily?.examsPerWeek > 0 ? (daysUntilExam % 3 === 0 ? 1 : 0) : 0;
     }
+
+    // חישוב כמה נשאר לבצע
+    const remainingQuestionsTodo = Math.max(0, solveQuestionsTarget - todayProgress.questionsToday);
+    const remainingTopicsTodo = Math.max(0, learnTopicsTarget - todayProgress.topicsToday);
+    const remainingReviewTodo = Math.max(0, fixErrorsTarget - todayProgress.reviewedToday);
+    const remainingExamsTodo = Math.max(0, examsTodayTarget - todayProgress.examsToday);
 
     const tasks = [
       { 
         id: "practice", 
         type: "practice",
-        title: `לפתור ${solveQuestions} שאלות`,
-        description: "תרגול יומי להגעה לציון המטרה",
-        target: solveQuestions,
+        title: remainingQuestionsTodo > 0 
+          ? `לפתור ${remainingQuestionsTodo} שאלות` 
+          : `✓ פתרת ${todayProgress.questionsToday} שאלות`,
+        description: remainingQuestionsTodo > 0 
+          ? `פתרת ${todayProgress.questionsToday}/${solveQuestionsTarget}` 
+          : "יעד יומי הושלם!",
+        target: solveQuestionsTarget,
+        current: todayProgress.questionsToday,
+        remaining: remainingQuestionsTodo,
+        isCompleted: remainingQuestionsTodo === 0,
         icon: Target
       },
       { 
         id: "learn", 
         type: "learn",
-        title: `ללמוד ${learnTopics} נושאים`,
-        description: "חיזוק נושאים חלשים",
-        target: learnTopics,
+        title: remainingTopicsTodo > 0 
+          ? `ללמוד ${remainingTopicsTodo} נושאים` 
+          : `✓ תרגלת ${todayProgress.topicsToday} נושאים`,
+        description: remainingTopicsTodo > 0 
+          ? `תרגלת ${todayProgress.topicsToday}/${learnTopicsTarget}` 
+          : "יעד יומי הושלם!",
+        target: learnTopicsTarget,
+        current: todayProgress.topicsToday,
+        remaining: remainingTopicsTodo,
+        isCompleted: remainingTopicsTodo === 0,
         icon: BookOpen
       },
       { 
         id: "review", 
         type: "review",
-        title: `לחזור על ${fixErrors} טעויות`,
-        description: "תיקון שגיאות נפוצות",
-        target: fixErrors,
+        title: remainingReviewTodo > 0 
+          ? `לחזור על ${remainingReviewTodo} טעויות` 
+          : `✓ חזרת על ${todayProgress.reviewedToday} טעויות`,
+        description: remainingReviewTodo > 0 
+          ? `חזרת ${todayProgress.reviewedToday}/${fixErrorsTarget}` 
+          : "יעד יומי הושלם!",
+        target: fixErrorsTarget,
+        current: todayProgress.reviewedToday,
+        remaining: remainingReviewTodo,
+        isCompleted: remainingReviewTodo === 0,
         icon: RotateCcw
       }
     ];
 
-    if (examsToday > 0) {
+    if (examsTodayTarget > 0) {
       tasks.push({
         id: "exam",
         type: "exam",
-        title: `לבצע ${examsToday} סימולציה`,
-        description: "הכנה לבגרות האמיתית",
-        target: examsToday,
+        title: remainingExamsTodo > 0 
+          ? `לבצע ${remainingExamsTodo} סימולציה` 
+          : `✓ ביצעת ${todayProgress.examsToday} סימולציות`,
+        description: remainingExamsTodo > 0 
+          ? `ביצעת ${todayProgress.examsToday}/${examsTodayTarget}` 
+          : "יעד יומי הושלם!",
+        target: examsTodayTarget,
+        current: todayProgress.examsToday,
+        remaining: remainingExamsTodo,
+        isCompleted: remainingExamsTodo === 0,
         icon: FileCheck
       });
     }
 
-    return { tasks, solveQuestions, learnTopics, fixErrors, examsToday };
-  }, [readinessData]);
+    return { 
+      tasks, 
+      solveQuestions: solveQuestionsTarget, 
+      learnTopics: learnTopicsTarget, 
+      fixErrors: fixErrorsTarget, 
+      examsToday: examsTodayTarget 
+    };
+  }, [readinessData, todayProgress]);
 
   // חישוב נושאים מומלצים לתרגול
   const recommendedTopics = useMemo(() => {
