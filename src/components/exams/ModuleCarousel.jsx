@@ -23,7 +23,7 @@ export default function ModuleCarousel({
     if (modules && modules.length > 0) {
       const selectedModuleId = sessionStorage.getItem('selectedModuleId');
       if (selectedModuleId) {
-        const moduleIdx = modules.findIndex(m => m.id === selectedModuleId);
+        const moduleIdx = modules.findIndex((m) => m.id === selectedModuleId);
         if (moduleIdx !== -1) {
           setCurrentIndex(moduleIdx);
           // גלול למעלה כדי לראות את הקרוסלה
@@ -78,7 +78,7 @@ export default function ModuleCarousel({
     0;
 
     const maxExams = isPremium === true ? 100 : 5;
-    const progress = totalAttempts > 0 ? Math.min(100, Math.round((totalAttempts / maxExams) * 100)) : 0;
+    const progress = totalAttempts > 0 ? Math.min(100, Math.round(totalAttempts / maxExams * 100)) : 0;
 
     return {
       totalAttempts,
@@ -121,7 +121,7 @@ export default function ModuleCarousel({
 
           <div className={`bg-indigo-50 rounded-2xl p-4 ${isLocked ? 'opacity-75' : ''}`}>
             {/* Header with gradient */}
-            <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} rounded-xl p-4 text-white relative overflow-hidden mb-3`}>
+            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8" />
               
@@ -279,8 +279,8 @@ export default function ModuleCarousel({
                     {currentModule.entity !== 'practice' && onRandomExam &&
                   <div className="space-y-2">
                         <Button
-                      onClick={() => onRandomExam(currentModule.id)}
-                      className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-11 text-[13px] font-bold transition-all flex items-center justify-center gap-2 rounded-[14px]`}>
+                      onClick={() => onRandomExam(currentModule.id)} className="bg-[#3B82F6] text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-blue-600 h-11 transition-all flex items-center justify-center gap-2">
+
 
                           <Shuffle className="w-5 h-5" />
                           בגרות אקראית
