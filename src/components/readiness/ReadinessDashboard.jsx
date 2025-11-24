@@ -155,7 +155,7 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         </motion.div>
       )}
 
-      {/* נושאים חלשים */}
+      {/* נושאים חלשים - הצגה לכולם, תרגול רק לפרימיום */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -173,19 +173,33 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
               {weakTopics.slice(0, 3).map((topic, idx) => (
                 <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
                   <span className="text-sm text-gray-700">{topic.name}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${topic.topic_id}`))}
-                    className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
-                  >
-                    תרגל נושא זה
-                  </Button>
+                  {isPremium ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${topic.topic_id}`))}
+                      className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
+                    >
+                      תרגל נושא זה
+                    </Button>
+                  ) : (
+                    <div className="flex items-center gap-1 text-xs text-amber-600">
+                      <Lock className="w-3 h-3" />
+                      <span>פרימיום</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            {weakTopics.length > 3 && (
+            {!isPremium && (
+              <PremiumUpsell 
+                message="שדרג לפרימיום כדי לתרגל את הנושאים החלשים שלך"
+                className="mt-3"
+              />
+            )}
+
+            {isPremium && weakTopics.length > 3 && (
               <Button
                 variant="outline"
                 onClick={() => navigate(createPageUrl("WeakTopics"))}
