@@ -830,7 +830,7 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-indigo-50 rounded-2xl p-4">
+          className="bg-blue-50 rounded-2xl p-4">
 
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle className="w-5 h-5 text-[#3B82F6]" />
