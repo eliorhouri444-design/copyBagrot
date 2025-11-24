@@ -182,19 +182,11 @@ export default function DailyPlanCard({
   };
 
   const handleTopicClick = (topic) => {
-    if (!isPremium && recommendedTopics.indexOf(topic) > 0) {
-      navigate(createPageUrl("Premium"));
-      return;
-    }
     sessionStorage.setItem('selectedTopicId', topic.topic_id);
     navigate(createPageUrl("Practice"));
   };
 
   const handleExamClick = (module) => {
-    if (!isPremium && recommendedExams.indexOf(module) > 0) {
-      navigate(createPageUrl("Premium"));
-      return;
-    }
     sessionStorage.setItem('selectedModuleId', module.id);
     navigate(createPageUrl("Exams"));
   };
