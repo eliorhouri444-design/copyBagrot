@@ -204,8 +204,82 @@ export default function DailyPlanCard({
 
   return (
     <div className="space-y-4">
+      {/* נושאים לתרגול */}
+      {recommendedTopics.length > 0 && (
+        <CardSimple delay={0.15}>
+          <div className="flex items-center gap-2 mb-3">
+            <BookOpen className="w-4 h-4 text-[#3B82F6]" />
+            <h3 className="text-[14px] font-bold text-[#2B2B2B]">נושאים לתרגול</h3>
+          </div>
+          
+          <div className="space-y-2">
+            {recommendedTopics.map((topic) => {
+              const badge = getStatusBadge(topic.status);
+              
+              return (
+                <button
+                  key={topic.topic_id}
+                  onClick={() => handleTopicClick(topic)}
+                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
+                      {topic.icon || "📚"}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[13px] font-bold text-[#2B2B2B]">{topic.name}</div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${badge.bg}`}>
+                        {badge.text}
+                      </span>
+                    </div>
+                  </div>
+                  <Play className="w-4 h-4 text-[#3B82F6]" />
+                </button>
+              );
+            })}
+          </div>
+        </CardSimple>
+      )}
+
+      {/* שאלונים להבחן */}
+      {recommendedExams.length > 0 && (
+        <CardSimple delay={0.2}>
+          <div className="flex items-center gap-2 mb-3">
+            <FileCheck className="w-4 h-4 text-[#3B82F6]" />
+            <h3 className="text-[14px] font-bold text-[#2B2B2B]">שאלונים להבחן</h3>
+          </div>
+          
+          <div className="space-y-2">
+            {recommendedExams.map((module) => {
+              const badge = getStatusBadge(module.status, "exam");
+              
+              return (
+                <button
+                  key={module.id}
+                  onClick={() => handleExamClick(module)}
+                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className={`w-8 h-8 bg-gradient-to-r ${module.color || 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center text-white text-[11px] font-bold`}>
+                      {module.id}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[13px] font-bold text-[#2B2B2B]">{module.title}</div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${badge.bg}`}>
+                        {badge.text}
+                      </span>
+                    </div>
+                  </div>
+                  <Play className="w-4 h-4 text-[#3B82F6]" />
+                </button>
+              );
+            })}
+          </div>
+        </CardSimple>
+      )}
+
       {/* משימות היום */}
-      <CardSimple delay={0.15}>
+      <CardSimple delay={0.25}>
         <div className="flex items-center justify-between mb-3">
           <CardTitle icon={CheckCircle}>משימות היום</CardTitle>
           <div className="text-[12px] text-[#6E6E6E]">{completedCount}/{totalTasks}</div>
@@ -275,100 +349,6 @@ export default function DailyPlanCard({
           התחל משימות היום
         </Button>
       </CardSimple>
-
-      {/* נושאים לתרגול */}
-      {recommendedTopics.length > 0 && (
-        <CardSimple delay={0.2}>
-          <div className="flex items-center gap-2 mb-3">
-            <BookOpen className="w-4 h-4 text-[#3B82F6]" />
-            <h3 className="text-[14px] font-bold text-[#2B2B2B]">נושאים לתרגול</h3>
-          </div>
-          
-          <div className="space-y-2">
-            {recommendedTopics.map((topic, idx) => {
-              const badge = getStatusBadge(topic.status);
-              const isLocked = !isPremium && idx > 0;
-              
-              return (
-                <button
-                  key={topic.topic_id}
-                  onClick={() => handleTopicClick(topic)}
-                  disabled={isLocked}
-                  className={`w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between ${
-                    isLocked 
-                      ? 'border-gray-200 opacity-60 cursor-not-allowed'
-                      : 'border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                      {topic.icon || "📚"}
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[13px] font-bold text-[#2B2B2B]">{topic.name}</div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${badge.bg}`}>
-                        {badge.text}
-                      </span>
-                    </div>
-                  </div>
-                  {isLocked ? (
-                    <Crown className="w-4 h-4 text-amber-500" />
-                  ) : (
-                    <Play className="w-4 h-4 text-[#3B82F6]" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </CardSimple>
-      )}
-
-      {/* שאלונים להבחן */}
-      {recommendedExams.length > 0 && (
-        <CardSimple delay={0.25}>
-          <div className="flex items-center gap-2 mb-3">
-            <FileCheck className="w-4 h-4 text-[#3B82F6]" />
-            <h3 className="text-[14px] font-bold text-[#2B2B2B]">שאלונים להבחן</h3>
-          </div>
-          
-          <div className="space-y-2">
-            {recommendedExams.map((module, idx) => {
-              const badge = getStatusBadge(module.status, "exam");
-              const isLocked = !isPremium && idx > 0;
-              
-              return (
-                <button
-                  key={module.id}
-                  onClick={() => handleExamClick(module)}
-                  disabled={isLocked}
-                  className={`w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between ${
-                    isLocked 
-                      ? 'border-gray-200 opacity-60 cursor-not-allowed'
-                      : 'border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className={`w-8 h-8 bg-gradient-to-r ${module.color || 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center text-white text-[11px] font-bold`}>
-                      {module.id}
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[13px] font-bold text-[#2B2B2B]">{module.title}</div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${badge.bg}`}>
-                        {badge.text}
-                      </span>
-                    </div>
-                  </div>
-                  {isLocked ? (
-                    <Crown className="w-4 h-4 text-amber-500" />
-                  ) : (
-                    <Play className="w-4 h-4 text-[#3B82F6]" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </CardSimple>
-      )}
     </div>
   );
 }
