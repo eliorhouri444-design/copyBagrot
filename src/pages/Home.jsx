@@ -2,13 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User, Play } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import WhatToStudyCard from "@/components/home/WhatToStudyCard";
-import { motion } from "framer-motion";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -147,10 +146,7 @@ export default function HomePage() {
     return mostRecent;
   }, [practiceAttempts, examAttempts, topics]);
 
-  const handleToggleTask = (taskIdx) => {
-    const taskId = dailyTasks[taskIdx]?.id;
-    if (!taskId) return;
-    
+  const toggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
       setCompletedTasks(completedTasks.filter(t => t !== taskId));
     } else {
@@ -178,10 +174,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-5 space-y-4">
-        {/* 1. המצב שלך */}
+      <div className="px-5 space-y-6">
+        {/* מה המצב שלך */}
         <CardSimple delay={0.05}>
-          <CardTitle icon={Target}>המצב שלך</CardTitle>
+          <CardTitle>מה המצב שלך</CardTitle>
           
           <div className="grid grid-cols-3 gap-3 mb-3">
             <StatCard value={`${readinessData?.scores.overall || 0}%`} label="מוכנות" color="#3B82F6" />
@@ -190,78 +186,94 @@ export default function HomePage() {
           </div>
 
           <Button
-            onClick={() => navigate(createPageUrl("Statistics"))}
+            onClick={() => setShowDetails(!showDetails)}
             variant="outline"
-            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
+            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
           >
-            ראה פירוט מלא
+            {showDetails ? 'הסתר פירוט' : 'ראה פירוט'}
+            <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
           </Button>
+
+          {showDetails && readinessData && (
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">שליטה</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">תרגול</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">בגרויות</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">מהירות</div>
+                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</div>
+              </div>
+            </div>
+          )}
         </CardSimple>
 
-        {/* 2. מה לעשות היום */}
-        <CardSimple delay={0.1}>
-          <CardTitle>מה לעשות היום</CardTitle>
-          
-          <div className="space-y-2">
-            {dailyTasks.map((task, idx) => {
-              const isCompleted = completedTasks.includes(task.id);
-              return (
-                <motion.button
-                  key={task.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + idx * 0.05 }}
-                  onClick={() => handleToggleTask(idx)}
-                  className={`w-full text-right p-3 rounded-lg transition-all border ${
-                    isCompleted 
-                      ? 'bg-white border-[#E9F0FF] opacity-60' 
-                      : 'bg-white border-[#3B82F6] hover:bg-blue-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      isCompleted ? 'bg-[#3B82F6] border-[#3B82F6]' : 'border-[#3B82F6]'
-                    }`}>
-                      {isCompleted && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-3 h-3 bg-white rounded-full"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className={`text-[14px] font-semibold ${isCompleted ? 'line-through text-[#6E6E6E]' : 'text-[#2B2B2B]'}`}>
-                        {task.title}
-                      </div>
-                    </div>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-        </CardSimple>
+        {/* מה ללמוד כדאי להצליח */}
+        <WhatToStudyCard
+          topics={topics}
+          modules={modules}
+          practiceAttempts={practiceAttempts}
+          examAttempts={examAttempts}
+          subject={user?.selected_subject}
+          units={user?.selected_units}
+        />
 
-        {/* 3. המשך למידה */}
-        <CardSimple delay={0.15}>
-          <CardTitle>המשך למידה</CardTitle>
-          
-          <Button
-            onClick={() => {
-              if (lastActivity) {
+        {/* המשך מאיפה שהפסקת */}
+        {lastActivity && (
+          <CardSimple delay={0.15}>
+            <div className="mb-3">
+              <div className="text-[13px] text-[#6E6E6E] mb-1">התחלת</div>
+              <div className="text-[18px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
+              <div className="text-[13px] text-[#6E6E6E]">המשך עכשיו</div>
+            </div>
+
+            <Button
+              onClick={() => {
                 if (lastActivity.type === 'practice') {
                   navigate(createPageUrl("Practice"));
                 } else {
                   navigate(createPageUrl("Exams"));
                 }
-              } else {
-                navigate(createPageUrl("Practice"));
-              }
-            }}
-            className="w-full h-16 bg-gradient-to-r from-[#3B82F6] to-[#1E40AF] hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-[14px] text-[16px] flex items-center justify-center gap-2"
+              }}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+            >
+              <PlayCircle className="w-5 h-5 ml-2" />
+              המשך
+            </Button>
+          </CardSimple>
+        )}
+
+        {/* מקצועות */}
+        <CardSimple delay={0.2}>
+          <CardTitle>המקצועות שלי</CardTitle>
+          
+          <div className="bg-white rounded-lg p-4 border border-[#E9F0FF] mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="font-bold text-[15px] text-[#2B2B2B]">{user?.selected_subject || 'אנגלית'}</div>
+                <div className="text-[13px] text-[#6E6E6E]">{user?.selected_units || 3} יחידות</div>
+              </div>
+              <div className="text-3xl font-black text-[#3B82F6]">
+                {readinessData?.scores.overall || 0}%
+              </div>
+            </div>
+            <Progress value={readinessData?.scores.overall || 0} className="h-2" />
+          </div>
+
+          <Button
+            onClick={() => navigate(createPageUrl("SubjectSelection"))}
+            variant="outline"
+            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
           >
-            <Play className="w-6 h-6" />
-            המשך איפה שהפסקת
+            ראה כל המקצועות
           </Button>
         </CardSimple>
       </div>
