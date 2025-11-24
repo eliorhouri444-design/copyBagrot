@@ -335,10 +335,52 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCopyLink = async () => {
-    const shareUrl = 'https://bagrut-plus.com';
+  const [referralCode, setReferralCode] = useState('');
+  const [referralClicks, setReferralClicks] = useState(0);
+
+  useEffect(() => {
+    if (user?.email) {
+      // Generate or get referral code
+      const code = user.referral_code || btoa(user.email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+      setReferralCode(code);
+      
+      // Save referral code if new
+      if (!user.referral_code) {
+        base44.auth.updateMe({ referral_code: code });
+      }
+      
+      // Load referral clicks count
+      loadReferralClicks(code);
+    }
+  }, [user?.email]);
+
+  const loadReferralClicks = async (code) => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      const clicks = await base44.entities.ReferralClick.filter({ referral_code: code });
+      setReferralClicks(clicks.length);
+      
+      // Check if reward should be given
+      if (clicks.length >= 20 && !user?.share_reward_claimed) {
+        const adFreeUntil = new Date();
+        adFreeUntil.setDate(adFreeUntil.getDate() + 5);
+        await base44.auth.updateMe({ 
+          share_reward_claimed: true,
+          ad_free_until: adFreeUntil.toISOString()
+        });
+        alert("🎉 מעולה! 20 חברים פתחו את הקישור שלך וקיבלת 5 ימים ללא פרסומות!");
+      }
+    } catch (error) {
+      console.error("Error loading referral clicks:", error);
+    }
+  };
+
+  const getShareUrl = () => {
+    return `${window.location.origin}?ref=${referralCode}`;
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl());
       alert("הקישור הועתק! 📋");
     } catch (error) {
       console.error("Error copying:", error);
@@ -346,25 +388,10 @@ export default function SettingsPage() {
   };
 
   const handleShareWhatsApp = () => {
-    const shareUrl = 'https://bagrut-plus.com';
+    const shareUrl = getShareUrl();
     const shareText = 'הצטרף לבגרות פלוס - האפליקציה הטובה ביותר להכנה לבגרות! 📚✨';
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
     window.open(whatsappUrl, '_blank');
-    
-    // Update share count
-    const newShareCount = shareCount + 1;
-    setShareCount(newShareCount);
-    base44.auth.updateMe({ share_count: newShareCount });
-    
-    if (newShareCount >= 20 && !user?.share_reward_claimed) {
-      const adFreeUntil = new Date();
-      adFreeUntil.setDate(adFreeUntil.getDate() + 5);
-      base44.auth.updateMe({ 
-        share_reward_claimed: true,
-        ad_free_until: adFreeUntil.toISOString()
-      });
-      setTimeout(() => alert("🎉 מעולה! שיתפת ל-20 חברים וקיבלת 5 ימים ללא פרסומות!"), 1000);
-    }
   };
 
   const handleCancelSubscription = async () => {
@@ -950,39 +977,42 @@ export default function SettingsPage() {
             {/* Progress */}
             <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-[#2B2B2B]">ההתקדמות שלך</span>
-                <span className="text-[#EC4899] font-bold">{shareCount}/20</span>
+                <span className="font-bold text-[#2B2B2B]">חברים שפתחו את הקישור</span>
+                <span className="text-[#EC4899] font-bold">{referralClicks}/20</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-pink-500 to-purple-500 h-3 rounded-full transition-all"
-                  style={{ width: `${Math.min((shareCount / 20) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((referralClicks / 20) * 100, 100)}%` }}
                 />
               </div>
               <p className="text-[12px] text-[#6E6E6E] mt-2">
-                {shareCount >= 20 
+                {referralClicks >= 20 
                   ? "🎉 קיבלת 5 ימים ללא פרסומות!" 
-                  : `עוד ${20 - shareCount} שיתופים ותקבל 5 ימים ללא פרסומות!`}
+                  : `עוד ${20 - referralClicks} חברים צריכים לפתוח את הקישור`}
               </p>
             </div>
 
             {/* Share Link */}
             <div>
-              <label className="text-[13px] font-semibold mb-2 block">הקישור שלך</label>
+              <label className="text-[13px] font-semibold mb-2 block">הקישור האישי שלך</label>
               <div className="flex gap-2">
                 <Input 
-                  value="https://bagrut-plus.com" 
+                  value={getShareUrl()} 
                   readOnly 
-                  className="flex-1 bg-gray-50"
+                  className="flex-1 bg-gray-50 text-[12px]"
                 />
                 <Button 
                   onClick={handleCopyLink}
                   variant="outline"
-                  className="px-4"
+                  className="px-4 flex-shrink-0"
                 >
                   העתק
                 </Button>
               </div>
+              <p className="text-[11px] text-[#6E6E6E] mt-1">
+                רק כשחבר פותח את הקישור הזה - זה נספר לך
+              </p>
             </div>
 
             {/* Share Buttons */}
@@ -1002,16 +1032,24 @@ export default function SettingsPage() {
               <div className="bg-gray-50 rounded-xl border border-[#E9F0FF] overflow-hidden">
                 <div className="grid grid-cols-2 divide-x divide-[#E9F0FF]">
                   <div className="p-3 text-center">
-                    <div className="text-2xl font-bold text-[#EC4899]">{shareCount}</div>
-                    <div className="text-[12px] text-[#6E6E6E]">שיתופים</div>
+                    <div className="text-2xl font-bold text-[#EC4899]">{referralClicks}</div>
+                    <div className="text-[12px] text-[#6E6E6E]">חברים פתחו</div>
                   </div>
                   <div className="p-3 text-center">
-                    <div className="text-2xl font-bold text-[#10B981]">{shareCount >= 20 ? 5 : 0}</div>
+                    <div className="text-2xl font-bold text-[#10B981]">{referralClicks >= 20 ? 5 : 0}</div>
                     <div className="text-[12px] text-[#6E6E6E]">ימים ללא פרסומות</div>
                   </div>
                 </div>
               </div>
             </div>
+            
+            <Button 
+              onClick={() => loadReferralClicks(referralCode)}
+              variant="outline"
+              className="w-full text-[13px]"
+            >
+              🔄 רענן נתונים
+            </Button>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowShare(false)}>סגור</Button>
