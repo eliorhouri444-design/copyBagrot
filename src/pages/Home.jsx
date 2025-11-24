@@ -143,7 +143,7 @@ export default function HomePage() {
     
     if (!incompletePractice && !incompleteExam) return null;
     
-    // בחר את האחרון
+    // בחר את האחרון לפי תאריך
     if (!incompleteExam || (incompletePractice && new Date(incompletePractice.created_date) > new Date(incompleteExam.created_date))) {
       return {
         type: 'practice',
@@ -152,13 +152,16 @@ export default function HomePage() {
         topicId: incompletePractice.topic_id
       };
     } else {
+      // מצא את המודול של הבגרות
+      const examModule = modules.find(m => incompleteExam.module_id === m.id);
       return {
         type: 'exam',
-        topic: 'בגרות מלאה',
-        examId: incompleteExam.exam_id
+        topic: examModule?.title || incompleteExam.module_id || 'בגרות',
+        examId: incompleteExam.exam_id,
+        moduleId: incompleteExam.module_id
       };
     }
-  }, [practiceAttempts, examAttempts, topics]);
+  }, [practiceAttempts, examAttempts, topics, modules]);
 
   const toggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
