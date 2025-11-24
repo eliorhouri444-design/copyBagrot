@@ -119,9 +119,9 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className={`bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 ${isLocked ? 'opacity-75' : ''}`}>
+          <div className={`bg-indigo-50 rounded-2xl p-4 ${isLocked ? 'opacity-75' : ''}`}>
             {/* Header with gradient */}
-            <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} p-5 text-white relative overflow-hidden`}>
+            <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} rounded-2xl p-5 text-white relative overflow-hidden mb-3`}>
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12" />
               <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-10 -translate-x-10" />
               
@@ -183,13 +183,13 @@ export default function ModuleCarousel({
             </div>
 
             {/* Content */}
-            <div className="bg-white p-5 space-y-4">
+            <div className="bg-white rounded-2xl p-4 space-y-3">
               {/* Description */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-gray-700 text-sm leading-relaxed">
+                className="text-[#2B2B2B] text-[13px] leading-relaxed">
 
                 {currentModule.details}
               </motion.p>
@@ -199,23 +199,23 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                className="bg-[#F5F8FF] rounded-xl p-4 border border-[#E9F0FF]">
 
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[13px] font-bold text-gray-900">התקדמות בשאלון</span>
-                  <span className="text-[17px] font-bold text-blue-600">
+                  <span className="text-[13px] font-bold text-[#2B2B2B]">התקדמות בשאלון</span>
+                  <span className="text-[17px] font-bold text-[#3B82F6]">
                     {moduleStats.progress}%
                   </span>
                 </div>
-                <div className="text-[11px] text-gray-600 mb-2">
+                <div className="text-[11px] text-[#6E6E6E] mb-2">
                   {moduleStats.totalAttempts} / {moduleStats.maxExams} בגרויות {!(isPremium === true) && '(חינם)'}
                 </div>
-                <div className="h-2 bg-white rounded-full overflow-hidden shadow-inner">
+                <div className="h-2 bg-white rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${moduleStats.progress}%` }}
                     transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
-                    className="h-full bg-blue-600 transition-all rounded-full" />
+                    className="h-full bg-[#3B82F6] transition-all rounded-full" />
 
                 </div>
               </motion.div>

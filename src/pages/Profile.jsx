@@ -269,10 +269,10 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
-          <p className="text-[11px] text-white/70">{displaySubject} • {displayUnits} יחידות</p>
+          <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
         </div>
         <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
           <Settings className="w-5 h-5 text-white" />
@@ -283,50 +283,50 @@ export default function ProfilePage() {
         {/* המנוי שלי */}
         {user?.is_premium ? (
           <CardSimple delay={0.05}>
-            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 mb-3 border-2 border-amber-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-600" />
-                  <h3 className="text-[16px] font-bold text-amber-900">המנוי שלי</h3>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setShowSubscriptionDialog(true)}
-                  className="h-8 text-[12px] text-amber-700 hover:bg-amber-200"
-                >
-                  נהל
-                </Button>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-[#3B82F6]" />
+                <h3 className="text-base font-bold text-[#2B2B2B]">המנוי שלי</h3>
               </div>
-              <p className="text-[13px] text-amber-800">
-                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
-              </p>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowSubscriptionDialog(true)}
+                className="h-8 text-[12px] text-[#3B82F6] hover:bg-[#E9F0FF]"
+              >
+                נהל
+              </Button>
             </div>
-
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-green-600" />
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+              <div className="text-[13px] text-[#6E6E6E] mb-1">סוג מנוי</div>
+              <div className="text-[15px] font-bold text-[#2B2B2B]">
+                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] mt-2 flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-[#3B82F6]" />
               </div>
               <div>
-                <div className="font-bold text-[15px] text-green-900">מנוי פעיל</div>
-                <div className="text-[13px] text-green-700">גישה מלאה לכל התכונות</div>
+                <div className="font-bold text-[15px] text-[#2B2B2B]">מנוי פעיל</div>
+                <div className="text-[13px] text-[#6E6E6E]">גישה מלאה לכל התכונות</div>
               </div>
             </div>
           </CardSimple>
         ) : (
           <CardSimple delay={0.05}>
-            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 border-2 border-amber-300 text-center">
-              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-2" />
-              <h3 className="text-[16px] font-bold text-amber-900 mb-1">שדרג לפרימיום</h3>
-              <p className="text-[13px] text-amber-800 mb-3">גישה בלתי מוגבלת לכל התכונות</p>
-              <Button
-                onClick={() => navigate(createPageUrl("Premium"))}
-                className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-[14px] text-[13px]"
-              >
-                <Crown className="w-4 h-4 ml-2" />
-                שדרג עכשיו
-              </Button>
+            <div className="flex items-center gap-2 mb-3">
+              <Crown className="w-5 h-5 text-[#3B82F6]" />
+              <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
             </div>
+            <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
+            <Button
+              onClick={() => navigate(createPageUrl("Premium"))}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+            >
+              <Crown className="w-4 h-4 ml-2" />
+              שדרג עכשיו
+            </Button>
           </CardSimple>
         )}
 

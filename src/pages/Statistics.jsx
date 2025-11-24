@@ -187,10 +187,10 @@ export default function StatisticsPage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">הנתונים שלי</h1>
-          <p className="text-[11px] text-white/70">{displaySubject} • {displayUnits} יחידות</p>
+          <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
         </div>
         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <TrendingUp className="w-5 h-5 text-white" />
@@ -466,23 +466,29 @@ export default function StatisticsPage() {
             </div>
           </CardSimple>
 
-          {/* כפתורים */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={() => navigate(createPageUrl("Practice"))}
-              className="h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
-            >
-              <BookOpen className="w-4 h-4 ml-2" />
-              תרגול
-            </Button>
-            <Button
-              onClick={() => navigate(createPageUrl("Exams"))}
-              className="h-12 bg-[#10B981] hover:bg-[#059669] text-white font-bold rounded-[14px] text-[15px]"
-            >
-              <FileCheck className="w-4 h-4 ml-2" />
-              בגרויות
-            </Button>
-          </div>
+          {/* צפי ציון */}
+          {readinessData && examAttempts.length > 0 && (
+            <CardSimple delay={0.4}>
+              <CardTitle icon={Award}>צפי ציון</CardTitle>
+              
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
+                <div className="text-[11px] text-amber-700 mb-1">לפי הביצועים האחרונים</div>
+                <div className="text-[48px] font-black text-amber-600 mb-1">
+                  {Math.round(readinessData.scores.overall * (user?.target_score || 85) / 100)}
+                </div>
+                <div className="text-[13px] text-amber-800 font-semibold">
+                  {readinessData.scores.overall >= 80 ? '🎯 מצוין!' : readinessData.scores.overall >= 60 ? '💪 בדרך הנכונה' : '📚 כדאי להתאמץ יותר'}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] mt-3 text-center">
+                <div className="text-[11px] text-[#6E6E6E] mb-1">סיכוי להשיג {user?.target_score || 85}</div>
+                <div className="text-[24px] font-black text-[#3B82F6]">
+                  {readinessData.scores.overall}%
+                </div>
+              </div>
+            </CardSimple>
+          )}
         </div>
       )}
     </div>

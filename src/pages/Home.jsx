@@ -137,9 +137,18 @@ export default function HomePage() {
   }, [readinessData]);
 
   const lastActivity = useMemo(() => {
-    // חפש תרגול או בגרות שלא הושלמו
-    const incompletePractice = practiceAttempts.find(a => !a.is_completed);
-    const incompleteExam = examAttempts.find(e => !e.is_completed);
+    // מצא את התרגול האחרון שלא הושלם
+    const sortedPractice = [...practiceAttempts]
+      .filter(a => !a.is_completed)
+      .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    
+    // מצא את הבגרות האחרונה שלא הושלמה
+    const sortedExams = [...examAttempts]
+      .filter(e => !e.is_completed)
+      .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    
+    const incompletePractice = sortedPractice[0];
+    const incompleteExam = sortedExams[0];
     
     if (!incompletePractice && !incompleteExam) return null;
     
@@ -156,7 +165,7 @@ export default function HomePage() {
       const examModule = modules.find(m => incompleteExam.module_id === m.id);
       return {
         type: 'exam',
-        topic: examModule?.title || incompleteExam.module_id || 'בגרות',
+        topic: examModule?.title || incompleteExam.module_id || 'שאלון',
         examId: incompleteExam.exam_id,
         moduleId: incompleteExam.module_id
       };
@@ -181,10 +190,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
-          <p className="text-[11px] text-white/70">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+          <p className="text-[11px] text-white/90">{user?.selected_subject} • {user?.selected_units} יחידות</p>
         </div>
         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <User className="w-5 h-5 text-white" />

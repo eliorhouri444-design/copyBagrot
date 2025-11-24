@@ -288,7 +288,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const currentTopic = topics[currentIndex];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-5 border border-gray-100">
+    <div className="bg-indigo-50 rounded-2xl p-4">
       <div className="relative">
         <AnimatePresence mode="wait">
           <motion.div
@@ -298,7 +298,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-2xl p-5 text-white mb-4 relative`}>
+            <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-2xl p-5 text-white mb-3 relative`}>
               <div className="text-center">
                 <div className="text-4xl mb-2">{currentTopic.icon}</div>
                 <h2 className="text-[18px] font-bold mb-1">{currentTopic.name}</h2>
@@ -334,48 +334,48 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             </div>
 
             {currentTopic.stats && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
-                <h3 className="text-[14px] font-bold text-center mb-3">📊 הסטטיסטיקה שלך</h3>
+              <div className="bg-white rounded-xl p-4 mb-3">
+                <div className="text-[14px] font-bold text-center text-[#2B2B2B] mb-3">📊 הסטטיסטיקה שלך</div>
                 
-                <div className="bg-white rounded-xl p-3 mb-3">
+                <div className="bg-[#F5F8FF] rounded-xl p-3 mb-3 border border-[#E9F0FF]">
                   <div className="flex justify-center items-center mb-2">
-                    <span className="text-[19px] font-bold text-blue-600">{currentTopic.stats.progress}%</span>
+                    <span className="text-[19px] font-bold text-[#3B82F6]">{currentTopic.stats.progress}%</span>
                   </div>
-                  <div className="text-[12px] font-semibold text-center mb-2">התקדמות</div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="text-[12px] font-semibold text-center text-[#2B2B2B] mb-2">התקדמות</div>
+                  <div className="h-2 bg-white rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${currentTopic.stats.progress}%` }}
                       transition={{ duration: 0.5 }}
-                      className="h-full bg-blue-600 rounded-full"
+                      className="h-full bg-[#3B82F6] rounded-full"
                     />
                   </div>
-                  <p className="text-[10px] text-gray-500 text-center mt-1">
+                  <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
                     {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
                   </p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-red-100 rounded-xl p-2 text-center border border-red-200">
+                  <div className="bg-red-50 rounded-xl p-2 text-center border border-red-200">
                     <div className="text-[19px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[10px] text-gray-700">שגויות</div>
+                    <div className="text-[10px] text-[#6E6E6E]">שגויות</div>
                   </div>
-                  <div className="bg-green-100 rounded-xl p-2 text-center border border-green-200">
+                  <div className="bg-green-50 rounded-xl p-2 text-center border border-green-200">
                     <div className="text-[19px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[10px] text-gray-700">נכונות</div>
+                    <div className="text-[10px] text-[#6E6E6E]">נכונות</div>
                   </div>
-                  <div className="bg-orange-100 rounded-xl p-2 text-center border border-orange-200">
+                  <div className="bg-orange-50 rounded-xl p-2 text-center border border-orange-200">
                     <div className="text-[19px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[10px] text-gray-700">חלקיות</div>
+                    <div className="text-[10px] text-[#6E6E6E]">חלקיות</div>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Button
                 onClick={handleStartPractice}
-                className="w-full h-12 text-[14px] font-bold bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md"
+                className="w-full h-12 text-[14px] font-bold bg-[#3B82F6] hover:bg-blue-700 rounded-[14px]"
               >
                 <Play className="w-5 h-5 ml-2" />
                 התחל תרגול
@@ -387,7 +387,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
                     navigate(createPageUrl("CustomWeakPractice"));
                   }}
-                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
+                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
                 >
                   <Target className="w-4 h-4 ml-2" />
                   תרגול טעויות בנושא זה
@@ -395,7 +395,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               ) : (
                 <Button
                   onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60"
+                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60"
                 >
                   <Lock className="w-4 h-4 ml-2" />
                   תרגול טעויות
