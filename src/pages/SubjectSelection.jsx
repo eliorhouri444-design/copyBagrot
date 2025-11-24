@@ -90,7 +90,7 @@ export default function SubjectSelectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#4769e6] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
+                      <div className="bg-[#456bf2] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
 
 
 
@@ -152,8 +152,8 @@ export default function SubjectSelectionPage() {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleUnitSelect(units)}
-                          disabled={isLoading}
-                          className={`w-full h-14 rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 bg-gradient-to-r ${subject.color} text-white hover:shadow-lg`}>
+                          disabled={isLoading} className="bg-[#3B82F6] text-white text-lg font-bold rounded-xl w-full h-14 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 from-purple-500 to-purple-600 hover:shadow-lg">
+
 
                               {isLoading ?
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /> :
