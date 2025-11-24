@@ -305,47 +305,16 @@ export default function HomePage() {
           }
         </CardSimple>
 
-        {/* משימות היום */}
-        <CardSimple delay={0.15}>
-          <CardTitle icon={CheckCircle}>משימות היום</CardTitle>
-          <div className="space-y-2">
-            {dailyTasks.map((task) =>
-            <div
-              key={task.id}
-              onClick={() => toggleTask(task.id)}
-              className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-              completedTasks.includes(task.id) ?
-              'bg-green-50 border-green-200' :
-              'bg-white border-[#E9F0FF] hover:border-[#3B82F6]'}`
-              }>
-
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-              completedTasks.includes(task.id) ?
-              'bg-green-500 border-green-500' :
-              'border-[#3B82F6]'}`
-              }>
-                  {completedTasks.includes(task.id) &&
-                <CheckCircle className="w-4 h-4 text-white" />
-                }
-                </div>
-                <div className={`text-[14px] font-semibold ${
-              completedTasks.includes(task.id) ? 'text-green-700 line-through' : 'text-[#2B2B2B]'}`
-              }>
-                  {task.title}
-                </div>
-              </div>
-            )}
-          </div>
-        </CardSimple>
-
-        {/* מה ללמוד */}
-        <WhatToStudyCard
+        {/* משימות היום + נושאים ושאלונים מומלצים - דינמי */}
+        <DailyPlanCard
+          readinessData={readinessData}
           topics={topics}
           modules={modules}
           practiceAttempts={practiceAttempts}
           examAttempts={examAttempts}
-          subject={user?.selected_subject}
-          units={user?.selected_units} />
+          isPremium={user?.is_premium}
+          completedTasks={completedTasks}
+          onToggleTask={toggleTask} />
 
       </div>
     </div>);
