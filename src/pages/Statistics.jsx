@@ -3,13 +3,14 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, FileCheck, ChevronDown, Clock, MessageSquare, TrendingUp, Zap, CheckCircle, Award, Calendar, AlertCircle, ArrowUp, ArrowDown } from "lucide-react";
+import { Target, BookOpen, FileCheck, ChevronDown, Clock, MessageSquare, TrendingUp, Zap, CheckCircle, Award, Calendar, AlertCircle, ArrowUp, ArrowDown, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import { motion } from "framer-motion";
+import LockedFeatureCard, { PremiumUpsell } from "@/components/premium/LockedFeatureCard";
 
 export default function StatisticsPage() {
   const navigate = useNavigate();
