@@ -15,9 +15,6 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const [cachedTopics, setCachedTopics] = useState(null);
 
   useEffect(() => {
-    // בדוק אם יש נושא שנבחר
-    const selectedTopicId = sessionStorage.getItem('selectedTopicId');
-    
     const cacheKey = `topics_${subject}_${units}`;
     const cached = sessionStorage.getItem(cacheKey);
     
@@ -216,16 +213,6 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       const cacheKey = `topics_${subject}_${units}`;
       sessionStorage.setItem(cacheKey, JSON.stringify(topicsWithStats));
       sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
-
-      // אם יש נושא שנבחר, קפוץ אליו
-      const selectedTopicId = sessionStorage.getItem('selectedTopicId');
-      if (selectedTopicId) {
-        const topicIdx = topicsWithStats.findIndex(t => t.topic_id === selectedTopicId);
-        if (topicIdx !== -1) {
-          setCurrentIndex(topicIdx);
-        }
-        sessionStorage.removeItem('selectedTopicId');
-      }
 
     } catch (error) {
       console.error("Error loading topics:", error);

@@ -18,15 +18,19 @@ export default function ModuleCarousel({
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // בדוק אם יש שאלון נבחר אחרי שה-modules נטענו
   useEffect(() => {
-    // בדוק אם יש שאלון שנבחר
-    const selectedModuleId = sessionStorage.getItem('selectedModuleId');
-    if (selectedModuleId && modules.length > 0) {
-      const moduleIdx = modules.findIndex(m => m.id === selectedModuleId);
-      if (moduleIdx !== -1) {
-        setCurrentIndex(moduleIdx);
+    if (modules && modules.length > 0) {
+      const selectedModuleId = sessionStorage.getItem('selectedModuleId');
+      if (selectedModuleId) {
+        const moduleIdx = modules.findIndex(m => m.id === selectedModuleId);
+        if (moduleIdx !== -1) {
+          setCurrentIndex(moduleIdx);
+          // גלול למעלה כדי לראות את הקרוסלה
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        sessionStorage.removeItem('selectedModuleId');
       }
-      sessionStorage.removeItem('selectedModuleId');
     }
   }, [modules]);
 
