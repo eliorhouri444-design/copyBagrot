@@ -394,6 +394,51 @@ export default function StatisticsPage() {
         </div>
       ) : (
         <div className="px-6 space-y-6 pb-6">
+          {/* חיזוי ציון */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative"
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Brain className="w-7 h-7" />
+                <h3 className="text-xl font-bold">חיזוי הציון שלך</h3>
+              </div>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 mb-4">
+                <div className="text-center">
+                  <div className="text-7xl font-black mb-2">{predictedScore.score}</div>
+                  <div className="text-sm opacity-90 mb-3">ציון צפוי בבגרות</div>
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <Target className="w-4 h-4" />
+                    <span>רמת ביטחון: {predictedScore.confidence}%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-3">
+                <p className="text-base font-semibold mb-2">{predictedScore.message}</p>
+                <p className="text-sm opacity-90">{predictedScore.recommendation}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold">{statistics.totalExams}</div>
+                  <div className="text-xs opacity-90">בגרויות נבדקו</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <div className="text-2xl font-bold">{statistics.totalPractice}</div>
+                  <div className="text-xs opacity-90">תרגולים בוצעו</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* 1️⃣ מדד מוכנות לבגרות (Ready Score) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
