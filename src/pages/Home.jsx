@@ -20,6 +20,41 @@ export default function HomePage() {
   const [showDetails, setShowDetails] = useState(false);
   const [modules, setModules] = useState([]);
 
+  // Track referral clicks when someone opens a shared link
+  useEffect(() => {
+    const trackReferral = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      
+      if (refCode) {
+        try {
+          // Check if this visitor already clicked (using localStorage)
+          const clickedRefs = JSON.parse(localStorage.getItem('clicked_refs') || '[]');
+          
+          if (!clickedRefs.includes(refCode)) {
+            // Record the click
+            await base44.entities.ReferralClick.create({
+              referral_code: refCode,
+              clicked_at: new Date().toISOString(),
+              visitor_id: Math.random().toString(36).substring(7)
+            });
+            
+            // Mark as clicked
+            clickedRefs.push(refCode);
+            localStorage.setItem('clicked_refs', JSON.stringify(clickedRefs));
+          }
+          
+          // Clean URL
+          window.history.replaceState({}, '', window.location.pathname);
+        } catch (error) {
+          console.error("Error tracking referral:", error);
+        }
+      }
+    };
+    
+    trackReferral();
+  }, []);
+
   useEffect(() => {
     loadAllData();
   }, []);
