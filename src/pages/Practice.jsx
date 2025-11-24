@@ -264,7 +264,7 @@ export default function PracticePage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`${headerColor} rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden`}
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-3xl p-6 shadow-xl mb-6 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
@@ -272,14 +272,14 @@ export default function PracticePage() {
         <div className="relative z-10">
           <button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-3 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
+            className="flex items-center gap-3 hover:bg-white/10 rounded-2xl p-3 transition-colors w-full"
           >
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
-              <BookOpen className="w-7 h-7 text-white" />
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
+              <BookOpen className="w-8 h-8 text-white" />
             </div>
             <div className="text-right flex-1">
-              <h1 className="text-2xl font-bold text-white">תרגול {displaySubject}</h1>
-              <p className="text-sm text-white/90">{displayUnits} יחידות</p>
+              <h1 className="text-3xl font-bold text-white">תרגול {displaySubject}</h1>
+              <p className="text-base text-white/90">{displayUnits} יחידות</p>
             </div>
           </button>
         </div>

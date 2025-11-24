@@ -334,21 +334,21 @@ export default function StatisticsPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden"
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-3xl p-6 shadow-xl mb-6 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
         <div className="relative z-10">
           <button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-3 hover:bg-white/10 rounded-lg p-2 transition-colors w-full"
+            className="flex items-center gap-3 hover:bg-white/10 rounded-2xl p-3 transition-colors w-full"
           >
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
-              <TrendingUp className="w-7 h-7 text-white" />
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
+              <TrendingUp className="w-8 h-8 text-white" />
             </div>
             <div className="text-right flex-1">
-              <h1 className="text-2xl font-bold text-white">הנתונים שלי</h1>
-              <p className="text-sm text-white/90">{displaySubject} • {displayUnits} יחידות</p>
+              <h1 className="text-3xl font-bold text-white">הנתונים שלי</h1>
+              <p className="text-base text-white/90">{displaySubject} • {displayUnits} יחידות</p>
             </div>
           </button>
         </div>
@@ -396,7 +396,7 @@ export default function StatisticsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl shadow-2xl p-6 text-white overflow-hidden relative"
+            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative"
           >
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
