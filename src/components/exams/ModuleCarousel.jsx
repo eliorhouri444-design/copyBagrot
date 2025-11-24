@@ -13,10 +13,27 @@ export default function ModuleCarousel({
   onEditModule,
   isPremium,
   onUpgrade,
-  examAttempts = []
+  examAttempts = [],
+  onShowAd
 }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [todayExamCount, setTodayExamCount] = useState(0);
+  const FREE_DAILY_EXAM = 1; // בגרות אחת בחינם ליום
+
+  // בדוק כמה בגרויות עשה היום
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `exam_count_${today}`;
+    const count = parseInt(localStorage.getItem(storageKey) || '0');
+    setTodayExamCount(count);
+    
+    // נקה ימים ישנים
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayKey = `exam_count_${yesterday.toISOString().split('T')[0]}`;
+    localStorage.removeItem(yesterdayKey);
+  }, []);
 
   // בדוק אם יש שאלון נבחר אחרי שה-modules נטענו
   useEffect(() => {
@@ -42,12 +59,39 @@ export default function ModuleCarousel({
     setCurrentIndex((prev) => prev === modules.length - 1 ? 0 : prev + 1);
   };
 
+  const incrementExamCount = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `exam_count_${today}`;
+    const newCount = todayExamCount + 1;
+    localStorage.setItem(storageKey, newCount.toString());
+    setTodayExamCount(newCount);
+  };
+
   const handleModuleClick = (module) => {
     if (module.entity === 'practice') {
       navigate(createPageUrl("Practice"));
     } else if (onSelectExam) {
       onSelectExam(module.id);
     }
+  };
+
+  const handleStartExam = (callback) => {
+    // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה בגרות היום)
+    if (isPremium !== true && todayExamCount >= FREE_DAILY_EXAM) {
+      // צריך לראות פרסומת קודם
+      if (onShowAd) {
+        onShowAd(() => {
+          // אחרי הפרסומת - המשך לבגרות
+          incrementExamCount();
+          callback();
+        });
+      }
+      return;
+    }
+
+    // בגרות חינמית או פרימיום
+    incrementExamCount();
+    callback();
   };
 
   const currentModule = modules[currentIndex];
@@ -278,8 +322,19 @@ export default function ModuleCarousel({
                     {/* מבחן אקראי - למעלה - לכולם */}
                     {currentModule.entity !== 'practice' && onRandomExam &&
                   <div className="space-y-2">
+                        {/* הודעה על בגרויות נותרות */}
+                        {isPremium !== true && (
+                          <div className="text-center text-[11px] text-gray-500 mb-1">
+                            {todayExamCount < FREE_DAILY_EXAM ? (
+                              <span className="text-green-600 font-semibold">✓ בגרות חינמית זמינה היום</span>
+                            ) : (
+                              <span className="text-amber-600 font-semibold">📺 נדרשת צפייה בפרסומת</span>
+                            )}
+                          </div>
+                        )}
+
                         <Button
-                      onClick={() => onRandomExam(currentModule.id)} className="bg-[#3B82F6] text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-blue-600 h-11 transition-all flex items-center justify-center gap-2">
+                      onClick={() => handleStartExam(() => onRandomExam(currentModule.id))} className="bg-[#3B82F6] text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-blue-600 h-11 transition-all flex items-center justify-center gap-2">
 
 
                           <Shuffle className="w-5 h-5" />
