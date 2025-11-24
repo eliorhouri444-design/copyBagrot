@@ -510,9 +510,9 @@ export default function StatisticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
+              className="bg-white rounded-2xl shadow-lg p-5"
             >
-              <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-6 h-6 text-purple-600" />
                 <h3 className="text-lg font-bold text-gray-900">פעילות 7 הימים האחרונים</h3>
               </div>
@@ -600,14 +600,14 @@ export default function StatisticsPage() {
               transition={{ delay: 0.3 }}
               className="bg-white rounded-2xl shadow-lg p-6"
             >
-              <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center gap-2 mb-4">
                 <Award className="w-6 h-6 text-green-600" />
                 <h3 className="text-lg font-bold text-gray-900">נקודות חוזק שלך 💪</h3>
               </div>
               
               <div className="space-y-3">
                 {statistics.strongTopics.slice(0, 5).map((topic, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-3xl p-4 shadow-2xl">
+                  <div key={idx} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4 shadow-lg">
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
                         <Star className="w-5 h-5 text-green-600" />
@@ -635,8 +635,8 @@ export default function StatisticsPage() {
               className="bg-white rounded-2xl shadow-lg p-5"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
+                <Target className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
               </div>
 
               {/* Topics Table */}
@@ -800,12 +800,12 @@ export default function StatisticsPage() {
               className="grid grid-cols-1 gap-3"
             >
               {statistics.weakTopics.length > 0 && (
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-5 border-2 border-blue-300">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-5 border-2 border-blue-200">
                   <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-bold text-gray-900 text-base">תרגול כל הטעויות</h4>
+                    <Target className="w-6 h-6 text-blue-600" />
+                    <h4 className="font-bold text-gray-900 text-lg">תרגול כל הטעויות</h4>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-base text-gray-600 mb-4">
                     תרגול ממוקד על כל השאלות שטעית בהן - ללא כפילויות
                   </p>
                   <Button
@@ -816,7 +816,7 @@ export default function StatisticsPage() {
                         navigate(createPageUrl("Premium"));
                       }
                     }}
-                    className={`w-full h-12 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-xl shadow-lg`}
+                    className={`w-full h-14 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-2xl shadow-lg`}
                   >
                     {user?.is_premium ? (
                       <>
@@ -834,12 +834,12 @@ export default function StatisticsPage() {
               )}
 
               {examAttempts.length > 0 && (
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-5 border-2 border-blue-300">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-5 border-2 border-blue-200">
                   <div className="flex items-center gap-2 mb-3">
-                    <FileCheck className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-bold text-gray-900 text-base">תרגל נושאים שאתה חלש בהם</h4>
+                    <FileCheck className="w-6 h-6 text-blue-600" />
+                    <h4 className="font-bold text-gray-900 text-lg">תרגל נושאים שאתה חלש בהם</h4>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-base text-gray-600 mb-4">
                     בגרות מותאמת אישית על כל הנושאים שבהם אתה צריך שיפור
                   </p>
                   <Button
@@ -850,7 +850,7 @@ export default function StatisticsPage() {
                         navigate(createPageUrl("Premium"));
                       }
                     }}
-                    className={`w-full h-12 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-xl shadow-lg`}
+                    className={`w-full h-14 ${user?.is_premium ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700' : 'bg-gray-400 hover:bg-gray-500'} text-white text-base font-bold rounded-2xl shadow-lg`}
                   >
                     {user?.is_premium ? (
                       <>
@@ -891,7 +891,7 @@ export default function StatisticsPage() {
                   </h4>
                   <div className="space-y-2">
                     {statistics.weakTopics.slice(0, 3).map((topic, idx) => (
-                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-3 shadow-2xl">
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 shadow-lg">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-bold text-gray-900 text-sm">{topic.name || topic.topic}</span>
                           <span className="text-blue-700 font-black text-lg">{Math.round(topic.accuracy)}%</span>
@@ -952,7 +952,7 @@ export default function StatisticsPage() {
                     </h4>
                     <div className="space-y-2">
                       {examWeakTopics.map((topic, idx) => (
-                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-3 shadow-2xl">
+                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-4 shadow-lg">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-bold text-gray-900 text-sm">{topic.topic}</span>
                             <span className="text-blue-700 font-black text-lg">{topic.mistakes} טעויות</span>
@@ -1001,18 +1001,18 @@ export default function StatisticsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="grid grid-cols-2 gap-3"
+            className="grid grid-cols-2 gap-4"
           >
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg font-bold text-base"
+              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-2xl shadow-lg font-bold text-base"
             >
               <BookOpen className="w-5 h-5 ml-2" />
               התחל תרגול
             </Button>
             <Button
               onClick={() => navigate(createPageUrl("Exams"))}
-              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-lg font-bold text-base"
+              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-2xl shadow-lg font-bold text-base"
             >
               <FileCheck className="w-5 h-5 ml-2" />
               עבור לבגרויות
