@@ -90,7 +90,7 @@ export default function SubjectSelectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#315bf2] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
+                      <div className="bg-[#4769e6] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
 
 
 
