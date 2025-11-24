@@ -385,55 +385,6 @@ export default function ProfilePage() {
           </CardSimple>
         )}
 
-        {/* מה ללמוד היום */}
-        {allTopics.length > 0 && (
-          <CardSimple delay={0.1}>
-            <CardTitle>מה ללמוד כדי להצליח</CardTitle>
-            
-            <div className="space-y-2">
-              {allTopics.slice(0, 5).map((topic, idx) => {
-                const topicAttempts = practiceAttempts.filter(a => a.topic_id === topic.topic_id);
-                const correct = topicAttempts.filter(a => a.status === "correct").length;
-                const mastery = topicAttempts.length > 0 ? Math.round((correct / topicAttempts.length) * 100) : 0;
-                const needsPractice = mastery < 75;
-
-                return (
-                  <button
-                    key={topic.topic_id}
-                    onClick={() => {
-                      sessionStorage.setItem('selectedTopic', topic.topic_id);
-                      navigate(createPageUrl("Practice"));
-                    }}
-                    className="w-full bg-white border border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2 flex-1 text-right">
-                      <span className="text-xl">{topic.icon || '📚'}</span>
-                      <div className="flex-1">
-                        <div className="font-bold text-[15px] text-[#2B2B2B]">{topic.name}</div>
-                        <div className="text-[13px] text-[#6E6E6E]">
-                          {needsPractice ? `${mastery}% שליטה - צריך חיזוק` : `${mastery}% - טוב!`}
-                        </div>
-                      </div>
-                    </div>
-                    {needsPractice && (
-                      <div className="text-red-600 text-[13px] font-bold">⚠️</div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <Button
-              onClick={() => navigate(createPageUrl("Practice"))}
-              className="w-full h-10 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[13px] mt-3"
-            >
-              ראה את כל הנושאים
-            </Button>
-          </CardSimple>
-        )}
-
-
-
         {/* הגדרות */}
         <CardSimple delay={0.4}>
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
