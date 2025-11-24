@@ -266,51 +266,35 @@ export default function SettingsPage() {
     }
   };
 
-  const handleShare = async () => {
+  const handleCopyLink = async () => {
+    const shareUrl = 'https://bagrut-plus.com';
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("הקישור הועתק! 📋");
+    } catch (error) {
+      console.error("Error copying:", error);
+    }
+  };
+
+  const handleShareWhatsApp = () => {
     const shareUrl = 'https://bagrut-plus.com';
     const shareText = 'הצטרף לבגרות פלוס - האפליקציה הטובה ביותר להכנה לבגרות! 📚✨';
-
-    try {
-      // Try native share first
-      if (navigator.share) {
-        await navigator.share({
-          title: 'בגרות פלוס',
-          text: shareText,
-          url: shareUrl
-        });
-      } else {
-        // Fallback - open WhatsApp share
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
-        window.open(whatsappUrl, '_blank');
-      }
-      
-      // Update share count after successful share
-      const newShareCount = shareCount + 1;
-      setShareCount(newShareCount);
-      
-      await base44.auth.updateMe({ share_count: newShareCount });
-      
-      if (newShareCount >= 20 && !user?.share_reward_claimed) {
-        const adFreeUntil = new Date();
-        adFreeUntil.setDate(adFreeUntil.getDate() + 5);
-        
-        await base44.auth.updateMe({ 
-          share_reward_claimed: true,
-          ad_free_until: adFreeUntil.toISOString()
-        });
-        
-        alert("🎉 מעולה! שיתפת ל-20 חברים וקיבלת 5 ימים ללא פרסומות!");
-      } else {
-        alert(`✅ שיתפת בהצלחה! (${newShareCount}/20)`);
-      }
-    } catch (error) {
-      // User cancelled or error - try clipboard fallback
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        alert("הקישור הועתק! שתף עם חברים 📋");
-      } catch (clipboardError) {
-        console.error("Error sharing:", error);
-      }
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Update share count
+    const newShareCount = shareCount + 1;
+    setShareCount(newShareCount);
+    base44.auth.updateMe({ share_count: newShareCount });
+    
+    if (newShareCount >= 20 && !user?.share_reward_claimed) {
+      const adFreeUntil = new Date();
+      adFreeUntil.setDate(adFreeUntil.getDate() + 5);
+      base44.auth.updateMe({ 
+        share_reward_claimed: true,
+        ad_free_until: adFreeUntil.toISOString()
+      });
+      setTimeout(() => alert("🎉 מעולה! שיתפת ל-20 חברים וקיבלת 5 ימים ללא פרסומות!"), 1000);
     }
   };
 
@@ -341,20 +325,19 @@ export default function SettingsPage() {
   };
 
   const SettingItem = ({ icon: Icon, title, subtitle, onClick, rightElement, color = "#3B82F6" }) => (
-    <motion.button
-      whileTap={{ scale: 0.98 }}
+    <button
       onClick={onClick}
-      className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] hover:border-[#3B82F6] transition-colors text-right"
+      className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] hover:border-[#3B82F6] transition-colors text-right active:bg-gray-50"
     >
       <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <div className="font-semibold text-[#2B2B2B] text-[14px]">{title}</div>
-        {subtitle && <div className="text-[12px] text-[#6E6E6E]">{subtitle}</div>}
+        {subtitle && <div className="text-[12px] text-[#6E6E6E] truncate">{subtitle}</div>}
       </div>
-      {rightElement || <ChevronLeft className="w-5 h-5 text-[#6E6E6E]" />}
-    </motion.button>
+      {rightElement || <ChevronLeft className="w-5 h-5 text-[#6E6E6E] flex-shrink-0" />}
+    </button>
   );
 
   const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#3B82F6" }) => (
@@ -502,7 +485,7 @@ export default function SettingsPage() {
             icon={Share2} 
             title="שתף עם חברים" 
             subtitle={`${shareCount}/20 שיתופים${shareCount >= 20 ? ' - קיבלת 5 ימים!' : ''}`}
-            onClick={handleShare}
+            onClick={() => setShowShare(true)}
             color="#EC4899"
           />
         </div>
@@ -822,6 +805,88 @@ export default function SettingsPage() {
               ביטול מנוי
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={showShare} onOpenChange={setShowShare}>
+        <DialogContent dir="rtl" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-[#EC4899]" />
+              שתף עם חברים
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Progress */}
+            <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-[#2B2B2B]">ההתקדמות שלך</span>
+                <span className="text-[#EC4899] font-bold">{shareCount}/20</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 h-3 rounded-full transition-all"
+                  style={{ width: `${Math.min((shareCount / 20) * 100, 100)}%` }}
+                />
+              </div>
+              <p className="text-[12px] text-[#6E6E6E] mt-2">
+                {shareCount >= 20 
+                  ? "🎉 קיבלת 5 ימים ללא פרסומות!" 
+                  : `עוד ${20 - shareCount} שיתופים ותקבל 5 ימים ללא פרסומות!`}
+              </p>
+            </div>
+
+            {/* Share Link */}
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block">הקישור שלך</label>
+              <div className="flex gap-2">
+                <Input 
+                  value="https://bagrut-plus.com" 
+                  readOnly 
+                  className="flex-1 bg-gray-50"
+                />
+                <Button 
+                  onClick={handleCopyLink}
+                  variant="outline"
+                  className="px-4"
+                >
+                  העתק
+                </Button>
+              </div>
+            </div>
+
+            {/* Share Buttons */}
+            <div className="space-y-2">
+              <Button 
+                onClick={handleShareWhatsApp}
+                className="w-full bg-[#25D366] hover:bg-[#1da851] text-white rounded-xl h-12"
+              >
+                <MessageCircle className="w-5 h-5 ml-2" />
+                שתף בוואטסאפ
+              </Button>
+            </div>
+
+            {/* Friends Table */}
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block">סטטיסטיקה</label>
+              <div className="bg-gray-50 rounded-xl border border-[#E9F0FF] overflow-hidden">
+                <div className="grid grid-cols-2 divide-x divide-[#E9F0FF]">
+                  <div className="p-3 text-center">
+                    <div className="text-2xl font-bold text-[#EC4899]">{shareCount}</div>
+                    <div className="text-[12px] text-[#6E6E6E]">שיתופים</div>
+                  </div>
+                  <div className="p-3 text-center">
+                    <div className="text-2xl font-bold text-[#10B981]">{shareCount >= 20 ? 5 : 0}</div>
+                    <div className="text-[12px] text-[#6E6E6E]">ימים ללא פרסומות</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowShare(false)}>סגור</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
