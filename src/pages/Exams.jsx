@@ -803,23 +803,22 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
 
             <div className="bg-gradient-to-r from-orange-600 to-red-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
-                <h3 className="text-lg font-bold">בגרות מותאמת אישית</h3>
+                <h3 className="text-[15px] font-bold">בגרות מותאמת אישית</h3>
                 <Crown className="w-5 h-5 text-yellow-300" />
               </div>
             </div>
 
             <div className="p-5 text-center">
-              <p className="text-gray-700 text-sm mb-4">בגרות שמבוססת על הנושאים שבהן טעית בעבר, כדי לחזק בדיוק את מה שצריך.
-
+              <p className="text-gray-700 text-[13px] mb-4">בגרות שמבוססת על הנושאים שבהן טעית בעבר, כדי לחזק בדיוק את מה שצריך.
             </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                 onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-14 text-base font-bold flex items-center justify-center gap-2 shadow-lg rounded-2xl">
+                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-12 text-[14px] font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl">
 
                   <Target className="w-5 h-5" />
                   <span className="">התחל בגרות</span>
@@ -833,15 +832,15 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
 
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
-                <h3 className="text-base font-bold">בגרויות אחרונות</h3>
-                <p className="text-xs opacity-90">הביצועים שלך</p>
+                <h3 className="text-[15px] font-bold">בגרויות אחרונות</h3>
+                <p className="text-[11px] opacity-90">הביצועים שלך</p>
               </div>
-              <CheckCircle className="w-7 h-7" />
+              <CheckCircle className="w-6 h-6" />
             </div>
           </div>
 
@@ -869,7 +868,7 @@ export default function ExamsPage() {
                             setShowAdDialog(attempt);
                           }
                         }}
-                        className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
+                        className="w-full text-right hover:bg-gray-50 rounded-xl p-3 transition-colors border border-gray-100 flex items-center justify-between">
 
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
@@ -884,10 +883,10 @@ export default function ExamsPage() {
                             }
                             </motion.div>
                             <div className="flex-1 text-right">
-                              <div className="text-sm font-semibold text-gray-900">
+                              <div className="text-[13px] font-semibold text-gray-900">
                                 {examData?.title || 'מבחן'}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-[11px] text-gray-500">
                                 {new Date(attempt.created_date).toLocaleDateString('he-IL', {
                                 day: 'numeric',
                                 month: 'short',
@@ -901,7 +900,7 @@ export default function ExamsPage() {
                             {isPremium ?
                           <>
                                 <motion.div
-                              className={`text-lg font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
+                              className={`text-[17px] font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}>
@@ -921,13 +920,12 @@ export default function ExamsPage() {
                         </motion.button>
 
                         {hasMistakes && isPremium &&
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border border-orange-200 mr-2">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-4 h-4 text-orange-600" />
-                              <h4 className="font-bold text-gray-900 text-sm">בגרות מותאמת עבורך</h4>
+                              <h4 className="font-bold text-gray-900 text-[13px]">בגרות מותאמת עבורך</h4>
                             </div>
-                            <p className="text-xs text-gray-600 mb-2">חזרה על השאלות שטעית בהן
-
+                            <p className="text-[11px] text-gray-600 mb-2">חזרה על השאלות שטעית בהן
                         </p>
                             <Button
                           onClick={(e) => {
@@ -935,7 +933,7 @@ export default function ExamsPage() {
                             sessionStorage.setItem('weakExamSource', attempt.exam_id);
                             navigate(createPageUrl("CustomWeakExam"));
                           }}
-                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[12px] font-bold flex items-center justify-center gap-2 rounded-xl">
 
                               בגרות אישית
                             </Button>
@@ -951,7 +949,7 @@ export default function ExamsPage() {
                     <Button
                   onClick={() => setShowAllExams(true)}
                   variant="outline"
-                  className="w-full mt-3 h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50">
+                  className="w-full mt-3 h-10 text-[13px] font-semibold border border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl">
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
@@ -959,7 +957,7 @@ export default function ExamsPage() {
               }
               </> :
 
-            <div className="text-center py-6 text-gray-500 text-sm">
+            <div className="text-center py-6 text-gray-500 text-[13px]">
                 טרם ביצעת מבחנים
               </div>
             }
@@ -971,21 +969,21 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border-2 border-amber-200 shadow-md">
+          className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-gray-900 text-sm">מתקרב למגבלה!</h4>
-                <p className="text-gray-700 text-xs">
+                <h4 className="font-bold text-gray-900 text-[13px]">מתקרב למגבלה!</h4>
+                <p className="text-gray-700 text-[11px]">
                   נותרו לך {remainingFreeExams} מבחנים חינם. שדרג לפרימיום כדי להמשיך ללמוד ללא הגבלה!
                 </p>
               </div>
               <Button
               onClick={() => navigate(createPageUrl("Premium"))}
-              className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-xs font-bold">
+              className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-[12px] font-bold rounded-xl">
 
                 <Crown className="w-4 h-4 mr-1" />
                 <span className="font-bold">שדרג</span>
@@ -1001,15 +999,15 @@ export default function ExamsPage() {
           transition={{ delay: 0.5 }}
           className="grid grid-cols-2 gap-4">
 
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-5 border-2 border-green-200 shadow-lg">
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-1">הוסף שאלון</h3>
-                  <p className="text-sm text-gray-600">צור שאלון חדש</p>
+                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">הוסף שאלון</h3>
+                  <p className="text-[12px] text-gray-600">צור שאלון חדש</p>
                 </div>
                 <Button
                 onClick={handleAddNewModule}
-                className="bg-green-600 hover:bg-green-700 text-white h-9 text-sm">
+                className="bg-green-600 hover:bg-green-700 text-white h-9 text-[12px] rounded-xl">
 
                   <span>הוסף</span>
                   <BookCheck className="w-4 h-4 mr-2" />
@@ -1017,15 +1015,15 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-5 border-2 border-purple-200 shadow-lg">
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-gray-900 mb-1">ניהול מבחנים</h3>
-                  <p className="text-sm text-gray-600">הוסף וערוך מבחנים</p>
+                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">ניהול מבחנים</h3>
+                  <p className="text-[12px] text-gray-600">הוסף וערוך מבחנים</p>
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminExams"))}
-                className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm">
+                className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-[12px] rounded-xl">
 
                   <span>נהל</span>
                   <Upload className="w-4 h-4 mr-2" />
