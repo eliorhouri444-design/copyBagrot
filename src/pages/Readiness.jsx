@@ -74,55 +74,18 @@ export default function ReadinessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-3xl p-6 shadow-xl mb-6 relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
-
-        <div className="relative z-10">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Statistics"))}
-            className="text-white hover:bg-white/20 mb-4"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-
-          <div className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-              className="w-20 h-20 mx-auto mb-4 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
-            >
-              <Target className="w-10 h-10 text-white" />
-            </motion.div>
-            
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-3xl font-bold text-white mb-2"
-            >
-              מחשב המוכנות לבגרות
-            </motion.h1>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-base text-white/90"
-            >
-              {user?.selected_subject} • {user?.selected_units} יחידות
-            </motion.p>
-          </div>
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 flex items-center justify-between">
+        <button
+          onClick={() => navigate(createPageUrl("Statistics"))}
+          className="text-right flex-1 hover:opacity-90 transition-opacity"
+        >
+          <h1 className="text-[16px] font-bold text-white">מחשב המוכנות לבגרות</h1>
+          <p className="text-[11px] text-white/70">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+        </button>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Target className="w-5 h-5 text-white" />
         </div>
-      </motion.div>
+      </div>
 
       <div className="px-6">
         <ReadinessDashboard 
