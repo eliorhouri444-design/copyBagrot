@@ -186,13 +186,82 @@ export default function SettingsPage() {
     }
   };
 
+  const [loadingSettings, setLoadingSettings] = useState({});
+
   const handleToggleSetting = async (key, value) => {
+    setLoadingSettings(prev => ({ ...prev, [key]: true }));
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
+    
     try {
       await base44.auth.updateMe({ [key]: value });
+      
+      // Handle specific notification types
+      if (key === 'app_notifications' && value) {
+        // Request browser notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+          const permission = await Notification.requestPermission();
+          if (permission !== 'granted') {
+            alert('כדי לקבל התראות, יש לאשר התראות בדפדפן');
+          }
+        }
+      }
+      
+      if (key === 'whatsapp_notifications' && value) {
+        // Save WhatsApp preference
+        if (!user?.phone) {
+          alert('כדי לקבל התראות בוואטסאפ, יש להוסיף מספר טלפון');
+          setShowUpdateContact(true);
+          setSettings(prev => ({ ...prev, whatsapp_notifications: false }));
+        }
+      }
+      
+      if (key === 'daily_reminders' && value) {
+        // Schedule daily reminder
+        await scheduleDailyReminder();
+      }
+      
+      if (key === 'progress_updates' && value) {
+        // Enable weekly progress updates
+        await base44.auth.updateMe({ weekly_report_enabled: true });
+      }
+      
     } catch (error) {
       console.error("Error saving setting:", error);
+      // Revert on error
+      setSettings(prev => ({ ...prev, [key]: !value }));
+      alert('שגיאה בשמירת ההגדרה');
+    } finally {
+      setLoadingSettings(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const scheduleDailyReminder = async () => {
+    try {
+      // Request notification permission if needed
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      
+      // Save reminder time (default 18:00)
+      await base44.auth.updateMe({ 
+        daily_reminder_enabled: true,
+        daily_reminder_time: '18:00'
+      });
+      
+    } catch (error) {
+      console.error("Error scheduling reminder:", error);
+    }
+  };
+
+  const sendTestNotification = () => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('בגרות פלוס 📚', {
+        body: 'זוהי התראת בדיקה! ההתראות עובדות בהצלחה.',
+        icon: '/icon.png'
+      });
+    } else {
+      alert('התראות לא מאושרות בדפדפן');
     }
   };
 
@@ -340,17 +409,28 @@ export default function SettingsPage() {
     </button>
   );
 
-  const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#3B82F6" }) => (
-    <div className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] overflow-hidden">
+  const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#3B82F6", loading = false }) => (
+    <div className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF]">
       <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
       <div className="flex-1 text-right min-w-0">
         <div className="font-semibold text-[#2B2B2B] text-[14px]">{title}</div>
-        {subtitle && <div className="text-[12px] text-[#6E6E6E] truncate">{subtitle}</div>}
+        {subtitle && <div className="text-[12px] text-[#6E6E6E]">{subtitle}</div>}
       </div>
       <div className="flex-shrink-0">
-        <Switch checked={checked} onCheckedChange={onChange} />
+        {loading ? (
+          <div className="w-11 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <button
+            onClick={() => onChange(!checked)}
+            className={`w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-[#3B82F6]' : 'bg-gray-300'}`}
+          >
+            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${checked ? 'translate-x-[-22px]' : 'translate-x-[-2px]'}`} />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -449,10 +529,51 @@ export default function SettingsPage() {
         {/* התראות */}
         <SectionTitle icon={Bell} title="התראות" color="#F59E0B" />
         <div className="space-y-2">
-          <SettingToggle icon={Smartphone} title="התראות אפליקציה" subtitle="קבל התראות על פעילות" checked={settings.app_notifications} onChange={(v) => handleToggleSetting('app_notifications', v)} color="#F59E0B" />
-          <SettingToggle icon={MessageCircle} title="התראות וואטסאפ" subtitle="קבל הודעות בוואטסאפ" checked={settings.whatsapp_notifications} onChange={(v) => handleToggleSetting('whatsapp_notifications', v)} color="#25D366" />
-          <SettingToggle icon={Clock} title="תזכורת יומית" subtitle="תזכורת ללמידה יומית" checked={settings.daily_reminders} onChange={(v) => handleToggleSetting('daily_reminders', v)} color="#3B82F6" />
-          <SettingToggle icon={TrendingUp} title="עדכוני התקדמות" subtitle="סיכום שבועי" checked={settings.progress_updates} onChange={(v) => handleToggleSetting('progress_updates', v)} color="#10B981" />
+          <SettingToggle 
+            icon={Smartphone} 
+            title="התראות אפליקציה" 
+            subtitle="קבל התראות על פעילות" 
+            checked={settings.app_notifications} 
+            onChange={(v) => handleToggleSetting('app_notifications', v)} 
+            color="#F59E0B"
+            loading={loadingSettings.app_notifications}
+          />
+          <SettingToggle 
+            icon={MessageCircle} 
+            title="התראות וואטסאפ" 
+            subtitle={user?.phone ? "קבל הודעות בוואטסאפ" : "הוסף טלפון כדי להפעיל"} 
+            checked={settings.whatsapp_notifications} 
+            onChange={(v) => handleToggleSetting('whatsapp_notifications', v)} 
+            color="#25D366"
+            loading={loadingSettings.whatsapp_notifications}
+          />
+          <SettingToggle 
+            icon={Clock} 
+            title="תזכורת יומית" 
+            subtitle="תזכורת ללמידה בשעה 18:00" 
+            checked={settings.daily_reminders} 
+            onChange={(v) => handleToggleSetting('daily_reminders', v)} 
+            color="#3B82F6"
+            loading={loadingSettings.daily_reminders}
+          />
+          <SettingToggle 
+            icon={TrendingUp} 
+            title="עדכוני התקדמות" 
+            subtitle="סיכום שבועי לאימייל" 
+            checked={settings.progress_updates} 
+            onChange={(v) => handleToggleSetting('progress_updates', v)} 
+            color="#10B981"
+            loading={loadingSettings.progress_updates}
+          />
+          
+          {settings.app_notifications && (
+            <button
+              onClick={sendTestNotification}
+              className="w-full bg-[#F59E0B]/10 text-[#F59E0B] rounded-xl p-3 text-[13px] font-semibold hover:bg-[#F59E0B]/20 transition-colors"
+            >
+              🔔 שלח התראת בדיקה
+            </button>
+          )}
         </div>
 
         {/* תוכנית אישית */}
@@ -467,7 +588,15 @@ export default function SettingsPage() {
         {/* כללי */}
         <SectionTitle icon={SettingsIcon} title="כללי" color="#8B5CF6" />
         <div className="space-y-2">
-          <SettingToggle icon={Volume2} title="צלילים" subtitle="הפעל/כבה צלילי אפליקציה" checked={settings.sounds} onChange={(v) => handleToggleSetting('sounds', v)} color="#8B5CF6" />
+          <SettingToggle 
+            icon={Volume2} 
+            title="צלילים" 
+            subtitle="הפעל/כבה צלילי אפליקציה" 
+            checked={settings.sounds} 
+            onChange={(v) => handleToggleSetting('sounds', v)} 
+            color="#8B5CF6"
+            loading={loadingSettings.sounds}
+          />
           <SettingItem icon={RotateCcw} title="איפוס נתוני למידה" subtitle="מחיקת כל ההתקדמות" onClick={() => setShowResetData(true)} color="#EF4444" />
         </div>
 
