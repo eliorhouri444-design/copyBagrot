@@ -334,6 +334,59 @@ export default function ProfilePage() {
           </CardSimple>
         )}
 
+        {/* שדרג לפרימיום - רק למשתמשים שלא פרימיום */}
+        {!user?.is_premium && (
+          <CardSimple delay={0.1}>
+            <div className="flex items-center gap-2 mb-3">
+              <Crown className="w-5 h-5 text-[#3B82F6]" />
+              <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
+            </div>
+            <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
+            <Button
+              onClick={() => navigate(createPageUrl("Premium"))}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+            >
+              <Crown className="w-4 h-4 ml-2" />
+              שדרג עכשיו
+            </Button>
+          </CardSimple>
+        )}
+
+        {/* המנוי שלי - רק למשתמשי פרימיום */}
+        {user?.is_premium && (
+          <CardSimple delay={0.1}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-[#3B82F6]" />
+                <h3 className="text-base font-bold text-[#2B2B2B]">המנוי שלי</h3>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowSubscriptionDialog(true)}
+                className="h-8 text-[12px] text-[#3B82F6] hover:bg-[#E9F0FF]"
+              >
+                נהל
+              </Button>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+              <div className="text-[13px] text-[#6E6E6E] mb-1">סוג מנוי</div>
+              <div className="text-[15px] font-bold text-[#2B2B2B]">
+                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] mt-2 flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-[#3B82F6]" />
+              </div>
+              <div>
+                <div className="font-bold text-[15px] text-[#2B2B2B]">מנוי פעיל</div>
+                <div className="text-[13px] text-[#6E6E6E]">גישה מלאה לכל התכונות</div>
+              </div>
+            </div>
+          </CardSimple>
+        )}
+
         {/* הגדרות */}
         <CardSimple delay={0.4}>
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
