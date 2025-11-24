@@ -174,11 +174,6 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       );
 
       const topicsWithStats = topicsArray
-        .filter(topic => {
-          // Filter out unwanted topics
-          const unwantedTopics = ['vocabulary_general', 'unknown'];
-          return !unwantedTopics.includes(topic.topic_id);
-        })
         .map(topic => {
         const topicAttempts = relevantAttempts.filter(a => a.topic_id === topic.topic_id);
 
