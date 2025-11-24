@@ -833,10 +833,10 @@ export default function ExamsPage() {
 
 
           <div className="flex items-center gap-2 mb-3">
-            <CheckCircle className="text-[#4d94ff] lucide lucide-target w-5 h-5" />
             <div className="flex-1 text-right">
               <h3 className="text-[#ffffff] text-base font-bold">בגרויות אחרונות</h3>
             </div>
+            <CheckCircle className="w-5 h-5 text-white" />
           </div>
 
           <div>
