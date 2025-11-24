@@ -325,23 +325,23 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      {/* 1️⃣ כותרת עליונה */}
+      {/* כותרת עליונה */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-3xl p-6 shadow-xl mb-6 relative overflow-hidden"
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
 
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg">
-                <User className="w-10 h-10 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg">
+                <User className="w-8 h-8 text-white" />
               </div>
               <div className="text-right">
-                <h1 className="text-2xl font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
+                <h1 className="text-xl font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
                 <p className="text-sm text-white/90">
                   תלמיד בבגרות {displaySubject} • {displayUnits} יחידות
                 </p>
@@ -353,33 +353,33 @@ export default function ProfilePage() {
               onClick={() => setIsEditing(true)}
               className="text-white hover:bg-white/20"
             >
-              <Settings className="w-6 h-6" />
+              <Settings className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </motion.div>
 
       <div className="max-w-4xl mx-auto px-6 space-y-6 pb-4">
-        {/* 2️⃣ מדד מוכנות לבגרות */}
+        {/* מדד מוכנות לבגרות */}
         {readinessData && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white rounded-3xl shadow-xl overflow-hidden"
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xl font-bold">מדד מוכנות לבגרות</h3>
-                <Target className="w-7 h-7" />
+                <h3 className="text-lg font-bold">מדד מוכנות לבגרות</h3>
+                <Target className="w-6 h-6" />
               </div>
               
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 mb-3">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-3">
                 <div className="text-center">
-                  <div className="text-6xl font-black mb-2">{readinessData.scores.overall}%</div>
+                  <div className="text-5xl font-black mb-2">{readinessData.scores.overall}%</div>
                   <div className="text-sm opacity-90">Ready Score</div>
                 </div>
-                <Progress value={readinessData.scores.overall} className="h-3 bg-white/30 mt-3" />
+                <Progress value={readinessData.scores.overall} className="h-2.5 bg-white/30 mt-3" />
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -394,7 +394,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="p-6 grid grid-cols-2 gap-4">
+            <div className="p-5 grid grid-cols-2 gap-3">
               <div className="text-center">
                 <ResponsiveContainer width="100%" height={100}>
                   <RadialBarChart 
@@ -468,27 +468,27 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="px-6 pb-6">
+            <div className="px-5 pb-5">
               <Button
                 onClick={() => navigate(createPageUrl("Readiness"))}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl"
+                className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl"
               >
-                <Target className="w-5 h-5 ml-2" />
+                <Target className="w-4 h-4 ml-2" />
                 עדכון תוכנית לימוד
               </Button>
             </div>
           </motion.div>
         )}
 
-        {/* 3️⃣ התקדמות במקצועות */}
+        {/* התקדמות במקצועות */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="bg-white rounded-2xl shadow-lg p-5"
         >
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-blue-600" />
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-blue-600" />
             ההתקדמות שלי במקצועות
           </h3>
 
@@ -519,17 +519,17 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        {/* 4️⃣ היום שלך - משימות מותאמות אישית */}
+        {/* היום שלך - משימות מותאמות אישית */}
         {dailyTasks.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-5"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Flame className="w-6 h-6 text-orange-600" />
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-600" />
                 היום שלך
               </h3>
               <div className="text-sm text-gray-600">
@@ -572,17 +572,17 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* 5️⃣ כרטיס "טעויות אחרונות" */}
+        {/* כרטיס "טעויות אחרונות" */}
         {recentMistakes.total > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-5"
           >
             <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-6 h-6 text-orange-600" />
-              <h3 className="text-xl font-bold text-gray-900">טעויות אחרונות</h3>
+              <AlertTriangle className="w-5 h-5 text-orange-600" />
+              <h3 className="text-lg font-bold text-gray-900">טעויות אחרונות</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
@@ -621,17 +621,17 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* 6️⃣ בגרויות שביצעת */}
+        {/* בגרויות שביצעת */}
         {examAttempts.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-5"
           >
             <div className="flex items-center gap-2 mb-4">
-              <FileCheck className="w-6 h-6 text-green-600" />
-              <h3 className="text-xl font-bold text-gray-900">בגרויות שביצעת</h3>
+              <FileCheck className="w-5 h-5 text-green-600" />
+              <h3 className="text-lg font-bold text-gray-900">בגרויות שביצעת</h3>
             </div>
 
             <div className="space-y-2 mb-4">
@@ -678,16 +678,16 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* 7️⃣ גרף זמן לימוד שבועי */}
+        {/* גרף זמן לימוד שבועי */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="bg-white rounded-2xl shadow-lg p-5"
         >
           <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-6 h-6 text-purple-600" />
-            <h3 className="text-xl font-bold text-gray-900">זמן לימוד השבוע</h3>
+            <Clock className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-bold text-gray-900">זמן לימוד השבוע</h3>
           </div>
 
           <ResponsiveContainer width="100%" height={180}>
@@ -718,17 +718,17 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        {/* 8️⃣ הישגים */}
+        {/* הישגים */}
         {achievements.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
+            className="bg-white rounded-2xl shadow-lg p-5"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Award className="w-6 h-6 text-amber-600" />
-              <h3 className="text-xl font-bold text-gray-900">הישגים</h3>
+              <Award className="w-5 h-5 text-amber-600" />
+              <h3 className="text-lg font-bold text-gray-900">הישגים</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -742,16 +742,16 @@ export default function ProfilePage() {
           </motion.div>
         )}
 
-        {/* 9️⃣ הודעות אישיות מהרובוט */}
+        {/* הודעות אישיות מהרובוט */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg p-6 border-2 border-indigo-200"
+          className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg p-5 border-2 border-indigo-200"
         >
           <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-6 h-6 text-indigo-600" />
-            <h3 className="text-xl font-bold text-gray-900">הודעה אחרונה מהרובוט</h3>
+            <MessageSquare className="w-5 h-5 text-indigo-600" />
+            <h3 className="text-lg font-bold text-gray-900">הודעה אחרונה מהרובוט</h3>
           </div>
 
           <div className="bg-white rounded-xl p-4 border-2 border-indigo-200">
@@ -772,13 +772,13 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        {/* 🔟 אזור אישי והגדרות */}
+        {/* אזור אישי והגדרות */}
         {user?.is_premium && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 }}
-            className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-6 shadow-lg"
+            className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-5 shadow-lg"
           >
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -816,10 +816,10 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="bg-white rounded-2xl shadow-lg p-5"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Settings className="w-6 h-6 text-gray-600" />
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-gray-600" />
             הגדרות חשבון
           </h2>
 
