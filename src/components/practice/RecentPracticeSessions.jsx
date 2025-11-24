@@ -185,83 +185,69 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
       </motion.div>
 
       <Dialog open={!!showAdDialog} onOpenChange={() => { setShowAdDialog(null); }}>
-        <DialogContent dir="rtl" className="w-full h-full max-w-full max-h-full m-0 p-0 rounded-none">
-          <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between">
-              <div className="text-right flex-1">
-                <h1 className="text-[16px] font-bold text-white">צפייה בציון התרגול</h1>
-                <p className="text-[11px] text-white/70">בחר אופציה</p>
-              </div>
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
-            </div>
+        <DialogContent dir="rtl" className="sm:max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-[16px] font-bold text-gray-900">צפייה בציון התרגול</DialogTitle>
+            <DialogDescription className="text-[12px] text-gray-600">
+              בחר אופציה לצפייה בפרטי התרגול והציון
+            </DialogDescription>
+          </DialogHeader>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-5 py-6">
-              <div className="space-y-4 max-w-2xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 text-center">
-                  <Play className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-[17px] font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
-                  <p className="text-[13px] text-gray-600 mb-6">
-                    צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
-                  </p>
-                  <Button
-                    onClick={async () => {
-                      alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
-                      await new Promise(resolve => setTimeout(resolve, 2000));
-                      setUnlockedSessions(prev => new Set([...prev, showAdDialog.id]));
-                      setSelectedSession(showAdDialog);
-                      setShowAdDialog(null);
-                    }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-14 text-[15px] font-bold rounded-xl"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    צפה בפרסומת
-                  </Button>
-                </div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t-2 border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-[13px]">
-                    <span className="px-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 text-gray-600 font-medium">או</span>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 text-center">
-                  <Crown className="w-16 h-16 text-amber-600 mx-auto mb-4" />
-                  <h3 className="text-[17px] font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
-                  <p className="text-[13px] text-gray-600 mb-6">
-                    גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
-                  </p>
-                  <Button
-                    onClick={() => {
-                      setShowAdDialog(null);
-                      navigate(createPageUrl("Premium"));
-                    }}
-                    className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-14 text-[15px] font-bold rounded-xl"
-                  >
-                    <Crown className="w-5 h-5 mr-2" />
-                    שדרג עכשיו
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="p-5 bg-white border-t border-gray-200">
-              <Button 
-                variant="outline"
-                onClick={() => setShowAdDialog(null)} 
-                className="w-full h-12 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 font-bold rounded-xl text-[14px]"
+          <div className="space-y-4 py-2">
+            <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100 text-center">
+              <Play className="w-14 h-14 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-[15px] font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
+              <p className="text-[12px] text-gray-600 mb-4">
+                צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
+              </p>
+              <Button
+                onClick={async () => {
+                  alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  setUnlockedSessions(prev => new Set([...prev, showAdDialog.id]));
+                  setSelectedSession(showAdDialog);
+                  setShowAdDialog(null);
+                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-12 text-[14px] font-bold rounded-xl"
               >
-                ביטול
+                <Play className="w-5 h-5 mr-2" />
+                צפה בפרסומת
+              </Button>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-[12px]">
+                <span className="px-3 bg-white text-gray-500">או</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100 text-center">
+              <Crown className="w-14 h-14 text-amber-600 mx-auto mb-3" />
+              <h3 className="text-[15px] font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
+              <p className="text-[12px] text-gray-600 mb-4">
+                גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
+              </p>
+              <Button
+                onClick={() => {
+                  setShowAdDialog(null);
+                  navigate(createPageUrl("Premium"));
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 text-[14px] font-bold rounded-xl"
+              >
+                <Crown className="w-5 h-5 mr-2" />
+                שדרג עכשיו
               </Button>
             </div>
           </div>
+
+          <DialogFooter className="pt-2">
+            <Button variant="outline" onClick={() => setShowAdDialog(null)} className="w-full h-11 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold rounded-xl text-[13px]">
+              ביטול
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
