@@ -214,7 +214,7 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         )}
       </motion.div>
 
-      {/* טעויות */}
+      {/* טעויות - הצגה לכולם, תרגול רק לפרימיום */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -239,24 +239,38 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
                     <span className="text-sm text-gray-700">{mistake.topic_name}</span>
                     <span className="text-xs text-gray-500 mr-2">– {mistake.count} טעויות</span>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${mistake.topic_id}`))}
-                    className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
-                  >
-                    תרגל טעות זו
-                  </Button>
+                  {isPremium ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${mistake.topic_id}`))}
+                      className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
+                    >
+                      תרגל טעות זו
+                    </Button>
+                  ) : (
+                    <div className="flex items-center gap-1 text-xs text-amber-600">
+                      <Lock className="w-3 h-3" />
+                      <span>פרימיום</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            <Button
-              onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-              className="w-full mt-3 bg-red-500 hover:bg-red-600 text-white text-sm h-9"
-            >
-              בוחן טעויות מלא
-            </Button>
+            {isPremium ? (
+              <Button
+                onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+                className="w-full mt-3 bg-red-500 hover:bg-red-600 text-white text-sm h-9"
+              >
+                בוחן טעויות מלא
+              </Button>
+            ) : (
+              <PremiumUpsell 
+                message={`יש לך ${mistakes.reduce((sum, m) => sum + m.count, 0)} טעויות… רוצה לתקן? (פרימיום)`}
+                className="mt-3"
+              />
+            )}
           </>
         ) : (
           <p className="text-sm text-gray-500">אין טעויות עדיין - כל הכבוד! 🎉</p>
