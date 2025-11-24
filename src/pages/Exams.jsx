@@ -829,13 +829,13 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="bg-indigo-50 rounded-2xl p-4">
+          transition={{ delay: 0.25 }} className="bg-[#5294ff] p-4 rounded-2xl">
+
 
           <div className="flex items-center gap-2 mb-3">
-            <Target className="w-5 h-5 text-[#3B82F6]" />
+            <CheckCircle className="text-[#4d94ff] lucide lucide-target w-5 h-5" />
             <div className="flex-1 text-right">
-              <h3 className="text-base font-bold text-[#2B2B2B]">בגרויות אחרונות</h3>
+              <h3 className="text-[#ffffff] text-base font-bold">בגרויות אחרונות</h3>
             </div>
           </div>
 
@@ -862,17 +862,21 @@ export default function ExamsPage() {
                           } else {
                             setShowAdDialog(attempt);
                           }
-                        }}
-                        className="w-full text-right hover:bg-white rounded-xl p-3 transition-colors border border-[#E9F0FF] bg-white flex items-center justify-between">
+                        }} className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between">
+
 
                           <div className="flex items-center gap-3 flex-1">
-                            <div className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                              {passed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                              ) : (
-                                <X className="w-4 h-4 text-red-600" />
-                              )}
-                            </div>
+                            <motion.div
+                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}>
+
+                              {passed ?
+                            <CheckCircle className="w-4 h-4 text-green-600" /> :
+
+                            <X className="w-4 h-4 text-red-600" />
+                            }
+                            </motion.div>
                             <div className="flex-1 text-right">
                               <div className="text-[13px] font-semibold text-[#2B2B2B]">
                                 {examData?.title || 'מבחן'}
@@ -939,8 +943,8 @@ export default function ExamsPage() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                   onClick={() => setShowAllExams(true)}
-                  variant="outline"
-                  className="w-full mt-2 h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px]">
+                  variant="outline" className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
+
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
