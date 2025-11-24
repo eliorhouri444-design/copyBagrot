@@ -415,6 +415,15 @@ export default function ProfilePage() {
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
+              onClick={() => navigate(createPageUrl("Settings"))}>
+
+              <Settings className="w-5 h-5 ml-3" />
+              כל ההגדרות
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={() => setIsEditing(true)}>
 
               <Edit className="w-5 h-5 ml-3" />
