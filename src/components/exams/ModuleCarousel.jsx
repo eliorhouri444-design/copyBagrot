@@ -27,7 +27,7 @@ export default function ModuleCarousel({
     const storageKey = `exam_count_${today}`;
     const count = parseInt(localStorage.getItem(storageKey) || '0');
     setTodayExamCount(count);
-    
+
     // נקה ימים ישנים
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -163,7 +163,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className={`bg-indigo-50 rounded-2xl p-4 ${isLocked ? 'opacity-75' : ''}`}>
+          <div className="bg-[#ffffff] p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10" />
@@ -323,15 +323,15 @@ export default function ModuleCarousel({
                     {currentModule.entity !== 'practice' && onRandomExam &&
                   <div className="space-y-2">
                         {/* הודעה על בגרויות נותרות */}
-                        {isPremium !== true && (
-                          <div className="text-center text-[11px] text-gray-500 mb-1">
-                            {todayExamCount < FREE_DAILY_EXAM ? (
-                              <span className="text-green-600 font-semibold">✓ בגרות חינמית זמינה היום</span>
-                            ) : (
-                              <span className="text-amber-600 font-semibold">📺 נדרשת צפייה בפרסומת</span>
-                            )}
+                        {isPremium !== true &&
+                    <div className="text-center text-[11px] text-gray-500 mb-1">
+                            {todayExamCount < FREE_DAILY_EXAM ?
+                      <span className="text-green-600 font-semibold">✓ בגרות חינמית זמינה היום</span> :
+
+                      <span className="text-amber-600 font-semibold">📺 נדרשת צפייה בפרסומת</span>
+                      }
                           </div>
-                        )}
+                    }
 
                         <Button
                       onClick={() => handleStartExam(() => onRandomExam(currentModule.id))} className="bg-[#3B82F6] text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-blue-600 h-11 transition-all flex items-center justify-center gap-2">
