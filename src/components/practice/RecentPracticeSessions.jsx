@@ -57,7 +57,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
   if (!practiceSessions || practiceSessions.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+        <div className="bg-[#3B82F6] p-4 from-blue-600 to-indigo-600">
           <div className="flex items-center gap-3 text-white">
             <div className="flex-1 text-right">
               <h3 className="text-base font-bold">תרגולים אחרונים</h3>
