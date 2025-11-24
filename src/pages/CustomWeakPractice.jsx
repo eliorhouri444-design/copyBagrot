@@ -356,10 +356,14 @@ Return JSON:`,
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600 font-medium">
-                  {sourceSession ? 'שאלה מהתרגול המקורי' : 'שאלה שטעית בה'}
+                  {question._metadata?.source === 'exam' 
+                    ? `שאלה מבחינה: ${question._metadata.exam_title}` 
+                    : sourceSession ? 'שאלה מהתרגול המקורי' : 'שאלה שטעית בה'}
                 </div>
                 {question._metadata && (
-                  <div className="text-xs text-red-600">⚡ טעית {question._metadata.failures} פעמים</div>
+                  <div className="text-xs text-red-600">
+                    {question._metadata.source === 'exam' ? '📝 טעות מבחינה' : `⚡ טעית ${question._metadata.failures} פעמים`}
+                  </div>
                 )}
               </div>
             </div>
