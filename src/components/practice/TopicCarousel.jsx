@@ -214,6 +214,19 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       sessionStorage.setItem(cacheKey, JSON.stringify(topicsWithStats));
       sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
 
+      // בדוק אם יש נושא נבחר
+      const selectedTopicId = sessionStorage.getItem('selectedTopicId');
+      if (selectedTopicId) {
+        const topicIdx = topicsWithStats.findIndex(t => t.topic_id === selectedTopicId);
+        if (topicIdx !== -1) {
+          setCurrentIndex(topicIdx);
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 100);
+        }
+        sessionStorage.removeItem('selectedTopicId');
+      }
+
     } catch (error) {
       console.error("Error loading topics:", error);
       if (cachedTopics) {
