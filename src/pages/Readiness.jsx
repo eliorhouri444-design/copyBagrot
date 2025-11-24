@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, Loader2 } from "lucide-react";
+import { Target, Loader2, ChevronRight, BookOpen } from "lucide-react";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import ReadinessDashboard from "@/components/readiness/ReadinessDashboard";
 
@@ -59,6 +59,55 @@ export default function ReadinessPage() {
 
   const readinessData = useReadinessCalculator(user, topics, practiceAttempts, examAttempts);
 
+  // חישוב נושאים חלשים
+  const weakTopics = useMemo(() => {
+    const topicStats = {};
+    
+    practiceAttempts.forEach(attempt => {
+      const topicId = attempt.topic_id;
+      if (!topicId) return;
+      
+      if (!topicStats[topicId]) {
+        topicStats[topicId] = { total: 0, correct: 0 };
+      }
+      topicStats[topicId].total++;
+      if (attempt.status === "correct" || attempt.percentage >= 80) {
+        topicStats[topicId].correct++;
+      }
+    });
+
+    return topics.filter(topic => {
+      const stats = topicStats[topic.topic_id];
+      if (!stats) return true; // לא נגע בנושא
+      return stats.total < 5 || (stats.correct / stats.total) < 0.75;
+    }).map(topic => ({
+      topic_id: topic.topic_id,
+      name: topic.name
+    }));
+  }, [topics, practiceAttempts]);
+
+  // חישוב טעויות
+  const mistakes = useMemo(() => {
+    const topicMistakes = {};
+    
+    practiceAttempts.filter(a => a.status === "incorrect").forEach(attempt => {
+      const topicId = attempt.topic_id;
+      if (!topicId) return;
+      
+      if (!topicMistakes[topicId]) {
+        const topic = topics.find(t => t.topic_id === topicId);
+        topicMistakes[topicId] = { 
+          topic_id: topicId, 
+          topic_name: topic?.name || topicId,
+          count: 0 
+        };
+      }
+      topicMistakes[topicId].count++;
+    });
+
+    return Object.values(topicMistakes).sort((a, b) => b.count - a.count);
+  }, [practiceAttempts, topics]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
@@ -72,23 +121,26 @@ export default function ReadinessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 flex items-center justify-between">
+      {/* Header */}
+      <div className="bg-[#3B82F6] px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(createPageUrl("Statistics"))}
-          className="text-right flex-1 hover:opacity-90 transition-opacity"
+          className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
         >
-          <h1 className="text-[16px] font-bold text-white">מחשב המוכנות לבגרות</h1>
-          <p className="text-[11px] text-white/70">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+          <ChevronRight className="w-5 h-5 text-white" />
         </button>
-        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-          <Target className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-white" />
+          <h1 className="text-[16px] font-bold text-white">תוכנית לבגרות</h1>
         </div>
       </div>
 
-      <div className="px-6">
+      <div className="px-4 py-4">
         <ReadinessDashboard 
           readinessData={readinessData} 
           isPremium={user?.is_premium}
+          weakTopics={weakTopics}
+          mistakes={mistakes}
         />
       </div>
     </div>
