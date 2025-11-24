@@ -250,32 +250,6 @@ export default function HomePage() {
             </Button>
           </CardSimple>
         )}
-
-        {/* מקצועות */}
-        <CardSimple delay={0.2}>
-          <CardTitle>המקצועות שלי</CardTitle>
-          
-          <div className="bg-white rounded-lg p-4 border border-[#E9F0FF] mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <div className="font-bold text-[15px] text-[#2B2B2B]">{user?.selected_subject || 'אנגלית'}</div>
-                <div className="text-[13px] text-[#6E6E6E]">{user?.selected_units || 3} יחידות</div>
-              </div>
-              <div className="text-3xl font-black text-[#3B82F6]">
-                {readinessData?.scores.overall || 0}%
-              </div>
-            </div>
-            <Progress value={readinessData?.scores.overall || 0} className="h-2" />
-          </div>
-
-          <Button
-            onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            variant="outline"
-            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
-          >
-            ראה כל המקצועות
-          </Button>
-        </CardSimple>
       </div>
     </div>
   );
