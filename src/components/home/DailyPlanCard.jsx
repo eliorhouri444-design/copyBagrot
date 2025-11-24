@@ -312,18 +312,19 @@ export default function DailyPlanCard({
         <div className="space-y-2 mb-3">
           {dailyTasks.tasks.map((task, idx) => {
             const Icon = task.icon;
-            const isCompleted = completedTasks.includes(task.id);
+            const isCompleted = task.isCompleted;
             const isLocked = !isPremium && idx > 0;
+            const progressPct = task.target > 0 ? Math.min(100, Math.round((task.current / task.target) * 100)) : 0;
 
             return (
               <div
                 key={task.id}
-                onClick={() => !isLocked && onToggleTask?.(task.id)}
+                onClick={() => !isLocked && !isCompleted && handleTaskClick(task)}
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                   isLocked 
                     ? 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'
                     : isCompleted
-                      ? 'bg-green-50 border-green-200 cursor-pointer'
+                      ? 'bg-green-50 border-green-200'
                       : 'bg-white border-[#E9F0FF] hover:border-[#3B82F6] cursor-pointer'
                 }`}
               >
@@ -344,14 +345,26 @@ export default function DailyPlanCard({
                 
                 <div className="flex-1">
                   <div className={`text-[13px] font-semibold ${
-                    isCompleted ? 'text-green-700 line-through' : isLocked ? 'text-gray-400' : 'text-[#2B2B2B]'
+                    isCompleted ? 'text-green-700' : isLocked ? 'text-gray-400' : 'text-[#2B2B2B]'
                   }`}>
                     {task.title}
                   </div>
                   <div className="text-[11px] text-[#6E6E6E]">{task.description}</div>
+                  {/* Progress bar for each task */}
+                  {!isCompleted && !isLocked && (
+                    <div className="mt-1.5">
+                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#3B82F6] rounded-full transition-all"
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {isLocked && <Crown className="w-4 h-4 text-amber-500" />}
+                {!isLocked && !isCompleted && <Play className="w-4 h-4 text-[#3B82F6]" />}
               </div>
             );
           })}
