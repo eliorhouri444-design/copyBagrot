@@ -272,9 +272,20 @@ export default function HomePage() {
           }
         </CardSimple>
 
+        {/* נושאים ושאלונים + משימות היום */}
+        <DailyPlanCard
+          readinessData={readinessData}
+          topics={topics}
+          modules={modules}
+          practiceAttempts={practiceAttempts}
+          examAttempts={examAttempts}
+          isPremium={user?.is_premium}
+          completedTasks={completedTasks}
+          onToggleTask={toggleTask} />
+
         {/* המשך מאיפה שהפסקת */}
         {lastActivity &&
-        <CardSimple delay={0.1}>
+        <CardSimple delay={0.3}>
             <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
             <div className="mb-3">
               <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
@@ -297,9 +308,6 @@ export default function HomePage() {
             </Button>
           </CardSimple>
         }
-
-        {/* נושאים ושאלונים + משימות היום */}
-        <DailyPlanCard
           readinessData={readinessData}
           topics={topics}
           modules={modules}
