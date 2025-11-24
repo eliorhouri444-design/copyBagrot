@@ -90,13 +90,13 @@ export default function SubjectSelectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                      subject.isLocked ?
-                      'bg-gray-300' :
-                      isOpen ?
-                      'bg-white/20 backdrop-blur-sm' :
-                      'bg-gradient-to-br ' + subject.color}`
-                      }>
+                      <div className="bg-[#315bf2] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
+
+
+
+
+
+
                         {subject.isLocked ?
                         <Lock className="w-7 h-7 text-gray-600" /> :
 
