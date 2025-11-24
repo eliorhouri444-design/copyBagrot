@@ -268,19 +268,19 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
-        <p className="text-gray-600 font-semibold">טוען נושאים...</p>
+      <div className="bg-indigo-50 rounded-2xl p-8 text-center">
+        <Loader2 className="animate-spin h-10 w-10 text-[#3B82F6] mx-auto mb-3" />
+        <p className="text-[#6E6E6E] text-[13px] font-semibold">טוען נושאים...</p>
       </div>
     );
   }
 
   if (topics.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-        <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-        <h3 className="text-xl font-bold text-gray-700 mb-2">אין שאלות זמינות</h3>
-        <p className="text-gray-500">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
+      <div className="bg-indigo-50 rounded-2xl p-6 text-center">
+        <Target className="w-12 h-12 mx-auto mb-3 text-[#3B82F6]" />
+        <h3 className="text-[16px] font-bold text-[#2B2B2B] mb-1">אין שאלות זמינות</h3>
+        <p className="text-[#6E6E6E] text-[12px]">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
       </div>
     );
   }
@@ -375,9 +375,9 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             <div className="space-y-2">
               <Button
                 onClick={handleStartPractice}
-                className="w-full h-12 text-[14px] font-bold bg-[#3B82F6] hover:bg-blue-700 rounded-[14px]"
+                className="w-full h-11 text-[13px] font-bold bg-[#3B82F6] hover:bg-blue-700 rounded-[14px]"
               >
-                <Play className="w-5 h-5 ml-2" />
+                <Play className="w-4 h-4 ml-2" />
                 התחל תרגול
               </Button>
 
@@ -387,7 +387,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
                     navigate(createPageUrl("CustomWeakPractice"));
                   }}
-                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                  className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
                 >
                   <Target className="w-4 h-4 ml-2" />
                   תרגול טעויות בנושא זה
@@ -395,7 +395,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               ) : (
                 <Button
                   onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60"
+                  className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60"
                 >
                   <Lock className="w-4 h-4 ml-2" />
                   תרגול טעויות
@@ -409,29 +409,29 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
           <>
             <button
               onClick={() => setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1)}
-              className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-3 w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 z-10 border border-gray-100"
+              className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]"
             >
-              <ChevronRight className="w-5 h-5 text-gray-700" />
+              <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
             </button>
 
             <button
               onClick={() => setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1)}
-              className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-3 w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 z-10 border border-gray-100"
+              className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-700" />
+              <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
             </button>
           </>
         )}
       </div>
 
       {topics.length > 1 && (
-        <div className="flex justify-center gap-2 mt-5">
+        <div className="flex justify-center gap-1.5 mt-3">
           {topics.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-2 rounded-full transition-all ${
-                idx === currentIndex ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300'
+              className={`h-1.5 rounded-full transition-all ${
+                idx === currentIndex ? 'w-6 bg-[#3B82F6]' : 'w-1.5 bg-gray-300'
               }`}
             />
           ))}

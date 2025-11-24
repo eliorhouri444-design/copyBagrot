@@ -364,31 +364,31 @@ export default function ModuleCarousel({
           variant="outline"
           size="icon"
           onClick={handlePrevious}
-          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-10 h-10 pointer-events-auto -translate-x-2 border border-gray-100">
+          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto -translate-x-2 border border-[#E9F0FF]">
 
-          <ChevronRight className="w-5 h-5 text-gray-700" />
+          <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
         </Button>
 
         <Button
           variant="outline"
           size="icon"
           onClick={handleNext}
-          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-10 h-10 pointer-events-auto translate-x-2 border border-gray-100">
+          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto translate-x-2 border border-[#E9F0FF]">
 
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
+          <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
         </Button>
       </div>
 
       {/* Dots indicator */}
-      <div className="flex justify-center gap-2 mt-5">
+      <div className="flex justify-center gap-1.5 mt-3">
         {modules.map((_, idx) =>
         <button
           key={idx}
           onClick={() => setCurrentIndex(idx)}
-          className={`h-2 rounded-full transition-all duration-300 ${
+          className={`h-1.5 rounded-full transition-all duration-300 ${
           idx === currentIndex ?
-          'w-8 bg-blue-600' :
-          'w-2 bg-gray-300 hover:bg-gray-400'}`
+          'w-6 bg-[#3B82F6]' :
+          'w-1.5 bg-gray-300 hover:bg-gray-400'}`
           } />
 
         )}

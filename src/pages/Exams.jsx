@@ -803,24 +803,22 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+          className="bg-indigo-50 rounded-2xl p-4">
 
-            <div className="bg-gradient-to-r from-orange-600 to-red-600 p-4">
-              <div className="text-center text-white flex items-center justify-center gap-2">
-                <h3 className="text-[15px] font-bold">בגרות מותאמת אישית</h3>
-                <Crown className="w-5 h-5 text-yellow-300" />
-              </div>
+            <div className="flex items-center gap-2 mb-3">
+              <Crown className="w-5 h-5 text-[#3B82F6]" />
+              <h3 className="text-base font-bold text-[#2B2B2B]">בגרות מותאמת אישית</h3>
             </div>
 
-            <div className="p-5 text-center">
-              <p className="text-gray-700 text-[13px] mb-4">בגרות שמבוססת על הנושאים שבהן טעית בעבר, כדי לחזק בדיוק את מה שצריך.
+            <div className="text-center">
+              <p className="text-[#6E6E6E] text-[13px] mb-3">בגרות שמבוססת על הנושאים שבהן טעית בעבר, כדי לחזק בדיוק את מה שצריך.
             </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                 onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-12 text-[14px] font-bold flex items-center justify-center gap-2 shadow-lg rounded-xl">
+                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-11 text-[13px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
-                  <Target className="w-5 h-5" />
+                  <Target className="w-4 h-4" />
                   <span className="">התחל בגרות</span>
                 </Button>
               </motion.div>
@@ -832,22 +830,19 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+          className="bg-indigo-50 rounded-2xl p-4">
 
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
-            <div className="flex items-center gap-3 text-white">
-              <div className="flex-1 text-right">
-                <h3 className="text-[15px] font-bold">בגרויות אחרונות</h3>
-                <p className="text-[11px] opacity-90">הביצועים שלך</p>
-              </div>
-              <CheckCircle className="w-6 h-6" />
+          <div className="flex items-center gap-2 mb-3">
+            <CheckCircle className="w-5 h-5 text-[#3B82F6]" />
+            <div className="flex-1 text-right">
+              <h3 className="text-base font-bold text-[#2B2B2B]">בגרויות אחרונות</h3>
             </div>
           </div>
 
-          <div className="p-4">
+          <div>
             {examAttempts.length > 0 ?
             <>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {examAttempts.slice(0, 2).map((attempt, idx) => {
                   const examData = allExamsMap.get(attempt.exam_id);
                   const passed = attempt.score_percent >= 56;
@@ -868,11 +863,11 @@ export default function ExamsPage() {
                             setShowAdDialog(attempt);
                           }
                         }}
-                        className="w-full text-right hover:bg-gray-50 rounded-xl p-3 transition-colors border border-gray-100 flex items-center justify-between">
+                        className="w-full text-right hover:bg-white rounded-xl p-3 transition-colors border border-[#E9F0FF] bg-white flex items-center justify-between">
 
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
-                            className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
+                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
                             whileHover={{ rotate: 360 }}
                             transition={{ duration: 0.5 }}>
 
@@ -883,10 +878,10 @@ export default function ExamsPage() {
                             }
                             </motion.div>
                             <div className="flex-1 text-right">
-                              <div className="text-[13px] font-semibold text-gray-900">
+                              <div className="text-[13px] font-semibold text-[#2B2B2B]">
                                 {examData?.title || 'מבחן'}
                               </div>
-                              <div className="text-[11px] text-gray-500">
+                              <div className="text-[11px] text-[#6E6E6E]">
                                 {new Date(attempt.created_date).toLocaleDateString('he-IL', {
                                 day: 'numeric',
                                 month: 'short',
@@ -920,12 +915,12 @@ export default function ExamsPage() {
                         </motion.button>
 
                         {hasMistakes && isPremium &&
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border border-orange-200 mr-2">
+                      <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
                             <div className="flex items-center gap-2 mb-2">
-                              <Crown className="w-4 h-4 text-orange-600" />
-                              <h4 className="font-bold text-gray-900 text-[13px]">בגרות מותאמת עבורך</h4>
+                              <Crown className="w-4 h-4 text-[#3B82F6]" />
+                              <h4 className="font-bold text-[#2B2B2B] text-[12px]">בגרות מותאמת עבורך</h4>
                             </div>
-                            <p className="text-[11px] text-gray-600 mb-2">חזרה על השאלות שטעית בהן
+                            <p className="text-[11px] text-[#6E6E6E] mb-2">חזרה על השאלות שטעית בהן
                         </p>
                             <Button
                           onClick={(e) => {
@@ -933,7 +928,7 @@ export default function ExamsPage() {
                             sessionStorage.setItem('weakExamSource', attempt.exam_id);
                             navigate(createPageUrl("CustomWeakExam"));
                           }}
-                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[12px] font-bold flex items-center justify-center gap-2 rounded-xl">
+                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
                               בגרות אישית
                             </Button>
@@ -949,7 +944,7 @@ export default function ExamsPage() {
                     <Button
                   onClick={() => setShowAllExams(true)}
                   variant="outline"
-                  className="w-full mt-3 h-10 text-[13px] font-semibold border border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl">
+                  className="w-full mt-2 h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px]">
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
@@ -957,11 +952,10 @@ export default function ExamsPage() {
               }
               </> :
 
-            <div className="text-center py-6 text-gray-500 text-[13px]">
+            <div className="text-center py-4 text-[#6E6E6E] text-[12px]">
                 טרם ביצעת מבחנים
               </div>
             }
-          </div>
         </motion.div>
 
         {!isPremium && practiceSessionsCount >= 40 &&
@@ -969,21 +963,21 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
+          className="bg-indigo-50 rounded-2xl p-4">
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-[#3B82F6] rounded-full flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-gray-900 text-[13px]">מתקרב למגבלה!</h4>
-                <p className="text-gray-700 text-[11px]">
+                <h4 className="font-bold text-[#2B2B2B] text-[13px]">מתקרב למגבלה!</h4>
+                <p className="text-[#6E6E6E] text-[11px]">
                   נותרו לך {remainingFreeExams} מבחנים חינם. שדרג לפרימיום כדי להמשיך ללמוד ללא הגבלה!
                 </p>
               </div>
               <Button
               onClick={() => navigate(createPageUrl("Premium"))}
-              className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 text-white h-9 text-[12px] font-bold rounded-xl">
+              className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] font-bold rounded-[14px]">
 
                 <Crown className="w-4 h-4 mr-1" />
                 <span className="font-bold">שדרג</span>
@@ -997,17 +991,17 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="grid grid-cols-2 gap-4">
+          className="grid grid-cols-2 gap-3">
 
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
+            <div className="bg-indigo-50 rounded-xl p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">הוסף שאלון</h3>
-                  <p className="text-[12px] text-gray-600">צור שאלון חדש</p>
+                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">הוסף שאלון</h3>
+                  <p className="text-[11px] text-[#6E6E6E]">צור שאלון חדש</p>
                 </div>
                 <Button
                 onClick={handleAddNewModule}
-                className="bg-green-600 hover:bg-green-700 text-white h-9 text-[12px] rounded-xl">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <span>הוסף</span>
                   <BookCheck className="w-4 h-4 mr-2" />
@@ -1015,15 +1009,15 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
+            <div className="bg-indigo-50 rounded-xl p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">ניהול מבחנים</h3>
-                  <p className="text-[12px] text-gray-600">הוסף וערוך מבחנים</p>
+                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">ניהול מבחנים</h3>
+                  <p className="text-[11px] text-[#6E6E6E]">הוסף וערוך מבחנים</p>
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminExams"))}
-                className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-[12px] rounded-xl">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <span>נהל</span>
                   <Upload className="w-4 h-4 mr-2" />
