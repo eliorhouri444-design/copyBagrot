@@ -956,6 +956,7 @@ export default function ExamsPage() {
                 טרם ביצעת מבחנים
               </div>
             }
+          </div>
         </motion.div>
 
         {!isPremium && practiceSessionsCount >= 40 &&
