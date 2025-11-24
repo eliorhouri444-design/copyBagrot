@@ -62,10 +62,57 @@ export default function HomePage() {
       );
       setExamAttempts(userExamAttempts);
 
-      const relevantModules = allModules.filter(
-        m => m.subject === subject && parseInt(m.unit_level) === units
-      );
-      setModules(relevantModules);
+      // בניית רשימת מודולים (כולל ברירות מחדל)
+      const defaultModulesStructure = {
+        "אנגלית": {
+          3: [
+            { id: "C", title: "מודול C", color: "from-purple-500 to-purple-600" },
+            { id: "A", title: "מודול A", color: "from-blue-500 to-blue-600" },
+            { id: "B", title: "מודול B", color: "from-cyan-500 to-cyan-600" }
+          ],
+          4: [
+            { id: "C", title: "מודול C", color: "from-blue-500 to-blue-600" },
+            { id: "D", title: "מודול D", color: "from-orange-500 to-orange-600" },
+            { id: "E", title: "מודול E", color: "from-pink-500 to-pink-600" }
+          ],
+          5: [
+            { id: "E", title: "מודול E", color: "from-indigo-500 to-indigo-600" },
+            { id: "F", title: "מודול F", color: "from-rose-500 to-rose-600" },
+            { id: "G", title: "מודול G", color: "from-green-500 to-green-600" }
+          ]
+        },
+        "מתמטיקה": {
+          3: [
+            { id: "801", title: "שאלון 801", color: "from-purple-500 to-purple-600" },
+            { id: "802", title: "שאלון 802", color: "from-blue-500 to-blue-600" }
+          ],
+          4: [
+            { id: "803", title: "שאלון 803", color: "from-green-500 to-green-600" },
+            { id: "804", title: "שאלון 804", color: "from-purple-500 to-purple-600" }
+          ],
+          5: [
+            { id: "805", title: "שאלון 805", color: "from-indigo-500 to-indigo-600" },
+            { id: "806", title: "שאלון 806", color: "from-purple-500 to-purple-600" }
+          ]
+        }
+      };
+
+      const defaultMods = defaultModulesStructure[subject]?.[units] || [];
+      const customMods = allModules.filter(m => m.subject === subject && parseInt(m.unit_level) === units);
+      
+      const modulesMap = new Map();
+      defaultMods.forEach(mod => modulesMap.set(mod.id, mod));
+      customMods.forEach(mod => {
+        const existing = modulesMap.get(mod.module_id);
+        if (existing) {
+          modulesMap.set(mod.module_id, { ...existing, ...mod, id: mod.module_id });
+        } else {
+          modulesMap.set(mod.module_id, { ...mod, id: mod.module_id });
+        }
+      });
+      
+      const finalModules = Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
+      setModules(finalModules);
 
     } catch (error) {
       console.error("Error loading data:", error);
