@@ -14,11 +14,14 @@ import {
   Flame,
   Star,
   Brain,
-  ChevronLeft
+  ChevronLeft,
+  Lock,
+  Crown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import LockedFeatureCard, { LockedPreview, PremiumUpsell } from "@/components/premium/LockedFeatureCard";
 
 export default function ReadinessDashboard({ readinessData, isPremium, weakTopics = [], mistakes = [] }) {
   const navigate = useNavigate();
