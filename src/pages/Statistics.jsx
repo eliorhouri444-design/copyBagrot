@@ -142,10 +142,10 @@ export default function StatisticsPage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#112D57] p-6 mb-6">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
         <div className="text-center">
-          <h1 className="text-[22px] font-bold text-white mb-1">הנתונים שלי</h1>
-          <p className="text-[13px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
+          <h1 className="text-[18px] font-bold text-white mb-0.5">הנתונים שלי</h1>
+          <p className="text-[12px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ export default function StatisticsPage() {
               <p className="text-[15px] text-[#6E6E6E] mb-6">עדיין לא ביצעת תרגולים או בחינות</p>
               <Button
                 onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
+                className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
               >
                 <BookOpen className="w-5 h-5 ml-2" />
                 התחל תרגול
@@ -182,7 +182,7 @@ export default function StatisticsPage() {
               <Button
                 onClick={() => setShowDetailedView(!showDetailedView)}
                 variant="outline"
-                className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
+                className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
               >
                 {showDetailedView ? 'הסתר' : 'ראה פירוט מלא'}
                 <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailedView ? 'rotate-180' : ''}`} />
@@ -234,7 +234,7 @@ export default function StatisticsPage() {
               <Button
                 onClick={() => navigate(createPageUrl("Readiness"))}
                 variant="outline"
-                className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
+                className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
               >
                 ראה פירוט מלא
               </Button>
@@ -313,7 +313,7 @@ export default function StatisticsPage() {
           <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
+              className="h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
             >
               <BookOpen className="w-4 h-4 ml-2" />
               תרגול

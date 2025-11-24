@@ -109,10 +109,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#112D57] p-6 mb-6">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
         <div className="text-center">
-          <h1 className="text-[22px] font-bold text-white mb-1">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
-          <p className="text-[13px] text-white/80">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+          <h1 className="text-[18px] font-bold text-white mb-0.5">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
+          <p className="text-[12px] text-white/80">{user?.selected_subject} • {user?.selected_units} יחידות</p>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export default function HomePage() {
 
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="w-full h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
             >
               התחל עכשיו
             </Button>
@@ -218,7 +218,7 @@ export default function HomePage() {
                   navigate(createPageUrl("Exams"));
                 }
               }}
-              className="w-full h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
             >
               <PlayCircle className="w-5 h-5 ml-2" />
               המשך

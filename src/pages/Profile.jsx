@@ -269,23 +269,13 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#112D57] p-6 mb-6">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 mb-6">
         <div className="text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-            <User className="w-8 h-8 text-white" />
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+            <User className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-[22px] font-bold text-white mb-1">{user?.full_name || 'תלמיד'}</h1>
-          <p className="text-[13px] text-white/80">תלמיד בבגרות {displaySubject} • {displayUnits} יחידות</p>
-          
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsEditing(true)}
-            className="text-white hover:bg-white/20 mt-3 text-[13px]"
-          >
-            <Settings className="w-4 h-4 ml-2" />
-            הגדרות
-          </Button>
+          <h1 className="text-[18px] font-bold text-white mb-0.5">{user?.full_name || 'תלמיד'}</h1>
+          <p className="text-[12px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
         </div>
       </div>
 
@@ -304,7 +294,7 @@ export default function ProfilePage() {
             <Button
               onClick={() => setShowDetailsView(!showDetailsView)}
               variant="outline"
-              className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
+              className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
             >
               {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
               <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-180' : ''}`} />
@@ -345,170 +335,54 @@ export default function ProfilePage() {
           </CardSimple>
         )}
 
-        {/* משימות היום */}
-        {dailyTasks.length > 0 && (
+        {/* מה ללמוד היום */}
+        {allTopics.length > 0 && (
           <CardSimple delay={0.1}>
-            <CardTitle>היום שלך</CardTitle>
+            <CardTitle>מה ללמוד כדי להצליח</CardTitle>
             
-            <div className="space-y-2 mb-3">
-              {dailyTasks.map(task => (
-                <div
-                  key={task.id}
-                  onClick={() => toggleTask(task.id)}
-                  className={`p-3 rounded-lg cursor-pointer transition-all border ${
-                    completedTasks.includes(task.id)
-                      ? 'bg-green-50 border-green-300' 
-                      : 'bg-white border-[#E9F0FF]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      completedTasks.includes(task.id)
-                        ? 'bg-green-500 border-green-500' 
-                        : 'bg-white border-[#1E4BA1]'
-                    }`}>
-                      {completedTasks.includes(task.id) && <CheckCircle className="w-3 h-3 text-white" />}
+            <div className="space-y-2">
+              {allTopics.slice(0, 5).map((topic, idx) => {
+                const topicAttempts = practiceAttempts.filter(a => a.topic_id === topic.topic_id);
+                const correct = topicAttempts.filter(a => a.status === "correct").length;
+                const mastery = topicAttempts.length > 0 ? Math.round((correct / topicAttempts.length) * 100) : 0;
+                const needsPractice = mastery < 75;
+
+                return (
+                  <button
+                    key={topic.topic_id}
+                    onClick={() => {
+                      sessionStorage.setItem('selectedTopic', topic.topic_id);
+                      navigate(createPageUrl("Practice"));
+                    }}
+                    className="w-full bg-white border border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2 flex-1 text-right">
+                      <span className="text-xl">{topic.icon || '📚'}</span>
+                      <div className="flex-1">
+                        <div className="font-bold text-[15px] text-[#2B2B2B]">{topic.name}</div>
+                        <div className="text-[13px] text-[#6E6E6E]">
+                          {needsPractice ? `${mastery}% שליטה - צריך חיזוק` : `${mastery}% - טוב!`}
+                        </div>
+                      </div>
                     </div>
-                    <span className={`text-[15px] font-semibold ${
-                      completedTasks.includes(task.id) ? 'text-green-800 line-through' : 'text-[#2B2B2B]'
-                    }`}>
-                      {task.title}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center text-[13px] text-[#6E6E6E]">
-              לחץ על משימה לסימון ✓
-            </div>
-          </CardSimple>
-        )}
-
-        {/* טעויות */}
-        {recentMistakes.total > 0 && (
-          <CardSimple delay={0.15}>
-            <CardTitle icon={AlertTriangle}>טעויות אחרונות</CardTitle>
-
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="bg-white rounded-lg p-4 border-2 border-red-200 text-center">
-                <div className="text-4xl font-black text-red-600 mb-1">{recentMistakes.total}</div>
-                <div className="text-[13px] text-[#6E6E6E]">טעויות השבוע</div>
-              </div>
-              
-              {recentMistakes.weakestTopic && (
-                <div className="bg-white rounded-lg p-4 border-2 border-orange-200 text-center">
-                  <div className="text-[13px] text-[#6E6E6E] mb-1">הנושא החלש</div>
-                  <div className="font-bold text-orange-900 text-[15px] leading-tight">
-                    {allTopics.find(t => t.topic_id === recentMistakes.weakestTopic)?.name || 'נושא'}
-                  </div>
-                </div>
-              )}
+                    {needsPractice && (
+                      <div className="text-red-600 text-[13px] font-bold">⚠️</div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <Button
-              onClick={() => navigate(user?.is_premium ? createPageUrl("CustomWeakPractice") : createPageUrl("Premium"))}
-              className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-bold rounded-[14px] text-[15px]"
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="w-full h-10 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[13px] mt-3"
             >
-              🔥 לפתור טעויות
+              ראה את כל הנושאים
             </Button>
           </CardSimple>
         )}
 
-        {/* בגרויות */}
-        {examAttempts.length > 0 && (
-          <CardSimple delay={0.2}>
-            <CardTitle icon={FileCheck}>בגרויות שביצעת</CardTitle>
 
-            <div className="space-y-2 mb-3">
-              {examAttempts.slice(0, 3).map((exam, idx) => (
-                <div key={idx} className="bg-white border border-[#E9F0FF] rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-[15px] text-[#2B2B2B]">
-                        {exam.exam_type || 'בגרות'}
-                      </div>
-                      <div className="text-[13px] text-[#6E6E6E]">
-                        {new Date(exam.created_date).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
-                      </div>
-                    </div>
-                    <div className={`text-3xl font-black ${
-                      exam.score_percent >= 80 ? 'text-green-600' :
-                      exam.score_percent >= 60 ? 'text-[#1E4BA1]' : 'text-orange-600'
-                    }`}>
-                      {Math.round(exam.score_percent || 0)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => navigate(createPageUrl("Exams"))}
-              className="w-full h-12 bg-[#10B981] hover:bg-[#059669] text-white font-bold rounded-[14px] text-[15px]"
-            >
-              <FileCheck className="w-5 h-5 ml-2" />
-              בצע בגרות חדשה
-            </Button>
-          </CardSimple>
-        )}
-
-        {/* זמן לימוד */}
-        <CardSimple delay={0.25}>
-          <CardTitle icon={Clock}>זמן לימוד השבוע</CardTitle>
-
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={weekData}>
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'white', border: '2px solid #E9F0FF', borderRadius: '12px', direction: 'rtl', fontSize: '12px' }}
-                formatter={(value) => [`${value} דקות`]}
-              />
-              <Bar dataKey="minutes" fill="#1E4BA1" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-
-          <div className="text-center mt-3">
-            <span className="text-[13px] text-[#6E6E6E]">השבוע: </span>
-            <span className="text-2xl font-black text-[#1E4BA1]">
-              {weekData.reduce((sum, d) => sum + d.minutes, 0)}
-            </span>
-            <span className="text-[13px] text-[#6E6E6E]"> דקות</span>
-          </div>
-        </CardSimple>
-
-        {/* הישגים */}
-        {achievements.length > 0 && (
-          <CardSimple delay={0.3}>
-            <CardTitle icon={Award}>הישגים</CardTitle>
-
-            <div className="grid grid-cols-2 gap-3">
-              {achievements.map((achievement, idx) => (
-                <div key={idx} className="bg-white border-2 border-[#E9F0FF] rounded-lg p-4 text-center">
-                  <div className="text-3xl mb-2">{achievement.icon}</div>
-                  <div className="text-[13px] font-bold text-[#2B2B2B]">{achievement.text}</div>
-                </div>
-              ))}
-            </div>
-          </CardSimple>
-        )}
-
-        {/* הודעה מהרובוט */}
-        <CardSimple delay={0.35}>
-          <CardTitle icon={MessageSquare}>הודעה מהרובוט</CardTitle>
-
-          <div className="bg-white rounded-lg p-4 border border-[#E9F0FF]">
-            <p className="text-[#2B2B2B] font-semibold text-[15px] leading-relaxed">
-              {(() => {
-                const todayMinutes = weekData[weekData.length - 1]?.minutes || 0;
-                if (todayMinutes === 0 && readinessData) {
-                  return `היום אתה צריך ${readinessData.daily.questions} שאלות כדי להתקדם לקראת ${user?.target_score || 85}+`;
-                }
-                return `כל הכבוד! תמשיך כך להצליח 💪`;
-              })()}
-            </p>
-          </div>
-        </CardSimple>
 
         {/* הגדרות */}
         <CardSimple delay={0.4}>
@@ -517,7 +391,7 @@ export default function ProfilePage() {
           <div className="space-y-2">
             <Button
               variant="outline"
-              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#112D57] text-[15px]"
+              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={() => setIsEditing(true)}
             >
               <Edit className="w-5 h-5 ml-3" />
@@ -526,7 +400,7 @@ export default function ProfilePage() {
 
             <Button
               variant="outline"
-              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#112D57] text-[15px]"
+              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 ml-3" />
@@ -584,7 +458,7 @@ export default function ProfilePage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditing(false)}>ביטול</Button>
-            <Button onClick={handleSaveProfile} className="bg-[#1E4BA1]">שמור</Button>
+            <Button onClick={handleSaveProfile} className="bg-[#3B82F6]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
