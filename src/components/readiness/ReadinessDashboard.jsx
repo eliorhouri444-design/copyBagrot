@@ -371,42 +371,56 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         </div>
       </motion.div>
 
-      {/* ציר זמן */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl shadow-lg p-4"
-      >
-        <h3 className="text-base font-bold text-gray-900 mb-3">ציר זמן</h3>
+      {/* ציר זמן - פרימיום בלבד */}
+      {isPremium ? (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg p-4"
+        >
+          <h3 className="text-base font-bold text-gray-900 mb-3">ציר זמן</h3>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-green-500">•</span>
-            <span className="text-gray-700">{timeline.daysNeeded} ימים עד מוכנות מלאה</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-green-500">•</span>
+              <span className="text-gray-700">{timeline.daysNeeded} ימים עד מוכנות מלאה</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-blue-500">•</span>
+              <span className="text-gray-700">{timeline.daysUntilExam} ימים עד הבגרות</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-blue-500">•</span>
-            <span className="text-gray-700">{timeline.daysUntilExam} ימים עד הבגרות</span>
-          </div>
-        </div>
 
-        {!isOnTrack && (
-          <div className="mt-3 bg-red-50 rounded-lg p-3 border border-red-200">
-            <p className="text-red-700 text-sm font-medium">
-              ⚠️ עליך להגביר את הקצב כדי לעמוד במטרה
-            </p>
-          </div>
-        )}
-        
-        {isOnTrack && (
-          <div className="mt-3 bg-green-50 rounded-lg p-3 border border-green-200">
-            <p className="text-green-700 text-sm font-medium">
-              ✓ אתה בדיוק בזמן! תמשיך בקצב הזה
-            </p>
-          </div>
-        )}
-      </motion.div>
+          {!isOnTrack && (
+            <div className="mt-3 bg-red-50 rounded-lg p-3 border border-red-200">
+              <p className="text-red-700 text-sm font-medium">
+                ⚠️ עליך להגביר את הקצב כדי לעמוד במטרה
+              </p>
+            </div>
+          )}
+          
+          {isOnTrack && (
+            <div className="mt-3 bg-green-50 rounded-lg p-3 border border-green-200">
+              <p className="text-green-700 text-sm font-medium">
+                ✓ אתה בדיוק בזמן! תמשיך בקצב הזה
+              </p>
+            </div>
+          )}
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <LockedFeatureCard
+            title="ציר זמן מלא"
+            description={`נשארו ${timeline.daysUntilExam} ימים — פרימיום יבנה לך תוכנית מותאמת.`}
+            compact
+          />
+        </motion.div>
+      )}
 
       {/* פרימיום */}
       {!isPremium && (
