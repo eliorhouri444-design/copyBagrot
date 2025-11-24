@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, ChevronLeft, PlayCircle, CheckCircle } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { motion } from "framer-motion";
+import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 
 export default function HomePage() {
@@ -16,6 +16,7 @@ export default function HomePage() {
   const [examAttempts, setExamAttempts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     loadAllData();
@@ -73,24 +74,20 @@ export default function HomePage() {
 
   const dailyTasks = useMemo(() => {
     if (!readinessData) return [];
-
     return [
-      { id: "practice", title: `לפתור ${readinessData.daily.questions} שאלות`, completed: false },
-      { id: "learn", title: `ללמוד ${readinessData.daily.topics} נושאים`, completed: false },
-      { id: "review", title: `לחזור על ${readinessData.daily.reviewMistakes} טעויות`, completed: false }
+      { id: "practice", title: `לפתור ${readinessData.daily.questions} שאלות` },
+      { id: "learn", title: `ללמוד ${readinessData.daily.topics} נושאים` },
+      { id: "review", title: `לחזור על ${readinessData.daily.reviewMistakes} טעויות` }
     ];
   }, [readinessData]);
 
   const lastActivity = useMemo(() => {
     if (practiceAttempts.length === 0 && examAttempts.length === 0) return null;
-
     const lastPractice = practiceAttempts[0];
     const lastExam = examAttempts[0];
-
     const mostRecent = !lastExam || (lastPractice && new Date(lastPractice.created_date) > new Date(lastExam.created_date))
-      ? { type: 'practice', topic: topics.find(t => t.topic_id === lastPractice?.topic_id)?.name || 'תרגול', id: lastPractice?.topic_id }
-      : { type: 'exam', topic: 'בגרות מלאה', id: lastExam?.id };
-
+      ? { type: 'practice', topic: topics.find(t => t.topic_id === lastPractice?.topic_id)?.name || 'תרגול' }
+      : { type: 'exam', topic: 'בגרות מלאה' };
     return mostRecent;
   }, [practiceAttempts, examAttempts, topics]);
 
@@ -104,95 +101,89 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-[2rem] p-6 shadow-xl mb-6 relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
-        
-        <div className="relative z-10 text-center">
-          <h1 className="text-3xl font-bold text-white mb-1">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
-          <p className="text-base text-white/90">{user?.selected_subject} • {user?.selected_units} יחידות</p>
+    <div className="min-h-screen bg-white pb-20">
+      <div className="bg-[#112D57] p-6 mb-6">
+        <div className="text-center">
+          <h1 className="text-[22px] font-bold text-white mb-1">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
+          <p className="text-[13px] text-white/80">{user?.selected_subject} • {user?.selected_units} יחידות</p>
         </div>
-      </motion.div>
+      </div>
 
-      <div className="px-6 space-y-4 pb-4">
-        {/* 1️⃣ מה המצב שלך - 3 נתונים בלבד */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
-        >
-          <h3 className="text-base font-bold text-gray-900 mb-4">מה המצב שלך</h3>
+      <div className="px-5 space-y-6">
+        {/* מה המצב שלך */}
+        <CardSimple delay={0.05}>
+          <CardTitle>מה המצב שלך</CardTitle>
           
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="text-center">
-              <div className="text-4xl font-black text-blue-600 mb-1">{readinessData?.scores.overall || 0}%</div>
-              <div className="text-xs text-gray-600">מוכנות</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-black text-purple-600 mb-1">{daysUntilExam}</div>
-              <div className="text-xs text-gray-600">ימים לבגרות</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-black text-green-600 mb-1">{user?.target_score || 85}</div>
-              <div className="text-xs text-gray-600">ציון מטרה</div>
-            </div>
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            <StatCard value={`${readinessData?.scores.overall || 0}%`} label="מוכנות" color="#1E4BA1" />
+            <StatCard value={daysUntilExam} label="ימים לבגרות" color="#9333EA" />
+            <StatCard value={user?.target_score || 85} label="ציון מטרה" color="#10B981" />
           </div>
 
           <Button
-            onClick={() => navigate(createPageUrl("Statistics"))}
+            onClick={() => setShowDetails(!showDetails)}
             variant="outline"
-            className="w-full h-10 text-sm rounded-xl border-2 border-gray-200"
+            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
           >
-            ראה פירוט מלא
-            <ChevronLeft className="w-4 h-4 mr-2" />
+            {showDetails ? 'הסתר פירוט' : 'ראה פירוט'}
+            <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
           </Button>
-        </motion.div>
 
-        {/* 2️⃣ מה לעשות היום */}
+          {showDetails && readinessData && (
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">שליטה</div>
+                <div className="text-2xl font-black text-[#1E4BA1]">{readinessData.scores.mastery}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">תרגול</div>
+                <div className="text-2xl font-black text-[#9333EA]">{readinessData.scores.practice}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">בגרויות</div>
+                <div className="text-2xl font-black text-[#10B981]">{readinessData.scores.exams}%</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                <div className="text-sm text-[#6E6E6E] mb-1">מהירות</div>
+                <div className="text-2xl font-black text-[#F59E0B]">{readinessData.scores.speed}%</div>
+              </div>
+            </div>
+          )}
+        </CardSimple>
+
+        {/* מה לעשות היום */}
         {dailyTasks.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg p-5"
-          >
-            <h3 className="text-base font-bold text-gray-900 mb-3">מה לעשות היום</h3>
+          <CardSimple delay={0.1}>
+            <CardTitle>מה לעשות היום</CardTitle>
             
             <div className="space-y-2 mb-4">
               {dailyTasks.map(task => (
                 <div
                   key={task.id}
                   onClick={() => toggleTask(task.id)}
-                  className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  className={`p-3 rounded-lg cursor-pointer transition-all border ${
                     completedTasks.includes(task.id)
                       ? 'bg-green-50 border-green-300' 
-                      : 'bg-blue-50 border-blue-200'
+                      : 'bg-white border-[#E9F0FF]'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       completedTasks.includes(task.id)
                         ? 'bg-green-500 border-green-500' 
-                        : 'bg-white border-blue-400'
+                        : 'bg-white border-[#1E4BA1]'
                     }`}>
                       {completedTasks.includes(task.id) && <CheckCircle className="w-3 h-3 text-white" />}
                     </div>
-                    <span className={`text-sm font-semibold ${
-                      completedTasks.includes(task.id) ? 'text-green-800 line-through' : 'text-gray-900'
+                    <span className={`text-[15px] font-semibold ${
+                      completedTasks.includes(task.id) ? 'text-green-800 line-through' : 'text-[#2B2B2B]'
                     }`}>
                       {task.title}
                     </span>
@@ -203,24 +194,20 @@ export default function HomePage() {
 
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl"
+              className="w-full h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
             >
               התחל עכשיו
             </Button>
-          </motion.div>
+          </CardSimple>
         )}
 
-        {/* 3️⃣ המשך מאיפה שהפסקת */}
+        {/* המשך מאיפה שהפסקת */}
         {lastActivity && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-lg p-5 border-2 border-purple-200"
-          >
+          <CardSimple delay={0.15}>
             <div className="mb-3">
-              <div className="text-xs text-gray-600 mb-1">התחלת</div>
-              <div className="text-lg font-bold text-gray-900">{lastActivity.topic}</div>
+              <div className="text-[13px] text-[#6E6E6E] mb-1">התחלת</div>
+              <div className="text-[18px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
+              <div className="text-[13px] text-[#6E6E6E]">המשך עכשיו</div>
             </div>
 
             <Button
@@ -231,47 +218,39 @@ export default function HomePage() {
                   navigate(createPageUrl("Exams"));
                 }
               }}
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl"
+              className="w-full h-12 bg-[#1E4BA1] hover:bg-[#112D57] text-white font-bold rounded-[14px] text-[15px]"
             >
               <PlayCircle className="w-5 h-5 ml-2" />
-              המשך עכשיו
+              המשך
             </Button>
-          </motion.div>
+          </CardSimple>
         )}
 
-        {/* 4️⃣ מקצועות - 3 בלבד */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
-        >
-          <h3 className="text-base font-bold text-gray-900 mb-3">המקצועות שלי</h3>
+        {/* מקצועות */}
+        <CardSimple delay={0.2}>
+          <CardTitle>המקצועות שלי</CardTitle>
           
-          <div className="space-y-2 mb-3">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <div className="font-bold text-gray-900">{user?.selected_subject || 'אנגלית'}</div>
-                  <div className="text-xs text-gray-600">{user?.selected_units || 3} יחידות</div>
-                </div>
-                <div className="text-3xl font-black text-blue-600">
-                  {readinessData?.scores.overall || 0}%
-                </div>
+          <div className="bg-white rounded-lg p-4 border border-[#E9F0FF] mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="font-bold text-[15px] text-[#2B2B2B]">{user?.selected_subject || 'אנגלית'}</div>
+                <div className="text-[13px] text-[#6E6E6E]">{user?.selected_units || 3} יחידות</div>
               </div>
-              <Progress value={readinessData?.scores.overall || 0} className="h-2" />
+              <div className="text-3xl font-black text-[#1E4BA1]">
+                {readinessData?.scores.overall || 0}%
+              </div>
             </div>
+            <Progress value={readinessData?.scores.overall || 0} className="h-2" />
           </div>
 
           <Button
             onClick={() => navigate(createPageUrl("SubjectSelection"))}
             variant="outline"
-            className="w-full h-10 text-sm rounded-xl border-2 border-gray-200"
+            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]"
           >
             ראה כל המקצועות
-            <ChevronLeft className="w-4 h-4 mr-2" />
           </Button>
-        </motion.div>
+        </CardSimple>
       </div>
     </div>
   );
