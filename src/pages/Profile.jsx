@@ -380,6 +380,28 @@ export default function ProfilePage() {
                   </div>
                   <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
                 </div>
+
+                {/* פעולות מותאמות */}
+                <div className="pt-3 border-t border-[#E9F0FF] mt-3">
+                  <div className="text-[13px] font-bold text-[#2B2B2B] mb-2">פעולות מומלצות</div>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => navigate(createPageUrl("WeakExamSelection"))}
+                      className="w-full h-11 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2"
+                    >
+                      <Target className="w-4 h-4" />
+                      בגרות על טעויות
+                    </Button>
+                    <Button
+                      onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
+                      variant="outline"
+                      className="w-full h-11 border-2 border-[#E9F0FF] text-[#3B82F6] font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2 hover:bg-[#F5F8FF]"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      תרגול נושאים לחיזוק
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </CardSimple>
