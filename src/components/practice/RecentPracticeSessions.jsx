@@ -309,108 +309,126 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
       </Dialog>
 
       <Dialog open={showAllSessions} onOpenChange={setShowAllSessions}>
-        <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl">כל התרגולים שלך</DialogTitle>
-          </DialogHeader>
+        <DialogContent dir="rtl" className="w-full h-full max-w-full max-h-full m-0 p-0 rounded-none">
+          <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between">
+              <div className="text-right flex-1">
+                <h1 className="text-[16px] font-bold text-white">כל התרגולים שלך</h1>
+                <p className="text-[11px] text-white/70">{practiceSessions.length} תרגולים</p>
+              </div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            {practiceSessions.map((session) => {
-              const passed = session.percentage >= 70;
-              const hasMistakes = session.percentage < 70;
+            {/* Content - scrollable */}
+            <div className="flex-1 overflow-y-auto px-5 py-6">
+              <div className="space-y-3 max-w-2xl mx-auto">
+                {practiceSessions.map((session, idx) => {
+                  const passed = session.percentage >= 70;
+                  const hasMistakes = session.percentage < 70;
 
-              return (
-                <div key={session.id} className="space-y-2">
-                  <button
-                    onClick={() => {
-                      setShowAllSessions(false);
-                      if (isPremium || unlockedSessions.has(session.id)) {
-                        setSelectedSession(session);
-                      } else {
-                        setShowAdDialog(session);
-                      }
-                    }}
-                    className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-                        {passed ? (
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <TrendingUp className="w-4 h-4 text-orange-600" />
-                        )}
-                      </div>
-                      <div className="text-right flex-1">
-                        <div className="text-sm font-semibold text-gray-900">
-                          {getTopicName(session.topic_id)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(session.created_date).toLocaleDateString('he-IL', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      {isPremium ? (
-                        <>
-                          <div className={`text-xl font-bold ${passed ? 'text-green-600' : 'text-orange-600'}`}>
-                            {Math.round(session.percentage)}%
-                          </div>
-                          <div className="text-[10px] text-gray-500">
-                            {session.total_score || 0}/{session.max_score || 0}
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          <Lock className="w-5 h-5 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  </button>
-
-                  {hasMistakes && (
-                    <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-3 border-2 border-red-200 mr-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Crown className="w-4 h-4 text-red-600" />
-                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות מתרגול זה</h4>
-                      </div>
-                      <p className="text-xs text-gray-600 mb-2">
-                        חזור על השאלות שטעית בהן
-                      </p>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                  return (
+                    <motion.div
+                      key={session.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="space-y-2"
+                    >
+                      <button
+                        onClick={() => {
                           setShowAllSessions(false);
-                          if (isPremium) {
-                            sessionStorage.setItem('weakPracticeSource', session.id);
-                            navigate(createPageUrl("CustomWeakPractice"));
+                          if (isPremium || unlockedSessions.has(session.id)) {
+                            setSelectedSession(session);
                           } else {
-                            navigate(createPageUrl("Premium"));
+                            setShowAdDialog(session);
                           }
                         }}
-                        className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2"
+                        className="w-full text-right hover:bg-white rounded-xl p-4 transition-all bg-white shadow-md border border-gray-100 hover:border-blue-400 flex items-center justify-between"
                       >
-                        <Target className="w-3 h-3" />
-                        {isPremium ? 'תרגול טעויות' : '🔒 שדרג לפרימיום'}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                            {passed ? (
+                              <CheckCircle className="w-6 h-6 text-green-600" />
+                            ) : (
+                              <TrendingUp className="w-6 h-6 text-orange-600" />
+                            )}
+                          </div>
+                          <div className="text-right flex-1">
+                            <div className="text-[14px] font-bold text-gray-900">
+                              {getTopicName(session.topic_id)}
+                            </div>
+                            <div className="text-[12px] text-gray-500">
+                              {new Date(session.created_date).toLocaleDateString('he-IL', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                          </div>
+                        </div>
 
-          <DialogFooter>
-            <Button onClick={() => setShowAllSessions(false)} className="w-full">
-              סגור
-            </Button>
-          </DialogFooter>
+                        <div className="text-left">
+                          {isPremium ? (
+                            <>
+                              <div className={`text-[20px] font-black ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+                                {Math.round(session.percentage)}%
+                              </div>
+                              <div className="text-[11px] text-gray-500">
+                                {session.total_score || 0}/{session.max_score || 0} נק'
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <Lock className="w-6 h-6 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                      </button>
+
+                      {hasMistakes && isPremium && (
+                        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md mr-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Crown className="w-5 h-5 text-orange-600" />
+                            <h4 className="font-bold text-gray-900 text-[13px]">תרגול טעויות מתרגול זה</h4>
+                          </div>
+                          <p className="text-[11px] text-gray-600 mb-3">
+                            חזור על השאלות שטעית בהן
+                          </p>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowAllSessions(false);
+                              sessionStorage.setItem('weakPracticeSource', session.id);
+                              navigate(createPageUrl("CustomWeakPractice"));
+                            }}
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-11 text-[13px] font-bold flex items-center justify-center gap-2 rounded-xl"
+                          >
+                            <Target className="w-4 h-4" />
+                            תרגול טעויות
+                          </Button>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 bg-white border-t border-gray-200">
+              <Button 
+                onClick={() => setShowAllSessions(false)} 
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-[14px]"
+              >
+                סגור
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
