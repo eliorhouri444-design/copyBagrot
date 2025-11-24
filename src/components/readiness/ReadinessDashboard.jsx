@@ -329,28 +329,45 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         )}
       </motion.div>
 
-      {/* המשימות שלך להיום */}
+      {/* המשימות שלך להיום - חינם: משימה אחת, פרימיום: כל המשימות */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
         className="bg-white rounded-2xl shadow-lg p-4"
       >
-        <h3 className="text-base font-bold text-gray-900 mb-3">המשימות שלך להיום</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-gray-900">המשימות שלך להיום</h3>
+          {!isPremium && <Crown className="w-4 h-4 text-amber-500" />}
+        </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-purple-500">•</span>
-            <span className="text-gray-700">ללמוד {daily.topics} נושאים</span>
-          </div>
+          {/* משימה ראשונה - לכולם */}
           <div className="flex items-center gap-2 text-sm">
             <span className="text-purple-500">•</span>
             <span className="text-gray-700">לפתור {daily.questions} שאלות</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-purple-500">•</span>
-            <span className="text-gray-700">לחזור על {daily.reviewMistakes} טעויות</span>
-          </div>
+          
+          {/* שאר המשימות - פרימיום בלבד */}
+          {isPremium ? (
+            <>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-500">•</span>
+                <span className="text-gray-700">ללמוד {daily.topics} נושאים</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-purple-500">•</span>
+                <span className="text-gray-700">לחזור על {daily.reviewMistakes} טעויות</span>
+              </div>
+            </>
+          ) : (
+            <div className="bg-amber-50 rounded-lg p-2 mt-2 border border-amber-200">
+              <div className="flex items-center gap-2 text-xs text-amber-700">
+                <Lock className="w-3 h-3" />
+                <span>עוד {2} משימות זמינות בפרימיום</span>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
 
