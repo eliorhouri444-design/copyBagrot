@@ -277,7 +277,7 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         )}
       </motion.div>
 
-      {/* בוחן חכם - AI Test */}
+      {/* בוחן חכם - AI Test - פרימיום בלבד */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -287,6 +287,7 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         <div className="flex items-center gap-2 mb-3">
           <Star className="w-5 h-5 text-amber-500" />
           <h3 className="text-base font-bold text-gray-900">בוחן חכם (AI)</h3>
+          {!isPremium && <Crown className="w-4 h-4 text-amber-500" />}
         </div>
 
         <p className="text-sm text-gray-600 mb-3">בוחן אוטומטי מבוסס:</p>
@@ -309,13 +310,23 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
           </div>
         </div>
 
-        <Button
-          onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-          className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white text-sm h-10"
-        >
-          <Brain className="w-4 h-4 ml-2" />
-          התחל בוחן חכם
-        </Button>
+        {isPremium ? (
+          <Button
+            onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+            className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white text-sm h-10"
+          >
+            <Brain className="w-4 h-4 ml-2" />
+            התחל בוחן חכם
+          </Button>
+        ) : (
+          <Button
+            onClick={() => navigate(createPageUrl("Premium"))}
+            className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-sm h-10"
+          >
+            <Lock className="w-4 h-4 ml-2" />
+            שדרג לפרימיום
+          </Button>
+        )}
       </motion.div>
 
       {/* המשימות שלך להיום */}
