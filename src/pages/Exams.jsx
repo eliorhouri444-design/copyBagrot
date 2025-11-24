@@ -1044,17 +1044,6 @@ export default function ExamsPage() {
                 </Button>
               </div>
             </div>
-
-
-                <Button
-                onClick={() => setShowModuleOrderDialog(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm">
-
-                  <span>ערוך</span>
-                  <Settings className="w-4 h-4 mr-2" />
-                </Button>
-              </div>
-            </div>
           </motion.div>
         }
       </div>
