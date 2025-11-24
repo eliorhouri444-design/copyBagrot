@@ -585,7 +585,7 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
       {/* Header */}
       <div className="bg-[#3B82F6] px-5 py-4 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+        <button onClick={() => navigate(createPageUrl("Profile"))} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <ChevronRight className="w-5 h-5 text-white" />
         </button>
         <h1 className="text-[18px] font-bold text-white">הגדרות</h1>
