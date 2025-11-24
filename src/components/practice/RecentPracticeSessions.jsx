@@ -309,22 +309,22 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
       </Dialog>
 
       <Dialog open={showAllSessions} onOpenChange={setShowAllSessions}>
-        <DialogContent dir="rtl" className="w-full h-full max-w-full max-h-full m-0 p-0 rounded-none">
+        <DialogContent dir="rtl" className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none">
           <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between flex-shrink-0">
               <div className="text-right flex-1">
-                <h1 className="text-[16px] font-bold text-white">כל התרגולים שלך</h1>
-                <p className="text-[11px] text-white/70">{practiceSessions.length} תרגולים</p>
+                <h1 className="text-[18px] font-bold text-white">כל התרגולים שלך</h1>
+                <p className="text-[12px] text-white/70">{practiceSessions.length} תרגולים</p>
               </div>
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
             </div>
 
-            {/* Content - scrollable */}
-            <div className="flex-1 overflow-y-auto px-5 py-6">
-              <div className="space-y-3 max-w-2xl mx-auto">
+            {/* Content - scrollable with better spacing */}
+            <div className="flex-1 overflow-y-auto px-4 py-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-5xl mx-auto pb-4">
                 {practiceSessions.map((session, idx) => {
                   const passed = session.percentage >= 70;
                   const hasMistakes = session.percentage < 70;
@@ -334,8 +334,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                       key={session.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="space-y-2"
+                      transition={{ delay: Math.min(idx * 0.03, 0.5) }}
                     >
                       <button
                         onClick={() => {
@@ -346,59 +345,46 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                             setShowAdDialog(session);
                           }
                         }}
-                        className="w-full text-right hover:bg-white rounded-xl p-4 transition-all bg-white shadow-md border border-gray-100 hover:border-blue-400 flex items-center justify-between"
+                        className="w-full text-right hover:bg-white rounded-xl p-4 transition-all bg-white shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3"
                       >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
                             {passed ? (
                               <CheckCircle className="w-6 h-6 text-green-600" />
                             ) : (
                               <TrendingUp className="w-6 h-6 text-orange-600" />
                             )}
                           </div>
-                          <div className="text-right flex-1">
-                            <div className="text-[14px] font-bold text-gray-900">
+                          <div className="text-right flex-1 min-w-0">
+                            <div className="text-[14px] font-bold text-gray-900 truncate">
                               {getTopicName(session.topic_id)}
                             </div>
-                            <div className="text-[12px] text-gray-500">
+                            <div className="text-[11px] text-gray-500">
                               {new Date(session.created_date).toLocaleDateString('he-IL', {
                                 day: 'numeric',
                                 month: 'short',
-                                year: 'numeric',
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
                             </div>
                           </div>
-                        </div>
-
-                        <div className="text-left">
-                          {isPremium ? (
-                            <>
-                              <div className={`text-[20px] font-black ${passed ? 'text-green-600' : 'text-orange-600'}`}>
-                                {Math.round(session.percentage)}%
-                              </div>
-                              <div className="text-[11px] text-gray-500">
-                                {session.total_score || 0}/{session.max_score || 0} נק'
-                              </div>
-                            </>
-                          ) : (
-                            <div className="flex items-center gap-1">
+                          <div className="text-left">
+                            {isPremium ? (
+                              <>
+                                <div className={`text-[20px] font-black ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+                                  {Math.round(session.percentage)}%
+                                </div>
+                                <div className="text-[10px] text-gray-500">
+                                  {session.total_score || 0}/{session.max_score || 0}
+                                </div>
+                              </>
+                            ) : (
                               <Lock className="w-6 h-6 text-gray-400" />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-
-                      {hasMistakes && isPremium && (
-                        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md mr-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Crown className="w-5 h-5 text-orange-600" />
-                            <h4 className="font-bold text-gray-900 text-[13px]">תרגול טעויות מתרגול זה</h4>
+                            )}
                           </div>
-                          <p className="text-[11px] text-gray-600 mb-3">
-                            חזור על השאלות שטעית בהן
-                          </p>
+                        </div>
+
+                        {hasMistakes && isPremium && (
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -406,24 +392,24 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                               sessionStorage.setItem('weakPracticeSource', session.id);
                               navigate(createPageUrl("CustomWeakPractice"));
                             }}
-                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-11 text-[13px] font-bold flex items-center justify-center gap-2 rounded-xl"
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[12px] font-bold flex items-center justify-center gap-2 rounded-xl"
                           >
                             <Target className="w-4 h-4" />
                             תרגול טעויות
                           </Button>
-                        </div>
-                      )}
+                        )}
+                      </button>
                     </motion.div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-5 bg-white border-t border-gray-200">
+            {/* Footer - fixed at bottom */}
+            <div className="p-4 bg-white border-t border-gray-200 flex-shrink-0">
               <Button 
                 onClick={() => setShowAllSessions(false)} 
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-[14px]"
+                className="w-full max-w-md mx-auto h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-[15px] block"
               >
                 סגור
               </Button>
