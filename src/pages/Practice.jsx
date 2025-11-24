@@ -260,13 +260,13 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 pt-0">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity"
         >
-          <h1 className="text-[16px] font-bold text-white">תרגול {displaySubject}</h1>
-          <p className="text-[11px] text-white/70">{displayUnits} יחידות</p>
+          <h1 className="text-[16px] font-bold text-white">{displaySubject}</h1>
+          <p className="text-[11px] text-white/90">{displayUnits} יחידות</p>
         </button>
         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <BookOpen className="w-5 h-5 text-white" />
