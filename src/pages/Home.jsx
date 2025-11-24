@@ -164,14 +164,7 @@ export default function HomePage() {
   Math.max(0, Math.ceil((new Date(user.exam_date) - new Date()) / (1000 * 60 * 60 * 24))) :
   90;
 
-  const dailyTasks = useMemo(() => {
-    if (!readinessData) return [];
-    return [
-    { id: "practice", title: `לפתור ${readinessData.daily.questions} שאלות` },
-    { id: "learn", title: `ללמוד ${readinessData.daily.topics} נושאים` },
-    { id: "review", title: `לחזור על ${readinessData.daily.reviewMistakes} טעויות` }];
 
-  }, [readinessData]);
 
   const lastActivity = useMemo(() => {
     // מצא את התרגול האחרון שלא הושלם
