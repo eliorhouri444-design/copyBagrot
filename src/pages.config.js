@@ -61,6 +61,7 @@ import CustomWeakTopicExam from './pages/CustomWeakTopicExam';
 import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
 import DailyPractice from './pages/DailyPractice';
 import LearningPlan from './pages/LearningPlan';
+import Readiness from './pages/Readiness';
 import __Layout from './Layout.jsx';
 
 
@@ -128,6 +129,7 @@ export const PAGES = {
     "AdminNotificationTemplates": AdminNotificationTemplates,
     "DailyPractice": DailyPractice,
     "LearningPlan": LearningPlan,
+    "Readiness": Readiness,
 }
 
 export const pagesConfig = {
