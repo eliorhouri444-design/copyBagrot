@@ -101,46 +101,59 @@ export default function ReadinessDashboard({ readinessData, isPremium, weakTopic
         </div>
       </motion.div>
 
-      {/* מה חסר לך כדי להגיע לציון */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-2xl shadow-lg p-4"
-      >
-        <h3 className="text-base font-bold text-gray-900 mb-3">
-          מה חסר לך כדי להגיע ל-{targets.targetScore}
-        </h3>
+      {/* מה חסר לך כדי להגיע לציון - פרימיום בלבד */}
+      {isPremium ? (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-lg p-4"
+        >
+          <h3 className="text-base font-bold text-gray-900 mb-3">
+            מה חסר לך כדי להגיע ל-{targets.targetScore}
+          </h3>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-blue-500">•</span>
-            <span className="text-gray-700">לפתור {remaining.practice} שאלות</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-blue-500">•</span>
-            <span className="text-gray-700">להשלים {remaining.exams} בגרויות מלאות</span>
-          </div>
-          {remaining.untouchedTopics > 0 && (
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-orange-500">•</span>
-              <span className="text-gray-700">ללמוד {remaining.untouchedTopics} נושאים חדשים</span>
+              <span className="text-blue-500">•</span>
+              <span className="text-gray-700">לפתור {remaining.practice} שאלות</span>
             </div>
-          )}
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-purple-500">•</span>
-            <span className="text-gray-700">לחזור על {remaining.weakTopics} נושאים חלשים</span>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-blue-500">•</span>
+              <span className="text-gray-700">להשלים {remaining.exams} בגרויות מלאות</span>
+            </div>
+            {remaining.untouchedTopics > 0 && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-orange-500">•</span>
+                <span className="text-gray-700">ללמוד {remaining.untouchedTopics} נושאים חדשים</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-purple-500">•</span>
+              <span className="text-gray-700">לחזור על {remaining.weakTopics} נושאים חלשים</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-red-500">•</span>
+              <span className="text-gray-700">טעויות: &lt;{targets.requirements.errorRate}%</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-amber-500">•</span>
+              <span className="text-gray-700">לשפר מהירות ב-15%</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-red-500">•</span>
-            <span className="text-gray-700">טעויות: &lt;{targets.requirements.errorRate}%</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-amber-500">•</span>
-            <span className="text-gray-700">לשפר מהירות ב-15%</span>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <LockedFeatureCard
+            title="מה חסר לך להגיע לציון?"
+            description="שדרג לפרימיום כדי לראות בדיוק מה חסר לך - שאלות, בגרויות, נושאים ועוד."
+          />
+        </motion.div>
+      )}
 
       {/* נושאים חלשים */}
       <motion.div
