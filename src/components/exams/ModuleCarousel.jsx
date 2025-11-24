@@ -121,18 +121,18 @@ export default function ModuleCarousel({
 
           <div className={`bg-indigo-50 rounded-2xl p-4 ${isLocked ? 'opacity-75' : ''}`}>
             {/* Header with gradient */}
-            <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} rounded-2xl p-5 text-white relative overflow-hidden mb-3`}>
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12" />
-              <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-10 -translate-x-10" />
+            <div className={`bg-gradient-to-br ${currentModule.color || 'from-blue-500 to-indigo-600'} rounded-xl p-4 text-white relative overflow-hidden mb-3`}>
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8" />
               
               <div className="relative z-10 flex items-start gap-3">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                  className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-xl flex-shrink-0">
+                  className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
 
-                  <FileText className="w-7 h-7 text-white" />
+                  <FileText className="w-6 h-6 text-white" />
                 </motion.div>
                 
                 <div className="flex-1">
@@ -140,7 +140,7 @@ export default function ModuleCarousel({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="text-[18px] font-bold mb-1">
+                    className="text-[16px] font-bold mb-0.5">
 
                     {currentModule.title}
                   </motion.h2>
@@ -148,7 +148,7 @@ export default function ModuleCarousel({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="text-white/90 text-[12px]">
+                    className="text-white/90 text-[11px]">
 
                     {currentModule.description}
                   </motion.p>
@@ -183,13 +183,13 @@ export default function ModuleCarousel({
             </div>
 
             {/* Content */}
-            <div className="bg-white rounded-2xl p-4 space-y-3">
+            <div className="bg-white rounded-xl p-3 space-y-2.5">
               {/* Description */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-[#2B2B2B] text-[13px] leading-relaxed">
+                className="text-[#2B2B2B] text-[12px] leading-relaxed">
 
                 {currentModule.details}
               </motion.p>
@@ -199,18 +199,18 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-[#F5F8FF] rounded-xl p-4 border border-[#E9F0FF]">
+                className="bg-[#F5F8FF] rounded-xl p-3 border border-[#E9F0FF]">
 
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[13px] font-bold text-[#2B2B2B]">התקדמות בשאלון</span>
-                  <span className="text-[17px] font-bold text-[#3B82F6]">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-[12px] font-bold text-[#2B2B2B]">התקדמות בשאלון</span>
+                  <span className="text-[15px] font-bold text-[#3B82F6]">
                     {moduleStats.progress}%
                   </span>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] mb-2">
+                <div className="text-[10px] text-[#6E6E6E] mb-1.5">
                   {moduleStats.totalAttempts} / {moduleStats.maxExams} בגרויות {!(isPremium === true) && '(חינם)'}
                 </div>
-                <div className="h-2 bg-white rounded-full overflow-hidden">
+                <div className="h-1.5 bg-white rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${moduleStats.progress}%` }}
@@ -225,19 +225,19 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="grid grid-cols-3 gap-2">
+                className="grid grid-cols-3 gap-1.5">
 
-                <div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-200">
-                  <div className="text-[19px] font-bold text-blue-600">{moduleStats.totalAttempts}</div>
-                  <div className="text-[10px] text-blue-700 font-medium">ניסיונות</div>
+                <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-200">
+                  <div className="text-[16px] font-bold text-blue-600">{moduleStats.totalAttempts}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ניסיונות</div>
                 </div>
-                <div className="bg-green-50 rounded-xl p-3 text-center border border-green-200">
-                  <div className="text-[19px] font-bold text-green-600">{moduleStats.passedAttempts}</div>
-                  <div className="text-[10px] text-green-700 font-medium">עברו</div>
+                <div className="bg-green-50 rounded-lg p-2 text-center border border-green-200">
+                  <div className="text-[16px] font-bold text-green-600">{moduleStats.passedAttempts}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">עברו</div>
                 </div>
-                <div className="bg-purple-50 rounded-xl p-3 text-center border border-purple-200">
-                  <div className="text-[19px] font-bold text-blue-600">{moduleStats.avgScore}</div>
-                  <div className="text-[10px] text-purple-700 font-medium">ממוצע</div>
+                <div className="bg-purple-50 rounded-lg p-2 text-center border border-purple-200">
+                  <div className="text-[16px] font-bold text-[#3B82F6]">{moduleStats.avgScore}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ממוצע</div>
                 </div>
               </motion.div>
 
@@ -246,14 +246,14 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex items-center justify-between text-[12px] text-gray-600 pt-2 border-t border-gray-200">
+                className="flex items-center justify-between text-[11px] text-[#6E6E6E] pt-2 border-t border-[#E9F0FF]">
 
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
                   <span>{currentModule.duration} דקות</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4" />
+                <div className="flex items-center gap-1.5">
+                  <Target className="w-3.5 h-3.5" />
                   <span>{currentModule.points} נקודות</span>
                 </div>
               </motion.div>
@@ -263,14 +263,14 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="space-y-3 pt-2">
+                className="space-y-2 pt-2">
 
                 {isLocked ?
                 <Button
                   onClick={onUpgrade}
-                  className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-md rounded-xl">
+                  className="w-full h-11 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[13px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
-                    <Crown className="w-5 h-5" />
+                    <Crown className="w-4 h-4" />
                     שדרג לפרימיום
                   </Button> :
 
@@ -280,7 +280,7 @@ export default function ModuleCarousel({
                   <div className="space-y-2">
                         <Button
                       onClick={() => onRandomExam(currentModule.id)}
-                      className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-12 text-[14px] font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 rounded-xl`}>
+                      className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-11 text-[13px] font-bold transition-all flex items-center justify-center gap-2 rounded-[14px]`}>
 
                           <Shuffle className="w-5 h-5" />
                           בגרות אקראית
@@ -289,14 +289,14 @@ export default function ModuleCarousel({
                         {isPremium === true ?
                     <Button
                       onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-                      className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white">
+                      className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
 
                             בגרות אישית
                           </Button> :
 
                     <Button
                       onClick={() => navigate(createPageUrl("Premium"))}
-                      className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white opacity-60">
+                      className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60">
 
                             בגרות אישית
                           </Button>
@@ -311,28 +311,28 @@ export default function ModuleCarousel({
                     <Button
                       onClick={() => handleModuleClick(currentModule)}
                       variant="outline"
-                      className="w-full h-11 text-[13px] font-semibold border hover:bg-gray-50 rounded-xl">
+                      className="w-full h-10 text-[12px] font-semibold border hover:bg-gray-50 rounded-[14px]">
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                    <div className="bg-white rounded-xl p-3 border border-gray-200">
+                    <div className="bg-white rounded-lg p-2.5 border border-[#E9F0FF]">
                             <div className="text-center mb-2">
-                              <h4 className="text-[12px] font-bold text-gray-900 mb-0.5">מוגבל ל-5 בגרויות</h4>
-                              <p className="text-[10px] text-gray-600">מוגבל ל-5 הבגרויות הראשונות</p>
+                              <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
+                              <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
                             </div>
                             <Button
                         onClick={() => handleModuleClick(currentModule)}
                         variant="outline"
-                        className="w-full h-10 text-[12px] font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl mb-2">
+                        className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
 
                               בחר מבחן (מוגבל ל-5)
                             </Button>
                             <Button
                         onClick={onUpgrade}
-                        className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[12px] font-bold flex items-center justify-center gap-2 shadow-md rounded-xl">
+                        className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
-                              <Crown className="w-4 h-4" />
+                              <Crown className="w-3.5 h-3.5" />
                               לגישה מלאה 100+ בגרויות
                             </Button>
                           </div>
@@ -344,10 +344,10 @@ export default function ModuleCarousel({
                     {currentModule.entity === 'practice' &&
                   <Button
                     onClick={() => handleModuleClick(currentModule)}
-                    className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-12 text-[14px] font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 rounded-xl`}>
+                    className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-11 text-[13px] font-bold transition-all flex items-center justify-center gap-2 rounded-[14px]`}>
 
                         התחל תרגול
-                        <Play className="w-5 h-5" />
+                        <Play className="w-4 h-4" />
                       </Button>
                   }
                   </>

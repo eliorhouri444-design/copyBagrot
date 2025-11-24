@@ -255,9 +255,9 @@ export default function HomePage() {
         {/* המשך מאיפה שהפסקת */}
         {lastActivity && (
           <CardSimple delay={0.15}>
+            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
             <div className="mb-3">
-              <div className="text-[13px] text-[#6E6E6E] mb-1">התחלת</div>
-              <div className="text-[18px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
+              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
               <div className="text-[13px] text-[#6E6E6E]">המשך עכשיו</div>
             </div>
 
@@ -266,7 +266,6 @@ export default function HomePage() {
                 if (lastActivity.type === 'practice') {
                   navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
                 } else {
-                  // המשך לדף הבגרות עם ה-examId
                   sessionStorage.setItem('currentExamId', lastActivity.examId);
                   navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
                 }

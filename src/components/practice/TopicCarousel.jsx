@@ -298,11 +298,11 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-2xl p-5 text-white mb-3 relative`}>
+            <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-xl p-4 text-white mb-3 relative`}>
               <div className="text-center">
-                <div className="text-4xl mb-2">{currentTopic.icon}</div>
-                <h2 className="text-[18px] font-bold mb-1">{currentTopic.name}</h2>
-                <p className="text-[11px] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
+                <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
+                <h2 className="text-[16px] font-bold mb-0.5">{currentTopic.name}</h2>
+                <p className="text-[10px] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
               </div>
               {onEditTopic && (
                 <Button
@@ -334,14 +334,14 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             </div>
 
             {currentTopic.stats && (
-              <div className="bg-white rounded-xl p-4 mb-3">
-                <div className="text-[14px] font-bold text-center text-[#2B2B2B] mb-3">📊 הסטטיסטיקה שלך</div>
+              <div className="bg-white rounded-xl p-3 mb-3">
+                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
                 
-                <div className="bg-[#F5F8FF] rounded-xl p-3 mb-3 border border-[#E9F0FF]">
-                  <div className="flex justify-center items-center mb-2">
-                    <span className="text-[19px] font-bold text-[#3B82F6]">{currentTopic.stats.progress}%</span>
+                <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
+                  <div className="flex justify-center items-center mb-1.5">
+                    <span className="text-[17px] font-bold text-[#3B82F6]">{currentTopic.stats.progress}%</span>
                   </div>
-                  <div className="text-[12px] font-semibold text-center text-[#2B2B2B] mb-2">התקדמות</div>
+                  <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
                   <div className="h-2 bg-white rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -355,18 +355,18 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-red-50 rounded-xl p-2 text-center border border-red-200">
-                    <div className="text-[19px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[10px] text-[#6E6E6E]">שגויות</div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
+                    <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">שגויות</div>
                   </div>
-                  <div className="bg-green-50 rounded-xl p-2 text-center border border-green-200">
-                    <div className="text-[19px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[10px] text-[#6E6E6E]">נכונות</div>
+                  <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
+                    <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">נכונות</div>
                   </div>
-                  <div className="bg-orange-50 rounded-xl p-2 text-center border border-orange-200">
-                    <div className="text-[19px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[10px] text-[#6E6E6E]">חלקיות</div>
+                  <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
+                    <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">חלקיות</div>
                   </div>
                 </div>
               </div>
