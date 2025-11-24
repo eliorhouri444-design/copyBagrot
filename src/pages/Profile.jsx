@@ -281,7 +281,7 @@ export default function ProfilePage() {
 
       <div className="px-5 space-y-6">
         {/* המנוי שלי */}
-        {user?.is_premium ?
+        {user?.is_premium &&
         <CardSimple delay={0.05}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -312,21 +312,6 @@ export default function ProfilePage() {
                 <div className="text-[13px] text-[#6E6E6E]">גישה מלאה לכל התכונות</div>
               </div>
             </div>
-          </CardSimple> :
-
-        <CardSimple delay={0.05}>
-            <div className="flex items-center gap-2 mb-3">
-              <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
-            </div>
-            <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
-            <Button
-            onClick={() => navigate(createPageUrl("Premium"))}
-            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
-
-              <Crown className="w-4 h-4 ml-2" />
-              שדרג עכשיו
-            </Button>
           </CardSimple>
         }
 
