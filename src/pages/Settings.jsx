@@ -357,17 +357,33 @@ export default function SettingsPage() {
   const loadReferralClicks = async (code) => {
     try {
       const clicks = await base44.entities.ReferralClick.filter({ referral_code: code });
-      setReferralClicks(clicks.length);
+      const totalClicks = clicks.length;
+      setReferralClicks(totalClicks);
       
-      // Check if reward should be given
-      if (clicks.length >= 20 && !user?.share_reward_claimed) {
-        const adFreeUntil = new Date();
-        adFreeUntil.setDate(adFreeUntil.getDate() + 5);
+      // Calculate rewards - every 20 clicks = 5 days ad-free
+      const rewardsClaimed = user?.referral_rewards_claimed || 0;
+      const rewardsEarned = Math.floor(totalClicks / 20);
+      
+      if (rewardsEarned > rewardsClaimed) {
+        // Give new rewards
+        const newRewards = rewardsEarned - rewardsClaimed;
+        const daysToAdd = newRewards * 5;
+        
+        // Calculate new ad-free date
+        const currentAdFree = user?.ad_free_until ? new Date(user.ad_free_until) : new Date();
+        const baseDate = currentAdFree > new Date() ? currentAdFree : new Date();
+        baseDate.setDate(baseDate.getDate() + daysToAdd);
+        
         await base44.auth.updateMe({ 
-          share_reward_claimed: true,
-          ad_free_until: adFreeUntil.toISOString()
+          referral_rewards_claimed: rewardsEarned,
+          ad_free_until: baseDate.toISOString()
         });
-        alert("🎉 מעולה! 20 חברים פתחו את הקישור שלך וקיבלת 5 ימים ללא פרסומות!");
+        
+        alert(`🎉 מעולה! קיבלת ${daysToAdd} ימים נוספים ללא פרסומות!`);
+        
+        // Refresh user data
+        const updatedUser = await base44.auth.me();
+        setUser(updatedUser);
       }
     } catch (error) {
       console.error("Error loading referral clicks:", error);
@@ -978,19 +994,20 @@ export default function SettingsPage() {
             <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-bold text-[#2B2B2B]">חברים שפתחו את הקישור</span>
-                <span className="text-[#EC4899] font-bold">{referralClicks}/20</span>
+                <span className="text-[#EC4899] font-bold">{referralClicks}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-pink-500 to-purple-500 h-3 rounded-full transition-all"
-                  style={{ width: `${Math.min((referralClicks / 20) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((referralClicks % 20) / 20 * 100, 100)}%` }}
                 />
               </div>
               <p className="text-[12px] text-[#6E6E6E] mt-2">
-                {referralClicks >= 20 
-                  ? "🎉 קיבלת 5 ימים ללא פרסומות!" 
-                  : `עוד ${20 - referralClicks} חברים צריכים לפתוח את הקישור`}
+                {`עוד ${20 - (referralClicks % 20)} חברים ותקבל 5 ימים נוספים ללא פרסומות!`}
               </p>
+              <div className="mt-2 text-[11px] text-[#EC4899] font-semibold">
+                🎁 קיבלת עד עכשיו: {Math.floor(referralClicks / 20) * 5} ימים ללא פרסומות
+              </div>
             </div>
 
             {/* Share Link */}
@@ -1036,8 +1053,8 @@ export default function SettingsPage() {
                     <div className="text-[12px] text-[#6E6E6E]">חברים פתחו</div>
                   </div>
                   <div className="p-3 text-center">
-                    <div className="text-2xl font-bold text-[#10B981]">{referralClicks >= 20 ? 5 : 0}</div>
-                    <div className="text-[12px] text-[#6E6E6E]">ימים ללא פרסומות</div>
+                    <div className="text-2xl font-bold text-[#10B981]">{Math.floor(referralClicks / 20) * 5}</div>
+                    <div className="text-[12px] text-[#6E6E6E]">ימים שהרווחת</div>
                   </div>
                 </div>
               </div>
@@ -1045,10 +1062,9 @@ export default function SettingsPage() {
             
             <Button 
               onClick={() => loadReferralClicks(referralCode)}
-              variant="outline"
-              className="w-full text-[13px]"
+              className="w-full text-[13px] bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
             >
-              🔄 רענן נתונים
+              🎁 בדוק אם יש לך פרסים חדשים
             </Button>
           </div>
           <DialogFooter>
