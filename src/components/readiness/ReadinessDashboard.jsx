@@ -11,13 +11,16 @@ import {
   Award,
   CheckCircle,
   AlertTriangle,
-  Flame
+  Flame,
+  Star,
+  Brain,
+  ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function ReadinessDashboard({ readinessData, isPremium }) {
+export default function ReadinessDashboard({ readinessData, isPremium, weakTopics = [], mistakes = [] }) {
   const navigate = useNavigate();
 
   if (!readinessData) {
@@ -134,6 +137,127 @@ export default function ReadinessDashboard({ readinessData, isPremium }) {
             <span className="text-gray-700">לשפר מהירות ב-15%</span>
           </div>
         </div>
+      </motion.div>
+
+      {/* נושאים חלשים */}
+      {weakTopics.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+          className="bg-white rounded-2xl shadow-lg p-4"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-5 h-5 text-amber-500" />
+            <h3 className="text-base font-bold text-gray-900">נושאים חלשים</h3>
+          </div>
+
+          <div className="space-y-2">
+            {weakTopics.slice(0, 3).map((topic, idx) => (
+              <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+                <span className="text-sm text-gray-700">{topic.name}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${topic.topic_id}`))}
+                  className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
+                >
+                  תרגל נושא זה
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {weakTopics.length > 3 && (
+            <Button
+              variant="outline"
+              onClick={() => navigate(createPageUrl("WeakTopics"))}
+              className="w-full mt-3 text-sm h-9"
+            >
+              ראה את כל {weakTopics.length} הנושאים החלשים
+            </Button>
+          )}
+        </motion.div>
+      )}
+
+      {/* טעויות */}
+      {mistakes.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.14 }}
+          className="bg-white rounded-2xl shadow-lg p-4"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Star className="w-5 h-5 text-amber-500" />
+            <h3 className="text-base font-bold text-gray-900">טעויות</h3>
+          </div>
+
+          <p className="text-sm text-gray-600 mb-3">יש לך {mistakes.length} טעויות</p>
+
+          <div className="space-y-2">
+            {mistakes.slice(0, 2).map((mistake, idx) => (
+              <div key={idx} className="flex items-center justify-between bg-gray-50 rounded-lg p-3 border border-gray-100">
+                <div>
+                  <span className="text-sm text-gray-700">{mistake.topic_name}</span>
+                  <span className="text-xs text-gray-500 mr-2">– {mistake.count} טעויות</span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => navigate(createPageUrl(`TopicPracticeNew?topic=${mistake.topic_id}`))}
+                  className="text-xs text-blue-600 hover:bg-blue-50 h-7 px-2"
+                >
+                  תרגל טעות זו
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => navigate(createPageUrl("CustomWeakExam"))}
+            className="w-full mt-3 bg-red-500 hover:bg-red-600 text-white text-sm h-9"
+          >
+            בוחן טעויות מלא
+          </Button>
+        </motion.div>
+      )}
+
+      {/* בוחן חכם */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.16 }}
+        className="bg-white rounded-2xl shadow-lg p-4"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <Star className="w-5 h-5 text-amber-500" />
+          <h3 className="text-base font-bold text-gray-900">בוחן חכם (AI)</h3>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-3">בוחן אוטומטי מבוסס:</p>
+        <div className="space-y-1 mb-3">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-purple-500">•</span>
+            <span className="text-gray-700">טעויות</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-purple-500">•</span>
+            <span className="text-gray-700">נושאים חלשים</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-purple-500">•</span>
+            <span className="text-gray-700">שאלות שלא הושלמו</span>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+          className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white text-sm h-10"
+        >
+          <Brain className="w-4 h-4 ml-2" />
+          התחל בוחן חכם
+        </Button>
       </motion.div>
 
       {/* המשימות שלך להיום */}
