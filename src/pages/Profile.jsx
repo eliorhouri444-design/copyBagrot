@@ -318,7 +318,7 @@ export default function ProfilePage() {
         {/* הדרך שלך לבגרות */}
         {readinessData &&
         <CardSimple delay={0.05}>
-            <CardTitle>הדרך שלך לבגרות</CardTitle>
+            <CardTitle>התקדמות שלך</CardTitle>
             
             <div className="grid grid-cols-3 gap-3 mb-3">
               <StatCard value={`${readinessData.scores.mastery}%`} label="שליטה בחומר" color="#3B82F6" />
@@ -370,12 +370,12 @@ export default function ProfilePage() {
           </CardSimple>
         }
 
-        {/* התקדמות שלך - שדרג לפרימיום */}
+        {/* שדרג לפרימיום */}
         {!user?.is_premium &&
         <CardSimple delay={0.15}>
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">התקדמות שלך</h3>
+              <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
             </div>
             <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
             <Button
