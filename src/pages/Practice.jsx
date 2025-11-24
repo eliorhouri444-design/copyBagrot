@@ -335,8 +335,8 @@ export default function PracticePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="bg-gradient-to-br from-blue-50 to-amber-50 rounded-3xl shadow-2xl overflow-hidden border-2 border-blue-200">
-            <div className="bg-blue-600 p-4">
+          <div className="bg-gradient-to-br from-blue-50 to-amber-50 rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
               <div className="text-center text-white flex items-center justify-center gap-2">
                 <h3 className="text-lg font-bold">תרגול פרימיום מותאם אישית</h3>
                 <Crown className="w-5 h-5 text-yellow-300" />
@@ -360,19 +360,19 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full p-4 rounded-xl border-2 text-right transition-all ${
+                  className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
                     user?.is_premium 
                       ? 'bg-white border-blue-200 hover:border-blue-400 hover:shadow-md' 
                       : 'bg-gray-50 border-gray-300 opacity-60 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-6 h-6 text-white" />
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-7 h-7 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-gray-900 text-sm mb-1">תרגול טעויות ונושאים חלשים</div>
-                      <div className="text-xs text-gray-600">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
+                      <div className="font-bold text-gray-900 text-base mb-1">תרגול טעויות ונושאים חלשים</div>
+                      <div className="text-sm text-gray-600">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
                     </div>
                     {!user?.is_premium && (
                       <Crown className="w-5 h-5 text-amber-500" />
@@ -391,19 +391,19 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full p-4 rounded-xl border-2 text-right transition-all ${
+                  className={`w-full p-5 rounded-2xl border-2 text-right transition-all ${
                     user?.is_premium 
                       ? 'bg-white border-purple-200 hover:border-purple-400 hover:shadow-md' 
                       : 'bg-gray-50 border-gray-300 opacity-60 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                      <Settings className="w-6 h-6 text-white" />
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <Settings className="w-7 h-7 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-gray-900 text-sm mb-1">בניה עצמאית של תרגול</div>
-                      <div className="text-xs text-gray-600">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
+                      <div className="font-bold text-gray-900 text-base mb-1">בניה עצמאית של תרגול</div>
+                      <div className="text-sm text-gray-600">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
                     </div>
                     {!user?.is_premium && (
                       <Crown className="w-5 h-5 text-amber-500" />
@@ -416,9 +416,9 @@ export default function PracticePage() {
                 <div className="mt-4 text-center">
                   <Button
                     onClick={() => navigate(createPageUrl("Premium"))}
-                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-10 text-sm font-bold rounded-xl px-6"
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 text-base font-bold rounded-2xl px-8"
                   >
-                    <Crown className="w-4 h-4 ml-2" />
+                    <Crown className="w-5 h-5 ml-2" />
                     שדרג לפרימיום
                   </Button>
                 </div>
@@ -432,39 +432,39 @@ export default function PracticePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="grid grid-cols-2 gap-3"
+            className="grid grid-cols-2 gap-4"
           >
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200 shadow-md">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-5 border-2 border-purple-200 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">ניהול שאלות</h3>
-                  <p className="text-xs text-gray-600">הוסף ועדכן</p>
+                  <h3 className="text-base font-bold text-gray-900 mb-1">ניהול שאלות</h3>
+                  <p className="text-sm text-gray-600">הוסף ועדכן</p>
                 </div>
                 <Button
                   onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
-                  className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-sm rounded-2xl"
+                  className="bg-purple-600 hover:bg-purple-700 text-white h-10 text-sm rounded-2xl"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   נהל
                 </Button>
               </div>
-            </div>
+              </div>
 
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-4 border-2 border-indigo-200 shadow-md">
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-5 border-2 border-indigo-200 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">ניהול נושאים</h3>
-                  <p className="text-xs text-gray-600">הוסף, ערוך, סדר</p>
+                  <h3 className="text-base font-bold text-gray-900 mb-1">ניהול נושאים</h3>
+                  <p className="text-sm text-gray-600">הוסף, ערוך, סדר</p>
                 </div>
                 <Button
                   onClick={() => navigate(createPageUrl("AdminTopics"))}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-sm rounded-2xl"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-10 text-sm rounded-2xl"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   נהל
                 </Button>
               </div>
-            </div>
+              </div>
           </motion.div>
         )}
       </div>

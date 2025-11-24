@@ -390,7 +390,7 @@ export default function StatisticsPage() {
           </motion.div>
         </div>
       ) : (
-        <div className="px-4 space-y-5 pb-6">
+        <div className="px-6 space-y-6 pb-6">
           {/* Predicted Score Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
