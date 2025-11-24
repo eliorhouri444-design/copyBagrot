@@ -17,7 +17,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   useEffect(() => {
     const cacheKey = `topics_${subject}_${units}`;
     const cached = sessionStorage.getItem(cacheKey);
-    
+
     if (cached) {
       try {
         const parsedCache = JSON.parse(cached);
@@ -28,11 +28,11 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         console.error('Cache parse error:', e);
       }
     }
-    
+
     // טען רק אם אין cache או אם עברו יותר מ-2 דקות
     const lastUpdate = sessionStorage.getItem(`${cacheKey}_time`);
-    const shouldUpdate = !cached || !lastUpdate || (Date.now() - parseInt(lastUpdate) > 120000);
-    
+    const shouldUpdate = !cached || !lastUpdate || Date.now() - parseInt(lastUpdate) > 120000;
+
     if (shouldUpdate) {
       loadTopics();
     }
@@ -43,34 +43,34 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
     try {
       // Load custom topics first
       const customTopics = await base44.entities.TopicNew.list();
-      const relevantCustomTopics = customTopics.filter(t => 
-        t.subject_id === subject && 
-        t.unit_level === parseInt(units) && 
-        t.is_active === true
+      const relevantCustomTopics = customTopics.filter((t) =>
+      t.subject_id === subject &&
+      t.unit_level === parseInt(units) &&
+      t.is_active === true
       );
 
       // Load questions
       const allQuestions = await base44.entities.QuestionBank.list();
-      const relevantQuestions = allQuestions.filter(q => 
-        q.subject_id === subject && 
-        parseInt(q.unit_level) === parseInt(units) && 
-        q.is_active === true &&
-        q.topic_id
+      const relevantQuestions = allQuestions.filter((q) =>
+      q.subject_id === subject &&
+      parseInt(q.unit_level) === parseInt(units) &&
+      q.is_active === true &&
+      q.topic_id
       );
 
       // Load vocabulary questions if English
       const allVocabQuestions = subject === 'אנגלית' ? await base44.entities.VocabularyQuestion.list() : [];
-      const relevantVocabQuestions = allVocabQuestions.filter(q => 
-        q.subject_id === subject && 
-        parseInt(q.unit_level) === parseInt(units) && 
-        q.is_active === true
+      const relevantVocabQuestions = allVocabQuestions.filter((q) =>
+      q.subject_id === subject &&
+      parseInt(q.unit_level) === parseInt(units) &&
+      q.is_active === true
       );
 
       // Build topics map starting from TopicNew
       const topicsMap = {};
-      
+
       // First, add all custom topics
-      relevantCustomTopics.forEach(topic => {
+      relevantCustomTopics.forEach((topic) => {
         topicsMap[topic.topic_id] = {
           topic_id: topic.topic_id,
           questions: [],
@@ -82,7 +82,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       });
 
       // Then, add questions to existing topics or create new ones
-      relevantQuestions.forEach(q => {
+      relevantQuestions.forEach((q) => {
         const topicId = q.topic_id;
         if (!topicsMap[topicId]) {
           topicsMap[topicId] = {
@@ -97,7 +97,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       });
 
       // Add vocabulary questions to topics
-      relevantVocabQuestions.forEach(q => {
+      relevantVocabQuestions.forEach((q) => {
         const topicId = q.topic_id || 'vocabulary_general';
         if (!topicsMap[topicId]) {
           topicsMap[topicId] = {
@@ -111,9 +111,9 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         topicsMap[topicId].vocabQuestions.push(q);
       });
 
-      const topicsArray = Object.values(topicsMap).map(topic => {
+      const topicsArray = Object.values(topicsMap).map((topic) => {
         const customTopic = topic.customTopic;
-        
+
         let displayName = topic.topic_id;
         let icon = "📚";
         let description = "";
@@ -136,10 +136,10 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         // Store actual count for statistics - include both regular and vocab questions
         const actualCount = topic.questions.length + topic.vocabQuestions.length;
         const isVocabulary = topic.vocabQuestions.length > 0 && topic.questions.length === 0;
-        
+
         // Check if this is Extended Reading by checking first question
-        const hasReadingText = topic.questions[0]?.reading_text && 
-                               topic.questions[0].reading_text.length > 50;
+        const hasReadingText = topic.questions[0]?.reading_text &&
+        topic.questions[0].reading_text.length > 50;
 
         return {
           topic_id: topic.topic_id,
@@ -164,41 +164,41 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
       // טעינה מקבילה של user ו-attempts
       const [user, attempts] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.AttemptNew.list()
-      ]);
-      
-      const relevantAttempts = attempts.filter(a => 
-        a.created_by === user.email && 
-        a.subject_id === subject
+      base44.auth.me(),
+      base44.entities.AttemptNew.list()]
       );
 
-      const topicsWithStats = topicsArray
-        .map(topic => {
-        const topicAttempts = relevantAttempts.filter(a => a.topic_id === topic.topic_id);
+      const relevantAttempts = attempts.filter((a) =>
+      a.created_by === user.email &&
+      a.subject_id === subject
+      );
+
+      const topicsWithStats = topicsArray.
+      map((topic) => {
+        const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
         // Count unique questions answered
-        const uniqueQuestions = new Set(topicAttempts.map(a => a.question_id));
+        const uniqueQuestions = new Set(topicAttempts.map((a) => a.question_id));
         const uniqueAnswered = uniqueQuestions.size;
 
-        const correct = topicAttempts.filter(a => a.status === 'correct').length;
-        const wrong = topicAttempts.filter(a => a.status === 'incorrect').length;
-        const partial = topicAttempts.filter(a => a.status === 'partial').length;
+        const correct = topicAttempts.filter((a) => a.status === 'correct').length;
+        const wrong = topicAttempts.filter((a) => a.status === 'incorrect').length;
+        const partial = topicAttempts.filter((a) => a.status === 'partial').length;
         const total = topicAttempts.length;
 
         // Calculate progress based on unique questions vs total available
         const actualTotal = topic.actualQuestionCount || topic.questionCount;
-        const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round((uniqueAnswered / actualTotal) * 100) : 0;
+        const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round(uniqueAnswered / actualTotal * 100) : 0;
 
         return {
           ...topic,
-          stats: { 
-            correct: correct || 0, 
-            wrong: wrong || 0, 
-            partial: partial || 0, 
-            total: total || 0, 
-            progress: progress || 0, 
-            uniqueAnswered: uniqueAnswered || 0 
+          stats: {
+            correct: correct || 0,
+            wrong: wrong || 0,
+            partial: partial || 0,
+            total: total || 0,
+            progress: progress || 0,
+            uniqueAnswered: uniqueAnswered || 0
           }
         };
       });
@@ -212,7 +212,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       // בדוק אם יש נושא נבחר
       const selectedTopicId = sessionStorage.getItem('selectedTopicId');
       if (selectedTopicId) {
-        const topicIdx = topicsWithStats.findIndex(t => t.topic_id === selectedTopicId);
+        const topicIdx = topicsWithStats.findIndex((t) => t.topic_id === selectedTopicId);
         if (topicIdx !== -1) {
           setCurrentIndex(topicIdx);
           setTimeout(() => {
@@ -237,17 +237,17 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const handleStartPractice = async () => {
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
-    
+
     console.log(`🔍 Starting practice for: ${topic.topic_id}`);
     console.log(`📖 Is Vocabulary: ${topic.isVocabulary}`);
     console.log(`📖 Is Extended Reading: ${topic.isExtendedReading}`);
-    
+
     if (topic.isVocabulary) {
       console.log("→ Navigating to VocabularyPractice");
       navigate(createPageUrl(`VocabularyPractice?topicId=${topicIdParam}`));
       return;
     }
-    
+
     if (topic.isExtendedReading) {
       console.log("→ Navigating to ExtendedReading");
       navigate(createPageUrl(`ExtendedReading?topicid=${topicIdParam}`));
@@ -258,21 +258,21 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   };
 
   const defaultColors = [
-    "from-blue-500 to-blue-600",
-    "from-purple-500 to-purple-600",
-    "from-pink-500 to-pink-600",
-    "from-green-500 to-emerald-600",
-    "from-orange-500 to-orange-600",
-    "from-cyan-500 to-cyan-600"
-  ];
+  "from-blue-500 to-blue-600",
+  "from-purple-500 to-purple-600",
+  "from-pink-500 to-pink-600",
+  "from-green-500 to-emerald-600",
+  "from-orange-500 to-orange-600",
+  "from-cyan-500 to-cyan-600"];
+
 
   if (isLoading) {
     return (
       <div className="bg-indigo-50 rounded-2xl p-8 text-center">
         <Loader2 className="animate-spin h-10 w-10 text-[#3B82F6] mx-auto mb-3" />
         <p className="text-[#6E6E6E] text-[13px] font-semibold">טוען נושאים...</p>
-      </div>
-    );
+      </div>);
+
   }
 
   if (topics.length === 0) {
@@ -281,8 +281,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         <Target className="w-12 h-12 mx-auto mb-3 text-[#3B82F6]" />
         <h3 className="text-[16px] font-bold text-[#2B2B2B] mb-1">אין שאלות זמינות</h3>
         <p className="text-[#6E6E6E] text-[12px]">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
-      </div>
-    );
+      </div>);
+
   }
 
   const currentTopic = topics[currentIndex];
@@ -296,45 +296,45 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className={`bg-gradient-to-br ${currentTopic.color || defaultColors[currentIndex % defaultColors.length]} rounded-xl p-4 text-white mb-3 relative`}>
+            transition={{ duration: 0.3 }}>
+
+            <div className="bg-gradient-to-br text-[#3B82F6] mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
               <div className="text-center">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
-                <h2 className="text-[16px] font-bold mb-0.5">{currentTopic.name}</h2>
-                <p className="text-[10px] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
+                <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
+                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
               </div>
-              {onEditTopic && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditTopic(currentTopic);
-                  }}
-                  className="absolute top-2 left-2 text-white hover:bg-white/20"
-                >
+              {onEditTopic &&
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditTopic(currentTopic);
+                }}
+                className="absolute top-2 left-2 text-white hover:bg-white/20">
+
                   <Edit2 className="w-5 h-5" />
                 </Button>
-              )}
-              {onAddTopic && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    console.log('🟢 Plus button clicked in carousel!');
-                    onAddTopic();
-                  }}
-                  className="absolute top-2 right-2 text-white hover:bg-white/20 z-20"
-                >
+              }
+              {onAddTopic &&
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('🟢 Plus button clicked in carousel!');
+                  onAddTopic();
+                }}
+                className="absolute top-2 right-2 text-white hover:bg-white/20 z-20">
+
                   <Plus className="w-5 h-5" />
                 </Button>
-              )}
+              }
             </div>
 
-            {currentTopic.stats && (
-              <div className="bg-white rounded-xl p-3 mb-3">
+            {currentTopic.stats &&
+            <div className="bg-white rounded-xl p-3 mb-3">
                 <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
                 
                 <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
@@ -344,11 +344,11 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                   <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
                   <div className="h-2 bg-white rounded-full overflow-hidden">
                     <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${currentTopic.stats.progress}%` }}
-                      transition={{ duration: 0.5 }}
-                      className="h-full bg-[#3B82F6] rounded-full"
-                    />
+                    initial={{ width: 0 }}
+                    animate={{ width: `${currentTopic.stats.progress}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full bg-[#3B82F6] rounded-full" />
+
                   </div>
                   <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
                     {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
@@ -370,73 +370,73 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                   </div>
                 </div>
               </div>
-            )}
+            }
 
             <div className="space-y-2">
               <Button
-                onClick={handleStartPractice}
-                className="w-full h-11 text-[13px] font-bold bg-[#3B82F6] hover:bg-blue-700 rounded-[14px]"
-              >
+                onClick={handleStartPractice} className="bg-[#3B82F6] text-[#fafafa] px-4 py-2 font-bold rounded-[14px] \u05E4\u05E8\u05D9\u05DE\u05D9\u05D5\u05DD \u05DE\u05D5\u05EA\u05D0\u05DD \u05D0\u05D9\u05E9\u05D9\u05EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700">
+
+
                 <Play className="w-4 h-4 ml-2" />
                 התחל תרגול
               </Button>
 
-              {isPremium ? (
-                <Button
-                  onClick={() => {
-                    sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                    navigate(createPageUrl("CustomWeakPractice"));
-                  }}
-                  className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
-                >
+              {isPremium ?
+              <Button
+                onClick={() => {
+                  sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
+                  navigate(createPageUrl("CustomWeakPractice"));
+                }}
+                className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
+
                   <Target className="w-4 h-4 ml-2" />
                   תרגול טעויות בנושא זה
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60"
-                >
+                </Button> :
+
+              <Button
+                onClick={() => navigate(createPageUrl("Premium"))}
+                className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white opacity-60">
+
                   <Lock className="w-4 h-4 ml-2" />
                   תרגול טעויות
                 </Button>
-              )}
+              }
             </div>
           </motion.div>
         </AnimatePresence>
 
-        {topics.length > 1 && (
-          <>
+        {topics.length > 1 &&
+        <>
             <button
-              onClick={() => setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1)}
-              className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]"
-            >
+            onClick={() => setCurrentIndex((prev) => prev === 0 ? topics.length - 1 : prev - 1)}
+            className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]">
+
               <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
             </button>
 
             <button
-              onClick={() => setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1)}
-              className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]"
-            >
+            onClick={() => setCurrentIndex((prev) => prev === topics.length - 1 ? 0 : prev + 1)}
+            className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]">
+
               <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
             </button>
           </>
-        )}
+        }
       </div>
 
-      {topics.length > 1 && (
-        <div className="flex justify-center gap-1.5 mt-3">
-          {topics.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentIndex(idx)}
-              className={`h-1.5 rounded-full transition-all ${
-                idx === currentIndex ? 'w-6 bg-[#3B82F6]' : 'w-1.5 bg-gray-300'
-              }`}
-            />
-          ))}
+      {topics.length > 1 &&
+      <div className="flex justify-center gap-1.5 mt-3">
+          {topics.map((_, idx) =>
+        <button
+          key={idx}
+          onClick={() => setCurrentIndex(idx)}
+          className={`h-1.5 rounded-full transition-all ${
+          idx === currentIndex ? 'w-6 bg-[#3B82F6]' : 'w-1.5 bg-gray-300'}`
+          } />
+
+        )}
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
