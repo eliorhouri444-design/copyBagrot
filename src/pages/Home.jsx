@@ -231,34 +231,8 @@ export default function HomePage() {
       </div>
 
       <div className="px-5 space-y-4">
-        {/* המשך מאיפה שהפסקת */}
-        {lastActivity &&
-        <CardSimple delay={0.05}>
-            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
-            <div className="mb-3">
-              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
-              <div className="text-[13px] text-[#6E6E6E]">{lastActivity.type === 'practice' ? 'תרגול נושא' : 'בגרות'}</div>
-            </div>
-
-            <Button
-            onClick={() => {
-              if (lastActivity.type === 'practice') {
-                navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
-              } else {
-                sessionStorage.setItem('currentExamId', lastActivity.examId);
-                navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
-              }
-            }}
-            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
-
-              <PlayCircle className="w-5 h-5 ml-2" />
-              המשך
-            </Button>
-          </CardSimple>
-        }
-
         {/* מה המצב שלך */}
-        <CardSimple delay={0.1}>
+        <CardSimple delay={0.05}>
           <CardTitle>מה המצב שלך</CardTitle>
           
           <div className="grid grid-cols-3 gap-3 mb-3">
@@ -298,7 +272,33 @@ export default function HomePage() {
           }
         </CardSimple>
 
-        {/* משימות היום + נושאים ושאלונים מומלצים - דינמי */}
+        {/* המשך מאיפה שהפסקת */}
+        {lastActivity &&
+        <CardSimple delay={0.1}>
+            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
+            <div className="mb-3">
+              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
+              <div className="text-[13px] text-[#6E6E6E]">{lastActivity.type === 'practice' ? 'תרגול נושא' : 'בגרות'}</div>
+            </div>
+
+            <Button
+            onClick={() => {
+              if (lastActivity.type === 'practice') {
+                navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
+              } else {
+                sessionStorage.setItem('currentExamId', lastActivity.examId);
+                navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
+              }
+            }}
+            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
+
+              <PlayCircle className="w-5 h-5 ml-2" />
+              המשך
+            </Button>
+          </CardSimple>
+        }
+
+        {/* נושאים ושאלונים + משימות היום */}
         <DailyPlanCard
           readinessData={readinessData}
           topics={topics}
