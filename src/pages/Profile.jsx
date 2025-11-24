@@ -20,8 +20,8 @@ import {
   MessageSquare,
   CheckCircle,
   AlertTriangle,
-  ChevronDown
-} from "lucide-react";
+  ChevronDown } from
+"lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -31,15 +31,15 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  DialogFooter } from
+"@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SelectValue } from
+"@/components/ui/select";
 import { differenceInDays } from "date-fns";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -58,18 +58,18 @@ export default function ProfilePage() {
   const [showDetailsView, setShowDetailsView] = useState(false);
 
   const subjects = [
-    "מתמטיקה", "פיזיקה", "ביולוגיה", "היסטוריה",
-    "אזרחות", "ספרות", "לשון", "אנגלית", "ערבית"
-  ];
+  "מתמטיקה", "פיזיקה", "ביולוגיה", "היסטוריה",
+  "אזרחות", "ספרות", "לשון", "אנגלית", "ערבית"];
+
 
   const cancelReasons = [
-    "יקר מדי",
-    "לא משתמש מספיק",
-    "מצאתי אפליקציה אחרת",
-    "סיימתי את הבגרות",
-    "הבעיות הטכניות",
-    "אחר"
-  ];
+  "יקר מדי",
+  "לא משתמש מספיק",
+  "מצאתי אפליקציה אחרת",
+  "סיימתי את הבגרות",
+  "הבעיות הטכניות",
+  "אחר"];
+
 
   const displaySubject = user?.selected_subject || "אנגלית";
   const displayUnits = parseInt(user?.selected_units || 3);
@@ -78,7 +78,7 @@ export default function ProfilePage() {
     queryKey: ['practice-attempts-profile', user?.email],
     queryFn: async () => {
       const attempts = await base44.entities.AttemptNew.list("-created_date", 1000);
-      return attempts.filter(a => a.created_by === user.email);
+      return attempts.filter((a) => a.created_by === user.email);
     },
     enabled: !!user?.email,
     initialData: []
@@ -88,7 +88,7 @@ export default function ProfilePage() {
     queryKey: ['exam-attempts-profile', user?.email],
     queryFn: async () => {
       const attempts = await base44.entities.ExamAttempt.list("-created_date", 100);
-      return attempts.filter(a => a.created_by === user.email);
+      return attempts.filter((a) => a.created_by === user.email);
     },
     enabled: !!user?.email,
     initialData: []
@@ -98,7 +98,7 @@ export default function ProfilePage() {
     queryKey: ['topics-profile', displaySubject, displayUnits],
     queryFn: async () => {
       const topics = await base44.entities.TopicNew.list();
-      return topics.filter(t => t.subject_id === displaySubject && t.unit_level === displayUnits && t.is_active);
+      return topics.filter((t) => t.subject_id === displaySubject && t.unit_level === displayUnits && t.is_active);
     },
     enabled: !!user,
     initialData: []
@@ -140,7 +140,7 @@ export default function ProfilePage() {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      const dayAttempts = practiceAttempts.filter(a => a.created_date?.startsWith(dateStr));
+      const dayAttempts = practiceAttempts.filter((a) => a.created_date?.startsWith(dateStr));
       last7Days.push({
         day: date.toLocaleDateString('he-IL', { weekday: 'short' }),
         minutes: dayAttempts.length * 2
@@ -152,10 +152,10 @@ export default function ProfilePage() {
   const dailyTasks = useMemo(() => {
     if (!readinessData) return [];
     return [
-      { id: "practice", title: `לפתור ${readinessData.daily.questions} שאלות` },
-      { id: "learn", title: `ללמוד ${readinessData.daily.topics} נושאים` },
-      { id: "review", title: `לחזור על ${readinessData.daily.reviewMistakes} טעויות` }
-    ];
+    { id: "practice", title: `לפתור ${readinessData.daily.questions} שאלות` },
+    { id: "learn", title: `ללמוד ${readinessData.daily.topics} נושאים` },
+    { id: "review", title: `לחזור על ${readinessData.daily.reviewMistakes} טעויות` }];
+
   }, [readinessData]);
 
   const achievements = useMemo(() => {
@@ -165,9 +165,9 @@ export default function ProfilePage() {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        const hasActivity = practiceAttempts.some(a => a.created_date?.startsWith(dateStr));
-        if (hasActivity) streak++;
-        else if (i > 0) break;
+        const hasActivity = practiceAttempts.some((a) => a.created_date?.startsWith(dateStr));
+        if (hasActivity) streak++;else
+        if (i > 0) break;
       }
       return streak;
     })();
@@ -175,7 +175,7 @@ export default function ProfilePage() {
     const improvements = [];
     if (streakDays >= 3) improvements.push({ icon: "🔥", text: `${streakDays} ימים רצופים` });
     if (practiceAttempts.length >= 100) improvements.push({ icon: "💯", text: "100 שאלות נענו" });
-    if (examAttempts.some(e => e.is_completed)) improvements.push({ icon: "🎓", text: "בגרות ראשונה" });
+    if (examAttempts.some((e) => e.is_completed)) improvements.push({ icon: "🎓", text: "בגרות ראשונה" });
 
     return improvements;
   }, [practiceAttempts, examAttempts]);
@@ -183,13 +183,13 @@ export default function ProfilePage() {
   const recentMistakes = useMemo(() => {
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 7);
-    
-    const weekMistakes = practiceAttempts.filter(a => 
-      a.status === "incorrect" && new Date(a.created_date) >= last7Days
+
+    const weekMistakes = practiceAttempts.filter((a) =>
+    a.status === "incorrect" && new Date(a.created_date) >= last7Days
     );
 
     const topicCounts = {};
-    weekMistakes.forEach(mistake => {
+    weekMistakes.forEach((mistake) => {
       const topic = mistake.topic_id || 'unknown';
       topicCounts[topic] = (topicCounts[topic] || 0) + 1;
     });
@@ -253,7 +253,7 @@ export default function ProfilePage() {
 
   const toggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
-      setCompletedTasks(completedTasks.filter(t => t !== taskId));
+      setCompletedTasks(completedTasks.filter((t) => t !== taskId));
     } else {
       setCompletedTasks([...completedTasks, taskId]);
     }
@@ -263,13 +263,13 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_40px_4px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
@@ -281,19 +281,19 @@ export default function ProfilePage() {
 
       <div className="px-5 space-y-6">
         {/* המנוי שלי */}
-        {user?.is_premium ? (
-          <CardSimple delay={0.05}>
+        {user?.is_premium ?
+        <CardSimple delay={0.05}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Crown className="w-5 h-5 text-[#3B82F6]" />
                 <h3 className="text-base font-bold text-[#2B2B2B]">המנוי שלי</h3>
               </div>
               <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowSubscriptionDialog(true)}
-                className="h-8 text-[12px] text-[#3B82F6] hover:bg-[#E9F0FF]"
-              >
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowSubscriptionDialog(true)}
+              className="h-8 text-[12px] text-[#3B82F6] hover:bg-[#E9F0FF]">
+
                 נהל
               </Button>
             </div>
@@ -312,27 +312,27 @@ export default function ProfilePage() {
                 <div className="text-[13px] text-[#6E6E6E]">גישה מלאה לכל התכונות</div>
               </div>
             </div>
-          </CardSimple>
-        ) : (
-          <CardSimple delay={0.05}>
+          </CardSimple> :
+
+        <CardSimple delay={0.05}>
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-[#3B82F6]" />
               <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
             </div>
             <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
             <Button
-              onClick={() => navigate(createPageUrl("Premium"))}
-              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
-            >
+            onClick={() => navigate(createPageUrl("Premium"))}
+            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
+
               <Crown className="w-4 h-4 ml-2" />
               שדרג עכשיו
             </Button>
           </CardSimple>
-        )}
+        }
 
         {/* הדרך שלך לבגרות */}
-        {readinessData && (
-          <CardSimple delay={0.05}>
+        {readinessData &&
+        <CardSimple delay={0.05}>
             <CardTitle>הדרך שלך לבגרות</CardTitle>
             
             <div className="grid grid-cols-3 gap-3 mb-3">
@@ -342,16 +342,16 @@ export default function ProfilePage() {
             </div>
 
             <Button
-              onClick={() => setShowDetailsView(!showDetailsView)}
-              variant="outline"
-              className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
-            >
+            onClick={() => setShowDetailsView(!showDetailsView)}
+            variant="outline"
+            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]">
+
               {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
               <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-180' : ''}`} />
             </Button>
 
-            {showDetailsView && (
-              <div className="space-y-2 mt-3">
+            {showDetailsView &&
+          <div className="space-y-2 mt-3">
                 <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="flex items-center justify-between">
                     <span className="text-[15px] font-semibold text-[#2B2B2B]">שליטה בחומר</span>
@@ -380,32 +380,10 @@ export default function ProfilePage() {
                   </div>
                   <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
                 </div>
-
-                {/* פעולות מותאמות */}
-                <div className="pt-3 border-t border-[#E9F0FF] mt-3">
-                  <div className="text-[13px] font-bold text-[#2B2B2B] mb-2">פעולות מומלצות</div>
-                  <div className="space-y-2">
-                    <Button
-                      onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                      className="w-full h-11 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2"
-                    >
-                      <Target className="w-4 h-4" />
-                      בגרות על טעויות
-                    </Button>
-                    <Button
-                      onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
-                      variant="outline"
-                      className="w-full h-11 border-2 border-[#E9F0FF] text-[#3B82F6] font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2 hover:bg-[#F5F8FF]"
-                    >
-                      <BookOpen className="w-4 h-4" />
-                      תרגול נושאים לחיזוק
-                    </Button>
-                  </div>
-                </div>
               </div>
-            )}
+          }
           </CardSimple>
-        )}
+        }
 
         {/* הגדרות */}
         <CardSimple delay={0.4}>
@@ -415,17 +393,8 @@ export default function ProfilePage() {
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={() => navigate(createPageUrl("Settings"))}
-            >
-              <Settings className="w-5 h-5 ml-3" />
-              כל ההגדרות
-            </Button>
+              onClick={() => setIsEditing(true)}>
 
-            <Button
-              variant="outline"
-              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={() => setIsEditing(true)}
-            >
               <Edit className="w-5 h-5 ml-3" />
               ערוך פרטים
             </Button>
@@ -433,8 +402,8 @@ export default function ProfilePage() {
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={handleLogout}
-            >
+              onClick={handleLogout}>
+
               <LogOut className="w-5 h-5 ml-3" />
               התנתק
             </Button>
@@ -460,7 +429,7 @@ export default function ProfilePage() {
               <Select value={editData.selected_subject} onValueChange={(value) => setEditData({ ...editData, selected_subject: value })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent dir="rtl">
-                  {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  {subjects.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -512,13 +481,13 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {user?.subscription_type === 'monthly' && (
-              <Button onClick={() => navigate(createPageUrl("Premium"))} className="w-full bg-[#F59E0B] rounded-[14px]">
+            {user?.subscription_type === 'monthly' &&
+            <Button onClick={() => navigate(createPageUrl("Premium"))} className="w-full bg-[#F59E0B] rounded-[14px]">
                 שדרג למנוי שנתי וחסוך 50%
               </Button>
-            )}
+            }
 
-            <Button variant="outline" className="w-full text-red-600 hover:bg-red-50 rounded-[14px]" onClick={() => { setShowSubscriptionDialog(false); setShowCancelDialog(true); }}>
+            <Button variant="outline" className="w-full text-red-600 hover:bg-red-50 rounded-[14px]" onClick={() => {setShowSubscriptionDialog(false);setShowCancelDialog(true);}}>
               ביטול מנוי
             </Button>
           </div>
@@ -537,7 +506,7 @@ export default function ProfilePage() {
             <Select value={cancelReason} onValueChange={setCancelReason}>
               <SelectTrigger><SelectValue placeholder="בחר סיבה..." /></SelectTrigger>
               <SelectContent dir="rtl">
-                {cancelReasons.map(reason => <SelectItem key={reason} value={reason}>{reason}</SelectItem>)}
+                {cancelReasons.map((reason) => <SelectItem key={reason} value={reason}>{reason}</SelectItem>)}
               </SelectContent>
             </Select>
 
@@ -552,6 +521,6 @@ export default function ProfilePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
