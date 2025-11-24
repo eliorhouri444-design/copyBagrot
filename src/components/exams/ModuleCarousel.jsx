@@ -18,6 +18,18 @@ export default function ModuleCarousel({
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  useEffect(() => {
+    // בדוק אם יש שאלון שנבחר
+    const selectedModuleId = sessionStorage.getItem('selectedModuleId');
+    if (selectedModuleId && modules.length > 0) {
+      const moduleIdx = modules.findIndex(m => m.id === selectedModuleId);
+      if (moduleIdx !== -1) {
+        setCurrentIndex(moduleIdx);
+      }
+      sessionStorage.removeItem('selectedModuleId');
+    }
+  }, [modules]);
+
   const handlePrevious = () => {
     setCurrentIndex((prev) => prev === 0 ? modules.length - 1 : prev - 1);
   };

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
+import WhatToStudyCard from "@/components/home/WhatToStudyCard";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [showDetails, setShowDetails] = useState(false);
+  const [modules, setModules] = useState([]);
 
   useEffect(() => {
     loadAllData();
@@ -36,10 +38,11 @@ export default function HomePage() {
       const subject = currentUser.selected_subject || 'אנגלית';
       const units = parseInt(currentUser.selected_units || 3);
 
-      const [allTopics, allAttempts, allExamAttempts] = await Promise.all([
+      const [allTopics, allAttempts, allExamAttempts, allModules] = await Promise.all([
         base44.entities.TopicNew.list(),
         base44.entities.AttemptNew.list("-created_date", 2000),
-        base44.entities.ExamAttempt.list("-created_date", 100)
+        base44.entities.ExamAttempt.list("-created_date", 100),
+        base44.entities.ModuleDefinition.list()
       ]);
 
       const relevantTopics = allTopics.filter(
@@ -58,6 +61,11 @@ export default function HomePage() {
         e => e.subject === subject && parseInt(e.unit_level) === units
       );
       setExamAttempts(userExamAttempts);
+
+      const relevantModules = allModules.filter(
+        m => m.subject === subject && parseInt(m.unit_level) === units
+      );
+      setModules(relevantModules);
 
     } catch (error) {
       console.error("Error loading data:", error);
@@ -161,48 +169,15 @@ export default function HomePage() {
           )}
         </CardSimple>
 
-        {/* מה לעשות היום */}
-        {dailyTasks.length > 0 && (
-          <CardSimple delay={0.1}>
-            <CardTitle>מה לעשות היום</CardTitle>
-            
-            <div className="space-y-2 mb-4">
-              {dailyTasks.map(task => (
-                <div
-                  key={task.id}
-                  onClick={() => toggleTask(task.id)}
-                  className={`p-3 rounded-lg cursor-pointer transition-all border ${
-                    completedTasks.includes(task.id)
-                      ? 'bg-green-50 border-green-300' 
-                      : 'bg-white border-[#E9F0FF]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      completedTasks.includes(task.id)
-                        ? 'bg-green-500 border-green-500' 
-                        : 'bg-white border-[#1E4BA1]'
-                    }`}>
-                      {completedTasks.includes(task.id) && <CheckCircle className="w-3 h-3 text-white" />}
-                    </div>
-                    <span className={`text-[15px] font-semibold ${
-                      completedTasks.includes(task.id) ? 'text-green-800 line-through' : 'text-[#2B2B2B]'
-                    }`}>
-                      {task.title}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => navigate(createPageUrl("Practice"))}
-              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
-            >
-              התחל עכשיו
-            </Button>
-          </CardSimple>
-        )}
+        {/* מה ללמוד כדאי להצליח */}
+        <WhatToStudyCard
+          topics={topics}
+          modules={modules}
+          practiceAttempts={practiceAttempts}
+          examAttempts={examAttempts}
+          subject={user?.selected_subject}
+          units={user?.selected_units}
+        />
 
         {/* המשך מאיפה שהפסקת */}
         {lastActivity && (
