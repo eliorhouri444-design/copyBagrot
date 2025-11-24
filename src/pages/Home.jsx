@@ -308,14 +308,6 @@ export default function HomePage() {
             </Button>
           </CardSimple>
         }
-          readinessData={readinessData}
-          topics={topics}
-          modules={modules}
-          practiceAttempts={practiceAttempts}
-          examAttempts={examAttempts}
-          isPremium={user?.is_premium}
-          completedTasks={completedTasks}
-          onToggleTask={toggleTask} />
 
       </div>
     </div>);
