@@ -280,6 +280,56 @@ export default function ProfilePage() {
       </div>
 
       <div className="px-5 space-y-6">
+        {/* המנוי שלי */}
+        {user?.is_premium ? (
+          <CardSimple delay={0.05}>
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 mb-3 border-2 border-amber-300">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-600" />
+                  <h3 className="text-[16px] font-bold text-amber-900">המנוי שלי</h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowSubscriptionDialog(true)}
+                  className="h-8 text-[12px] text-amber-700 hover:bg-amber-200"
+                >
+                  נהל
+                </Button>
+              </div>
+              <p className="text-[13px] text-amber-800">
+                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <div className="font-bold text-[15px] text-green-900">מנוי פעיל</div>
+                <div className="text-[13px] text-green-700">גישה מלאה לכל התכונות</div>
+              </div>
+            </div>
+          </CardSimple>
+        ) : (
+          <CardSimple delay={0.05}>
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 border-2 border-amber-300 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-2" />
+              <h3 className="text-[16px] font-bold text-amber-900 mb-1">שדרג לפרימיום</h3>
+              <p className="text-[13px] text-amber-800 mb-3">גישה בלתי מוגבלת לכל התכונות</p>
+              <Button
+                onClick={() => navigate(createPageUrl("Premium"))}
+                className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-[14px] text-[13px]"
+              >
+                <Crown className="w-4 h-4 ml-2" />
+                שדרג עכשיו
+              </Button>
+            </div>
+          </CardSimple>
+        )}
+
         {/* הדרך שלך לבגרות */}
         {readinessData && (
           <CardSimple delay={0.05}>

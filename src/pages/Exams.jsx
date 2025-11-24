@@ -766,30 +766,18 @@ export default function ExamsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-4">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-3xl p-6 shadow-xl mb-6 relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
-
-        <div className="relative z-10">
-          <button
-            onClick={() => navigate(createPageUrl("SubjectSelection"))}
-            className="flex items-center gap-3 hover:bg-white/10 rounded-2xl p-3 transition-colors w-full"
-          >
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg flex-shrink-0">
-              <FileCheck className="w-8 h-8 text-white" />
-            </div>
-            <div className="text-right flex-1">
-              <h1 className="text-3xl font-bold text-white">בגרויות {displaySubject}</h1>
-              <p className="text-base text-white/90">{displayUnits} יחידות</p>
-            </div>
-          </button>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+        <button
+          onClick={() => navigate(createPageUrl("SubjectSelection"))}
+          className="text-right flex-1 hover:opacity-90 transition-opacity"
+        >
+          <h1 className="text-[16px] font-bold text-white">בגרויות {displaySubject}</h1>
+          <p className="text-[11px] text-white/70">{displayUnits} יחידות</p>
+        </button>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <FileCheck className="w-5 h-5 text-white" />
         </div>
-      </motion.div>
+      </div>
 
       <div className="px-6 space-y-6 pb-6">
 
