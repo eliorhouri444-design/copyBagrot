@@ -400,38 +400,45 @@ export default function StatisticsPage() {
             </div>
           </CardSimple>
 
-          {/* 6. מפת דרך לציון המטרה */}
+          {/* 6. מפת דרך לציון המטרה - פרימיום בלבד */}
           {readinessData && (
-            <CardSimple delay={0.3}>
-              <CardTitle icon={Award}>מפת דרך ל-{user?.target_score || 85}</CardTitle>
-              
-              <div className="space-y-2">
-                <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
-                  <span className="text-[13px] font-semibold text-[#2B2B2B]">שאלות החודש</span>
-                  <span className="text-2xl font-black text-amber-600">
-                    {readinessData.daily.questions * 30}
-                  </span>
+            user?.is_premium ? (
+              <CardSimple delay={0.3}>
+                <CardTitle icon={Award}>מפת דרך ל-{user?.target_score || 85}</CardTitle>
+                
+                <div className="space-y-2">
+                  <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
+                    <span className="text-[13px] font-semibold text-[#2B2B2B]">שאלות החודש</span>
+                    <span className="text-2xl font-black text-amber-600">
+                      {readinessData.daily.questions * 30}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
+                    <span className="text-[13px] font-semibold text-[#2B2B2B]">בגרויות החודש</span>
+                    <span className="text-2xl font-black text-amber-600">
+                      {readinessData.daily.examsPerWeek * 4}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
+                    <span className="text-[13px] font-semibold text-[#2B2B2B]">נושאים לחזק</span>
+                    <span className="text-2xl font-black text-amber-600">
+                      {readinessData.remaining.weakTopics}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
+                    <span className="text-[13px] font-semibold text-[#2B2B2B]">יעד טעויות</span>
+                    <span className="text-2xl font-black text-amber-600">
+                      {readinessData.targets.requirements.errorRate}%
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
-                  <span className="text-[13px] font-semibold text-[#2B2B2B]">בגרויות החודש</span>
-                  <span className="text-2xl font-black text-amber-600">
-                    {readinessData.daily.examsPerWeek * 4}
-                  </span>
-                </div>
-                <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
-                  <span className="text-[13px] font-semibold text-[#2B2B2B]">נושאים לחזק</span>
-                  <span className="text-2xl font-black text-amber-600">
-                    {readinessData.remaining.weakTopics}
-                  </span>
-                </div>
-                <div className="bg-white rounded-lg p-3 flex items-center justify-between border border-[#E9F0FF]">
-                  <span className="text-[13px] font-semibold text-[#2B2B2B]">יעד טעויות</span>
-                  <span className="text-2xl font-black text-amber-600">
-                    {readinessData.targets.requirements.errorRate}%
-                  </span>
-                </div>
-              </div>
-            </CardSimple>
+              </CardSimple>
+            ) : (
+              <LockedFeatureCard
+                title="מפת דרך לציון המטרה"
+                description="שדרג לפרימיום כדי לראות בדיוק כמה שאלות ובגרויות צריך להגיע ל-85."
+              />
+            )
           )}
 
           {/* 7. תובנות AI חודשיות */}
