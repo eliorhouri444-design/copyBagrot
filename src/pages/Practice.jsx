@@ -408,7 +408,7 @@ export default function PracticePage() {
                     שדרג לפרימיום
                   </Button>
                 </div>
-              }
+              )}
             </div>
           </div>
         </motion.div>
