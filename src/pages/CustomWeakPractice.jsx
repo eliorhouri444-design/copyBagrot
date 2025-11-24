@@ -56,8 +56,6 @@ export default function CustomWeakPracticePage() {
       console.log('📊 User email:', currentUser.email);
       console.log('📊 Selected subject:', currentUser.selected_subject);
       console.log('📊 Selected units:', currentUser.selected_units);
-      console.log('📊 Specific topic ID:', specificTopicId);
-      console.log('📊 Specific session ID:', specificSessionId);
       
       let wrongAttempts = attempts.filter(a => 
         a.created_by === currentUser.email && 
@@ -71,16 +69,43 @@ export default function CustomWeakPracticePage() {
         wrongAttempts = wrongAttempts.filter(a => a.topic_id === specificTopicId);
       }
       
-      console.log('❌ Wrong attempts filtered:', wrongAttempts.length);
+      console.log('❌ Wrong practice attempts:', wrongAttempts.length);
 
-      console.log('Found wrong attempts:', wrongAttempts.length);
+      // ALSO get wrong answers from EXAMS
+      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
+      const userExamAttempts = examAttempts.filter(e => 
+        e.created_by === currentUser.email && 
+        e.is_completed
+      );
+      
+      // Extract wrong questions from exam answers
+      const examWrongQuestions = [];
+      userExamAttempts.forEach(exam => {
+        if (exam.answers && Array.isArray(exam.answers)) {
+          exam.answers.forEach((ans, idx) => {
+            if (ans.is_correct === false || ans.score < 50) {
+              examWrongQuestions.push({
+                question_number: idx + 1,
+                question_text: ans.question_text || `שאלה ${idx + 1}`,
+                correct_answer: ans.correct_answer || '',
+                user_answer: ans.user_answer || '',
+                exam_id: exam.id,
+                exam_title: exam.exam_title || 'מבחן',
+                source: 'exam'
+              });
+            }
+          });
+        }
+      });
+      
+      console.log('❌ Wrong exam questions:', examWrongQuestions.length);
 
-      // Collect unique question IDs
+      // Collect unique question IDs from practice
       const wrongQuestionIds = [...new Set(wrongAttempts.map(a => a.question_id))];
       
-      // Fetch the actual questions
+      // Fetch the actual questions from QuestionBank
       const allQuestions = await base44.entities.QuestionBank.list();
-      const weakQuestions = allQuestions.filter(q => 
+      const weakQuestionsFromBank = allQuestions.filter(q => 
         wrongQuestionIds.includes(q.question_id) &&
         q.subject_id === currentUser.selected_subject &&
         parseInt(q.unit_level) === parseInt(currentUser.selected_units) &&
@@ -91,12 +116,29 @@ export default function CustomWeakPracticePage() {
         ...q,
         _metadata: {
           failures: wrongAttempts.filter(a => a.question_id === q.question_id).length,
-          lastScore: wrongAttempts.find(a => a.question_id === q.question_id)?.percentage || 0
+          lastScore: wrongAttempts.find(a => a.question_id === q.question_id)?.percentage || 0,
+          source: 'practice'
         }
       }));
 
+      // Convert exam wrong questions to same format
+      const weakQuestionsFromExams = examWrongQuestions.map((q, idx) => ({
+        question_id: `exam_${q.exam_id}_${q.question_number}`,
+        question_text: q.question_text,
+        correct_answer: q.correct_answer,
+        _metadata: {
+          failures: 1,
+          lastScore: 0,
+          source: 'exam',
+          exam_title: q.exam_title
+        }
+      }));
+
+      // Combine both sources
+      const allWeakQuestions = [...weakQuestionsFromBank, ...weakQuestionsFromExams];
+
       // Sort by most failures
-      const sortedQuestions = weakQuestions.sort((a, b) => 
+      const sortedQuestions = allWeakQuestions.sort((a, b) => 
         (b._metadata?.failures || 0) - (a._metadata?.failures || 0)
       ).slice(0, 20);
 
