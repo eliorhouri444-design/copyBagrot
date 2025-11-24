@@ -403,25 +403,7 @@ export default function ProfilePage() {
           </div>
         </CardSimple>
 
-        {/* 4. מידע על התוכנית האישית */}
-        {user?.exam_date && (
-          <CardSimple delay={0.2}>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="text-[13px] text-[#2B2B2B] leading-relaxed text-center">
-                אתה לומד לפי תוכנית מותאמת לציון <span className="font-bold text-blue-600">{user?.target_score || 85}</span> ומועד עוד <span className="font-bold text-blue-600">{timeUntilExam !== null ? timeUntilExam : '—'} ימים</span>
-              </div>
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-                className="w-full h-9 text-[12px] rounded-[14px] border-2 border-blue-200 text-blue-600 mt-3"
-              >
-                שנה תוכנית
-              </Button>
-            </div>
-          </CardSimple>
-        )}
-
-        {/* 5. הגדרות חשבון */}
+        {/* 4. הגדרות חשבון */}
         <CardSimple delay={0.25}>
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
 
