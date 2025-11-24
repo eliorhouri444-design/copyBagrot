@@ -269,7 +269,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_40px_4px] from-blue-500 to-indigo-500 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_8px_8px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
@@ -380,28 +380,6 @@ export default function ProfilePage() {
                   </div>
                   <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
                 </div>
-
-                {/* פעולות מותאמות */}
-                <div className="pt-3 border-t border-[#E9F0FF] mt-3">
-                  <div className="text-[13px] font-bold text-[#2B2B2B] mb-2">פעולות מומלצות</div>
-                  <div className="space-y-2">
-                    <Button
-                      onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                      className="w-full h-11 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2"
-                    >
-                      <Target className="w-4 h-4" />
-                      בגרות על טעויות
-                    </Button>
-                    <Button
-                      onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
-                      variant="outline"
-                      className="w-full h-11 border-2 border-[#E9F0FF] text-[#3B82F6] font-bold rounded-[14px] text-[13px] flex items-center justify-center gap-2 hover:bg-[#F5F8FF]"
-                    >
-                      <BookOpen className="w-4 h-4" />
-                      תרגול נושאים לחיזוק
-                    </Button>
-                  </div>
-                </div>
               </div>
           }
           </CardSimple>
@@ -412,15 +390,6 @@ export default function ProfilePage() {
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
 
           <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={() => navigate(createPageUrl("Settings"))}>
-
-              <Settings className="w-5 h-5 ml-3" />
-              כל ההגדרות
-            </Button>
-
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
