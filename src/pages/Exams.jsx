@@ -829,11 +829,11 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="bg-[#3B82F6] p-4 rounded-2xl">
-
+          transition={{ delay: 0.25 }}
+          className="bg-indigo-50 rounded-2xl p-4">
 
           <div className="flex items-center gap-2 mb-3">
-            <CheckCircle className="w-5 h-5 text-[#3B82F6]" />
+            <Target className="w-5 h-5 text-[#3B82F6]" />
             <div className="flex-1 text-right">
               <h3 className="text-base font-bold text-[#2B2B2B]">בגרויות אחרונות</h3>
             </div>
