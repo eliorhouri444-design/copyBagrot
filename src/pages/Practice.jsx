@@ -260,7 +260,7 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 pt-0">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 from-blue-600 to-indigo-600 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity">
