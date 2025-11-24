@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import WhatToStudyCard from "@/components/home/WhatToStudyCard";
+import { motion } from "framer-motion";
 
 export default function HomePage() {
   const navigate = useNavigate();
