@@ -288,7 +288,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const currentTopic = topics[currentIndex];
 
   return (
-    <div className="bg-indigo-50 rounded-2xl p-4">
+    <div className="bg-[#ffffff] p-4 rounded-2xl">
       <div className="relative">
         <AnimatePresence mode="wait">
           <motion.div
