@@ -3,11 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity, BarChart3, Calendar, Flame, Star, ChevronLeft, Crown } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Award, AlertCircle, BookOpen, FileCheck, ArrowLeft, Zap, Brain, Clock, CheckCircle, XCircle, Activity, BarChart3, Calendar, Flame, Star, ChevronLeft, Crown, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, RadialBarChart, RadialBar, Legend } from "recharts";
+import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 
 export default function StatisticsPage() {
   const navigate = useNavigate();
@@ -88,6 +89,8 @@ export default function StatisticsPage() {
     enabled: isUserLoaded,
     initialData: []
   });
+
+  const readinessData = useReadinessCalculator(user, allTopics, practiceAttempts, examAttempts);
 
   const statistics = useMemo(() => {
     const totalPractice = practiceAttempts.length;
@@ -391,204 +394,328 @@ export default function StatisticsPage() {
         </div>
       ) : (
         <div className="px-6 space-y-6 pb-6">
-          {/* Predicted Score Card */}
+          {/* 1️⃣ מדד מוכנות לבגרות (Ready Score) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white overflow-hidden relative"
+            className="bg-white rounded-3xl shadow-xl overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <Brain className="w-7 h-7" />
-                <h3 className="text-xl font-bold">חיזוי הציון שלך</h3>
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Target className="w-7 h-7" />
+                  <h3 className="text-2xl font-bold">מוכנות לבגרות</h3>
+                </div>
+                <div className="text-right text-sm">
+                  <div>המטרה: {user?.target_score || 85}+</div>
+                  <div>{readinessData?.timeline.daysUntilExam || 90} ימים לבגרות</div>
+                </div>
               </div>
               
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5 mb-4">
-                <div className="text-center">
-                  <div className="text-7xl font-black mb-2">{predictedScore.score}</div>
-                  <div className="text-sm opacity-90 mb-3">ציון צפוי בבגרות</div>
-                  <div className="flex items-center justify-center gap-2 text-sm">
-                    <Target className="w-4 h-4" />
-                    <span>רמת ביטחון: {predictedScore.confidence}%</span>
-                  </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-5">
+                <div className="text-center mb-4">
+                  <div className="text-6xl font-black mb-2">{readinessData?.scores.overall || 0}%</div>
+                  <div className="text-sm opacity-90">Ready Score</div>
                 </div>
+                <Progress value={readinessData?.scores.overall || 0} className="h-3 bg-white/30" />
+              </div>
+            </div>
+
+            <div className="p-6 grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <ResponsiveContainer width="100%" height={100}>
+                  <RadialBarChart 
+                    innerRadius="60%" 
+                    outerRadius="100%" 
+                    data={[{ value: readinessData?.scores.mastery || 0, fill: "#3B82F6" }]}
+                    startAngle={90} 
+                    endAngle={-270}
+                  >
+                    <RadialBar dataKey="value" cornerRadius={10} />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
+                      {readinessData?.scores.mastery || 0}%
+                    </text>
+                  </RadialBarChart>
+                </ResponsiveContainer>
+                <div className="text-sm font-semibold text-gray-700 mt-1">📘 שליטה בחומר</div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-3">
-                <p className="text-base font-semibold mb-2">{predictedScore.message}</p>
-                <p className="text-sm opacity-90">{predictedScore.recommendation}</p>
+              <div className="text-center">
+                <ResponsiveContainer width="100%" height={100}>
+                  <RadialBarChart 
+                    innerRadius="60%" 
+                    outerRadius="100%" 
+                    data={[{ value: readinessData?.scores.practice || 0, fill: "#8B5CF6" }]}
+                    startAngle={90} 
+                    endAngle={-270}
+                  >
+                    <RadialBar dataKey="value" cornerRadius={10} />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
+                      {readinessData?.scores.practice || 0}%
+                    </text>
+                  </RadialBarChart>
+                </ResponsiveContainer>
+                <div className="text-sm font-semibold text-gray-700 mt-1">📝 תרגול</div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold">{statistics.totalExams}</div>
-                  <div className="text-xs opacity-90">בגרויות נבדקו</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold">{statistics.totalPractice}</div>
-                  <div className="text-xs opacity-90">תרגולים בוצעו</div>
-                </div>
+              <div className="text-center">
+                <ResponsiveContainer width="100%" height={100}>
+                  <RadialBarChart 
+                    innerRadius="60%" 
+                    outerRadius="100%" 
+                    data={[{ value: readinessData?.scores.exams || 0, fill: "#10B981" }]}
+                    startAngle={90} 
+                    endAngle={-270}
+                  >
+                    <RadialBar dataKey="value" cornerRadius={10} />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
+                      {readinessData?.scores.exams || 0}%
+                    </text>
+                  </RadialBarChart>
+                </ResponsiveContainer>
+                <div className="text-sm font-semibold text-gray-700 mt-1">🎓 בגרויות מלאות</div>
+              </div>
+
+              <div className="text-center">
+                <ResponsiveContainer width="100%" height={100}>
+                  <RadialBarChart 
+                    innerRadius="60%" 
+                    outerRadius="100%" 
+                    data={[{ value: readinessData?.scores.speed || 0, fill: "#F59E0B" }]}
+                    startAngle={90} 
+                    endAngle={-270}
+                  >
+                    <RadialBar dataKey="value" cornerRadius={10} />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
+                      {readinessData?.scores.speed || 0}%
+                    </text>
+                  </RadialBarChart>
+                </ResponsiveContainer>
+                <div className="text-sm font-semibold text-gray-700 mt-1">⚡ מהירות פתרון</div>
               </div>
             </div>
           </motion.div>
 
-          {/* Quick Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="grid grid-cols-2 gap-3"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-600">דיוק תרגולים</div>
-                  <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.practiceAccuracy)}%</div>
-                </div>
-              </div>
-              <Progress value={statistics.practiceAccuracy} className="h-2 bg-blue-100" />
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                  <FileCheck className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-600">ממוצע בגרויות</div>
-                  <div className="text-2xl font-bold text-gray-900">{Math.round(statistics.avgExamScore)}</div>
-                </div>
-              </div>
-              <Progress value={statistics.avgExamScore} className="h-2 bg-blue-100" />
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-600">שעות לימוד</div>
-                  <div className="text-2xl font-bold text-gray-900">{statistics.totalStudyHours}h</div>
-                </div>
-              </div>
-              <div className="text-xs text-gray-500">{statistics.totalStudyMinutes} דקות</div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg p-5 h-28">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                  {statistics.trend === 'up' ? <TrendingUp className="w-6 h-6 text-white" /> :
-                   statistics.trend === 'down' ? <TrendingDown className="w-6 h-6 text-white" /> :
-                   <Activity className="w-6 h-6 text-white" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-gray-600">מגמה</div>
-                  <div className={`text-xl font-bold ${
-                    statistics.trend === 'up' ? 'text-green-600' :
-                    statistics.trend === 'down' ? 'text-red-600' :
-                    'text-blue-600'
-                  }`}>
-                    {statistics.trend === 'up' ? 'משתפר' : statistics.trend === 'down' ? 'יורד' : 'יציב'}
-                  </div>
-                </div>
-              </div>
-              <div className="text-xs text-gray-500">30 הימים האחרונים</div>
-            </div>
-          </motion.div>
-
-          {/* 7 Days Activity Chart */}
-          {statistics.last7DaysActivity.some(d => d.total > 0) && (
+          {/* 2️⃣ מה אתה צריך כדי להגיע לציון המטרה */}
+          {readinessData && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl shadow-lg p-5"
+              transition={{ delay: 0.15 }}
+              className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-lg p-6 border-2 border-amber-200"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-6 h-6 text-purple-600" />
-                <h3 className="text-lg font-bold text-gray-900">פעילות 7 הימים האחרונים</h3>
+                <Target className="w-7 h-7 text-amber-600" />
+                <h3 className="text-xl font-bold text-gray-900">
+                  כדי להגיע ל־{user?.target_score || 85} אתה צריך:
+                </h3>
               </div>
-              
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={statistics.last7DaysActivity}>
-                  <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      border: '2px solid #E5E7EB', 
-                      borderRadius: '12px',
-                      direction: 'rtl'
-                    }}
-                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                  />
-                  <Bar dataKey="practice" fill="#3B82F6" name="תרגולים" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="exams" fill="#6366F1" name="בגרויות" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+
+              <div className="space-y-3">
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">לפתור עוד שאלות</span>
+                  <span className="text-3xl font-black text-amber-600">{readinessData.remaining.practice}</span>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">לבצע עוד בגרויות מלאות</span>
+                  <span className="text-3xl font-black text-amber-600">{readinessData.remaining.exams}</span>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">ללמוד נושאים שלא נגעת</span>
+                  <span className="text-3xl font-black text-amber-600">{readinessData.remaining.untouchedTopics}</span>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">לחזור על נושאים חלשים</span>
+                  <span className="text-3xl font-black text-amber-600">{readinessData.remaining.weakTopics}</span>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">להוריד טעויות ל-</span>
+                  <span className="text-3xl font-black text-amber-600">&lt;18%</span>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-amber-200">
+                  <span className="text-gray-900 font-semibold">לשפר מהירות ב-</span>
+                  <span className="text-3xl font-black text-amber-600">15%</span>
+                </div>
+              </div>
+
+              <div className="mt-4 text-center">
+                <Button
+                  onClick={() => navigate(createPageUrl("Readiness"))}
+                  className="w-full h-12 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl"
+                >
+                  <Target className="w-5 h-5 ml-2" />
+                  צפה בתוכנית המלאה
+                </Button>
+              </div>
             </motion.div>
           )}
 
-          {/* Performance Distribution */}
-          {pieData.length > 0 && (
+          {/* 4️⃣ תרגול – כל הסטטיסטיקות */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="bg-white rounded-2xl shadow-lg p-6"
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <BookOpen className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-bold text-gray-900">תרגול - סטטיסטיקות מלאות</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
+                <div className="text-sm text-gray-600 mb-1">שאלות שנענו</div>
+                <div className="text-3xl font-black text-blue-600">{statistics.totalPractice}</div>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
+                <div className="text-sm text-gray-600 mb-1">הצלחה</div>
+                <div className="text-3xl font-black text-green-600">{Math.round(statistics.practiceAccuracy)}%</div>
+              </div>
+
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-200">
+                <div className="text-sm text-gray-600 mb-1">ממוצע טעויות</div>
+                <div className="text-3xl font-black text-red-600">{Math.round(100 - statistics.practiceAccuracy)}%</div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
+                <div className="text-sm text-gray-600 mb-1">זמן ממוצע לשאלה</div>
+                <div className="text-3xl font-black text-purple-600">
+                  {(() => {
+                    const withTime = practiceAttempts.filter(a => a.time_seconds);
+                    const avg = withTime.length > 0 
+                      ? withTime.reduce((sum, a) => sum + a.time_seconds, 0) / withTime.length 
+                      : 120;
+                    return Math.round(avg);
+                  })()}s
+                </div>
+              </div>
+            </div>
+
+            {statistics.weakTopics.length > 0 && (
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-4 border-2 border-orange-200 mb-3">
+                <div className="text-sm font-semibold text-gray-700 mb-2">הכי הרבה טעויות בנושא:</div>
+                <div className="text-lg font-black text-red-600">{statistics.weakTopics[0].name || statistics.weakTopics[0].topic}</div>
+              </div>
+            )}
+
+            {statistics.strongTopics.length > 0 && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 mb-4">
+                <div className="text-sm font-semibold text-gray-700 mb-2">הכי מעט טעויות בנושא:</div>
+                <div className="text-lg font-black text-green-600">{statistics.strongTopics[0].name || statistics.strongTopics[0].topic}</div>
+              </div>
+            )}
+
+            <Button
+              onClick={() => {
+                if (user?.is_premium) {
+                  navigate(createPageUrl("CustomWeakPractice"));
+                } else {
+                  navigate(createPageUrl("Premium"));
+                }
+              }}
+              className={`w-full h-12 ${user?.is_premium ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700' : 'bg-gray-400'} text-white font-bold rounded-xl`}
+            >
+              {user?.is_premium ? '🔥 לפתור טעויות עכשיו' : '👑 שדרג לפרימיום'}
+            </Button>
+          </motion.div>
+
+          {/* 3️⃣ כמה למדת השבוע */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl shadow-lg p-5"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-6 h-6 text-blue-600" />
+              <h3 className="text-lg font-bold text-gray-900">זמן לימוד השבוע</h3>
+            </div>
+            
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={statistics.last7DaysActivity}>
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} label={{ value: 'דקות', angle: -90, position: 'insideLeft' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white', 
+                    border: '2px solid #E5E7EB', 
+                    borderRadius: '12px',
+                    direction: 'rtl'
+                  }}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  formatter={(value) => [`${value * 2} דקות`]}
+                />
+                <Bar dataKey="practice" fill="#3B82F6" name="תרגולים" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="exams" fill="#6366F1" name="בגרויות" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+
+            <div className="mt-4 text-center">
+              <div className="inline-block bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-2 border-2 border-blue-200">
+                <span className="text-sm text-gray-600">סה״כ: </span>
+                <span className="text-2xl font-black text-blue-600">{statistics.totalStudyMinutes}</span>
+                <span className="text-sm text-gray-600"> דקות</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 5️⃣ בגרויות שביצעת + ציונים */}
+          {examAttempts.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ delay: 0.3 }}
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center gap-2 mb-5">
-                <BarChart3 className="w-6 h-6 text-blue-600" />
-                <h3 className="text-lg font-bold text-gray-900">התפלגות ביצועים</h3>
-              </div>
-              
-              <div className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'white', 
-                        border: '2px solid #E5E7EB', 
-                        borderRadius: '12px',
-                        direction: 'rtl'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <FileCheck className="w-6 h-6 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900">בגרויות שביצעת</h3>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                {pieData.map((item, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-xs text-gray-600">{item.name}</span>
+              <div className="space-y-2 mb-4">
+                {examAttempts.slice(0, 10).map((exam, idx) => (
+                  <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-bold text-gray-900 text-sm">
+                          {exam.exam_type || 'בגרות'} {exam.exam_year || ''}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {new Date(exam.created_date).toLocaleDateString('he-IL', {
+                            day: 'numeric',
+                            month: 'short'
+                          })} • {exam.duration_minutes || 90} דק׳
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className={`text-2xl font-black ${
+                          exam.score_percent >= 80 ? 'text-green-600' :
+                          exam.score_percent >= 60 ? 'text-blue-600' :
+                          'text-orange-600'
+                        }`}>
+                          {Math.round(exam.score_percent || 0)}
+                        </div>
+                        <div className="text-xs text-gray-500">ציון</div>
+                      </div>
                     </div>
-                    <div className="text-xl font-bold text-gray-900">{item.value}</div>
                   </div>
                 ))}
               </div>
+
+              <Button
+                onClick={() => navigate(createPageUrl("Exams"))}
+                className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-xl"
+              >
+                <FileCheck className="w-5 h-5 ml-2" />
+                בצע בגרות חדשה
+              </Button>
             </motion.div>
           )}
 
@@ -626,61 +753,77 @@ export default function StatisticsPage() {
             </motion.div>
           )}
 
-          {/* Overall Performance Table */}
-          {(allTopics.length > 0 || examAttempts.length > 0) && (
+          {/* 6️⃣ הנושאים שלך - מפת התקדמות מלאה */}
+          {allTopics.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
-              className="bg-white rounded-2xl shadow-lg p-5"
+              className="bg-white rounded-2xl shadow-lg p-6"
             >
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-6 h-6 text-blue-600" />
-                <h3 className="text-lg font-bold text-gray-900">תרגולים לשיפור 🎯</h3>
+              <div className="flex items-center gap-2 mb-5">
+                <BookOpen className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-bold text-gray-900">הנושאים שלך - מפת התקדמות</h3>
               </div>
 
-              {/* Topics Table */}
-              <div className="mb-4">
-                <h4 className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-                  נושאי תרגול
-                </h4>
-                <div className="space-y-1.5">
-                  {allTopics
-                    .sort((a, b) => (a.order || 0) - (b.order || 0))
-                    .map((topic, idx) => {
-                      const topicData = statistics.topicArray.find(t => t.topic === topic.topic_id);
-                      const accuracy = topicData?.accuracy || 0;
-                      const total = topicData?.total || 0;
-                      
-                      return (
-                        <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-2">
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <div className="font-semibold text-gray-900 text-xs truncate flex-1">
-                              {topic.name}
-                            </div>
-                            <span className={`text-sm font-bold flex-shrink-0 ${
+              <div className="space-y-2">
+                {allTopics
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((topic, idx) => {
+                    const topicData = statistics.topicArray.find(t => t.topic === topic.topic_id);
+                    const accuracy = topicData?.accuracy || 0;
+                    const total = topicData?.total || 0;
+                    
+                    return (
+                      <div key={idx} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <div className="flex-1">
+                            <div className="font-bold text-gray-900 text-base">{topic.name}</div>
+                            <div className="text-xs text-gray-600">{total} תרגולים</div>
+                          </div>
+                          <div className="text-center">
+                            <div className={`text-3xl font-black ${
                               accuracy >= 80 ? 'text-green-600' :
                               accuracy >= 60 ? 'text-blue-600' :
                               total > 0 ? 'text-orange-600' : 'text-gray-400'
                             }`}>
                               {total > 0 ? `${Math.round(accuracy)}%` : '—'}
-                            </span>
-                          </div>
-                          <div className="w-full bg-blue-200 rounded-full h-1.5">
-                            <div 
-                              className={`h-1.5 rounded-full ${
-                                accuracy >= 80 ? 'bg-green-500' :
-                                accuracy >= 60 ? 'bg-blue-500' :
-                                'bg-orange-500'
-                              }`}
-                              style={{ width: `${Math.min(accuracy, 100)}%` }}
-                            />
+                            </div>
                           </div>
                         </div>
-                      );
-                    })}
-                </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <Progress value={accuracy} className="h-3" />
+                          </div>
+                          <Button
+                            onClick={() => {
+                              sessionStorage.setItem('selectedTopicForPractice', topic.topic_id);
+                              navigate(createPageUrl("TopicPracticeNew") + `?topic=${encodeURIComponent(topic.topic_id)}`);
+                            }}
+                            className="h-9 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold px-4 rounded-xl"
+                          >
+                            לתרגל עכשיו
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </motion.div>
+          )}
+
+          {/* בגרויות שאלונים */}
+          {(examAttempts.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.37 }}
+              className="bg-white rounded-2xl shadow-lg p-5"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <FileCheck className="w-6 h-6 text-blue-600" />
+                <h3 className="text-lg font-bold text-gray-900">שאלוני בגרות</h3>
               </div>
 
               {/* Modules Table */}
@@ -996,7 +1139,81 @@ export default function StatisticsPage() {
 
 
 
-          {/* Action Buttons */}
+          {/* 7️⃣ הודעות אישיות מהרובוט (AI Insights) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg p-6 border-2 border-indigo-200"
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <MessageSquare className="w-6 h-6 text-indigo-600" />
+              <h3 className="text-xl font-bold text-gray-900">תובנות אישיות מהרובוט 🤖</h3>
+            </div>
+
+            <div className="space-y-3">
+              {(() => {
+                const insights = [];
+                
+                // שיפור
+                if (statistics.trend === 'up') {
+                  insights.push({
+                    emoji: '🎉',
+                    text: `אתה משתפר יפה! עלית ${Math.round(statistics.practiceAccuracy - (statistics.practiceAccuracy * 0.88))}% השבוע.`,
+                    color: 'from-green-50 to-emerald-50 border-green-200'
+                  });
+                }
+
+                // נושא חלש
+                if (statistics.weakTopics.length > 0) {
+                  insights.push({
+                    emoji: '⚠️',
+                    text: `הנושא הכי חלש שלך כרגע: ${statistics.weakTopics[0].name || statistics.weakTopics[0].topic}.`,
+                    color: 'from-orange-50 to-red-50 border-orange-200'
+                  });
+                }
+
+                // יעד יומי
+                if (readinessData) {
+                  insights.push({
+                    emoji: '🎯',
+                    text: `כדי להגיע ל־${user?.target_score || 85} עליך לבצע לפחות ${readinessData.daily.questions} שאלות ביום.`,
+                    color: 'from-blue-50 to-indigo-50 border-blue-200'
+                  });
+                }
+
+                // פעילות אתמול
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+                const yesterdayActivity = statistics.last7DaysActivity.find(d => d.date === yesterdayStr);
+                if (yesterdayActivity && yesterdayActivity.total === 0) {
+                  insights.push({
+                    emoji: '📅',
+                    text: 'אתמול למדת 0 דקות. בוא נחזור לקצב היום.',
+                    color: 'from-red-50 to-pink-50 border-red-200'
+                  });
+                } else if (yesterdayActivity && yesterdayActivity.total > 0) {
+                  insights.push({
+                    emoji: '🔥',
+                    text: `כל הכבוד! אתמול תרגלת ${yesterdayActivity.total * 2} דקות. המשך כך!`,
+                    color: 'from-green-50 to-emerald-50 border-green-200'
+                  });
+                }
+
+                return insights.map((insight, idx) => (
+                  <div key={idx} className={`bg-gradient-to-r ${insight.color} border-2 rounded-xl p-4`}>
+                    <div className="flex items-start gap-3">
+                      <div className="text-2xl">{insight.emoji}</div>
+                      <p className="text-gray-900 font-semibold text-sm leading-relaxed flex-1">{insight.text}</p>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </motion.div>
+
+          {/* כפתורי Action */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1012,7 +1229,7 @@ export default function StatisticsPage() {
             </Button>
             <Button
               onClick={() => navigate(createPageUrl("Exams"))}
-              className="h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-2xl shadow-lg font-bold text-base"
+              className="h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-2xl shadow-lg font-bold text-base"
             >
               <FileCheck className="w-5 h-5 ml-2" />
               עבור לבגרויות
