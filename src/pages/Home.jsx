@@ -232,17 +232,14 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* כרטיס מצב + מוכנות */}
         <ReadinessCard
           readinessPercent={readinessData?.scores.overall || 0}
           daysUntilExam={daysUntilExam}
           targetScore={user?.target_score || 85}
         />
 
-        {/* המשימות היומיות */}
         <DailyTasksCard tasks={dailyTasks} />
 
-        {/* המשך מאיפה שהפסקת */}
         {lastActivity && (
           <QuickContinueCard 
             lastActivity={lastActivity}
@@ -250,23 +247,19 @@ export default function HomePage() {
           />
         )}
 
-        {/* מקצועות מרכזיים */}
         <QuickSubjects 
           subjects={quickSubjects}
           onSubjectClick={handleSubjectClick}
         />
 
-        {/* בגרות אחרונה */}
         <RecentExamCard
           lastExam={lastExamData}
           onViewResults={() => navigate(createPageUrl("Statistics"))}
           onNewExam={() => navigate(createPageUrl("Exams"))}
         />
 
-        {/* התקדמות שבועית */}
         <WeeklyProgressChart weekData={weekData} />
 
-        {/* הודעה מהרובוט */}
         <AIMessageCard 
           message={`היי ${user?.full_name?.split(' ')[0] || 'תלמיד'}! ${
             readinessData 
@@ -275,7 +268,6 @@ export default function HomePage() {
           }`}
         />
 
-        {/* ניווט מהיר */}
         <QuickNav onNavigate={handleQuickNav} />
       </div>
     </div>

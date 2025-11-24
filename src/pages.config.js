@@ -1,5 +1,4 @@
 import Onboarding from './pages/Onboarding';
-import Home from './pages/Home';
 import Practice from './pages/Practice';
 import Exams from './pages/Exams';
 import Premium from './pages/Premium';
@@ -62,12 +61,12 @@ import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
 import DailyPractice from './pages/DailyPractice';
 import LearningPlan from './pages/LearningPlan';
 import Readiness from './pages/Readiness';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Onboarding": Onboarding,
-    "Home": Home,
     "Practice": Practice,
     "Exams": Exams,
     "Premium": Premium,
@@ -130,6 +129,7 @@ export const PAGES = {
     "DailyPractice": DailyPractice,
     "LearningPlan": LearningPlan,
     "Readiness": Readiness,
+    "Home": Home,
 }
 
 export const pagesConfig = {
