@@ -766,11 +766,11 @@ export default function ExamsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-4">
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
-          className="text-right flex-1 hover:opacity-90 transition-opacity"
-        >
+          className="text-right flex-1 hover:opacity-90 transition-opacity">
+
           <h1 className="text-[16px] font-bold text-white">{displaySubject}</h1>
           <p className="text-[11px] text-white/90">{displayUnits} יחידות</p>
         </button>
@@ -829,8 +829,8 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="bg-blue-50 rounded-2xl p-4">
+          transition={{ delay: 0.25 }} className="bg-[#3B82F6] p-4 rounded-2xl">
+
 
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle className="w-5 h-5 text-[#3B82F6]" />
