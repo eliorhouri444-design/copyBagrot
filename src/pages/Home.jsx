@@ -137,13 +137,27 @@ export default function HomePage() {
   }, [readinessData]);
 
   const lastActivity = useMemo(() => {
-    if (practiceAttempts.length === 0 && examAttempts.length === 0) return null;
-    const lastPractice = practiceAttempts[0];
-    const lastExam = examAttempts[0];
-    const mostRecent = !lastExam || (lastPractice && new Date(lastPractice.created_date) > new Date(lastExam.created_date))
-      ? { type: 'practice', topic: topics.find(t => t.topic_id === lastPractice?.topic_id)?.name || 'תרגול' }
-      : { type: 'exam', topic: 'בגרות מלאה' };
-    return mostRecent;
+    // חפש תרגול או בגרות שלא הושלמו
+    const incompletePractice = practiceAttempts.find(a => !a.is_completed);
+    const incompleteExam = examAttempts.find(e => !e.is_completed);
+    
+    if (!incompletePractice && !incompleteExam) return null;
+    
+    // בחר את האחרון
+    if (!incompleteExam || (incompletePractice && new Date(incompletePractice.created_date) > new Date(incompleteExam.created_date))) {
+      return {
+        type: 'practice',
+        topic: topics.find(t => t.topic_id === incompletePractice.topic_id)?.name || 'תרגול',
+        sessionId: incompletePractice.session_id,
+        topicId: incompletePractice.topic_id
+      };
+    } else {
+      return {
+        type: 'exam',
+        topic: 'בגרות מלאה',
+        examId: incompleteExam.exam_id
+      };
+    }
   }, [practiceAttempts, examAttempts, topics]);
 
   const toggleTask = (taskId) => {
@@ -238,9 +252,11 @@ export default function HomePage() {
             <Button
               onClick={() => {
                 if (lastActivity.type === 'practice') {
-                  navigate(createPageUrl("Practice"));
+                  navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
                 } else {
-                  navigate(createPageUrl("Exams"));
+                  // המשך לדף הבגרות עם ה-examId
+                  sessionStorage.setItem('currentExamId', lastActivity.examId);
+                  navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
                 }
               }}
               className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
