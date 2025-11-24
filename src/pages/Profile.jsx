@@ -20,12 +20,7 @@ import {
   MessageSquare,
   CheckCircle,
   AlertTriangle,
-  ChevronDown,
-  Bell,
-  Lock,
-  Globe,
-  Calendar,
-  TrendingUp
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -273,190 +268,194 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      {/* Header - כרטיס משתמש */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-6 mb-6">
-        <div className="flex items-center gap-4">
-          {/* תמונת פרופיל */}
-          <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white/40 flex items-center justify-center flex-shrink-0">
-            <User className="w-10 h-10 text-white" />
-          </div>
-          
-          <div className="flex-1 text-right">
-            <h1 className="text-[20px] font-bold text-white mb-1">{user?.full_name || 'תלמיד'}</h1>
-            <p className="text-[13px] text-white/80">{displaySubject} • {displayUnits} יחידות</p>
-          </div>
-          
-          <button 
-            onClick={() => setIsEditing(true)} 
-            className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
-          >
-            <Edit className="w-5 h-5 text-white" />
-          </button>
+    <div className="min-h-screen bg-white pb-20">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
+        <div className="text-right flex-1">
+          <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
+          <p className="text-[11px] text-white/70">{displaySubject} • {displayUnits} יחידות</p>
         </div>
+        <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
+          <Settings className="w-5 h-5 text-white" />
+        </button>
       </div>
 
-      <div className="px-5 space-y-4">
-        {/* 1. התוכנית האישית לבגרות */}
-        <CardSimple delay={0.05}>
-          <CardTitle icon={Target}>התוכנית שלך לבגרות</CardTitle>
-          
-          <div className="grid grid-cols-3 gap-3 mb-3">
-            <div className="text-center">
-              <div className="text-[28px] font-black text-[#3B82F6]">
-                {readinessData?.scores.overall || 0}%
-              </div>
-              <div className="text-[10px] text-[#6E6E6E]">מוכנות</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[28px] font-black text-[#10B981]">
-                {user?.target_score || 85}
-              </div>
-              <div className="text-[10px] text-[#6E6E6E]">ציון מטרה</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[28px] font-black text-[#F59E0B]">
-                {timeUntilExam !== null ? timeUntilExam : '—'}
-              </div>
-              <div className="text-[10px] text-[#6E6E6E]">ימים לבגרות</div>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => setIsEditing(true)}
-            variant="outline"
-            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
-          >
-            עדכן מטרה
-          </Button>
-        </CardSimple>
-
-        {/* 2. התקדמות כללית */}
-        <CardSimple delay={0.1}>
-          <CardTitle icon={TrendingUp}>ההתקדמות הכללית שלך</CardTitle>
-          
-          <div className="mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] text-[#6E6E6E]">מוכנות כללית</span>
-              <span className="text-[15px] font-black text-[#3B82F6]">
-                {readinessData?.scores.overall || 0}%
-              </span>
-            </div>
-            <Progress value={readinessData?.scores.overall || 0} className="h-2" />
-          </div>
-
-          <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] text-center">
-            <div className="text-[13px] text-[#6E6E6E] mb-1">למדת השבוע</div>
-            <div className="text-[24px] font-black text-[#3B82F6]">
-              {weekData.reduce((sum, d) => sum + d.minutes, 0)} <span className="text-[14px] text-[#6E6E6E]">דקות</span>
-            </div>
-          </div>
-        </CardSimple>
-
-        {/* 3. הישגים */}
-        <CardSimple delay={0.15}>
-          <CardTitle icon={Award}>ההישגים שלך</CardTitle>
-          
-          <div className="grid grid-cols-2 gap-2">
-            {practiceAttempts.length > 0 && (() => {
-              let streak = 0;
-              for (let i = 0; i < 30; i++) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                const hasActivity = practiceAttempts.some(a => a.created_date?.startsWith(dateStr));
-                if (hasActivity) streak++;
-                else if (i > 0) break;
-              }
-              return streak >= 3 && (
-                <div className="bg-white rounded-lg p-3 border-2 border-blue-200 text-center">
-                  <div className="text-[24px] mb-1">🔥</div>
-                  <div className="text-[12px] font-bold text-[#2B2B2B]">{streak} ימים רצופים</div>
+      <div className="px-5 space-y-6">
+        {/* המנוי שלי */}
+        {user?.is_premium ? (
+          <CardSimple delay={0.05}>
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 mb-3 border-2 border-amber-300">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-600" />
+                  <h3 className="text-[16px] font-bold text-amber-900">המנוי שלי</h3>
                 </div>
-              );
-            })()}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowSubscriptionDialog(true)}
+                  className="h-8 text-[12px] text-amber-700 hover:bg-amber-200"
+                >
+                  נהל
+                </Button>
+              </div>
+              <p className="text-[13px] text-amber-800">
+                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <div className="font-bold text-[15px] text-green-900">מנוי פעיל</div>
+                <div className="text-[13px] text-green-700">גישה מלאה לכל התכונות</div>
+              </div>
+            </div>
+          </CardSimple>
+        ) : (
+          <CardSimple delay={0.05}>
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 rounded-xl p-4 border-2 border-amber-300 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-2" />
+              <h3 className="text-[16px] font-bold text-amber-900 mb-1">שדרג לפרימיום</h3>
+              <p className="text-[13px] text-amber-800 mb-3">גישה בלתי מוגבלת לכל התכונות</p>
+              <Button
+                onClick={() => navigate(createPageUrl("Premium"))}
+                className="w-full h-10 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-[14px] text-[13px]"
+              >
+                <Crown className="w-4 h-4 ml-2" />
+                שדרג עכשיו
+              </Button>
+            </div>
+          </CardSimple>
+        )}
+
+        {/* הדרך שלך לבגרות */}
+        {readinessData && (
+          <CardSimple delay={0.05}>
+            <CardTitle>הדרך שלך לבגרות</CardTitle>
             
-            {practiceAttempts.length >= 100 && (
-              <div className="bg-white rounded-lg p-3 border-2 border-purple-200 text-center">
-                <div className="text-[24px] mb-1">💯</div>
-                <div className="text-[12px] font-bold text-[#2B2B2B]">100 שאלות</div>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              <StatCard value={`${readinessData.scores.mastery}%`} label="שליטה בחומר" color="#3B82F6" />
+              <StatCard value={`${readinessData.scores.practice}%`} label="תרגול" color="#3B82F6" />
+              <StatCard value={`${readinessData.scores.exams}%`} label="בגרויות" color="#3B82F6" />
+            </div>
+
+            <Button
+              onClick={() => setShowDetailsView(!showDetailsView)}
+              variant="outline"
+              className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]"
+            >
+              {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
+              <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-180' : ''}`} />
+            </Button>
+
+            {showDetailsView && (
+              <div className="space-y-2 mt-3">
+                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold text-[#2B2B2B]">שליטה בחומר</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.mastery} className="h-2 mt-2" />
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold text-[#2B2B2B]">תרגול</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.practice} className="h-2 mt-2" />
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold text-[#2B2B2B]">בגרויות</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.exams} className="h-2 mt-2" />
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold text-[#2B2B2B]">מהירות</span>
+                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
+                </div>
               </div>
             )}
-            
-            {examAttempts.some(e => e.is_completed) && (
-              <div className="bg-white rounded-lg p-3 border-2 border-green-200 text-center">
-                <div className="text-[24px] mb-1">🎓</div>
-                <div className="text-[12px] font-bold text-[#2B2B2B]">בגרות ראשונה</div>
-              </div>
-            )}
-            
-            {examAttempts.length >= 2 && (() => {
-              const sorted = [...examAttempts].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
-              const improvement = sorted[sorted.length - 1].score_percent - sorted[0].score_percent;
-              return improvement >= 10 && (
-                <div className="bg-white rounded-lg p-3 border-2 border-amber-200 text-center">
-                  <div className="text-[24px] mb-1">📈</div>
-                  <div className="text-[12px] font-bold text-[#2B2B2B]">שיפור 10+</div>
-                </div>
-              );
-            })()}
-          </div>
-        </CardSimple>
+          </CardSimple>
+        )}
 
-        {/* 4. הגדרות חשבון */}
-        <CardSimple delay={0.25}>
+        {/* מה ללמוד היום */}
+        {allTopics.length > 0 && (
+          <CardSimple delay={0.1}>
+            <CardTitle>מה ללמוד כדי להצליח</CardTitle>
+            
+            <div className="space-y-2">
+              {allTopics.slice(0, 5).map((topic, idx) => {
+                const topicAttempts = practiceAttempts.filter(a => a.topic_id === topic.topic_id);
+                const correct = topicAttempts.filter(a => a.status === "correct").length;
+                const mastery = topicAttempts.length > 0 ? Math.round((correct / topicAttempts.length) * 100) : 0;
+                const needsPractice = mastery < 75;
+
+                return (
+                  <button
+                    key={topic.topic_id}
+                    onClick={() => {
+                      sessionStorage.setItem('selectedTopic', topic.topic_id);
+                      navigate(createPageUrl("Practice"));
+                    }}
+                    className="w-full bg-white border border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2 flex-1 text-right">
+                      <span className="text-xl">{topic.icon || '📚'}</span>
+                      <div className="flex-1">
+                        <div className="font-bold text-[15px] text-[#2B2B2B]">{topic.name}</div>
+                        <div className="text-[13px] text-[#6E6E6E]">
+                          {needsPractice ? `${mastery}% שליטה - צריך חיזוק` : `${mastery}% - טוב!`}
+                        </div>
+                      </div>
+                    </div>
+                    {needsPractice && (
+                      <div className="text-red-600 text-[13px] font-bold">⚠️</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="w-full h-10 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[13px] mt-3"
+            >
+              ראה את כל הנושאים
+            </Button>
+          </CardSimple>
+        )}
+
+
+
+        {/* הגדרות */}
+        <CardSimple delay={0.4}>
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
 
           <div className="space-y-2">
-            <button
+            <Button
+              variant="outline"
+              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={() => setIsEditing(true)}
-              className="w-full bg-white border-2 border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center gap-3 text-right"
             >
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Lock className="w-5 h-5 text-blue-600" />
-              </div>
-              <span className="text-[14px] font-semibold text-[#2B2B2B]">שינוי פרטים</span>
-            </button>
+              <Edit className="w-5 h-5 ml-3" />
+              ערוך פרטים
+            </Button>
 
-            <button
-              className="w-full bg-white border-2 border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center gap-3 text-right"
-              onClick={() => alert('בקרוב: שינוי שפה')}
-            >
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <Globe className="w-5 h-5 text-purple-600" />
-              </div>
-              <span className="text-[14px] font-semibold text-[#2B2B2B]">שינוי שפה</span>
-            </button>
-
-            <button
-              className="w-full bg-white border-2 border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center gap-3 text-right"
-              onClick={() => alert('בקרוב: הגדרות התראות')}
-            >
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Bell className="w-5 h-5 text-green-600" />
-              </div>
-              <span className="text-[14px] font-semibold text-[#2B2B2B]">התראות ווטסאפ</span>
-            </button>
-
-            <button
-              className="w-full bg-white border-2 border-[#E9F0FF] rounded-lg p-3 hover:border-blue-400 transition-all flex items-center gap-3 text-right"
-              onClick={() => alert('בקרוב: הגדרות פרטיות')}
-            >
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-indigo-600" />
-              </div>
-              <span className="text-[14px] font-semibold text-[#2B2B2B]">פרטיות</span>
-            </button>
-
-            <button
+            <Button
+              variant="outline"
+              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={handleLogout}
-              className="w-full bg-white border-2 border-red-200 rounded-lg p-3 hover:border-red-400 hover:bg-red-50 transition-all flex items-center gap-3 text-right"
             >
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <LogOut className="w-5 h-5 text-red-600" />
-              </div>
-              <span className="text-[14px] font-semibold text-red-600">יציאה מהחשבון</span>
-            </button>
+              <LogOut className="w-5 h-5 ml-3" />
+              התנתק
+            </Button>
           </div>
         </CardSimple>
       </div>
