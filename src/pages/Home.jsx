@@ -200,9 +200,35 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-5 space-y-6">
+      <div className="px-5 space-y-4">
+        {/* המשך מאיפה שהפסקת */}
+        {lastActivity && (
+          <CardSimple delay={0.05}>
+            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
+            <div className="mb-3">
+              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
+              <div className="text-[13px] text-[#6E6E6E]">{lastActivity.type === 'practice' ? 'תרגול נושא' : 'בגרות'}</div>
+            </div>
+
+            <Button
+              onClick={() => {
+                if (lastActivity.type === 'practice') {
+                  navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
+                } else {
+                  sessionStorage.setItem('currentExamId', lastActivity.examId);
+                  navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
+                }
+              }}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+            >
+              <PlayCircle className="w-5 h-5 ml-2" />
+              המשך
+            </Button>
+          </CardSimple>
+        )}
+
         {/* מה המצב שלך */}
-        <CardSimple delay={0.05}>
+        <CardSimple delay={0.1}>
           <CardTitle>מה המצב שלך</CardTitle>
           
           <div className="grid grid-cols-3 gap-3 mb-3">
@@ -242,7 +268,40 @@ export default function HomePage() {
           )}
         </CardSimple>
 
-        {/* מה ללמוד כדאי להצליח */}
+        {/* משימות היום */}
+        <CardSimple delay={0.15}>
+          <CardTitle icon={CheckCircle}>משימות היום</CardTitle>
+          <div className="space-y-2">
+            {dailyTasks.map(task => (
+              <div
+                key={task.id}
+                onClick={() => toggleTask(task.id)}
+                className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  completedTasks.includes(task.id)
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-white border-[#E9F0FF] hover:border-[#3B82F6]'
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  completedTasks.includes(task.id)
+                    ? 'bg-green-500 border-green-500'
+                    : 'border-[#3B82F6]'
+                }`}>
+                  {completedTasks.includes(task.id) && (
+                    <CheckCircle className="w-4 h-4 text-white" />
+                  )}
+                </div>
+                <div className={`text-[14px] font-semibold ${
+                  completedTasks.includes(task.id) ? 'text-green-700 line-through' : 'text-[#2B2B2B]'
+                }`}>
+                  {task.title}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardSimple>
+
+        {/* מה ללמוד */}
         <WhatToStudyCard
           topics={topics}
           modules={modules}
@@ -251,32 +310,6 @@ export default function HomePage() {
           subject={user?.selected_subject}
           units={user?.selected_units}
         />
-
-        {/* המשך מאיפה שהפסקת */}
-        {lastActivity && (
-          <CardSimple delay={0.15}>
-            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
-            <div className="mb-3">
-              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
-              <div className="text-[13px] text-[#6E6E6E]">המשך עכשיו</div>
-            </div>
-
-            <Button
-              onClick={() => {
-                if (lastActivity.type === 'practice') {
-                  navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
-                } else {
-                  sessionStorage.setItem('currentExamId', lastActivity.examId);
-                  navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
-                }
-              }}
-              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
-            >
-              <PlayCircle className="w-5 h-5 ml-2" />
-              המשך
-            </Button>
-          </CardSimple>
-        )}
       </div>
     </div>
   );
