@@ -300,11 +300,14 @@ export default function StatisticsPage() {
             </ResponsiveContainer>
           </CardSimple>
 
-          {/* 4. הנושאים שלך - TOP 5 */}
+          {/* 4. הנושאים שלך - TOP 5 - פרימיום לניתוח מלא */}
           <CardSimple delay={0.2}>
-            <CardTitle icon={Target}>הנושאים שלך - TOP 5</CardTitle>
+            <div className="flex items-center justify-between mb-3">
+              <CardTitle icon={Target}>הנושאים שלך - TOP 5</CardTitle>
+              {!user?.is_premium && <Crown className="w-4 h-4 text-amber-500" />}
+            </div>
             
-            {/* חזקים */}
+            {/* חזקים - בסיסי לכולם */}
             {statistics.strongTopics.length > 0 && (
               <div className="mb-3">
                 <div className="text-[12px] font-bold text-green-600 mb-2 flex items-center gap-1">
@@ -312,7 +315,7 @@ export default function StatisticsPage() {
                   הכי חזקים
                 </div>
                 <div className="space-y-1.5">
-                  {statistics.strongTopics.map(([topicId, stats], idx) => (
+                  {statistics.strongTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) => (
                     <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-green-600 w-4">{idx + 1}</span>
@@ -327,7 +330,7 @@ export default function StatisticsPage() {
               </div>
             )}
 
-            {/* חלשים */}
+            {/* חלשים - בסיסי לכולם */}
             {statistics.weakTopics.length > 0 && (
               <div>
                 <div className="text-[12px] font-bold text-red-600 mb-2 flex items-center gap-1">
@@ -335,7 +338,7 @@ export default function StatisticsPage() {
                   הכי חלשים
                 </div>
                 <div className="space-y-1.5">
-                  {statistics.weakTopics.map(([topicId, stats], idx) => (
+                  {statistics.weakTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) => (
                     <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-red-600 w-4">{idx + 1}</span>
@@ -348,6 +351,13 @@ export default function StatisticsPage() {
                   ))}
                 </div>
               </div>
+            )}
+
+            {!user?.is_premium && (statistics.strongTopics.length > 2 || statistics.weakTopics.length > 2) && (
+              <PremiumUpsell 
+                message="שדרג לפרימיום לניתוח מלא של כל הנושאים"
+                className="mt-3"
+              />
             )}
           </CardSimple>
 
