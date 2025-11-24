@@ -267,38 +267,50 @@ export default function SettingsPage() {
   };
 
   const handleShare = async () => {
-    const shareData = {
-      title: 'בגרות פלוס',
-      text: 'הצטרף לבגרות פלוס - האפליקציה הטובה ביותר להכנה לבגרות!',
-      url: 'https://bagrut-plus.com'
-    };
+    const shareUrl = 'https://bagrut-plus.com';
+    const shareText = 'הצטרף לבגרות פלוס - האפליקציה הטובה ביותר להכנה לבגרות! 📚✨';
 
     try {
+      // Try native share first
       if (navigator.share) {
-        await navigator.share(shareData);
-        const newShareCount = shareCount + 1;
-        setShareCount(newShareCount);
-        
-        await base44.auth.updateMe({ share_count: newShareCount });
-        
-        if (newShareCount >= 20 && !user?.share_reward_claimed) {
-          const adFreeUntil = new Date();
-          adFreeUntil.setDate(adFreeUntil.getDate() + 5);
-          
-          await base44.auth.updateMe({ 
-            share_reward_claimed: true,
-            ad_free_until: adFreeUntil.toISOString()
-          });
-          
-          alert("🎉 מעולה! שיתפת ל-20 חברים וקיבלת 5 ימים ללא פרסומות!");
-        }
+        await navigator.share({
+          title: 'בגרות פלוס',
+          text: shareText,
+          url: shareUrl
+        });
       } else {
-        // Fallback - copy link
-        await navigator.clipboard.writeText(shareData.url);
-        alert("הקישור הועתק! שתף עם חברים");
+        // Fallback - open WhatsApp share
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+      
+      // Update share count after successful share
+      const newShareCount = shareCount + 1;
+      setShareCount(newShareCount);
+      
+      await base44.auth.updateMe({ share_count: newShareCount });
+      
+      if (newShareCount >= 20 && !user?.share_reward_claimed) {
+        const adFreeUntil = new Date();
+        adFreeUntil.setDate(adFreeUntil.getDate() + 5);
+        
+        await base44.auth.updateMe({ 
+          share_reward_claimed: true,
+          ad_free_until: adFreeUntil.toISOString()
+        });
+        
+        alert("🎉 מעולה! שיתפת ל-20 חברים וקיבלת 5 ימים ללא פרסומות!");
+      } else {
+        alert(`✅ שיתפת בהצלחה! (${newShareCount}/20)`);
       }
     } catch (error) {
-      console.error("Error sharing:", error);
+      // User cancelled or error - try clipboard fallback
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("הקישור הועתק! שתף עם חברים 📋");
+      } catch (clipboardError) {
+        console.error("Error sharing:", error);
+      }
     }
   };
 
@@ -346,15 +358,17 @@ export default function SettingsPage() {
   );
 
   const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#3B82F6" }) => (
-    <div className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF]">
+    <div className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] overflow-hidden">
       <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
-      <div className="flex-1 text-right">
+      <div className="flex-1 text-right min-w-0">
         <div className="font-semibold text-[#2B2B2B] text-[14px]">{title}</div>
-        {subtitle && <div className="text-[12px] text-[#6E6E6E]">{subtitle}</div>}
+        {subtitle && <div className="text-[12px] text-[#6E6E6E] truncate">{subtitle}</div>}
       </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <div className="flex-shrink-0">
+        <Switch checked={checked} onCheckedChange={onChange} />
+      </div>
     </div>
   );
 
