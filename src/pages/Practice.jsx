@@ -20,8 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
+  DialogFooter } from
+"@/components/ui/dialog";
 
 export default function PracticePage() {
   const navigate = useNavigate();
@@ -53,8 +53,8 @@ export default function PracticePage() {
   const displayUnits = parseInt(user?.selected_units || cachedData.units || "3");
 
   const headerColor = user?.selected_subject || cachedData.subject ?
-    subjectColors[user?.selected_subject || cachedData.subject] || "bg-blue-600" :
-    "bg-blue-600";
+  subjectColors[user?.selected_subject || cachedData.subject] || "bg-blue-600" :
+  "bg-blue-600";
 
   useEffect(() => {
     const loadUser = async () => {
@@ -98,9 +98,9 @@ export default function PracticePage() {
     if (!editingTopicData) return;
 
     // Generate topic_id if adding new topic
-    const finalTopicId = editingTopicData.topic_id.endsWith('_') 
-      ? `${displaySubject}_${displayUnits}_${editingTopicData.name.replace(/\s+/g, '_')}`
-      : editingTopicData.topic_id;
+    const finalTopicId = editingTopicData.topic_id.endsWith('_') ?
+    `${displaySubject}_${displayUnits}_${editingTopicData.name.replace(/\s+/g, '_')}` :
+    editingTopicData.topic_id;
 
     try {
       const existingTopics = await base44.entities.TopicNew.filter({
@@ -165,11 +165,11 @@ export default function PracticePage() {
   const handleOpenReorderDialog = async () => {
     try {
       const allQuestions = await base44.entities.QuestionBank.list();
-      const relevantQuestions = allQuestions.filter(q => 
-        q.subject_id === displaySubject && 
-        parseInt(q.unit_level) === parseInt(displayUnits) && 
-        q.is_active === true &&
-        q.topic_id
+      const relevantQuestions = allQuestions.filter((q) =>
+      q.subject_id === displaySubject &&
+      parseInt(q.unit_level) === parseInt(displayUnits) &&
+      q.is_active === true &&
+      q.topic_id
       );
 
       const customTopics = await base44.entities.TopicNew.filter({
@@ -179,7 +179,7 @@ export default function PracticePage() {
       });
 
       const topicsMap = {};
-      relevantQuestions.forEach(q => {
+      relevantQuestions.forEach((q) => {
         if (!topicsMap[q.topic_id]) {
           topicsMap[q.topic_id] = {
             topic_id: q.topic_id,
@@ -191,7 +191,7 @@ export default function PracticePage() {
         topicsMap[q.topic_id].questionCount++;
       });
 
-      customTopics.forEach(ct => {
+      customTopics.forEach((ct) => {
         if (topicsMap[ct.topic_id]) {
           topicsMap[ct.topic_id].name = ct.name;
           topicsMap[ct.topic_id].order = ct.order || 0;
@@ -226,7 +226,7 @@ export default function PracticePage() {
     try {
       for (let i = 0; i < reorderTopics.length; i++) {
         const topic = reorderTopics[i];
-        
+
         if (topic.customTopicId) {
           await base44.entities.TopicNew.update(topic.customTopicId, { order: i });
         } else {
@@ -254,19 +254,19 @@ export default function PracticePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 pt-0">
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 mb-6 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
-          className="text-right flex-1 hover:opacity-90 transition-opacity"
-        >
-          <h1 className="text-[16px] font-bold text-white">{displaySubject}</h1>
-          <p className="text-[11px] text-white/90">{displayUnits} יחידות</p>
+          className="text-right flex-1 hover:opacity-90 transition-opacity">
+
+          <h1 className="text-[16px] font-bold text-white">תרגול {displaySubject}</h1>
+          <p className="text-[11px] text-white/70">{displayUnits} יחידות</p>
         </button>
         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <BookOpen className="w-5 h-5 text-white" />
@@ -279,8 +279,8 @@ export default function PracticePage() {
           key={`${displaySubject}_${displayUnits}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+          transition={{ delay: 0.1 }}>
+
           <TopicCarousel
             subject={displaySubject}
             units={displayUnits}
@@ -300,41 +300,43 @@ export default function PracticePage() {
               });
               console.log('🔵 Opening dialog...');
               setShowTopicEditDialog(true);
-            } : null}
-          />
+            } : null} />
+
         </motion.div>
 
         {/* תרגולים אחרונים */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-        >
-          <RecentPracticeSessions 
-            subject={displaySubject} 
+          transition={{ delay: 0.15 }}>
+
+          <RecentPracticeSessions
+            subject={displaySubject}
             units={displayUnits}
             userEmail={user?.email}
-            isPremium={user?.is_premium}
-          />
+            isPremium={user?.is_premium} />
+
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="bg-indigo-50 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">תרגול פרימיום מותאם אישית</h3>
+          transition={{ delay: 0.2 }}>
+
+          <div className="bg-[#3B82F6] p-4 rounded-2xl">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
+              <div className="text-center text-white flex items-center justify-center gap-2">
+                <h3 className="text-[15px] font-bold">תרגול פרימיום מותאם אישית</h3>
+                <Crown className="w-5 h-5 text-yellow-300" />
+              </div>
             </div>
 
-            <div>
-              <p className="text-[#6E6E6E] text-[13px] mb-3 text-center">
+            <div className="p-5">
+              <p className="text-gray-700 text-[13px] mb-4 text-center">
                 תכונות ייחודיות למנויי פרימיום - תרגול חכם ומותאם במיוחד בשבילך
               </p>
               
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {/* תרגול על בסיס טעויות */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -346,23 +348,23 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full p-3 rounded-xl border text-right transition-all ${
-                    user?.is_premium 
-                      ? 'bg-white border-[#E9F0FF] hover:border-[#3B82F6]' 
-                      : 'bg-white border-[#E9F0FF] opacity-60 cursor-not-allowed'
-                  }`}
-                >
+                  className={`w-full p-4 rounded-xl border text-right transition-all ${
+                  user?.is_premium ?
+                  'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md' :
+                  'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'}`
+                  }>
+
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-5 h-5 text-white" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-[#2B2B2B] text-[13px] mb-0.5">תרגול טעויות ונושאים חלשים</div>
-                      <div className="text-[11px] text-[#6E6E6E]">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
+                      <div className="font-bold text-gray-900 text-[14px] mb-1">תרגול טעויות ונושאים חלשים</div>
+                      <div className="text-[12px] text-gray-600">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
                     </div>
-                    {!user?.is_premium && (
-                      <Crown className="w-4 h-4 text-amber-500" />
-                    )}
+                    {!user?.is_premium &&
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    }
                   </div>
                 </motion.button>
 
@@ -377,82 +379,82 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className={`w-full p-3 rounded-xl border text-right transition-all ${
-                    user?.is_premium 
-                      ? 'bg-white border-[#E9F0FF] hover:border-[#3B82F6]' 
-                      : 'bg-white border-[#E9F0FF] opacity-60 cursor-not-allowed'
-                  }`}
-                >
+                  className={`w-full p-4 rounded-xl border text-right transition-all ${
+                  user?.is_premium ?
+                  'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md' :
+                  'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'}`
+                  }>
+
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                      <Settings className="w-5 h-5 text-white" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <Settings className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-[#2B2B2B] text-[13px] mb-0.5">בניה עצמאית של תרגול</div>
-                      <div className="text-[11px] text-[#6E6E6E]">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
+                      <div className="font-bold text-gray-900 text-[14px] mb-1">בניה עצמאית של תרגול</div>
+                      <div className="text-[12px] text-gray-600">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
                     </div>
-                    {!user?.is_premium && (
-                      <Crown className="w-4 h-4 text-amber-500" />
-                    )}
+                    {!user?.is_premium &&
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    }
                   </div>
                 </motion.button>
               </div>
 
-              {!user?.is_premium && (
-                <div className="mt-3 text-center">
+              {!user?.is_premium &&
+              <div className="mt-4 text-center">
                   <Button
-                    onClick={() => navigate(createPageUrl("Premium"))}
-                    className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8"
-                  >
+                  onClick={() => navigate(createPageUrl("Premium"))}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-11 text-[14px] font-bold rounded-xl px-8">
+
                     <Crown className="w-4 h-4 ml-2" />
                     שדרג לפרימיום
                   </Button>
                 </div>
-              )}
+              }
             </div>
           </div>
         </motion.div>
 
-        {user?.role === 'admin' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="grid grid-cols-2 gap-3"
-          >
-            <div className="bg-indigo-50 rounded-xl p-3">
+        {user?.role === 'admin' &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="grid grid-cols-2 gap-4">
+
+            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">ניהול שאלות</h3>
-                  <p className="text-[11px] text-[#6E6E6E]">הוסף ועדכן</p>
+                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">ניהול שאלות</h3>
+                  <p className="text-[12px] text-gray-600">הוסף ועדכן</p>
                 </div>
                 <Button
-                  onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
-                  className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]"
-                >
+                onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
+                className="bg-purple-600 hover:bg-purple-700 text-white h-9 text-[12px] rounded-xl">
+
                   <Upload className="w-4 h-4 mr-2" />
                   נהל
                 </Button>
               </div>
               </div>
 
-              <div className="bg-indigo-50 rounded-xl p-3">
+              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">ניהול נושאים</h3>
-                  <p className="text-[11px] text-[#6E6E6E]">הוסף, ערוך, סדר</p>
+                  <h3 className="text-[14px] font-bold text-gray-900 mb-0.5">ניהול נושאים</h3>
+                  <p className="text-[12px] text-gray-600">הוסף, ערוך, סדר</p>
                 </div>
                 <Button
-                  onClick={() => navigate(createPageUrl("AdminTopics"))}
-                  className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]"
-                >
+                onClick={() => navigate(createPageUrl("AdminTopics"))}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white h-9 text-[12px] rounded-xl">
+
                   <BookOpen className="w-4 h-4 mr-2" />
                   נהל
                 </Button>
               </div>
               </div>
           </motion.div>
-        )}
+        }
       </div>
 
       <Dialog open={showTopicEditDialog} onOpenChange={setShowTopicEditDialog}>
@@ -467,19 +469,19 @@ export default function PracticePage() {
             </DialogDescription>
           </DialogHeader>
 
-          {editingTopicData && (
-            <div className="space-y-4 py-4">
+          {editingTopicData &&
+          <div className="space-y-4 py-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   שם הנושא
                 </label>
                 <Input
-                  type="text"
-                  value={editingTopicData.name}
-                  onChange={(e) => setEditingTopicData({...editingTopicData, name: e.target.value})}
-                  className="w-full"
-                  placeholder="לדוגמה: קריאה והבנה"
-                />
+                type="text"
+                value={editingTopicData.name}
+                onChange={(e) => setEditingTopicData({ ...editingTopicData, name: e.target.value })}
+                className="w-full"
+                placeholder="לדוגמה: קריאה והבנה" />
+
               </div>
 
               <div>
@@ -487,11 +489,11 @@ export default function PracticePage() {
                   תיאור הנושא
                 </label>
                 <Textarea
-                  value={editingTopicData.description}
-                  onChange={(e) => setEditingTopicData({...editingTopicData, description: e.target.value})}
-                  className="w-full h-20"
-                  placeholder="תיאור מפורט של הנושא"
-                />
+                value={editingTopicData.description}
+                onChange={(e) => setEditingTopicData({ ...editingTopicData, description: e.target.value })}
+                className="w-full h-20"
+                placeholder="תיאור מפורט של הנושא" />
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -500,12 +502,12 @@ export default function PracticePage() {
                     אייקון (emoji)
                   </label>
                   <Input
-                    type="text"
-                    value={editingTopicData.icon}
-                    onChange={(e) => setEditingTopicData({...editingTopicData, icon: e.target.value})}
-                    className="w-full"
-                    placeholder="📖"
-                  />
+                  type="text"
+                  value={editingTopicData.icon}
+                  onChange={(e) => setEditingTopicData({ ...editingTopicData, icon: e.target.value })}
+                  className="w-full"
+                  placeholder="📖" />
+
                 </div>
 
                 <div>
@@ -513,11 +515,11 @@ export default function PracticePage() {
                     סדר תצוגה
                   </label>
                   <Input
-                    type="number"
-                    value={editingTopicData.order}
-                    onChange={(e) => setEditingTopicData({...editingTopicData, order: parseInt(e.target.value)})}
-                    className="w-full"
-                  />
+                  type="number"
+                  value={editingTopicData.order}
+                  onChange={(e) => setEditingTopicData({ ...editingTopicData, order: parseInt(e.target.value) })}
+                  className="w-full" />
+
                 </div>
               </div>
 
@@ -526,9 +528,9 @@ export default function PracticePage() {
                   צבע רקע (Tailwind Gradient)
                 </label>
                 <Select
-                  value={editingTopicData.color}
-                  onValueChange={(value) => setEditingTopicData({...editingTopicData, color: value})}
-                >
+                value={editingTopicData.color}
+                onValueChange={(value) => setEditingTopicData({ ...editingTopicData, color: value })}>
+
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="בחר צבע" />
                   </SelectTrigger>
@@ -591,16 +593,16 @@ export default function PracticePage() {
                 </div>
               </div>
             </div>
-          )}
+          }
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTopicEditDialog(false)}>
               ביטול
             </Button>
-            <Button 
+            <Button
               variant="destructive"
-              onClick={handleDeleteTopic}
-            >
+              onClick={handleDeleteTopic}>
+
               <Trash2 className="w-4 h-4 mr-2" />
               הסתר נושא
             </Button>
@@ -625,11 +627,11 @@ export default function PracticePage() {
           </DialogHeader>
 
           <div className="space-y-2 py-4">
-            {reorderTopics.map((topic, index) => (
-              <div
-                key={topic.topic_id}
-                className="bg-white border-2 border-gray-200 rounded-xl p-4 flex items-center gap-3"
-              >
+            {reorderTopics.map((topic, index) =>
+            <div
+              key={topic.topic_id}
+              className="bg-white border-2 border-gray-200 rounded-xl p-4 flex items-center gap-3">
+
                 <div className="text-2xl font-bold text-gray-400 w-8 text-center">
                   {index + 1}
                 </div>
@@ -641,26 +643,26 @@ export default function PracticePage() {
 
                 <div className="flex gap-1">
                   <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleMoveTopicUp(index)}
-                    disabled={index === 0}
-                    className="h-9 w-9"
-                  >
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMoveTopicUp(index)}
+                  disabled={index === 0}
+                  className="h-9 w-9">
+
                     <ArrowUp className="w-4 h-4" />
                   </Button>
                   <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleMoveTopicDown(index)}
-                    disabled={index === reorderTopics.length - 1}
-                    className="h-9 w-9"
-                  >
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleMoveTopicDown(index)}
+                  disabled={index === reorderTopics.length - 1}
+                  className="h-9 w-9">
+
                     <ArrowDown className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
 
           <DialogFooter>
@@ -674,6 +676,6 @@ export default function PracticePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
