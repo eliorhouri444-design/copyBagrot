@@ -60,6 +60,7 @@ export default function ProfilePage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [completedTasks, setCompletedTasks] = useState([]);
+  const [showDetailsView, setShowDetailsView] = useState(false);
 
   const subjects = [
     "מתמטיקה", "פיזיקה", "ביולוגיה", "היסטוריה",
@@ -325,7 +326,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
-      {/* כותרת עליונה */}
+      {/* כותרת */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -334,149 +335,96 @@ export default function ProfilePage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/30 shadow-lg">
-                <User className="w-8 h-8 text-white" />
-              </div>
-              <div className="text-right">
-                <h1 className="text-xl font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
-                <p className="text-sm text-white/90">
-                  תלמיד בבגרות {displaySubject} • {displayUnits} יחידות
-                </p>
-              </div>
-            </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setIsEditing(true)}
-              className="text-white hover:bg-white/20"
-            >
-              <Settings className="w-5 h-5" />
-            </Button>
+        <div className="relative z-10 text-center">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg mx-auto mb-3">
+            <User className="w-8 h-8 text-white" />
           </div>
+          <h1 className="text-2xl font-bold text-white mb-1">{user?.full_name || 'תלמיד'}</h1>
+          <p className="text-sm text-white/90">תלמיד בבגרות {displaySubject} • {displayUnits} יחידות</p>
+          
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsEditing(true)}
+            className="text-white hover:bg-white/20 mt-3"
+          >
+            <Settings className="w-4 h-4 ml-2" />
+            הגדרות
+          </Button>
         </div>
       </motion.div>
 
-      <div className="max-w-4xl mx-auto px-6 space-y-6 pb-4">
-        {/* מדד מוכנות לבגרות */}
+      <div className="max-w-4xl mx-auto px-6 space-y-4 pb-4">
+        {/* הדרך שלך לבגרות - פשוט */}
         {readinessData && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            className="bg-white rounded-2xl shadow-lg p-5"
           >
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold">מדד מוכנות לבגרות</h3>
-                <Target className="w-6 h-6" />
+            <h3 className="text-base font-bold text-gray-900 mb-4">הדרך שלך לבגרות</h3>
+            
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="text-center">
+                <div className="text-4xl font-black text-blue-600 mb-1">{readinessData.scores.mastery}%</div>
+                <div className="text-xs text-gray-600">שליטה בחומר</div>
               </div>
-              
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-3">
-                <div className="text-center">
-                  <div className="text-5xl font-black mb-2">{readinessData.scores.overall}%</div>
-                  <div className="text-sm opacity-90">Ready Score</div>
-                </div>
-                <Progress value={readinessData.scores.overall} className="h-2.5 bg-white/30 mt-3" />
+              <div className="text-center">
+                <div className="text-4xl font-black text-purple-600 mb-1">{readinessData.scores.practice}%</div>
+                <div className="text-xs text-gray-600">תרגול</div>
               </div>
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
-                  <div className="opacity-90">המטרה שלך:</div>
-                  <div className="font-bold text-lg">{user?.target_score || 85}+</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
-                  <div className="opacity-90">נשארו:</div>
-                  <div className="font-bold text-lg">{readinessData.timeline.daysUntilExam} ימים</div>
-                </div>
+              <div className="text-center">
+                <div className="text-4xl font-black text-green-600 mb-1">{readinessData.scores.exams}%</div>
+                <div className="text-xs text-gray-600">בגרויות</div>
               </div>
             </div>
 
-            <div className="p-5 grid grid-cols-2 gap-3">
-              <div className="text-center">
-                <ResponsiveContainer width="100%" height={100}>
-                  <RadialBarChart 
-                    innerRadius="60%" 
-                    outerRadius="100%" 
-                    data={[{ value: readinessData.scores.mastery, fill: "#3B82F6" }]}
-                    startAngle={90} 
-                    endAngle={-270}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={10} />
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
-                      {readinessData.scores.mastery}%
-                    </text>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-                <div className="text-sm font-semibold text-gray-700">📘 שליטה בחומר</div>
-              </div>
+            <Button
+              onClick={() => setShowDetailsView(!showDetailsView)}
+              variant="outline"
+              className="w-full h-10 text-sm rounded-xl border-2 border-gray-200"
+            >
+              {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
+              <ChevronLeft className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-90' : ''}`} />
+            </Button>
 
-              <div className="text-center">
-                <ResponsiveContainer width="100%" height={100}>
-                  <RadialBarChart 
-                    innerRadius="60%" 
-                    outerRadius="100%" 
-                    data={[{ value: readinessData.scores.practice, fill: "#8B5CF6" }]}
-                    startAngle={90} 
-                    endAngle={-270}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={10} />
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
-                      {readinessData.scores.practice}%
-                    </text>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-                <div className="text-sm font-semibold text-gray-700">📝 תרגול</div>
-              </div>
-
-              <div className="text-center">
-                <ResponsiveContainer width="100%" height={100}>
-                  <RadialBarChart 
-                    innerRadius="60%" 
-                    outerRadius="100%" 
-                    data={[{ value: readinessData.scores.exams, fill: "#10B981" }]}
-                    startAngle={90} 
-                    endAngle={-270}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={10} />
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
-                      {readinessData.scores.exams}%
-                    </text>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-                <div className="text-sm font-semibold text-gray-700">🎓 בגרויות</div>
-              </div>
-
-              <div className="text-center">
-                <ResponsiveContainer width="100%" height={100}>
-                  <RadialBarChart 
-                    innerRadius="60%" 
-                    outerRadius="100%" 
-                    data={[{ value: readinessData.scores.speed, fill: "#F59E0B" }]}
-                    startAngle={90} 
-                    endAngle={-270}
-                  >
-                    <RadialBar dataKey="value" cornerRadius={10} />
-                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-gray-900">
-                      {readinessData.scores.speed}%
-                    </text>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-                <div className="text-sm font-semibold text-gray-700">⚡ מהירות</div>
-              </div>
-            </div>
-
-            <div className="px-5 pb-5">
-              <Button
-                onClick={() => navigate(createPageUrl("Readiness"))}
-                className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl"
+            {showDetailsView && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-4 space-y-2"
               >
-                <Target className="w-4 h-4 ml-2" />
-                עדכון תוכנית לימוד
-              </Button>
-            </div>
+                <div className="bg-blue-50 rounded-xl p-3 border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">שליטה בחומר</span>
+                    <span className="text-2xl font-black text-blue-600">{readinessData.scores.mastery}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.mastery} className="h-2 mt-2" />
+                </div>
+                <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">תרגול</span>
+                    <span className="text-2xl font-black text-purple-600">{readinessData.scores.practice}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.practice} className="h-2 mt-2" />
+                </div>
+                <div className="bg-green-50 rounded-xl p-3 border border-green-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">בגרויות</span>
+                    <span className="text-2xl font-black text-green-600">{readinessData.scores.exams}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.exams} className="h-2 mt-2" />
+                </div>
+                <div className="bg-orange-50 rounded-xl p-3 border border-orange-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">מהירות</span>
+                    <span className="text-2xl font-black text-orange-600">{readinessData.scores.speed}%</span>
+                  </div>
+                  <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
 
