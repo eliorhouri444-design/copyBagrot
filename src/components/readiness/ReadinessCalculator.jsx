@@ -8,13 +8,13 @@ const WEIGHTS = {
 };
 
 const TARGET_REQUIREMENTS = {
-  60: { practice: 300, exams: 2, accuracy: 65, speed: 0.7, dailyQuestions: 15 },
-  70: { practice: 400, exams: 3, accuracy: 70, speed: 0.75, dailyQuestions: 20 },
-  80: { practice: 600, exams: 5, accuracy: 80, speed: 0.85, dailyQuestions: 25 },
-  85: { practice: 700, exams: 6, accuracy: 85, speed: 0.9, dailyQuestions: 30 },
-  90: { practice: 850, exams: 7, accuracy: 90, speed: 0.95, dailyQuestions: 35 },
-  95: { practice: 1000, exams: 9, accuracy: 93, speed: 1.0, dailyQuestions: 45 },
-  100: { practice: 1500, exams: 12, accuracy: 97, speed: 1.0, dailyQuestions: 60 }
+  60: { practice: 300, exams: 2, accuracy: 65, speed: 0.7, dailyQuestions: 10, topicsPerDay: 1, errorRate: 35 },
+  70: { practice: 400, exams: 3, accuracy: 70, speed: 0.75, dailyQuestions: 20, topicsPerDay: 1, errorRate: 30 },
+  80: { practice: 600, exams: 5, accuracy: 80, speed: 0.85, dailyQuestions: 25, topicsPerDay: 2, errorRate: 25 },
+  85: { practice: 700, exams: 6, accuracy: 85, speed: 0.9, dailyQuestions: 30, topicsPerDay: 2, errorRate: 20 },
+  90: { practice: 1000, exams: 7, accuracy: 90, speed: 0.95, dailyQuestions: 40, topicsPerDay: 3, errorRate: 15 },
+  95: { practice: 1200, exams: 10, accuracy: 93, speed: 1.0, dailyQuestions: 50, topicsPerDay: 3, errorRate: 10 },
+  100: { practice: 1500, exams: 12, accuracy: 97, speed: 1.0, dailyQuestions: 70, topicsPerDay: 3, errorRate: 10 }
 };
 
 const calculateMasteryScore = (topics, attempts) => {
@@ -116,19 +116,38 @@ const calculateRemainingMaterial = (topics, attempts, targetRequirements) => {
   };
 };
 
-const calculateDailyRecommendations = (targetRequirements, remaining, daysUntilExam) => {
+const calculateDailyRecommendations = (targetRequirements, remaining, daysUntilExam, currentAccuracy) => {
   const safetyMargin = 0.8;
   const effectiveDays = Math.max(1, Math.floor(daysUntilExam * safetyMargin));
 
-  const dailyPractice = Math.ceil(remaining.remainingPractice / effectiveDays);
-  const weeklyExams = remaining.remainingExams > 0 ? Math.ceil(remaining.remainingExams / Math.ceil(effectiveDays / 7)) : 0;
-  const topicsPerDay = Math.ceil(remaining.weakTopics / effectiveDays);
+  // חישוב דינמי של מספר שאלות ליום
+  const baseDaily = targetRequirements.dailyQuestions;
+  const remainingDaily = Math.ceil(remaining.remainingPractice / effectiveDays);
+  const dailyPractice = Math.max(baseDaily, Math.min(remainingDaily, 70));
+
+  // חישוב בגרויות שבועיות
+  const weeklyExams = remaining.remainingExams > 0 
+    ? Math.ceil(remaining.remainingExams / Math.ceil(effectiveDays / 7)) 
+    : 0;
+
+  // נושאים ליום
+  const topicsPerDay = remaining.weakTopics > 0 
+    ? Math.min(Math.ceil(remaining.weakTopics / effectiveDays), targetRequirements.topicsPerDay)
+    : targetRequirements.topicsPerDay;
+
+  // טעויות לחזרה
+  const currentErrorRate = 100 - currentAccuracy;
+  const reviewMistakes = currentErrorRate > targetRequirements.errorRate 
+    ? Math.min(15, Math.ceil((currentErrorRate - targetRequirements.errorRate) * 1.5))
+    : 5;
 
   return {
-    dailyPractice: Math.min(dailyPractice, 50),
+    dailyPractice,
     weeklyExams: Math.min(weeklyExams, 3),
-    topicsPerDay: Math.min(topicsPerDay, 3),
-    reviewMistakes: 10
+    topicsPerDay,
+    reviewMistakes,
+    studyMinutes: Math.ceil(dailyPractice * 1.5), // 1.5 דקות ממוצע לשאלה
+    examMinutes: weeklyExams > 0 ? 90 : 0
   };
 };
 
@@ -175,7 +194,8 @@ export const useReadinessCalculator = (user, topics, practiceAttempts, examAttem
     const dailyRecommendations = calculateDailyRecommendations(
       requirements, 
       { ...remaining, remainingExams: Math.max(0, requirements.exams - examAttempts.filter(e => e.is_completed).length) }, 
-      daysUntilExam
+      daysUntilExam,
+      practiceScore
     );
 
     const timeToReadiness = calculateTimeToReadiness(readinessScore, targetScore, dailyRecommendations);
@@ -200,7 +220,9 @@ export const useReadinessCalculator = (user, topics, practiceAttempts, examAttem
         questions: dailyRecommendations.dailyPractice,
         topics: dailyRecommendations.topicsPerDay,
         examsPerWeek: dailyRecommendations.weeklyExams,
-        reviewMistakes: dailyRecommendations.reviewMistakes
+        reviewMistakes: dailyRecommendations.reviewMistakes,
+        studyMinutes: dailyRecommendations.studyMinutes,
+        examMinutes: dailyRecommendations.examMinutes
       },
       
       timeline: {
@@ -212,6 +234,22 @@ export const useReadinessCalculator = (user, topics, practiceAttempts, examAttem
       targets: {
         targetScore,
         requirements
+      },
+
+      current: {
+        totalPractice: practiceAttempts.length,
+        totalExams: examAttempts.filter(e => e.is_completed).length,
+        currentAccuracy: practiceAttempts.length > 0 
+          ? (practiceAttempts.filter(a => a.status === "correct").length / practiceAttempts.length * 100)
+          : 0,
+        currentErrorRate: practiceAttempts.length > 0
+          ? (practiceAttempts.filter(a => a.status === "incorrect").length / practiceAttempts.length * 100)
+          : 0,
+        topicsMastered: topics.filter(t => {
+          const stats = practiceAttempts.filter(a => a.topic_id === t.topic_id);
+          const correct = stats.filter(a => a.status === "correct").length;
+          return stats.length >= 5 && (correct / stats.length) >= 0.75;
+        }).length
       }
     };
   }, [user, topics, practiceAttempts, examAttempts]);

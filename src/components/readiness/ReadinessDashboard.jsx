@@ -111,39 +111,67 @@ export default function ReadinessDashboard({ readinessData, isPremium }) {
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-blue-200">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-900 font-semibold">עוד {remaining.practice} תרגולים</span>
+          <div className="bg-white rounded-xl p-4 border-2 border-blue-200">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-gray-900 font-semibold">לפתור עוד שאלות</span>
+              <span className="text-3xl font-black text-blue-600">{remaining.practice}</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">{remaining.practice}</div>
+            <div className="text-xs text-gray-600">
+              {readinessData.current.totalPractice} / {targets.requirements.practice} הושלמו
+            </div>
           </div>
 
-          <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-blue-200">
-            <div className="flex items-center gap-3">
-              <FileCheck className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-900 font-semibold">עוד {remaining.exams} בגרויות מלאות</span>
+          <div className="bg-white rounded-xl p-4 border-2 border-blue-200">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-gray-900 font-semibold">לבצע עוד בגרויות מלאות</span>
+              <span className="text-3xl font-black text-blue-600">{remaining.exams}</span>
             </div>
-            <div className="text-2xl font-bold text-blue-600">{remaining.exams}</div>
-          </div>
-
-          <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-blue-200">
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-900 font-semibold">ללמוד {remaining.weakTopics} נושאים חלשים</span>
+            <div className="text-xs text-gray-600">
+              {readinessData.current.totalExams} / {targets.requirements.exams} הושלמו
             </div>
-            <div className="text-2xl font-bold text-blue-600">{remaining.weakTopics}</div>
           </div>
 
           {remaining.untouchedTopics > 0 && (
-            <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-orange-200">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-orange-600" />
-                <span className="text-gray-900 font-semibold">{remaining.untouchedTopics} נושאים שלא נגעת בהם</span>
+            <div className="bg-white rounded-xl p-4 border-2 border-orange-200">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-gray-900 font-semibold">ללמוד נושאים שלא נגעת</span>
+                <span className="text-3xl font-black text-orange-600">{remaining.untouchedTopics}</span>
               </div>
-              <div className="text-2xl font-bold text-orange-600">{remaining.untouchedTopics}</div>
+              <div className="text-xs text-gray-600">
+                מתוך {readinessData.current.topicsMastered} נושאים שכבר שולטים
+              </div>
             </div>
           )}
+
+          <div className="bg-white rounded-xl p-4 border-2 border-blue-200">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-gray-900 font-semibold">לחזור על נושאים חלשים</span>
+              <span className="text-3xl font-black text-blue-600">{remaining.weakTopics}</span>
+            </div>
+            <div className="text-xs text-gray-600">
+              נושאים שצריכים חיזוק
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border-2 border-red-200">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-gray-900 font-semibold">להוריד טעויות ל-</span>
+              <span className="text-3xl font-black text-red-600">&lt;{targets.requirements.errorRate}%</span>
+            </div>
+            <div className="text-xs text-gray-600">
+              כרגע: {Math.round(readinessData.current.currentErrorRate)}% טעויות
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border-2 border-amber-200">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-gray-900 font-semibold">לשפר מהירות ב-</span>
+              <span className="text-3xl font-black text-amber-600">15%</span>
+            </div>
+            <div className="text-xs text-gray-600">
+              יעד: {Math.round(targets.requirements.speed * 100)}% יעילות
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -155,50 +183,74 @@ export default function ReadinessDashboard({ readinessData, isPremium }) {
       >
         <div className="flex items-center gap-2 mb-4">
           <Flame className="w-6 h-6 text-purple-600" />
-          <h3 className="text-xl font-bold text-gray-900">התוכנית היומית שלך</h3>
+          <h3 className="text-xl font-bold text-gray-900">המלצות יומיות (היום)</h3>
+        </div>
+
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-4 text-white mb-4">
+          <div className="text-center">
+            <div className="text-sm opacity-90 mb-1">היום אתה צריך לבצע:</div>
+            <div className="text-4xl font-black">{daily.studyMinutes || Math.ceil(daily.questions * 1.5)}</div>
+            <div className="text-sm opacity-90">דקות לימוד</div>
+          </div>
         </div>
 
         <div className="space-y-3">
-          <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-purple-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-purple-600" />
+                <span className="text-gray-900 font-semibold text-sm">ללמוד:</span>
               </div>
-              <span className="text-gray-900 font-semibold">תרגול יומי</span>
+              <span className="text-purple-600 font-bold">{daily.topics} נושאים</span>
             </div>
-            <div className="text-2xl font-bold text-purple-600">{daily.questions} שאלות</div>
+            <div className="text-xs text-gray-600">
+              {remaining.untouchedTopics > 0 
+                ? `עוד ${remaining.untouchedTopics} נושאים שלא נגעת בהם`
+                : 'חזור על נושאים קיימים'}
+            </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-purple-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-purple-600" />
+                <span className="text-gray-900 font-semibold text-sm">לפתור:</span>
               </div>
-              <span className="text-gray-900 font-semibold">נושאים ללימוד</span>
+              <span className="text-purple-600 font-bold">{daily.questions} שאלות</span>
             </div>
-            <div className="text-2xl font-bold text-purple-600">{daily.topics} נושאים</div>
+            <div className="text-xs text-gray-600">
+              תרגול יומי מותאם לציון {targets.targetScore}
+            </div>
           </div>
 
           {daily.examsPerWeek > 0 && (
-            <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-purple-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                  <FileCheck className="w-5 h-5 text-white" />
+            <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-purple-600" />
+                  <span className="text-gray-900 font-semibold text-sm">לבצע:</span>
                 </div>
-                <span className="text-gray-900 font-semibold">בגרויות בשבוע</span>
+                <span className="text-purple-600 font-bold">
+                  {daily.examsPerWeek > 1 ? `${daily.examsPerWeek} בגרויות השבוע` : 'בגרות השבוע'}
+                </span>
               </div>
-              <div className="text-2xl font-bold text-purple-600">{daily.examsPerWeek}</div>
+              <div className="text-xs text-gray-600">
+                {daily.examMinutes || 90} דקות סימולציה מלאה
+              </div>
             </div>
           )}
 
-          <div className="bg-white rounded-xl p-4 flex items-center justify-between border-2 border-purple-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
+          <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
+                <span className="text-gray-900 font-semibold text-sm">לחזור על:</span>
               </div>
-              <span className="text-gray-900 font-semibold">חזרה על טעויות</span>
+              <span className="text-purple-600 font-bold">{daily.reviewMistakes} טעויות</span>
             </div>
-            <div className="text-2xl font-bold text-purple-600">{daily.reviewMistakes} שאלות</div>
+            <div className="text-xs text-gray-600">
+              חיזוק נקודות חולשה
+            </div>
           </div>
         </div>
       </motion.div>
