@@ -826,7 +826,7 @@ export default function ExamGenericPage() {
                   )}
 
                   {resultItem.explanation && (
-                    <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2">
+                    <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
                       <strong className="text-blue-600">הסבר:</strong> {resultItem.explanation}
                     </div>
                   )}
