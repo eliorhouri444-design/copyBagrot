@@ -85,6 +85,9 @@ export default function SettingsPage() {
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [shareCount, setShareCount] = useState(0);
   const [cancelReason, setCancelReason] = useState("");
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
   
   // Settings states
   const [settings, setSettings] = useState({
@@ -281,6 +284,36 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async () => {
+    setPasswordError('');
+    
+    if (!passwordData.currentPassword) {
+      setPasswordError('יש להזין סיסמה נוכחית');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('הסיסמה החדשה חייבת להכיל לפחות 6 תווים');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('הסיסמאות לא תואמות');
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      await base44.auth.changePassword(passwordData.currentPassword, passwordData.newPassword);
+      alert('הסיסמה שונתה בהצלחה! ✅');
+      setShowChangePassword(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setPasswordError('שגיאה בשינוי הסיסמה. ייתכן שהסיסמה הנוכחית שגויה.');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   const handleSendFeedback = async () => {
     if (!feedbackText.trim()) {
       alert("נא להזין משוב");
@@ -311,19 +344,35 @@ export default function SettingsPage() {
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     const isAndroid = /android/i.test(userAgent);
     
+    let storeUrl = null;
     if (isIOS) {
-      // Apple App Store - replace with your actual App Store ID
-      window.open("https://apps.apple.com/app/bagrut-plus/id123456789", "_blank");
+      storeUrl = "https://apps.apple.com/app/bagrut-plus/id123456789";
     } else if (isAndroid) {
-      // Google Play Store - replace with your actual package name
-      window.open("https://play.google.com/store/apps/details?id=com.bagrutplus.app", "_blank");
-    } else {
-      // Desktop - show message
-      alert("תודה על הדירוג! 🌟");
+      storeUrl = "https://play.google.com/store/apps/details?id=com.bagrutplus.app";
     }
     
+    if (storeUrl) {
+      // Save that user started rating process
+      await base44.auth.updateMe({ rating_started: true, rating: 5 });
+      window.open(storeUrl, "_blank");
+      
+      // Show confirmation dialog after returning from store
+      setTimeout(() => {
+        if (confirm("האם דירגת אותנו בחנות? 🌟")) {
+          claimRatingReward();
+        } else {
+          alert("אנא דרג אותנו בחנות כדי לקבל את הפרס");
+        }
+      }, 2000);
+    } else {
+      alert("תודה! הדירוג זמין רק באפליקציה במובייל 📱");
+    }
+    
+    setShowRating(false);
+  };
+
+  const claimRatingReward = async () => {
     try {
-      // Calculate new ad-free date (add to existing if applicable)
       const currentAdFree = user?.ad_free_until ? new Date(user.ad_free_until) : new Date();
       const baseDate = currentAdFree > new Date() ? currentAdFree : new Date();
       baseDate.setDate(baseDate.getDate() + 1);
@@ -334,12 +383,7 @@ export default function SettingsPage() {
         ad_free_until: baseDate.toISOString()
       });
       setUser({ ...user, has_rated: true, rating: 5, ad_free_until: baseDate.toISOString() });
-      setRatingSubmitted(true);
-      
-      setTimeout(() => {
-        setShowRating(false);
-        setRatingSubmitted(false);
-      }, 3000);
+      alert("🎉 תודה רבה! קיבלת יום אחד ללא פרסומות!");
     } catch (error) {
       console.error("Error saving rating:", error);
     }
@@ -735,14 +779,43 @@ export default function SettingsPage() {
           <DialogHeader>
             <DialogTitle>שינוי סיסמה</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-[14px] text-[#6E6E6E] text-center">
-              לשינוי סיסמה, נשלח לך קישור לאימייל שלך.
-            </p>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block">סיסמה נוכחית</label>
+              <Input 
+                type="password" 
+                value={passwordData.currentPassword} 
+                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} 
+                placeholder="הזן סיסמה נוכחית"
+              />
+            </div>
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block">סיסמה חדשה</label>
+              <Input 
+                type="password" 
+                value={passwordData.newPassword} 
+                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} 
+                placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
+              />
+            </div>
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block">אימות סיסמה חדשה</label>
+              <Input 
+                type="password" 
+                value={passwordData.confirmPassword} 
+                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} 
+                placeholder="הזן שוב את הסיסמה החדשה"
+              />
+            </div>
+            {passwordError && (
+              <p className="text-red-500 text-[13px]">{passwordError}</p>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowChangePassword(false)}>ביטול</Button>
-            <Button onClick={() => { alert("קישור לאיפוס סיסמה נשלח לאימייל שלך"); setShowChangePassword(false); }} className="bg-[#3B82F6]">שלח קישור</Button>
+            <Button variant="outline" onClick={() => { setShowChangePassword(false); setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setPasswordError(''); }}>ביטול</Button>
+            <Button onClick={handleChangePassword} className="bg-[#3B82F6]" disabled={changingPassword}>
+              {changingPassword ? 'משנה...' : 'שנה סיסמה'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
