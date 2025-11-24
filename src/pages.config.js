@@ -62,6 +62,7 @@ import DailyPractice from './pages/DailyPractice';
 import LearningPlan from './pages/LearningPlan';
 import Readiness from './pages/Readiness';
 import Home from './pages/Home';
+import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -130,6 +131,7 @@ export const PAGES = {
     "LearningPlan": LearningPlan,
     "Readiness": Readiness,
     "Home": Home,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {
