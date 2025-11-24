@@ -105,13 +105,13 @@ export default function SubjectSelectionPage() {
                       </div>
                       
                       <div className="text-right">
-                        <h3 className={`text-xl font-bold ${
-                        subject.isLocked ?
-                        'text-gray-500' :
-                        isOpen ?
-                        'text-white' :
-                        'text-gray-900'}`
-                        }>
+                        <h3 className="text-[#ffffff] text-xl font-bold">
+
+
+
+
+
+
                           {subject.name}
                         </h3>
                         {subject.isLocked &&
