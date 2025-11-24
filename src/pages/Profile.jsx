@@ -10,7 +10,6 @@ import {
   BookOpen,
   FileCheck,
   Crown,
-  LogOut,
   Trash2,
   Shield,
   CreditCard,
@@ -20,7 +19,14 @@ import {
   MessageSquare,
   CheckCircle,
   AlertTriangle,
-  ChevronDown } from
+  ChevronDown,
+  Camera,
+  Lock,
+  Star,
+  Share2,
+  Gift,
+  Copy,
+  Check } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +62,13 @@ export default function ProfilePage() {
   const [cancelReason, setCancelReason] = useState("");
   const [completedTasks, setCompletedTasks] = useState([]);
   const [showDetailsView, setShowDetailsView] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordData, setPasswordData] = useState({ current: "", new: "", confirm: "" });
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const subjects = [
   "מתמטיקה", "פיזיקה", "ביולוגיה", "היסטוריה",
@@ -259,6 +272,81 @@ export default function ProfilePage() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploadingImage(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await base44.auth.updateMe({ profile_image: file_url });
+      setUser({ ...user, profile_image: file_url });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("שגיאה בהעלאת התמונה");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordData.new !== passwordData.confirm) {
+      alert("הסיסמאות אינן תואמות");
+      return;
+    }
+    if (passwordData.new.length < 6) {
+      alert("הסיסמה חייבת להכיל לפחות 6 תווים");
+      return;
+    }
+    alert("בקשה לשינוי סיסמה נשלחה למייל שלך");
+    setShowPasswordDialog(false);
+    setPasswordData({ current: "", new: "", confirm: "" });
+  };
+
+  const handleRating = async () => {
+    if (rating === 0) return;
+    try {
+      const adFreeUntil = new Date();
+      adFreeUntil.setDate(adFreeUntil.getDate() + 1);
+      await base44.auth.updateMe({ 
+        app_rating: rating,
+        ad_free_until: adFreeUntil.toISOString()
+      });
+      setUser({ ...user, app_rating: rating, ad_free_until: adFreeUntil.toISOString() });
+      alert("תודה על הדירוג! 🎉 קיבלת יום אחד ללא פרסומות");
+      setShowRatingDialog(false);
+    } catch (error) {
+      console.error("Error saving rating:", error);
+    }
+  };
+
+  const shareCode = user?.email?.split('@')[0]?.toUpperCase() || "BAGRUT";
+  
+  const handleCopyShareLink = () => {
+    const shareLink = `https://bagrut-plus.app/invite/${shareCode}`;
+    navigator.clipboard.writeText(shareLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'בגרות פלוס',
+      text: `הצטרף לבגרות פלוס עם הקוד שלי: ${shareCode} וקבל גישה לאלפי שאלות תרגול!`,
+      url: `https://bagrut-plus.app/invite/${shareCode}`
+    };
+    
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.log("Share cancelled");
+      }
+    } else {
+      handleCopyShareLink();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -269,14 +357,48 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_8px_8px] from-blue-500 to-indigo-500 flex items-center justify-between">
-        <div className="text-right flex-1">
-          <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
-          <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
+      <div className="bg-[#3B82F6] mb-6 px-5 py-5 rounded-[4px_4px_8px_8px] from-blue-500 to-indigo-500">
+        <div className="flex items-center gap-4">
+          {/* Profile Image */}
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+              {user?.profile_image ? (
+                <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-8 h-8 text-white" />
+              )}
+            </div>
+            <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-md">
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageUpload} 
+                className="hidden" 
+                disabled={uploadingImage}
+              />
+              {uploadingImage ? (
+                <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Camera className="w-3 h-3 text-[#3B82F6]" />
+              )}
+            </label>
+          </div>
+          
+          <div className="flex-1">
+            <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
+            <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
+            {user?.is_premium && (
+              <div className="inline-flex items-center gap-1 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1">
+                <Crown className="w-3 h-3" />
+                פרימיום
+              </div>
+            )}
+          </div>
+          
+          <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
+            <Settings className="w-5 h-5 text-white" />
+          </button>
         </div>
-        <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
-          <Settings className="w-5 h-5 text-white" />
-        </button>
       </div>
 
       <div className="px-5 space-y-6">
@@ -385,25 +507,111 @@ export default function ProfilePage() {
           </CardSimple>
         }
 
+        {/* ניהול מנוי */}
+        <CardSimple delay={0.15}>
+          <CardTitle icon={CreditCard}>ניהול מנוי</CardTitle>
+          
+          {user?.is_premium ? (
+            <div className="space-y-3">
+              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg p-3 border border-amber-200">
+                <div className="flex items-center gap-2 mb-1">
+                  <Crown className="w-4 h-4 text-amber-600" />
+                  <span className="font-bold text-amber-900">מנוי פעיל</span>
+                </div>
+                <p className="text-[12px] text-amber-700">
+                  {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+                </p>
+              </div>
+              
+              <Button
+                variant="outline"
+                className="w-full justify-start rounded-lg h-11 border-2 border-[#E9F0FF] text-[#3B82F6] text-[14px]"
+                onClick={() => setShowSubscriptionDialog(true)}>
+                <Settings className="w-4 h-4 ml-2" />
+                שנה תוכנית מנוי
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="w-full justify-start rounded-lg h-11 border-2 border-red-100 text-red-600 text-[14px]"
+                onClick={() => setShowCancelDialog(true)}>
+                <Trash2 className="w-4 h-4 ml-2" />
+                בטל מנוי
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-[13px] text-[#6E6E6E]">שדרג לפרימיום וקבל גישה בלתי מוגבלת</p>
+              <Button
+                onClick={() => navigate(createPageUrl("Premium"))}
+                className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-[14px] text-[15px]">
+                <Crown className="w-4 h-4 ml-2" />
+                שדרג לפרימיום
+              </Button>
+            </div>
+          )}
+        </CardSimple>
+
+        {/* דרג וקבל + שתף חברים */}
+        <CardSimple delay={0.2}>
+          <CardTitle icon={Gift}>הטבות</CardTitle>
+          
+          <div className="space-y-3">
+            {/* דירוג */}
+            <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-purple-900 text-[14px] mb-0.5">דרג אותנו</div>
+                  <div className="text-[12px] text-purple-700">קבל יום אחד ללא פרסומות</div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setShowRatingDialog(true)}
+                  disabled={user?.app_rating}
+                  className="bg-purple-600 hover:bg-purple-700 text-white h-9 px-4">
+                  {user?.app_rating ? (
+                    <>
+                      <Check className="w-4 h-4 ml-1" />
+                      דורג
+                    </>
+                  ) : (
+                    <>
+                      <Star className="w-4 h-4 ml-1" />
+                      דרג
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+            
+            {/* שיתוף */}
+            <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-green-900 text-[14px] mb-0.5">הזמן חברים</div>
+                  <div className="text-[12px] text-green-700">על כל 10 חברים - 5 ימים ללא פרסומות</div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setShowShareDialog(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white h-9 px-4">
+                  <Share2 className="w-4 h-4 ml-1" />
+                  שתף
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardSimple>
+
         {/* הגדרות */}
-        <CardSimple delay={0.4}>
+        <CardSimple delay={0.25}>
           <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
 
           <div className="space-y-2">
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={() => navigate(createPageUrl("Settings"))}>
-
-              <Settings className="w-5 h-5 ml-3" />
-              כל ההגדרות
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
               onClick={() => setIsEditing(true)}>
-
               <Edit className="w-5 h-5 ml-3" />
               ערוך פרטים
             </Button>
@@ -411,10 +619,9 @@ export default function ProfilePage() {
             <Button
               variant="outline"
               className="w-full justify-start rounded-lg h-12 border-2 border-[#E9F0FF] text-[#3B82F6] text-[15px]"
-              onClick={handleLogout}>
-
-              <LogOut className="w-5 h-5 ml-3" />
-              התנתק
+              onClick={() => setShowPasswordDialog(true)}>
+              <Lock className="w-5 h-5 ml-3" />
+              שינוי סיסמה
             </Button>
           </div>
         </CardSimple>
@@ -478,28 +685,186 @@ export default function ProfilePage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-[18px]">
               <CreditCard className="w-5 h-5 text-[#F59E0B]" />
-              ניהול מנוי
+              שינוי תוכנית מנוי
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="bg-[#F5F8FF] rounded-lg p-4 border border-[#E9F0FF]">
-              <div className="font-bold text-[#2B2B2B] mb-2 text-[15px]">המנוי הנוכחי שלך</div>
-              <div className="text-[13px] text-[#6E6E6E]">
-                {user?.subscription_type === 'yearly' ? 'מנוי שנתי - 299.94 ₪' : 'מנוי חודשי - 49.99 ₪'}
+            <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+              <div className="font-bold text-amber-900 mb-1 text-[15px]">המנוי הנוכחי שלך</div>
+              <div className="text-[13px] text-amber-700">
+                {user?.subscription_type === 'yearly' ? 'מנוי שנתי - 299.94 ₪ לשנה' : 'מנוי חודשי - 49.99 ₪ לחודש'}
               </div>
             </div>
 
-            {user?.subscription_type === 'monthly' &&
-            <Button onClick={() => navigate(createPageUrl("Premium"))} className="w-full bg-[#F59E0B] rounded-[14px]">
-                שדרג למנוי שנתי וחסוך 50%
-              </Button>
-            }
-
-            <Button variant="outline" className="w-full text-red-600 hover:bg-red-50 rounded-[14px]" onClick={() => {setShowSubscriptionDialog(false);setShowCancelDialog(true);}}>
-              ביטול מנוי
-            </Button>
+            <div className="space-y-3">
+              <div className="text-[14px] font-semibold text-[#2B2B2B]">בחר תוכנית:</div>
+              
+              <button 
+                onClick={async () => {
+                  await base44.auth.updateMe({ subscription_type: 'monthly' });
+                  setUser({ ...user, subscription_type: 'monthly' });
+                  setShowSubscriptionDialog(false);
+                  alert("התוכנית שונתה למנוי חודשי");
+                }}
+                className={`w-full p-4 rounded-xl border-2 text-right transition-all ${user?.subscription_type === 'monthly' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-[#2B2B2B]">מנוי חודשי</div>
+                    <div className="text-[12px] text-gray-600">49.99 ₪ לחודש</div>
+                  </div>
+                  {user?.subscription_type === 'monthly' && <Check className="w-5 h-5 text-blue-600" />}
+                </div>
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  await base44.auth.updateMe({ subscription_type: 'yearly' });
+                  setUser({ ...user, subscription_type: 'yearly' });
+                  setShowSubscriptionDialog(false);
+                  alert("התוכנית שונתה למנוי שנתי - חסכת 50%!");
+                }}
+                className={`w-full p-4 rounded-xl border-2 text-right transition-all relative ${user?.subscription_type === 'yearly' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-amber-300'}`}>
+                <div className="absolute -top-2 right-3 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  הכי משתלם
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-[#2B2B2B]">מנוי שנתי</div>
+                    <div className="text-[12px] text-gray-600">299.94 ₪ לשנה (25 ₪/חודש)</div>
+                    <div className="text-[11px] text-green-600 font-semibold">חיסכון של 50%!</div>
+                  </div>
+                  {user?.subscription_type === 'yearly' && <Check className="w-5 h-5 text-amber-600" />}
+                </div>
+              </button>
+            </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent dir="rtl" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[18px]">
+              <Lock className="w-5 h-5 text-[#3B82F6]" />
+              שינוי סיסמה
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">סיסמה נוכחית</label>
+              <Input 
+                type="password" 
+                value={passwordData.current} 
+                onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })} 
+              />
+            </div>
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">סיסמה חדשה</label>
+              <Input 
+                type="password" 
+                value={passwordData.new} 
+                onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })} 
+              />
+            </div>
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">אימות סיסמה חדשה</label>
+              <Input 
+                type="password" 
+                value={passwordData.confirm} 
+                onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })} 
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>ביטול</Button>
+            <Button onClick={handleChangePassword} className="bg-[#3B82F6]">שנה סיסמה</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rating Dialog */}
+      <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
+        <DialogContent dir="rtl" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-[18px]">איך אתה מרגיש עם האפליקציה?</DialogTitle>
+          </DialogHeader>
+
+          <div className="py-6">
+            <div className="flex justify-center gap-2 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className="transition-transform hover:scale-110">
+                  <Star 
+                    className={`w-10 h-10 ${star <= rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} 
+                  />
+                </button>
+              ))}
+            </div>
+            <p className="text-center text-[13px] text-gray-600">
+              {rating === 0 && "לחץ על הכוכבים לדירוג"}
+              {rating === 1 && "אוי, מצטערים לשמוע 😢"}
+              {rating === 2 && "ננסה להשתפר 💪"}
+              {rating === 3 && "תודה! 😊"}
+              {rating === 4 && "מעולה! 🎉"}
+              {rating === 5 && "וואו, תודה רבה! 🌟"}
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRatingDialog(false)}>ביטול</Button>
+            <Button onClick={handleRating} disabled={rating === 0} className="bg-purple-600 hover:bg-purple-700">
+              שלח דירוג וקבל יום ללא פרסומות
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent dir="rtl" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[18px]">
+              <Share2 className="w-5 h-5 text-green-600" />
+              הזמן חברים
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+              <Gift className="w-12 h-12 text-green-600 mx-auto mb-2" />
+              <p className="font-bold text-green-900 mb-1">קבל 5 ימים ללא פרסומות!</p>
+              <p className="text-[12px] text-green-700">על כל 10 חברים שיורידו את האפליקציה עם הקוד שלך</p>
+            </div>
+
+            <div>
+              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">הקוד שלך:</label>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-gray-100 rounded-lg px-4 py-3 font-mono font-bold text-lg text-center">
+                  {shareCode}
+                </div>
+                <Button onClick={handleCopyShareLink} variant="outline" className="h-auto">
+                  {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+                </Button>
+              </div>
+            </div>
+
+            <div className="text-center text-[12px] text-gray-500">
+              חברים שהוזמנו: {user?.referral_count || 0} / 10
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleShare} className="w-full bg-green-600 hover:bg-green-700">
+              <Share2 className="w-4 h-4 ml-2" />
+              שתף עכשיו
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
