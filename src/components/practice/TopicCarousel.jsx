@@ -48,30 +48,17 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const loadTopics = async () => {
     setIsLoading(true);
     try {
-      // Load custom topics first
-      const customTopics = await base44.entities.TopicNew.list();
-      const relevantCustomTopics = customTopics.filter((t) =>
-        t.subject_id === subject &&
-        t.unit_level === parseInt(units) &&
-        t.is_active === true
-      );
+      // טעינה מקבילית של כל הנתונים
+      const [customTopics, allQuestions, user, allVocabQuestions] = await Promise.all([
+        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
+        base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
+        base44.auth.me(),
+        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }) : Promise.resolve([])
+      ]);
 
-      // Load questions
-      const allQuestions = await base44.entities.QuestionBank.list();
-      const relevantQuestions = allQuestions.filter((q) =>
-        q.subject_id === subject &&
-        parseInt(q.unit_level) === parseInt(units) &&
-        q.is_active === true &&
-        q.topic_id
-      );
-
-      // Load vocabulary questions if English
-      const allVocabQuestions = subject === 'אנגלית' ? await base44.entities.VocabularyQuestion.list() : [];
-      const relevantVocabQuestions = allVocabQuestions.filter((q) =>
-        q.subject_id === subject &&
-        parseInt(q.unit_level) === parseInt(units) &&
-        q.is_active === true
-      );
+      const relevantCustomTopics = customTopics;
+      const relevantQuestions = allQuestions.filter((q) => q.topic_id);
+      const relevantVocabQuestions = allVocabQuestions;
 
       // Build topics map starting from TopicNew
       const topicsMap = {};
@@ -179,23 +166,12 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         return true;
       });
 
-      // טעינה מקבילה של user ו-attempts - טען יותר attempts
-      const [user, attempts] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.AttemptNew.list("-created_date", 5000)
-      ]);
-
-      // סינון לפי המשתמש הנוכחי והמקצוע - רק מהחודש האחרון
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      
-      const relevantAttempts = attempts.filter((a) =>
-        a.created_by === user.email &&
-        a.subject_id === subject &&
-        new Date(a.created_date) >= oneMonthAgo
+      // טעינה יעילה של attempts - רק של המשתמש הנוכחי והמקצוע הרלוונטי
+      const relevantAttempts = await base44.entities.AttemptNew.filter(
+        { created_by: user.email, subject_id: subject },
+        "-created_date",
+        500
       );
-      
-      console.log(`📊 Loaded ${attempts.length} attempts, ${relevantAttempts.length} relevant for ${subject} (last month)`);
 
       const topicsWithStats = filteredTopics.map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
@@ -250,7 +226,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
         const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, sets: failed=${failedSets}, medium=${mediumSets}, excellent=${excellentSets}`);
+
 
         return {
           ...topic,
