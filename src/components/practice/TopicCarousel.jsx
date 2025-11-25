@@ -31,12 +31,24 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       loadTopics();
     };
 
+    // האזנה לאירועי עדכון גלובליים
+    const handleMasteryUpdate = () => {
+      console.log('🔄 TopicCarousel: Received update event');
+      loadTopics();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener('mastery-update', handleMasteryUpdate);
+    window.addEventListener('practice-complete', handleMasteryUpdate);
+    window.addEventListener('exam-complete', handleMasteryUpdate);
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('mastery-update', handleMasteryUpdate);
+      window.removeEventListener('practice-complete', handleMasteryUpdate);
+      window.removeEventListener('exam-complete', handleMasteryUpdate);
     };
   }, [subject, units]);
 
