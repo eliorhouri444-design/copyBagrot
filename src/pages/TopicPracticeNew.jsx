@@ -778,6 +778,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
       });
     }
 
+    // עדכון גלובלי של כל המדדים
+    triggerPracticeComplete();
+
     navigate(createPageUrl("Practice"));
   };
 
