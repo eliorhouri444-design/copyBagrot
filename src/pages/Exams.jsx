@@ -766,7 +766,7 @@ export default function ExamsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-4">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 from-blue-500 to-indigo-500 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity">
