@@ -521,86 +521,73 @@ export default function TopicPracticeNewPage() {
         console.log("✅ Feedback dialog should be open now");
         return; // Stop here, don't auto-advance
       } else {
-        // Regular question handling with smart checking
-        const solutions = await base44.entities.SolutionBank.filter({
-          question_id: currentQuestion.question_id
-        });
-
+        // Regular question handling - בדיקה מהירה קודם
         let isCorrect = false;
         let status = "incorrect";
         let correctAnswer = "";
-        let aiScore = 0;
 
-        if (solutions.length > 0) {
-          const solution = solutions[0];
-          const correctAnswers = solution.final_answers || [];
-          const acceptableVariants = solution.acceptable_variants || [];
-
-          if (correctAnswers.length > 0) {
-            correctAnswer = correctAnswers[0].value || "";
-          }
-
-          const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+        // נסה קודם בדיקה פשוטה ללא AI
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+        
+        // בדוק אם יש תשובה נכונה בשאלה עצמה
+        if (currentQuestion.correct_answer) {
+          correctAnswer = String(currentQuestion.correct_answer);
+          const normalizedCorrect = correctAnswer.trim().toLowerCase();
           
-          // First check exact match
-          const exactMatch = correctAnswers.some(ans => 
-            ans.value?.toLowerCase() === normalizedUserAnswer
-          ) || acceptableVariants.some(variant => 
-            variant.toLowerCase() === normalizedUserAnswer
-          );
-
-          if (exactMatch) {
+          if (normalizedUserAnswer === normalizedCorrect) {
             isCorrect = true;
             status = "correct";
-            aiScore = 100;
-          } else {
-            // Use smart AI checking
-            try {
-              const aiCheck = await base44.integrations.Core.InvokeLLM({
-                prompt: `INSTRUCTIONS FOR CHECKING ANSWERS:
+          }
+        }
 
-1. Check semantic meaning, not exact wording.
-2. Compare student answer to the correct answer and consider multiple accepted variations.
-3. Use key required words to confirm core meaning.
-4. Allow synonyms and paraphrasing.
-5. Ignore capitalization, punctuation, and minor spelling errors.
-6. Reject answers that change facts, subject, time, or purpose.
-7. Score answers on a scale:
-   - similarity_score 100 = fully correct
-   - similarity_score 70-90 = correct meaning but missing detail
-   - similarity_score 40-60 = related but incorrect
-   - similarity_score 0-30 = wrong
-8. Provide helpful feedback in Hebrew explaining mistakes or missing information.
+        // אם לא נמצאה התאמה, בדוק ב-SolutionBank
+        if (!isCorrect) {
+          const solutions = await base44.entities.SolutionBank.filter({
+            question_id: currentQuestion.question_id
+          });
 
+          if (solutions.length > 0) {
+            const solution = solutions[0];
+            const correctAnswers = solution.final_answers || [];
+            const acceptableVariants = solution.acceptable_variants || [];
+
+            if (correctAnswers.length > 0) {
+              correctAnswer = correctAnswers[0].value || "";
+            }
+
+            // בדיקת התאמה מדויקת - מהירה
+            const exactMatch = correctAnswers.some(ans => 
+              ans.value?.toLowerCase().trim() === normalizedUserAnswer
+            ) || acceptableVariants.some(variant => 
+              variant.toLowerCase().trim() === normalizedUserAnswer
+            );
+
+            if (exactMatch) {
+              isCorrect = true;
+              status = "correct";
+            } else if (userAnswer.length > 3) {
+              // רק לתשובות ארוכות - השתמש ב-AI
+              try {
+                const aiCheck = await base44.integrations.Core.InvokeLLM({
+                  prompt: `Check if student answer is correct. Be lenient with synonyms and paraphrasing.
 Question: ${currentQuestion.question_text}
-Correct Answer: ${correctAnswer}
-Acceptable Variations: ${acceptableVariants.join(', ')}
-Student Answer: ${userAnswer}
+Correct: ${correctAnswer}
+Student: ${userAnswer}
+Return JSON with is_correct (boolean) and similarity_score (0-100)`,
+                  response_json_schema: {
+                    type: "object",
+                    properties: {
+                      is_correct: { type: "boolean" },
+                      similarity_score: { type: "number" }
+                    }
+                  }
+                });
 
-If the answer expresses the same idea even if phrased differently, mark as correct.
-Focus on meaning, purpose, cause, and key details - not exact wording.
-
-Return JSON:`,
-                response_json_schema: {
-                  type: "object",
-                  properties: {
-                    is_correct: { type: "boolean" },
-                    similarity_score: { type: "number" },
-                    explanation_hebrew: { type: "string" },
-                    missing_details: { type: "string" }
-                  },
-                  required: ["is_correct", "similarity_score", "explanation_hebrew"]
-                }
-              });
-
-              isCorrect = aiCheck.is_correct || aiCheck.similarity_score >= 70;
-              aiScore = aiCheck.similarity_score || 0;
-              status = aiCheck.similarity_score >= 90 ? "correct" : aiCheck.similarity_score >= 70 ? "partial" : "incorrect";
-            } catch (error) {
-              console.error("Error with AI check:", error);
-              isCorrect = false;
-              status = "incorrect";
-              aiScore = 0;
+                isCorrect = aiCheck.is_correct || aiCheck.similarity_score >= 70;
+                status = aiCheck.similarity_score >= 90 ? "correct" : aiCheck.similarity_score >= 70 ? "partial" : "incorrect";
+              } catch (error) {
+                console.error("Error with AI check:", error);
+              }
             }
           }
         }
