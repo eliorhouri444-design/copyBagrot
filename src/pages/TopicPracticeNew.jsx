@@ -308,17 +308,42 @@ export default function TopicPracticeNewPage() {
       if ((currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0) {
         // מציאת התשובה הנכונה מהאופציות או מהשדה correct_answer
         let correctAnswer = "";
+        let correctAnswerDisplay = "";
 
         // אם יש שדה correct_answer בשאלה
         if (currentQuestion.correct_answer) {
-          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase().replace(/\s/g, '');
+          correctAnswerDisplay = String(currentQuestion.correct_answer);
+          correctAnswer = correctAnswerDisplay.trim().toLowerCase().replace(/\s+/g, ' ');
         }
 
-        // נרמול התשובה - הסרת כל הרווחים
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
+        // נרמול התשובה - שמירה על רווחים בודדים
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
         
-        // בדיקה נוספת - אם אין תשובה תקינה מהמשתמש
-        const isCorrect = normalizedUserAnswer.length > 0 && normalizedUserAnswer === correctAnswer;
+        console.log(`🔍 Multiple choice check:`);
+        console.log(`   User answer: "${userAnswer}" -> normalized: "${normalizedUserAnswer}"`);
+        console.log(`   Correct answer: "${correctAnswerDisplay}" -> normalized: "${correctAnswer}"`);
+        
+        // בדיקה - השוואה עם נרמול סטנדרטי
+        let isCorrect = false;
+        
+        if (correctAnswer && normalizedUserAnswer.length > 0) {
+          // בדיקה ישירה
+          isCorrect = normalizedUserAnswer === correctAnswer;
+          
+          // אם לא נמצאה התאמה, נסה בלי רווחים בכלל
+          if (!isCorrect) {
+            const noSpaceUser = normalizedUserAnswer.replace(/\s/g, '');
+            const noSpaceCorrect = correctAnswer.replace(/\s/g, '');
+            isCorrect = noSpaceUser === noSpaceCorrect;
+          }
+          
+          // אם עדיין לא נמצאה התאמה, בדוק אם התשובה הנכונה נמצאת בתוך תשובת המשתמש או להיפך
+          if (!isCorrect) {
+            isCorrect = normalizedUserAnswer.includes(correctAnswer) || correctAnswer.includes(normalizedUserAnswer);
+          }
+        }
+        
+        console.log(`   Result: ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'}`);
 
         // שמירה ברקע
         saveAttemptInBackground({
@@ -336,7 +361,7 @@ export default function TopicPracticeNewPage() {
 
         setResults((prev) => ({
           ...prev,
-          [currentQuestion.question_id]: { isCorrect, status: isCorrect ? "correct" : "incorrect", correctAnswer, userAnswer }
+          [currentQuestion.question_id]: { isCorrect, status: isCorrect ? "correct" : "incorrect", correctAnswer: correctAnswerDisplay, userAnswer }
         }));
 
         // מעבר מיידי לשאלה הבאה
