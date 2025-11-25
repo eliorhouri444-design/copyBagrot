@@ -3,11 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion } from "framer-motion";
-import { 
-  Loader2, Target, CheckCircle, BookOpen, Repeat, AlertTriangle, 
-  Clock, Play, Zap, Crown, Lock, TrendingUp, FileCheck, 
-  Calendar, Award, ChevronLeft
-} from 'lucide-react';
+import {
+  Loader2, Target, CheckCircle, BookOpen, Repeat, AlertTriangle,
+  Clock, Play, Zap, Crown, Lock, TrendingUp, FileCheck,
+  Calendar, Award, ChevronLeft } from
+'lucide-react';
 import { Button } from "@/components/ui/button";
 
 export default function StudyPlanPage() {
@@ -33,19 +33,19 @@ export default function StudyPlanPage() {
 
         // Load real stats
         const [attempts, sessions, weakTopics] = await Promise.all([
-          base44.entities.AttemptNew.filter({ created_by: currentUser.email }, '-created_date', 500),
-          base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, is_completed: true }, '-created_date', 100),
-          base44.entities.WeakTopic.filter({}, null, 50)
-        ]);
+        base44.entities.AttemptNew.filter({ created_by: currentUser.email }, '-created_date', 500),
+        base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, is_completed: true }, '-created_date', 100),
+        base44.entities.WeakTopic.filter({}, null, 50)]
+        );
 
-        const correctAttempts = attempts.filter(a => a.status === 'correct').length;
-        const wrongAttempts = attempts.filter(a => a.status === 'incorrect' || a.status === 'partial').length;
+        const correctAttempts = attempts.filter((a) => a.status === 'correct').length;
+        const wrongAttempts = attempts.filter((a) => a.status === 'incorrect' || a.status === 'partial').length;
 
         setStats({
           totalQuestions: 700,
           completedQuestions: attempts.length,
           totalExams: 6,
-          completedExams: sessions.filter(s => s.session_type === 'exam').length,
+          completedExams: sessions.filter((s) => s.session_type === 'exam').length,
           weakTopics: weakTopics.length,
           activeMistakes: wrongAttempts
         });
@@ -60,9 +60,9 @@ export default function StudyPlanPage() {
   }, []);
 
   // Calculate readiness
-  const practiceProgress = stats.totalQuestions > 0 ? Math.round((stats.completedQuestions / stats.totalQuestions) * 100) : 0;
-  const examProgress = stats.totalExams > 0 ? Math.round((stats.completedExams / stats.totalExams) * 100) : 0;
-  const overallReadiness = Math.round((practiceProgress * 0.5 + examProgress * 0.3 + Math.max(0, 100 - stats.weakTopics * 10) * 0.2));
+  const practiceProgress = stats.totalQuestions > 0 ? Math.round(stats.completedQuestions / stats.totalQuestions * 100) : 0;
+  const examProgress = stats.totalExams > 0 ? Math.round(stats.completedExams / stats.totalExams * 100) : 0;
+  const overallReadiness = Math.round(practiceProgress * 0.5 + examProgress * 0.3 + Math.max(0, 100 - stats.weakTopics * 10) * 0.2);
 
   // Days until exam
   const examDate = user?.exam_date ? new Date(user.exam_date) : null;
@@ -79,8 +79,8 @@ export default function StudyPlanPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-      </div>
-    );
+      </div>);
+
   }
 
   const displaySubject = user?.selected_subject || 'אנגלית';
@@ -89,7 +89,7 @@ export default function StudyPlanPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] rounded-b-[2rem] p-6 shadow-xl mb-6">
+      <div className="bg-blue-500 mb-6 p-6 rounded-b-[2rem] from-[#3B82F6] to-[#8B5CF6] shadow-xl">
         <div className="flex items-center justify-between text-white mb-4">
           <Button
             variant="ghost"
@@ -106,19 +106,19 @@ export default function StudyPlanPage() {
         </div>
 
         {/* Readiness Gauge */}
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center"
-        >
+          className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+
           <div className="relative w-32 h-32 mx-auto mb-3">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-              <circle 
-                cx="18" cy="18" r="15.9" fill="none" 
+              <circle
+                cx="18" cy="18" r="15.9" fill="none"
                 stroke="white" strokeWidth="3" strokeLinecap="round"
-                strokeDasharray={`${overallReadiness}, 100`}
-              />
+                strokeDasharray={`${overallReadiness}, 100`} />
+
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-4xl font-bold text-white">{overallReadiness}%</span>
@@ -146,37 +146,37 @@ export default function StudyPlanPage() {
 
       <div className="px-4 space-y-4">
         {/* Timeline Alert */}
-        {daysUntilExam !== null && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`rounded-2xl p-4 flex items-center gap-3 ${
-              daysUntilExam <= 7 ? 'bg-red-100 border-2 border-red-300' : 
-              daysUntilExam <= 14 ? 'bg-yellow-100 border-2 border-yellow-300' : 
-              'bg-green-100 border-2 border-green-300'
-            }`}
-          >
+        {daysUntilExam !== null &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl p-4 flex items-center gap-3 ${
+          daysUntilExam <= 7 ? 'bg-red-100 border-2 border-red-300' :
+          daysUntilExam <= 14 ? 'bg-yellow-100 border-2 border-yellow-300' :
+          'bg-green-100 border-2 border-green-300'}`
+          }>
+
             <Calendar className={`w-8 h-8 ${
-              daysUntilExam <= 7 ? 'text-red-600' : 
-              daysUntilExam <= 14 ? 'text-yellow-600' : 'text-green-600'
-            }`} />
+          daysUntilExam <= 7 ? 'text-red-600' :
+          daysUntilExam <= 14 ? 'text-yellow-600' : 'text-green-600'}`
+          } />
             <div className="flex-1">
               <div className="font-bold text-gray-900">{daysUntilExam} ימים לבגרות</div>
               <div className="text-sm text-gray-600">
-                {daysUntilExam <= 7 ? 'זמן להגביר מאמצים!' : 
-                 daysUntilExam <= 14 ? 'המשך בקצב הנוכחי' : 'אתה על המסלול הנכון'}
+                {daysUntilExam <= 7 ? 'זמן להגביר מאמצים!' :
+              daysUntilExam <= 14 ? 'המשך בקצב הנוכחי' : 'אתה על המסלול הנכון'}
               </div>
             </div>
           </motion.div>
-        )}
+        }
 
         {/* Progress Summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
-        >
+          className="bg-white rounded-2xl shadow-lg p-5">
+
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-600" />
             איפה אתה עומד כרגע
@@ -220,8 +220,8 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
-        >
+          className="bg-white rounded-2xl shadow-lg p-5">
+
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-green-600" />
             המשימות להיום
@@ -290,22 +290,22 @@ export default function StudyPlanPage() {
             </div>
           </div>
 
-          {!isPremium && (
-            <div className="mt-4 text-center text-sm text-gray-500">
+          {!isPremium &&
+          <div className="mt-4 text-center text-sm text-gray-500">
               זמן לימוד יומי: <span className="font-bold">30 דקות</span>
               <span className="text-gray-400"> (פרימיום: 90 דקות)</span>
             </div>
-          )}
+          }
         </motion.div>
 
         {/* Premium Upsell for Free Users */}
-        {!isPremium && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-r from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-5 text-center"
-          >
+        {!isPremium &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-r from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-5 text-center">
+
             <Crown className="w-12 h-12 text-white mx-auto mb-3" />
             <h3 className="text-xl font-bold text-white mb-2">שדרג לפרימיום</h3>
             <p className="text-white/90 text-sm mb-4">
@@ -318,48 +318,48 @@ export default function StudyPlanPage() {
               <li>✓ תרגול טעויות ללא הגבלה</li>
               <li>✓ ללא פרסומות</li>
             </ul>
-            <Button 
-              onClick={() => navigate(createPageUrl("Premium"))}
-              className="w-full bg-white text-amber-600 hover:bg-gray-100 font-bold h-12 rounded-xl"
-            >
+            <Button
+            onClick={() => navigate(createPageUrl("Premium"))}
+            className="w-full bg-white text-amber-600 hover:bg-gray-100 font-bold h-12 rounded-xl">
+
               <Crown className="w-5 h-5 ml-2" />
               שדרג עכשיו
             </Button>
           </motion.div>
-        )}
+        }
 
         {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-2 gap-3"
-        >
-          <Button 
-            onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-            className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1"
-          >
+          className="grid grid-cols-2 gap-3">
+
+          <Button
+            onClick={() => navigate(createPageUrl("CustomWeakPractice"))} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 h-14 flex flex-col items-center justify-center gap-1">
+
+
             <Repeat className="w-5 h-5" />
             תרגל טעויות
           </Button>
           
-          <Button 
+          <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1"
-          >
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1">
+
             <Play className="w-5 h-5" />
             המשך לתרגל
           </Button>
           
-          <Button 
-            onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
-            className="bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 h-14 text-sm font-bold rounded-xl col-span-2 flex items-center justify-center gap-2"
-          >
+          <Button
+            onClick={() => navigate(createPageUrl("WeakAreaSelection"))} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 h-14 col-span-2 flex items-center justify-center gap-2">
+
+
             <Zap className="w-5 h-5" />
             תרגל נושאים חלשים
           </Button>
           
-          <Button 
+          <Button
             onClick={() => {
               if (isPremium) {
                 navigate(createPageUrl("Exams"));
@@ -368,41 +368,41 @@ export default function StudyPlanPage() {
               }
             }}
             className={`h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 ${
-              isPremium 
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600' 
-                : 'bg-gray-400 hover:bg-gray-500'
-            }`}
-          >
+            isPremium ?
+            'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600' :
+            'bg-gray-400 hover:bg-gray-500'}`
+            }>
+
             <FileCheck className="w-5 h-5" />
             בגרות מלאה
             {!isPremium && <Lock className="w-3 h-3" />}
           </Button>
           
-          <Button 
+          <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1"
-          >
+            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1">
+
             <Target className="w-5 h-5" />
             משימה יומית
           </Button>
         </motion.div>
 
         {/* Smart Alert */}
-        {stats.weakTopics > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl p-4 flex items-start gap-3"
-          >
+        {stats.weakTopics > 0 &&
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl p-4 flex items-start gap-3">
+
             <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
               <div className="font-bold text-yellow-900">יש לך {stats.weakTopics} נושאים חלשים</div>
               <div className="text-sm text-yellow-800">מומלץ לחזור עליהם היום כדי לשפר את המוכנות</div>
             </div>
           </motion.div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
