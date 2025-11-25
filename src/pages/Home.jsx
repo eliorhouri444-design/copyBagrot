@@ -245,47 +245,6 @@ export default function HomePage() {
           isLoading={masteryLoading} 
         />
 
-        {/* מה המצב שלך - פירוט */}
-        <CardSimple delay={0.05}>
-          <CardTitle>פירוט מדדים</CardTitle>
-          
-          <div className="grid grid-cols-3 gap-3 mb-3">
-            <StatCard value={daysUntilExam} label="ימים לבגרות" color="#3B82F6" />
-            <StatCard value={user?.target_score || 85} label="ציון מטרה" color="#3B82F6" />
-            <StatCard value={`${readinessData?.current?.totalPractice || 0}`} label="שאלות נפתרו" color="#10B981" />
-          </div>
-
-          <Button
-            onClick={() => setShowDetails(!showDetails)}
-            variant="outline"
-            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]">
-
-            {showDetails ? 'הסתר פירוט' : 'ראה פירוט מלא'}
-            <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
-          </Button>
-
-          {showDetails && readinessData &&
-          <div className="grid grid-cols-2 gap-2 mt-3">
-              <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                <div className="text-sm text-gray-600 mb-1">שליטה בנושאים</div>
-                <div className="text-2xl font-black text-purple-600">{overallMastery.totalTopicMastery}%</div>
-              </div>
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                <div className="text-sm text-gray-600 mb-1">שליטה בבגרויות</div>
-                <div className="text-2xl font-black text-blue-600">{overallMastery.examsMastery}%</div>
-              </div>
-              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                <div className="text-sm text-gray-600 mb-1">אחוז הצלחה</div>
-                <div className="text-2xl font-black text-green-600">{Math.round(readinessData.current?.currentAccuracy || 0)}%</div>
-              </div>
-              <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                <div className="text-sm text-gray-600 mb-1">בגרויות הושלמו</div>
-                <div className="text-2xl font-black text-orange-600">{readinessData.current?.totalExams || 0}</div>
-              </div>
-            </div>
-          }
-        </CardSimple>
-
         {/* נושאים ושאלונים + משימות היום */}
         <DailyPlanCard
           readinessData={readinessData}
