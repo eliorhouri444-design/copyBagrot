@@ -236,6 +236,13 @@ export default function TopicPracticeNewPage() {
     }
   };
 
+  // שמירת attempt ברקע - לא מחכים לתוצאה
+  const saveAttemptInBackground = (attemptData) => {
+    base44.entities.AttemptNew.create(attemptData).catch(err => 
+      console.error("Error saving attempt:", err)
+    );
+  };
+
   const handleSubmitAnswer = async (providedAnswer) => {
     if (isSubmitting) return;
 
@@ -250,6 +257,53 @@ export default function TopicPracticeNewPage() {
     const targetWords = displayUnits === 4 ? 80 : displayUnits === 5 ? 100 : 80;
 
     try {
+      // בדיקה מהירה לשאלות רב-ברירה - ללא AI
+      if ((currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0) {
+        // מציאת התשובה הנכונה מהאופציות או מהשדה correct_answer
+        let correctAnswer = "";
+        
+        // אם יש שדה correct_answer בשאלה
+        if (currentQuestion.correct_answer) {
+          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase();
+        }
+        
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+        const isCorrect = normalizedUserAnswer === correctAnswer || 
+                         (currentQuestion.options?.findIndex((opt, idx) => {
+                           const optText = typeof opt === 'object' ? (opt.text || opt.value || '') : String(opt);
+                           return optText.trim().toLowerCase() === normalizedUserAnswer && idx === 0; // הנחה שהתשובה הראשונה נכונה
+                         }) === 0);
+
+        // שמירה ברקע
+        saveAttemptInBackground({
+          question_id: currentQuestion.question_id,
+          subject_id: currentQuestion.subject_id,
+          topic_id: topicId,
+          session_id: sessionId,
+          user_answer_text: userAnswer,
+          score: isCorrect ? (currentQuestion.max_score || 100) : 0,
+          max_score: currentQuestion.max_score || 100,
+          percentage: isCorrect ? 100 : 0,
+          status: isCorrect ? "correct" : "incorrect",
+          time_spent_seconds: 0
+        });
+
+        setResults(prev => ({
+          ...prev,
+          [currentQuestion.question_id]: { isCorrect, status: isCorrect ? "correct" : "incorrect", correctAnswer, userAnswer }
+        }));
+
+        // מעבר מיידי לשאלה הבאה
+        setIsSubmitting(false);
+        if (currentQuestionIndex < currentSetQuestions.length - 1) {
+          setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+          saveWeakTopicsStats();
+          setShowSummary(true);
+        }
+        return;
+      }
+
       // Check if this is a writing question
       if (currentQuestion.question_type === "writing") {
         console.log("🎯 Starting writing evaluation...");
