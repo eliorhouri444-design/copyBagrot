@@ -331,55 +331,34 @@ export default function ModuleCarousel({
                     {/* מבחן אקראי - למעלה - לכולם */}
                     {currentModule.entity !== 'practice' && onRandomExam &&
                   <div className="space-y-2">
-                        {/* הודעה על בגרויות נותרות */}
-                        {isPremium !== true &&
-                    <div className="text-center text-[11px] text-gray-500 mb-1">
-                            {todayExamCount < FREE_DAILY_EXAM ?
-                      <span className="text-green-600 font-semibold">✓ בגרות חינמית זמינה היום</span> :
-
-                      <span className="text-amber-600 font-semibold">📺 נדרשת צפייה בפרסומת</span>
-                      }
-                          </div>
-                    }
-
                         <Button
-                      onClick={() => handleStartExam(() => onRandomExam(currentModule.id))} className="bg-[#3B82F6] text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-blue-600 h-11 transition-all flex items-center justify-center gap-2">
-
-
-                          <Shuffle className="w-5 h-5" />
-                          בגרות אקראית
+                          onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
+                          className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800"
+                        >
+                          <Play className="w-4 h-4 ml-2" />
+                          התחל בגרות
                         </Button>
 
                         {isPremium === true ? (
-                      <>
-                        <Button
-                          onClick={() => {
-                            sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
-                            navigate(createPageUrl("CustomWeakExam"));
-                          }}
-                          className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
-                        >
-                          <AlertTriangle className="w-4 h-4 ml-2" />
-                          בוחן טעויות מהשאלון
-                        </Button>
-                        <Button
-                          onClick={() => navigate(createPageUrl("CustomWeakExam") + `?module=${currentModule.module_id || currentModule.id}&mode=adaptive`)}
-                          variant="outline"
-                          className="w-full h-10 text-[12px] font-bold border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800 rounded-[14px]"
-                        >
-                          <Target className="w-4 h-4 ml-2" />
-                          בוחן מותאם לשאלון
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        onClick={() => navigate(createPageUrl("Premium"))}
-                        className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800"
-                      >
-                        <Lock className="w-4 h-4 ml-2" />
-                        בוחן טעויות + בוחן מותאם
-                      </Button>
-                    )}
+                          <Button
+                            onClick={() => {
+                              sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
+                              navigate(createPageUrl("CustomWeakExam"));
+                            }}
+                            className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                          >
+                            <Target className="w-4 h-4 ml-2" />
+                            בוחן טעויות מהשאלון
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => navigate(createPageUrl("Premium"))}
+                            className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800"
+                          >
+                            <Lock className="w-4 h-4 ml-2" />
+                            בוחן טעויות
+                          </Button>
+                        )}
                       </div>
                   }
 
