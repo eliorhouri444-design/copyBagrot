@@ -717,12 +717,12 @@ export default function ExamGenericPage() {
                 <div className="text-2xl font-bold text-gray-900">{exam.duration_minutes}</div>
                 <div className="text-sm text-gray-600">דקות</div>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 text-center">
+              <div className="bg-blue-50 p-4 text-center rounded-xl">
                 <Award className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{exam.total_points}</div>
                 <div className="text-sm text-gray-600">נקודות</div>
               </div>
-              <div className="bg-purple-50 rounded-xl p-4 text-center">
+              <div className="bg-blue-50 p-4 text-center rounded-xl">
                 <CheckCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{exam.questions.length}</div>
                 <div className="text-sm text-gray-600">שאלות</div>
@@ -768,8 +768,8 @@ export default function ExamGenericPage() {
             </div>
 
             <Button
-              onClick={() => setShowModeDialog(true)}
-              className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold">
+              onClick={() => setShowModeDialog(true)} className="bg-blue-500 text-white px-4 py-2 text-lg font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full h-14 from-blue-600 to-purple-600">
+
 
               התחל מבחן
             </Button>
