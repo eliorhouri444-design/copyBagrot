@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { triggerExamComplete } from "@/components/mastery/useMasteryData";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Clock, Award, CheckCircle, X, AlertCircle, Loader2, ChevronRight, ChevronLeft, BookOpen, AlertTriangle, Zap, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
