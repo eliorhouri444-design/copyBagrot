@@ -1137,7 +1137,7 @@ export default function ExamsPage() {
             </div>
 
             <div className="bg-indigo-50 p-4 text-center rounded-xl from-amber-50 to-yellow-50 border-2 border-amber-200">
-              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+              <Crown className="w-12 h-12 text-blue-500 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
               <p className="text-sm text-gray-600 mb-4">
                 גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
