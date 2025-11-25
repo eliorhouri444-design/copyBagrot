@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useExamsData } from "@/components/cache/useExamsData";
+import { DataCache } from "@/components/cache/DataCache";
 import { createPageUrl } from "@/utils";
 import { BookOpen, CheckCircle, Award, Clock, Play, Crown, X, Upload, Settings, Trophy, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Accessibility, Shield, TrendingDown, Lock, Target, TrendingUp, Edit2, Trash2, Loader2, BookCheck, FileCheck, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
