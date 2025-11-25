@@ -421,7 +421,7 @@ export default function PremiumPage() {
                     transition={{ delay: 0.7 + idx * 0.05 }}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
 
-                      <div className={`${feature.gradient} p-5`}>
+                      <div className="bg-[#3B82F6] p-5">
                         <div className="flex items-center gap-4 text-white">
                           <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
                             <Icon className="w-7 h-7" />
