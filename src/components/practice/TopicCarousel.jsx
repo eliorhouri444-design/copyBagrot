@@ -48,12 +48,12 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const loadTopics = async () => {
     setIsLoading(true);
     try {
-      // טעינה מקבילית של כל הנתונים
+      // טעינה מקבילית של כל הנתונים - מוגבלת
       const [customTopics, allQuestions, user, allVocabQuestions] = await Promise.all([
-        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
-        base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
+        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 50),
+        base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 500),
         base44.auth.me(),
-        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }) : Promise.resolve([])
+        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 200) : Promise.resolve([])
       ]);
 
       const relevantCustomTopics = customTopics;
