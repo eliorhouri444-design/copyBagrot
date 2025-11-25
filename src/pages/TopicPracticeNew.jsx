@@ -481,7 +481,8 @@ export default function TopicPracticeNewPage() {
         const percentage = totalScore;
 
         console.log("💾 Saving attempt to database...");
-        await base44.entities.AttemptNew.create({
+        // שמירה ברקע - לא מחכים
+        saveAttemptInBackground({
           question_id: currentQuestion.question_id,
           subject_id: currentQuestion.subject_id,
           topic_id: topicId,
