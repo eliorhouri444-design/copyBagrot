@@ -939,7 +939,7 @@ export default function ExamGenericPage() {
         actionType="exam_retry" />
 
 
-      <div className="bg-blue-600 mb-3 p-3 rounded-b-xl from-blue-600 to-purple-600 shadow-lg">
+      <div className="bg-blue-500 mb-3 p-3 rounded-b-xl from-blue-600 to-purple-600 shadow-lg">
         <div className="flex items-center justify-between mb-2">
           <Button variant="ghost" size="icon" onClick={handleExitExam} className="text-white hover:bg-white/20 h-8 w-8">
             <ArrowLeft className="w-5 h-5" />
