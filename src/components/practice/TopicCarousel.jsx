@@ -401,7 +401,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
             <div className="space-y-2">
               <Button
-                onClick={handleStartPractice} className="bg-[#3B82F6] text-[#fafafa] px-4 py-2 font-bold rounded-[14px] \u05E4\u05E8\u05D9\u05DE\u05D9\u05D5\u05DD \u05DE\u05D5\u05EA\u05D0\u05DD \u05D0\u05D9\u05E9\u05D9\u05EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700">
+                onClick={handleStartPractice} className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800">
 
 
                 <Play className="w-4 h-4 ml-2" />
