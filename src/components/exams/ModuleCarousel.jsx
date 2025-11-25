@@ -188,6 +188,14 @@ export default function ModuleCarousel({
     Math.round(moduleAttempts.reduce((sum, attemptItem) => sum + (attemptItem.score_percent || 0), 0) / totalAttempts) :
     0;
 
+    // חלוקה לפי טווחי ציונים
+    const excellentAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 86).length;
+    const mediumAttempts = moduleAttempts.filter((attemptItem) => {
+      const score = attemptItem.score_percent || 0;
+      return score >= 56 && score < 86;
+    }).length;
+    const failedAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) < 56).length;
+
     const maxExams = isPremium === true ? 100 : 5;
     const progress = totalAttempts > 0 ? Math.min(100, Math.round(totalAttempts / maxExams * 100)) : 0;
 
@@ -196,7 +204,10 @@ export default function ModuleCarousel({
       passedAttempts,
       avgScore,
       progress,
-      maxExams
+      maxExams,
+      excellentAttempts,
+      mediumAttempts,
+      failedAttempts
     };
   }, [currentModule, examAttempts, isPremium]);
 
