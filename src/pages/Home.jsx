@@ -65,6 +65,93 @@ export default function HomePage() {
     loadAllData();
   }, []);
 
+  // Timer for rating and share dialogs
+  useEffect(() => {
+    if (!user || user.is_premium) return;
+    
+    const checkAndShowDialogs = async () => {
+      try {
+        // Load ad settings
+        const settings = await base44.entities.UserAdSettings.list();
+        let currentSettings = settings[0];
+        
+        if (!currentSettings) {
+          currentSettings = await base44.entities.UserAdSettings.create({
+            free_attempts: 3,
+            has_seen_info_today: false,
+            ads_viewed_today: 0,
+            has_rated: false,
+            last_reset_date: new Date().toISOString().split('T')[0]
+          });
+        }
+        
+        setAdSettings(currentSettings);
+        
+        const today = new Date().toISOString().split('T')[0];
+        const lastRatingShown = localStorage.getItem('last_rating_dialog_date');
+        const lastShareShown = localStorage.getItem('last_share_dialog_date');
+        
+        // אם כבר דירג - לא מציגים
+        if (currentSettings.has_rated) return;
+        
+        // Show rating dialog after 3 minutes (180000ms)
+        const ratingTimer = setTimeout(() => {
+          // אל תציג אם כבר הוצג היום
+          if (lastRatingShown === today) return;
+          setShowRatingDialog(true);
+          localStorage.setItem('last_rating_dialog_date', today);
+        }, 180000); // 3 דקות
+        
+        // Show share dialog after 5 minutes (300000ms)
+        const shareTimer = setTimeout(() => {
+          // אל תציג אם כבר הוצג היום
+          if (lastShareShown === today) return;
+          setShowShareDialog(true);
+          localStorage.setItem('last_share_dialog_date', today);
+        }, 300000); // 5 דקות
+        
+        return () => {
+          clearTimeout(ratingTimer);
+          clearTimeout(shareTimer);
+        };
+      } catch (error) {
+        console.error("Error loading ad settings:", error);
+      }
+    };
+    
+    checkAndShowDialogs();
+  }, [user]);
+
+  const handleSubmitRating = async (rating) => {
+    try {
+      if (rating === 5 && adSettings) {
+        const bonusEndDate = new Date();
+        bonusEndDate.setDate(bonusEndDate.getDate() + 1);
+
+        await base44.entities.UserAdSettings.update(adSettings.id, {
+          has_rated: true,
+          rating_date: new Date().toISOString(),
+          bonus_active_until: bonusEndDate.toISOString().split('T')[0]
+        });
+
+        alert("🎉 תודה על הדירוג! קיבלת יום אחד ללא פרסומות!");
+      } else if (adSettings) {
+        await base44.entities.UserAdSettings.update(adSettings.id, {
+          has_rated: true,
+          rating_date: new Date().toISOString()
+        });
+      }
+      setShowRatingDialog(false);
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+    }
+  };
+
+  const getReferralCode = () => {
+    if (!user?.email) return 'guest';
+    return btoa(user.email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+  };
+
   const loadAllData = async () => {
     setIsLoading(true);
     try {
