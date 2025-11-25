@@ -110,17 +110,19 @@ export default function CustomWeakPracticePage() {
       console.log('❌ Wrong exam questions:', examWrongQuestions.length);
 
       // Collect unique question IDs from practice
-      const wrongQuestionIds = [...new Set(wrongAttempts.map(a => a.question_id))];
+      const wrongQuestionIds = [...new Set(wrongAttempts.map(a => a.question_id).filter(Boolean))];
+      console.log('📝 Wrong question IDs:', wrongQuestionIds);
       
       // Fetch the actual questions from QuestionBank
       const allQuestions = await base44.entities.QuestionBank.list();
+      console.log('📚 Total questions in bank:', allQuestions.length);
+      
+      // More flexible filtering - just find questions that were wrong, filter active and non-listening
       const weakQuestionsFromBank = allQuestions.filter(q => 
         wrongQuestionIds.includes(q.question_id) &&
-        q.subject_id === currentUser.selected_subject &&
-        parseInt(q.unit_level) === parseInt(currentUser.selected_units) &&
-        q.is_active &&
-        !q.topic_id?.includes('listening') &&
-        !q.topic_id?.includes('extended_reading')
+        q.is_active !== false &&
+        !q.topic_id?.toLowerCase().includes('listening') &&
+        !q.topic_id?.toLowerCase().includes('extended_reading')
       ).map(q => ({
         ...q,
         _metadata: {
@@ -129,6 +131,8 @@ export default function CustomWeakPracticePage() {
           source: 'practice'
         }
       }));
+      
+      console.log('✅ Weak questions from bank:', weakQuestionsFromBank.length);
 
       // Convert exam wrong questions to same format
       const weakQuestionsFromExams = examWrongQuestions.map((q, idx) => ({
