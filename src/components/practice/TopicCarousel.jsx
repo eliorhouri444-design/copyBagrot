@@ -19,6 +19,27 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
     loadTopics();
   }, [subject, units]);
 
+  // רענון כשחוזרים לדף (visibility change)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadTopics();
+      }
+    };
+    
+    const handleFocus = () => {
+      loadTopics();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [subject, units]);
+
   const loadTopics = async () => {
     setIsLoading(true);
     try {
