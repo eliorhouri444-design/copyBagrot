@@ -1250,7 +1250,6 @@ export default function TopicPracticeNewPage() {
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
             className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10">
-
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
 
@@ -1259,16 +1258,17 @@ export default function TopicPracticeNewPage() {
             <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && !isListeningTopic &&
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowStoryDialog(true)}
-            className="text-white hover:bg-white/20">
-
+          {readingText && !isListeningTopic ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowStoryDialog(true)}
+              className="text-white hover:bg-white/20">
               <BookOpen className="w-5 h-5" />
             </Button>
-          }
+          ) : (
+            <div className="w-8 sm:w-10" />
+          )}
         </div>
 
         <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
@@ -1277,9 +1277,8 @@ export default function TopicPracticeNewPage() {
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
             className="h-full bg-white" />
-
         </div>
-        </div>
+      </div>
 
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-2 sm:p-3 gap-3">
         {/* Reading text panel on the right */}
