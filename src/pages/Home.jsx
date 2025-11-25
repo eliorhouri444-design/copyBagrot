@@ -67,9 +67,12 @@ export default function HomePage() {
     trackReferral();
   }, []);
 
+  // Redirect to onboarding if needed
   useEffect(() => {
-    loadAllData();
-  }, []);
+    if (homeData?.needsOnboarding) {
+      navigate(createPageUrl("Onboarding"));
+    }
+  }, [homeData, navigate]);
 
   // Timer for rating and share dialogs
   useEffect(() => {
