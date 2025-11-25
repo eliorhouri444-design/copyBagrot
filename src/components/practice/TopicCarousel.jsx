@@ -430,15 +430,15 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                 <div className="grid grid-cols-3 gap-1.5">
                   <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
                     <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">שגויות</div>
+                    <div className="text-[9px] text-[#6E6E6E]">סטים שגויים</div>
                   </div>
                   <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
                     <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">נכונות</div>
+                    <div className="text-[9px] text-[#6E6E6E]">סטים נכונים</div>
                   </div>
                   <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
                     <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">חלקיות</div>
+                    <div className="text-[9px] text-[#6E6E6E]">סטים חלקיים</div>
                   </div>
                 </div>
               </div>
