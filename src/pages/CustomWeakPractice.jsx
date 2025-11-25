@@ -70,7 +70,15 @@ export default function CustomWeakPracticePage() {
         wrongAttempts = wrongAttempts.filter(a => a.topic_id === specificTopicId);
       }
       
-      console.log('❌ Wrong practice attempts:', wrongAttempts.length);
+      // If we have selected subject, filter by it, but keep all if no subject set
+      if (currentUser.selected_subject) {
+        wrongAttempts = wrongAttempts.filter(a => 
+          a.subject_id === currentUser.selected_subject &&
+          parseInt(a.unit_level || 0) === parseInt(currentUser.selected_units || 3)
+        );
+      }
+      
+      console.log('❌ Wrong practice attempts after filters:', wrongAttempts.length);
 
       // ALSO get wrong answers from EXAMS
       const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
