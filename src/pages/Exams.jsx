@@ -866,10 +866,10 @@ export default function ExamsPage() {
 
 
                           <div className="flex items-center gap-3 flex-1">
-                            <motion.div
-                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
-                            whileHover={{ rotate: 360 }}
-                            transition={{ duration: 0.5 }}>
+                            <motion.div className="bg-blue-100 p-1.5 rounded-lg border border-red-200"
+
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.5 }}>
 
                               {passed ?
                             <CheckCircle className="w-4 h-4 text-green-600" /> :
