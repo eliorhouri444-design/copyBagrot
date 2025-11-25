@@ -221,7 +221,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
         const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
 
-        // קיבוץ לפי סשנים (סטים) לספירת סטים בוצעו
+        // קיבוץ לפי סשנים (סטים) לספירת סטים עם ציון לא עובר
         const sessionMap = {};
         topicAttempts.forEach(a => {
           const sessionId = a.session_id || 'unknown';
@@ -230,7 +230,15 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
           }
           sessionMap[sessionId].push(a);
         });
-        const totalSets = Object.keys(sessionMap).filter(k => k !== 'unknown').length;
+        // ספירת סטים עם ציון לא עובר (פחות מ-56%)
+        const failedSets = Object.entries(sessionMap)
+          .filter(([key, attempts]) => {
+            if (key === 'unknown') return false;
+            const correct = attempts.filter(a => a.status === 'correct').length;
+            const total = attempts.length;
+            const percentage = total > 0 ? (correct / total) * 100 : 0;
+            return percentage < 56;
+          }).length;
 
         // סך כל השאלות בנושא
         const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
