@@ -1,7 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-export default function RatingDialog({ open, onOpenChange, onSubmitRating }) {
+export default function RatingDialog({ open, onOpenChange, onSubmitRating, onClose }) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
 
@@ -21,9 +21,25 @@ export default function RatingDialog({ open, onOpenChange, onSubmitRating }) {
     setHoveredRating(0);
   };
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      onOpenChange(false);
+    }
+    setRating(0);
+    setHoveredRating(0);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent dir="rtl" className="sm:max-w-md">
+      <DialogContent dir="rtl" className="sm:max-w-md relative">
+        <button
+          onClick={handleClose}
+          className="absolute top-3 left-3 p-1 rounded-full hover:bg-gray-100 z-10"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <div className="p-4 bg-amber-100 rounded-full">
