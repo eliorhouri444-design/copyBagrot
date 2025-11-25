@@ -669,16 +669,16 @@ export default function ExamGenericPage() {
             <motion.button
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('carousel')}
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg">
+              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-300 hover:border-purple-500 transition-all shadow-lg">
+
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
+                <div className="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center">
                   <Zap className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-right">
                   <h3 className="text-xl font-bold text-gray-900">מצב קרוסלה</h3>
-                  <p className="text-sm text-purple-700 font-medium">⚡ שאלה אחרי שאלה</p>
+                  <p className="text-blue-600 text-sm font-medium">⚡ שאלה אחרי שאלה</p>
                 </div>
               </div>
 
