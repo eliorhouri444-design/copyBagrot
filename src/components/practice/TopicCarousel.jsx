@@ -192,55 +192,78 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         base44.entities.AttemptNew.list("-created_date", 5000)
       ]);
 
-      // סינון לפי המשתמש הנוכחי והמקצוע
+      // סינון לפי המשתמש הנוכחי והמקצוע - רק מהחודש האחרון
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      
       const relevantAttempts = attempts.filter((a) =>
         a.created_by === user.email &&
-        a.subject_id === subject
+        a.subject_id === subject &&
+        new Date(a.created_date) >= oneMonthAgo
       );
       
-      console.log(`📊 Loaded ${attempts.length} attempts, ${relevantAttempts.length} relevant for ${subject}`);
+      console.log(`📊 Loaded ${attempts.length} attempts, ${relevantAttempts.length} relevant for ${subject} (last month)`);
 
       const topicsWithStats = filteredTopics.map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
+
+        // קיבוץ לפי סשנים (סטים)
+        const sessionMap = {};
+        topicAttempts.forEach(a => {
+          const sessionId = a.session_id || 'unknown';
+          if (!sessionMap[sessionId]) {
+            sessionMap[sessionId] = [];
+          }
+          sessionMap[sessionId].push(a);
+        });
+
+        // חישוב סטטיסטיקות לפי סטים
+        let correctSets = 0;
+        let wrongSets = 0;
+        let partialSets = 0;
+        let totalSets = Object.keys(sessionMap).length;
+
+        Object.values(sessionMap).forEach(setAttempts => {
+          if (setAttempts.length === 0) return;
+          
+          const correctInSet = setAttempts.filter(a => a.status === 'correct').length;
+          const wrongInSet = setAttempts.filter(a => a.status === 'incorrect').length;
+          const totalInSet = setAttempts.length;
+          
+          // אם רוב התשובות נכונות - סט נכון
+          // אם רוב התשובות שגויות - סט שגוי
+          // אחרת - סט חלקי
+          if (correctInSet > totalInSet / 2) {
+            correctSets++;
+          } else if (wrongInSet > totalInSet / 2) {
+            wrongSets++;
+          } else {
+            partialSets++;
+          }
+        });
 
         // Count unique questions answered
         const uniqueQuestions = new Set(topicAttempts.map((a) => a.question_id));
         const uniqueAnswered = uniqueQuestions.size;
 
-        // ספירה לפי התוצאה האחרונה של כל שאלה (לא כל הניסיונות)
-        const latestAttemptByQuestion = {};
-        topicAttempts.forEach(a => {
-          const existing = latestAttemptByQuestion[a.question_id];
-          if (!existing || new Date(a.created_date) > new Date(existing.created_date)) {
-            latestAttemptByQuestion[a.question_id] = a;
-          }
-        });
-        
-        const latestAttempts = Object.values(latestAttemptByQuestion);
-        const correct = latestAttempts.filter((a) => a.status === 'correct').length;
-        const wrong = latestAttempts.filter((a) => a.status === 'incorrect').length;
-        const partial = latestAttempts.filter((a) => a.status === 'partial').length;
-        const total = latestAttempts.length;
-
-        // Calculate progress based on unique questions vs total available
+        // Calculate progress based on sets completed
+        const QUESTIONS_PER_SET = 10;
         const actualTotal = topic.actualQuestionCount || topic.questionCount;
-        const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round(uniqueAnswered / actualTotal * 100) : 0;
-        
-        // חישוב אחוז הצלחה
-        const successRate = total > 0 ? Math.round((correct / total) * 100) : 0;
+        const totalPossibleSets = Math.ceil(actualTotal / QUESTIONS_PER_SET);
+        const progress = totalPossibleSets > 0 && totalSets > 0 ? Math.min(100, Math.round(totalSets / totalPossibleSets * 100)) : 0;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${topicAttempts.length} attempts, ${uniqueAnswered} unique, ${correct}✓ ${wrong}✗ ${partial}~`);
+        console.log(`📈 Topic ${topic.topic_id}: ${totalSets} sets, ${correctSets}✓ ${wrongSets}✗ ${partialSets}~`);
 
         return {
           ...topic,
           stats: {
-            correct: correct || 0,
-            wrong: wrong || 0,
-            partial: partial || 0,
-            total: total || 0,
-            progress: progress || 0,
-            uniqueAnswered: uniqueAnswered || 0,
-            successRate: successRate || 0
+            correct: correctSets,
+            wrong: wrongSets,
+            partial: partialSets,
+            total: totalSets,
+            progress: progress,
+            uniqueAnswered: uniqueAnswered,
+            totalSets: totalSets
           }
         };
       });
