@@ -166,63 +166,30 @@ export default function ModuleCarousel({
 
           <div className="bg-[#ffffff] p-4 rounded-2xl">
             {/* Header with gradient */}
-            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8" />
+            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
+              {onEditModule &&
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditModule(currentModule);
+                }}
+                className="absolute top-2 left-2 text-white hover:bg-white/20">
+                  <Edit2 className="w-5 h-5" />
+                </Button>
+              }
               
-              <div className="relative z-10 flex items-start gap-3">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                  className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-
-                  <FileText className="w-6 h-6 text-white" />
-                </motion.div>
+              <div className="text-center">
+                <div className="text-3xl mb-1.5">📝</div>
+                <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentModule.title}</h2>
+                <p className="text-[#ffffff] opacity-90">{moduleStats.totalAttempts} מבחנים נעשו</p>
                 
-                <div className="flex-1">
-                  <motion.h2
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-[16px] font-bold mb-0.5">
-
-                    {currentModule.title}
-                  </motion.h2>
-                  <motion.p
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-white/90 text-[11px]">
-
-                    {currentModule.description}
-                  </motion.p>
-                  
-                  {isLocked &&
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
-
-                      <Crown className="w-3 h-3" />
-                      פרימיום
-                    </motion.div>
-                  }
-                </div>
-
-                {onEditModule &&
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditModule(currentModule);
-                  }}
-                  className="text-white hover:bg-white/20 flex-shrink-0">
-
-                    <Edit2 className="w-5 h-5" />
-                  </Button>
+                {isLocked &&
+                <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
+                    <Crown className="w-3 h-3" />
+                    פרימיום
+                  </div>
                 }
               </div>
             </div>
