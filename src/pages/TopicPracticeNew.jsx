@@ -20,6 +20,7 @@ import {
 "@/components/ui/dialog";
 import AdManager from "../components/ads/AdManager";
 import RatingDialog from "../components/ads/RatingDialog";
+import { triggerPracticeComplete } from "@/components/mastery/useMasteryData";
 
 const QUESTIONS_PER_SET = 10;
 const WRITING_QUESTIONS_PER_SET = 3;
@@ -822,6 +823,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
         percentage: percentage
       });
     }
+
+    // Trigger global update for carousels
+    triggerPracticeComplete();
 
     navigate(createPageUrl("Practice"));
   };
