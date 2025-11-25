@@ -283,7 +283,19 @@ function calculateOverallMastery(topicsWithMastery, modulesWithMastery) {
 }
 
 // פונקציה לעדכון מדדים אחרי פעולה (לשימוש גלובלי)
-export async function triggerMasteryUpdate() {
-  // שלח אירוע לעדכון
+export function triggerMasteryUpdate() {
+  console.log('🔄 Triggering global mastery update');
   window.dispatchEvent(new CustomEvent('mastery-update'));
+}
+
+// פונקציה לעדכון אחרי סיום תרגול
+export function triggerPracticeComplete() {
+  console.log('✅ Practice complete - triggering update');
+  window.dispatchEvent(new CustomEvent('practice-complete'));
+}
+
+// פונקציה לעדכון אחרי סיום בגרות
+export function triggerExamComplete() {
+  console.log('📝 Exam complete - triggering update');
+  window.dispatchEvent(new CustomEvent('exam-complete'));
 }
