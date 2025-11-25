@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle, AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import MasteryStatsCard from "@/components/mastery/MasteryStatsCard";
 
 export default function ModuleCarousel({
   modules,
@@ -238,52 +239,26 @@ export default function ModuleCarousel({
                 {currentModule.details}
               </motion.p>
 
-              {/* Progress bar */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="bg-[#F5F8FF] rounded-xl p-3 border border-[#E9F0FF]">
-
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-[12px] font-bold text-[#2B2B2B]">התקדמות בשאלון</span>
-                  <span className="text-[15px] font-bold text-[#3B82F6]">
-                    {moduleStats.progress}%
-                  </span>
-                </div>
-                <div className="text-[10px] text-[#6E6E6E] mb-1.5">
-                  {moduleStats.totalAttempts} / {moduleStats.maxExams} בגרויות {!(isPremium === true) && '(חינם)'}
-                </div>
-                <div className="h-1.5 bg-white rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${moduleStats.progress}%` }}
-                    transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
-                    className="h-full bg-[#3B82F6] transition-all rounded-full" />
-
-                </div>
-              </motion.div>
-
-              {/* Stats grid */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="grid grid-cols-3 gap-1.5">
-
-                <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-200">
-                  <div className="text-[16px] font-bold text-blue-600">{moduleStats.totalAttempts}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">ניסיונות</div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-2 text-center border border-green-200">
-                  <div className="text-[16px] font-bold text-green-600">{moduleStats.passedAttempts}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">עברו</div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-2 text-center border border-purple-200">
-                  <div className="text-[16px] font-bold text-[#3B82F6]">{moduleStats.avgScore}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">ממוצע</div>
-                </div>
-              </motion.div>
+              {/* Mastery Stats Card */}
+              <MasteryStatsCard 
+                mastery={{
+                  examMastery: moduleStats.avgScore > 0 
+                    ? Math.round(
+                        moduleStats.avgScore * 0.4 +
+                        (moduleStats.totalAttempts >= 3 ? Math.max(0, 100 - 20) : 50) * 0.3 +
+                        (moduleStats.passedAttempts / Math.max(1, moduleStats.totalAttempts)) * 100 * 0.3
+                      )
+                    : 0,
+                  completedExams: moduleStats.totalAttempts,
+                  totalAvailable: moduleStats.maxExams,
+                  averageExamScore: moduleStats.avgScore,
+                  passedExams: moduleStats.passedAttempts,
+                  examWeakAreas: [],
+                  bestScore: moduleStats.avgScore,
+                  lastScore: moduleStats.avgScore
+                }}
+                type="module"
+              />
 
               {/* Module info */}
               <motion.div
@@ -341,21 +316,36 @@ export default function ModuleCarousel({
                           בגרות אקראית
                         </Button>
 
-                        {isPremium === true ?
-                    <Button
-                      onClick={() => navigate(createPageUrl("CustomWeakExam"))}
-                      className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
-
-                            בגרות אישית
-                          </Button> :
-
-                    <Button
-                      onClick={() => navigate(createPageUrl("Premium"))} className="bg-blue-500 text-white px-4 py-2 font-bold opacity-100 rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full h-10 from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700">
-
-
-                            בגרות אישית
-                          </Button>
-                    }
+                        {isPremium === true ? (
+                      <>
+                        <Button
+                          onClick={() => {
+                            sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
+                            navigate(createPageUrl("CustomWeakExam"));
+                          }}
+                          className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                        >
+                          <AlertTriangle className="w-4 h-4 ml-2" />
+                          בוחן טעויות מהשאלון
+                        </Button>
+                        <Button
+                          onClick={() => navigate(createPageUrl("CustomWeakExam") + `?module=${currentModule.module_id || currentModule.id}&mode=adaptive`)}
+                          variant="outline"
+                          className="w-full h-10 text-[12px] font-bold border-2 border-purple-300 text-purple-700 hover:bg-purple-50 rounded-[14px]"
+                        >
+                          <Target className="w-4 h-4 ml-2" />
+                          בוחן מותאם לשאלון
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        onClick={() => navigate(createPageUrl("Premium"))}
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:from-amber-600 hover:to-orange-600 w-full h-10"
+                      >
+                        <Lock className="w-4 h-4 ml-2" />
+                        בוחן טעויות + בוחן מותאם
+                      </Button>
+                    )}
                       </div>
                   }
 
