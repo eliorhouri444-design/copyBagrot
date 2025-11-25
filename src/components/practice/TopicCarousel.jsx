@@ -320,10 +320,21 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}>
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.3 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, info) => {
+              const threshold = 50;
+              if (info.offset.x > threshold && topics.length > 1) {
+                setCurrentIndex((prev) => prev === 0 ? topics.length - 1 : prev - 1);
+              } else if (info.offset.x < -threshold && topics.length > 1) {
+                setCurrentIndex((prev) => prev === topics.length - 1 ? 0 : prev + 1);
+              }
+            }}>
 
             <div className="bg-gradient-to-br text-[#3B82F6] mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
               <div className="text-center">
