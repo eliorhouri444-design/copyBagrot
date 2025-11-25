@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useExamsData } from "@/components/cache/useExamsData";
+import { DataCache } from "@/components/cache/DataCache";
 import { createPageUrl } from "@/utils";
 import { BookOpen, CheckCircle, Award, Clock, Play, Crown, X, Upload, Settings, Trophy, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Accessibility, Shield, TrendingDown, Lock, Target, TrendingUp, Edit2, Trash2, Loader2, BookCheck, FileCheck, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,18 +44,13 @@ export default function ExamsPage() {
   const [showAdDialog, setShowAdDialog] = useState(null);
   const [unlockedAttempts, setUnlockedAttempts] = useState(new Set());
 
-  const [cachedData, setCachedData] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return {
-        subject: localStorage.getItem('selected_subject') || 'אנגלית',
-        units: localStorage.getItem('selected_units') || '3'
-      };
-    }
-    return { subject: 'אנגלית', units: '3' };
-  });
+  const [cachedSubject, setCachedSubject] = useState(() => localStorage.getItem('selected_subject') || 'אנגלית');
+  const [cachedUnits, setCachedUnits] = useState(() => localStorage.getItem('selected_units') || '3');
 
-  const displaySubject = user?.selected_subject || cachedData.subject || 'אנגלית';
-  const displayUnits = parseInt(user?.selected_units || cachedData.units || 3);
+  const { data: examsData, isLoading: isExamsLoading, error: examsError } = useExamsData(cachedSubject, cachedUnits);
+
+  const displaySubject = examsData?.subject || cachedSubject;
+  const displayUnits = parseInt(examsData?.units || cachedUnits);
 
   const subjectColors = {
     "אנגלית": "bg-blue-600",
@@ -162,103 +159,22 @@ export default function ExamsPage() {
     }
   };
 
-  const { data: customModules = [] } = useQuery({
-    queryKey: ['custom-modules', displaySubject, displayUnits],
-    queryFn: async () => {
-      const all = await base44.entities.ModuleDefinition.list();
-      return all.filter((m) => m.subject === displaySubject && parseInt(m.unit_level) === parseInt(displayUnits));
-    },
-    staleTime: 5 * 60 * 1000
-  });
+  const customModules = examsData?.modules?.filter(m => !defaultModulesStructure[displaySubject]?.[displayUnits]?.some(dm => dm.id === m.id)) || [];
 
-  const currentModules = useMemo(() => {
-    const defaultMods = defaultModulesStructure[displaySubject]?.[displayUnits] || [];
-    const modulesMap = new Map();
-
-    // Add default modules
-    defaultMods.forEach((mod) => {
-      modulesMap.set(mod.id, mod);
-    });
-
-    // Override with custom modules and add new ones
-    customModules.forEach((customMod) => {
-      const existing = modulesMap.get(customMod.module_id);
-      if (existing) {
-        // Update existing default module
-        modulesMap.set(customMod.module_id, {
-          ...existing,
-          id: customMod.module_id,
-          title: customMod.title || existing.title,
-          description: customMod.description || existing.description,
-          details: customMod.details || existing.details,
-          duration: customMod.duration || existing.duration,
-          points: customMod.points || existing.points,
-          parts: customMod.parts || existing.parts,
-          color: customMod.color || existing.color,
-          entity: customMod.entity || existing.entity,
-          order: customMod.order ?? existing.order
-        });
-      } else {
-        // Add new custom module
-        modulesMap.set(customMod.module_id, {
-          id: customMod.module_id,
-          title: customMod.title,
-          description: customMod.description || '',
-          details: customMod.details || '',
-          duration: customMod.duration || 90,
-          points: customMod.points || '100',
-          parts: customMod.parts || [],
-          color: customMod.color || 'from-blue-500 to-indigo-600',
-          entity: customMod.entity || 'GenericExam',
-          order: customMod.order ?? 999
-        });
-      }
-    });
-
-    return Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
-  }, [displaySubject, displayUnits, customModules]);
+  const currentModules = examsData?.modules || [];
 
   const [moduleOrder, setModuleOrder] = useState([]);
 
-  const { data: allModuleAExams = [] } = useQuery({
-    queryKey: ['module-a-exams'],
-    queryFn: () => base44.entities.ModuleAExam.list()
-  });
-
-  const { data: allModuleBExams = [] } = useQuery({
-    queryKey: ['module-b-exams'],
-    queryFn: () => base44.entities.ModuleBExam.list()
-  });
-
-  const { data: allModuleCExams = [] } = useQuery({
-    queryKey: ['module-c-exams'],
-    queryFn: () => base44.entities.ModuleCExam.list()
-  });
-
-  const { data: allGenericExams = [] } = useQuery({
-    queryKey: ['generic-exams'],
-    queryFn: () => base44.entities.GenericExam.list()
-  });
+  const allModuleAExams = examsData?.moduleAExams || [];
+  const allModuleBExams = examsData?.moduleBExams || [];
+  const allModuleCExams = examsData?.moduleCExams || [];
+  const allGenericExams = examsData?.genericExams || [];
 
   const allExamsMap = useMemo(() => {
-    const map = new Map();
-    [...allModuleAExams, ...allModuleBExams, ...allModuleCExams, ...allGenericExams].forEach((exam) => {
-      map.set(exam.id, exam);
-    });
-    return map;
-  }, [allModuleAExams, allModuleBExams, allModuleCExams, allGenericExams]);
+    return examsData?.allExamsMap ? new Map(Object.entries(examsData.allExamsMap)) : new Map();
+  }, [examsData]);
 
-  const { data: examAttempts = [], refetch: refetchExamAttempts } = useQuery({
-    queryKey: ['exam-attempts', displaySubject, displayUnits],
-    queryFn: async () => {
-      if (!user?.email || isLoading) return [];
-      const allAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
-      return allAttempts.filter((attempt) =>
-      attempt.subject === displaySubject && parseInt(attempt.unit_level) === parseInt(displayUnits)
-      );
-    },
-    enabled: !!user?.email && !isLoading
-  });
+  const examAttempts = examsData?.examAttempts || [];
 
   const handleEditModule = (module) => {
     setEditingModuleData({
@@ -301,11 +217,11 @@ export default function ExamsPage() {
 
       if (existing) {
         await base44.entities.ModuleDefinition.update(existing.id, moduleData);
-      } else {
+        } else {
         await base44.entities.ModuleDefinition.create(moduleData);
-      }
-
-      queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
+        }
+        DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
+        queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
 
       alert('המודול עודכן בהצלחה! ✅');
       setShowModuleEditDialog(false);
@@ -323,6 +239,7 @@ export default function ExamsPage() {
       const existing = customModules.find((m) => m.module_id === moduleId);
       if (existing) {
         await base44.entities.ModuleDefinition.delete(existing.id);
+        DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
         queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
         alert('המודול נמחק בהצלחה.');
       } else {
@@ -376,6 +293,7 @@ export default function ExamsPage() {
       alert('השאלון נוסף בהצלחה! ✅');
       setShowAddModuleDialog(false);
       setEditingModuleData(null);
+      DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
       queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
     } catch (error) {
       console.error('Error adding module:', error);
@@ -384,54 +302,28 @@ export default function ExamsPage() {
   };
 
   useEffect(() => {
-    const loadUser = async () => {
-      let retries = 3;
-      while (retries > 0) {
-        try {
-          const currentUser = await base44.auth.me();
-          setUser(currentUser);
-          setIsLoading(false);
-
-          if (currentUser?.selected_subject) {
-            localStorage.setItem('selected_subject', currentUser.selected_subject);
-            setCachedData((prev) => ({ ...prev, subject: currentUser.selected_subject }));
-          }
-          if (currentUser?.selected_units) {
-            localStorage.setItem('selected_units', currentUser.selected_units.toString());
-            setCachedData((prev) => ({ ...prev, units: currentUser.selected_units }));
-          }
-
-          if (currentUser?.accessibility_settings) {
-            setExtraTime(currentUser.accessibility_settings.extra_time || 0);
-            setFontSize(currentUser.accessibility_settings.font_size || "normal");
-            setHighContrast(currentUser.accessibility_settings.high_contrast || false);
-          }
-
-          const orderKey = `${currentUser?.selected_subject || 'אנגלית'}_${currentUser?.selected_units || 3}`;
-          const savedOrder = currentUser?.module_order?.[orderKey];
-          if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
-            setModuleOrder(savedOrder);
-          } else {
-            const defaultModules = defaultModulesStructure[currentUser?.selected_subject || 'אנגלית']?.[currentUser?.selected_units || 3] || [];
-            setModuleOrder(defaultModules.map((m) => m.id));
-          }
-
-          return;
-        } catch (error) {
-          console.error("User load error (retries left: " + (retries - 1) + "):", error);
-          retries--;
-          if (retries > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 1000 * (4 - retries)));
-          }
-        }
-      }
-      console.warn("Failed to load user after multiple attempts. Using cached data/defaults.");
+    if (examsData?.user) {
+      const currentUser = examsData.user;
+      setUser(currentUser);
       setIsLoading(false);
-      const defaultModules = defaultModulesStructure[cachedData.subject || 'אנגלית']?.[cachedData.units || 3] || [];
-      setModuleOrder(defaultModules.map((m) => m.id));
-    };
-    loadUser();
-  }, []);
+
+      if (currentUser?.selected_subject) {
+        setCachedSubject(currentUser.selected_subject);
+        localStorage.setItem('selected_subject', currentUser.selected_subject);
+      }
+      if (currentUser?.selected_units) {
+        setCachedUnits(currentUser.selected_units.toString());
+        localStorage.setItem('selected_units', currentUser.selected_units.toString());
+      }
+      if (currentUser?.accessibility_settings) {
+        setExtraTime(currentUser.accessibility_settings.extra_time || 0);
+        setFontSize(currentUser.accessibility_settings.font_size || "normal");
+        setHighContrast(currentUser.accessibility_settings.high_contrast || false);
+      }
+    } else if (!isExamsLoading) {
+      setIsLoading(false); // Finished loading but no user
+    }
+  }, [examsData, isExamsLoading]);
 
   useEffect(() => {
     if (user) {
@@ -450,7 +342,7 @@ export default function ExamsPage() {
   }, [displaySubject, displayUnits, user]);
 
   const overallStats = useMemo(() => {
-    if (isLoading || !examAttempts) {
+    if (isExamsLoading || !examAttempts) {
       return { topicsStarted: 0, totalTopics: 0, avgProgress: 0 };
     }
     return { topicsStarted: 0, totalTopics: 0, avgProgress: 0 };
@@ -539,11 +431,11 @@ export default function ExamsPage() {
   };
 
   const { currentAverage, hoursCompleted, weeklyProgress } = useMemo(() => {
-    if (!examAttempts.length) {
+    if (!examAttempts || !examAttempts.length) {
       return { currentAverage: 0, hoursCompleted: 0, weeklyProgress: 0 };
     }
 
-    const totalScore = examAttempts.reduce((sum, attempt) => sum + attempt.score_percent, 0);
+    const totalScore = examAttempts.reduce((sum, attempt) => sum + (attempt.score_percent || 0), 0);
     const average = totalScore / examAttempts.length;
 
     return {
@@ -741,10 +633,11 @@ export default function ExamsPage() {
     if (user?.id && confirm("האם אתה בטוח שברצונך למחוק את כל המבחנים שלך עבור מקצוע זה? פעולה זו בלתי הפיכה.")) {
       try {
         await base44.entities.ExamAttempt.deleteMany({
-          user_id: user.id,
+          created_by: user.email,
           subject: displaySubject,
           unit_level: displayUnits
         });
+        DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
         queryClient.invalidateQueries(['exam-attempts', displaySubject, displayUnits]);
         alert("כל המבחנים נמחקו בהצלחה.");
         setShowAllExams(false);
@@ -755,13 +648,12 @@ export default function ExamsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isExamsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
         <span className="sr-only">טוען...</span>
       </div>);
-
   }
 
   return (
@@ -829,53 +721,58 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="bg-[#5294ff] p-4 rounded-2xl">
-
-
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 text-right">
-              <h3 className="text-[#ffffff] text-base font-bold">בגרויות אחרונות</h3>
+          transition={{ delay: 0.25 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <div className="flex items-center justify-between bg-blue-500 text-white p-4">
+            <div className="text-right">
+              <h3 className="font-bold text-lg">בגרויות אחרונות</h3>
+              <p className="text-sm opacity-90">הביצועים שלך במבחנים</p>
             </div>
-            <CheckCircle className="w-5 h-5 text-white" />
+            <BookOpen className="w-8 h-8 text-white opacity-90" />
           </div>
 
-          <div>
-            {examAttempts.length > 0 ?
-            <>
+          <div className="p-4">
+            {examAttempts.length > 0 ? (
+              <>
                 <div className="space-y-2">
                   {examAttempts.slice(0, 2).map((attempt, idx) => {
-                  const examData = allExamsMap.get(attempt.exam_id);
-                  const passed = attempt.score_percent >= 56;
-                  const hasMistakes = attempt.score_percent < 56;
+                    const examData = allExamsMap.get(attempt.exam_id);
+                    const passed = attempt.score_percent >= 56;
+                    const hasMistakes = attempt.score_percent < 56;
 
-                  return (
-                    <div key={attempt.id} className="space-y-2">
+                    return (
+                      <div key={attempt.id} className="space-y-2">
                         <motion.button
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + idx * 0.1 }}
-                        whileHover={{ scale: 1.02, x: -5 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          if (isPremium || unlockedAttempts.has(attempt.id)) {
-                            setShowAttemptDetails(attempt);
-                          } else {
-                            setShowAdDialog(attempt);
-                          }
-                        }} className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between">
-
-
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 + idx * 0.1 }}
+                          whileHover={{ scale: 1.02, x: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            if (isPremium || unlockedAttempts.has(attempt.id)) {
+                              setShowAttemptDetails(attempt);
+                            } else {
+                              setShowAdDialog(attempt);
+                            }
+                          }}
+                          className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between"
+                        >
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
-                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
-                            whileHover={{ rotate: 360 }}
-                            transition={{ duration: 0.5 }}>
-
-                              {passed ?
-                            <CheckCircle className="w-4 h-4 text-green-600" /> :
-
-                            <X className="w-4 h-4 text-red-600" />
-                            }
+                              className={`p-1.5 rounded-lg ${
+                                passed
+                                  ? 'bg-green-50 border border-green-200'
+                                  : 'bg-red-50 border border-red-200'
+                              }`}
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              {passed ? (
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                              ) : (
+                                <X className="w-4 h-4 text-red-600" />
+                              )}
                             </motion.div>
                             <div className="flex-1 text-right">
                               <div className="text-[13px] font-semibold text-[#2B2B2B]">
@@ -883,79 +780,88 @@ export default function ExamsPage() {
                               </div>
                               <div className="text-[11px] text-[#6E6E6E]">
                                 {new Date(attempt.created_date).toLocaleDateString('he-IL', {
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            {isPremium ?
-                          <>
+                            {isPremium ? (
+                              <>
                                 <motion.div
-                              className={`text-[17px] font-bold ${passed ? 'text-green-600' : 'text-red-600'}`}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: 0.5 + idx * 0.1, type: "spring" }}>
-
+                                  className={`text-[17px] font-bold ${
+                                    passed ? 'text-green-600' : 'text-red-600'
+                                  }`}
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ delay: 0.5 + idx * 0.1, type: 'spring' }}
+                                >
                                   {Math.round(attempt.score_percent)}
                                 </motion.div>
                                 <div className="text-[10px] text-gray-500">
                                   {passed ? 'עבר' : 'נכשל'}
                                 </div>
-                              </> :
-
-                          <div className="flex items-center gap-1">
+                              </>
+                            ) : (
+                              <div className="flex items-center gap-1">
                                 <Lock className="w-5 h-5 text-gray-400" />
                               </div>
-                          }
+                            )}
                           </div>
                         </motion.button>
 
-                        {hasMistakes && isPremium &&
-                      <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
+                        {hasMistakes && isPremium && (
+                          <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-4 h-4 text-[#3B82F6]" />
-                              <h4 className="font-bold text-[#2B2B2B] text-[12px]">בגרות מותאמת עבורך</h4>
+                              <h4 className="font-bold text-[#2B2B2B] text-[12px]">
+                                בגרות מותאמת עבורך
+                              </h4>
                             </div>
-                            <p className="text-[11px] text-[#6E6E6E] mb-2">חזרה על השאלות שטעית בהן
-                        </p>
+                            <p className="text-[11px] text-[#6E6E6E] mb-2">
+                              חזרה על השאלות שטעית בהן
+                            </p>
                             <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            sessionStorage.setItem('weakExamSource', attempt.exam_id);
-                            navigate(createPageUrl("CustomWeakExam"));
-                          }}
-                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
-
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                sessionStorage.setItem('weakExamSource', attempt.exam_id);
+                                navigate(createPageUrl("CustomWeakExam"));
+                              }}
+                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]"
+                            >
                               בגרות אישית
                             </Button>
                           </div>
-                      }
-                      </div>);
-
-                })}
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
-                {examAttempts.length > 2 &&
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {examAttempts.length > 2 && (
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
-                  onClick={() => setShowAllExams(true)}
-                  variant="outline" className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
-
-
+                      onClick={() => setShowAllExams(true)}
+                      variant="outline"
+                      className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]"
+                    >
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
                   </motion.div>
-              }
-              </> :
-
-            <div className="text-center py-4 text-[#6E6E6E] text-[12px]">
-                טרם ביצעת מבחנים
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8 px-4">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="w-8 h-8 text-gray-400" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-1">אין בגרויות עדיין</h4>
+                <p className="text-gray-500 text-sm">התחל לפתור בגרויות כדי לראות את ההתקדמות שלך</p>
               </div>
-            }
+            )}
           </div>
         </motion.div>
 
