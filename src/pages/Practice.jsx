@@ -46,39 +46,18 @@ export default function PracticePage() {
     "גאוגרפיה": "bg-cyan-600"
   };
 
-  const displaySubject = user?.selected_subject || cachedData.subject || "אנגלית";
-  const displayUnits = parseInt(user?.selected_units || cachedData.units || "3");
-
-  const headerColor = user?.selected_subject || cachedData.subject ?
-  subjectColors[user?.selected_subject || cachedData.subject] || "bg-blue-600" :
-  "bg-blue-600";
+  const headerColor = subjectColors[displaySubject] || "bg-blue-600";
 
   useEffect(() => {
-    const loadUser = async () => {
-      setIsLoading(true);
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-
-        if (currentUser?.selected_subject) {
-          localStorage.setItem('selected_subject', currentUser.selected_subject);
-        }
-        if (currentUser?.selected_units) {
-          localStorage.setItem('selected_units', currentUser.selected_units.toString());
-        }
-
-        setCachedData({
-          subject: currentUser?.selected_subject || 'אנגלית',
-          units: currentUser?.selected_units || 3
-        });
-      } catch (error) {
-        console.error("Error loading user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadUser();
-  }, []);
+    if (user?.selected_subject) {
+      setCachedSubject(user.selected_subject);
+      localStorage.setItem('selected_subject', user.selected_subject);
+    }
+    if (user?.selected_units) {
+      setCachedUnits(user.selected_units.toString());
+      localStorage.setItem('selected_units', user.selected_units.toString());
+    }
+  }, [user]);
 
   const handleEditTopic = async (topic) => {
     setEditingTopicData({
@@ -250,12 +229,11 @@ export default function PracticePage() {
     }
   };
 
-  if (!user) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
       </div>);
-
   }
 
   return (
@@ -282,12 +260,10 @@ export default function PracticePage() {
           transition={{ delay: 0.1 }}>
 
           <TopicCarousel
-            subject={displaySubject}
-            units={displayUnits}
+            topics={practiceData?.topics || []}
             isPremium={user?.is_premium}
             onEditTopic={user?.role === 'admin' ? handleEditTopic : null}
             onAddTopic={user?.role === 'admin' ? () => {
-              console.log('🔵 onAddTopic clicked!');
               setEditingTopicData({
                 topic_id: `${displaySubject}_${displayUnits}_`,
                 subject: displaySubject,
@@ -298,7 +274,6 @@ export default function PracticePage() {
                 color: 'from-blue-500 to-blue-600',
                 order: 999
               });
-              console.log('🔵 Opening dialog...');
               setShowTopicEditDialog(true);
             } : null} />
 
@@ -311,10 +286,9 @@ export default function PracticePage() {
           transition={{ delay: 0.15 }}>
 
           <RecentPracticeSessions
-            subject={displaySubject}
-            units={displayUnits}
-            userEmail={user?.email}
-            isPremium={user?.is_premium} />
+            sessions={practiceData?.recentSessions || []}
+            isPremium={user?.is_premium}
+          />
 
         </motion.div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, PlayCircle, CheckCircle, User } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle } from "@/components/ui/card-simple";
@@ -40,30 +40,22 @@ export default function HomePage() {
 
       if (refCode) {
         try {
-          // Check if this visitor already clicked (using localStorage)
           const clickedRefs = JSON.parse(localStorage.getItem('clicked_refs') || '[]');
-
           if (!clickedRefs.includes(refCode)) {
-            // Record the click
             await base44.entities.ReferralClick.create({
               referral_code: refCode,
               clicked_at: new Date().toISOString(),
               visitor_id: Math.random().toString(36).substring(7)
             });
-
-            // Mark as clicked
             clickedRefs.push(refCode);
             localStorage.setItem('clicked_refs', JSON.stringify(clickedRefs));
           }
-
-          // Clean URL
           window.history.replaceState({}, '', window.location.pathname);
         } catch (error) {
           console.error("Error tracking referral:", error);
         }
       }
     };
-
     trackReferral();
   }, []);
 
@@ -80,7 +72,6 @@ export default function HomePage() {
     
     const checkAndShowDialogs = async () => {
       try {
-        // Load ad settings
         const settings = await base44.entities.UserAdSettings.list();
         let currentSettings = settings[0];
         
@@ -100,24 +91,18 @@ export default function HomePage() {
         const lastRatingShown = localStorage.getItem('last_rating_dialog_date');
         const lastShareShown = localStorage.getItem('last_share_dialog_date');
         
-        // אם כבר דירג - לא מציגים
         if (currentSettings.has_rated) return;
         
-        // בדוק אם המשתמש ביקש לא לראות שוב
         const neverShowRating = localStorage.getItem('never_show_rating_dialog') === 'true';
         const neverShowShare = localStorage.getItem('never_show_share_dialog') === 'true';
         
-        // Show rating dialog after 3 minutes (180000ms)
         const ratingTimer = setTimeout(() => {
-          // אל תציג אם כבר הוצג היום או אם ביקש לא לראות
           if (lastRatingShown === today || neverShowRating) return;
           setShowRatingDialog(true);
           localStorage.setItem('last_rating_dialog_date', today);
         }, 180000); // 3 דקות
         
-        // Show share dialog after 5 minutes (300000ms)
         const shareTimer = setTimeout(() => {
-          // אל תציג אם כבר הוצג היום או אם ביקש לא לראות
           if (lastShareShown === today || neverShowShare) return;
           setShowShareDialog(true);
           localStorage.setItem('last_share_dialog_date', today);
@@ -191,7 +176,13 @@ export default function HomePage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
       </div>);
-
+  }
+  
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-red-500">Error loading data.</p>
+      </div>);
   }
 
   return (

@@ -6,251 +6,20 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 
-export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
+export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [topics, setTopics] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCheckingTopic, setIsCheckingTopic] = useState(false);
-  const [cachedTopics, setCachedTopics] = useState(null);
+  const [topics, setTopics] = useState(initialTopics);
 
   useEffect(() => {
-    // תמיד טען מחדש - ללא cache כדי לראות עדכונים מיידית
-    loadTopics();
-  }, [subject, units]);
+    setTopics(initialTopics);
+  }, [initialTopics]);
 
-  // רענון כשחוזרים לדף (visibility change) ואירועי עדכון גלובליים
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadTopics();
-      }
-    };
-
-    const handleMasteryUpdate = () => {
-      console.log('🔄 TopicCarousel: Received update event');
-      loadTopics();
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('mastery-update', handleMasteryUpdate);
-    window.addEventListener('practice-complete', handleMasteryUpdate);
-    window.addEventListener('exam-complete', handleMasteryUpdate);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('mastery-update', handleMasteryUpdate);
-      window.removeEventListener('practice-complete', handleMasteryUpdate);
-      window.removeEventListener('exam-complete', handleMasteryUpdate);
-    };
-  }, [subject, units]);
-
-  const loadTopics = async () => {
-    setIsLoading(true);
-    try {
-      // טעינה מקבילית של כל הנתונים - מוגבלת
-      const [customTopics, allQuestions, user, allVocabQuestions] = await Promise.all([
-        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 50),
-        base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 500),
-        base44.auth.me(),
-        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }, null, 200) : Promise.resolve([])
-      ]);
-
-      const relevantCustomTopics = customTopics;
-      const relevantQuestions = allQuestions.filter((q) => q.topic_id);
-      const relevantVocabQuestions = allVocabQuestions;
-
-      // Build topics map starting from TopicNew
-      const topicsMap = {};
-
-      // First, add all custom topics
-      relevantCustomTopics.forEach((topic) => {
-        topicsMap[topic.topic_id] = {
-          topic_id: topic.topic_id,
-          questions: [],
-          vocabQuestions: [],
-          subject_id: topic.subject_id,
-          unit_level: topic.unit_level,
-          customTopic: topic
-        };
-      });
-
-      // Then, add questions to existing topics or create new ones
-      relevantQuestions.forEach((q) => {
-        const topicId = q.topic_id;
-        if (!topicsMap[topicId]) {
-          topicsMap[topicId] = {
-            topic_id: topicId,
-            questions: [],
-            vocabQuestions: [],
-            subject_id: q.subject_id,
-            unit_level: q.unit_level
-          };
-        }
-        topicsMap[topicId].questions.push(q);
-      });
-
-      // Add vocabulary questions to topics
-      relevantVocabQuestions.forEach((q) => {
-        const topicId = q.topic_id || 'vocabulary_general';
-        if (!topicsMap[topicId]) {
-          topicsMap[topicId] = {
-            topic_id: topicId,
-            questions: [],
-            vocabQuestions: [],
-            subject_id: q.subject_id,
-            unit_level: q.unit_level
-          };
-        }
-        topicsMap[topicId].vocabQuestions.push(q);
-      });
-
-      const topicsArray = Object.values(topicsMap).map((topic) => {
-        const customTopic = topic.customTopic;
-
-        let displayName = topic.topic_id;
-        let icon = "📚";
-        let description = "";
-        let order = 0;
-        let color = "from-blue-500 to-blue-600";
-
-        if (customTopic) {
-          displayName = customTopic.name;
-          icon = customTopic.icon || "📚";
-          description = customTopic.description || "";
-          order = customTopic.order || 0;
-          color = customTopic.color || "from-blue-500 to-blue-600";
-        } else {
-          const parts = topic.topic_id.split('_');
-          if (parts.length >= 3) {
-            displayName = parts.slice(2).join(' ');
-          }
-        }
-
-        // Store actual count for statistics - include both regular and vocab questions
-        const actualCount = topic.questions.length + topic.vocabQuestions.length;
-        const isVocabulary = topic.vocabQuestions.length > 0 && topic.questions.length === 0;
-
-        // Check if this is Extended Reading by checking first question
-        const hasReadingText = topic.questions[0]?.reading_text &&
-          topic.questions[0].reading_text.length > 50;
-
-        return {
-          topic_id: topic.topic_id,
-          name: displayName,
-          icon: icon,
-          description: description,
-          color: color,
-          order: order,
-          questionCount: actualCount,
-          actualQuestionCount: actualCount,
-          subject_id: topic.subject_id,
-          unit_level: topic.unit_level,
-          isExtendedReading: hasReadingText,
-          isVocabulary: isVocabulary
-        };
-      });
-
-      topicsArray.sort((a, b) => {
-        if (a.order !== b.order) return a.order - b.order;
-        return b.actualQuestionCount - a.actualQuestionCount;
-      });
-
-      // סינון נושאים לא רצויים
-      const filteredTopics = topicsArray.filter(topic => {
-        const id = topic.topic_id?.toLowerCase() || '';
-        const name = topic.name?.toLowerCase() || '';
-        if (id === 'unknown' || name === 'unknown') return false;
-        if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
-        if (!topic.name || topic.name.trim() === '') return false;
-        return true;
-      });
-
-      // טעינה יעילה של attempts - רק של המשתמש הנוכחי והמקצוע הרלוונטי, מוגבל ל-100 אחרונים
-      const relevantAttempts = await base44.entities.AttemptNew.filter(
-        { created_by: user.email, subject_id: subject },
-        "-created_date",
-        100
-      );
-
-      const topicsWithStats = filteredTopics.map((topic) => {
-        const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
-
-        // ספירת שאלות ייחודיות שנענו נכון (לחישוב התקדמות)
-        const correctAnswersMap = {};
-        topicAttempts.forEach(a => {
-          if (a.status === 'correct') {
-            correctAnswersMap[a.question_id] = true;
-          }
-        });
-        const uniqueCorrectAnswers = Object.keys(correctAnswersMap).length;
-
-        // ספירת כל התשובות לפי סטטוס
-        const correctCount = topicAttempts.filter(a => a.status === 'correct').length;
-        const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
-        const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
-
-        // קיבוץ לפי סשנים (סטים) לספירת סטים לפי ציון
-        const sessionMap = {};
-        topicAttempts.forEach(a => {
-          const sessionId = a.session_id || 'unknown';
-          if (!sessionMap[sessionId]) {
-            sessionMap[sessionId] = [];
-          }
-          sessionMap[sessionId].push(a);
-        });
-
-        // ספירת סטים לפי טווחי ציונים
-        let failedSets = 0;    // פחות מ-56%
-        let mediumSets = 0;    // 56% עד 85%
-        let excellentSets = 0; // 86% עד 100%
-
-        Object.entries(sessionMap).forEach(([key, attempts]) => {
-          if (key === 'unknown') return;
-          const correct = attempts.filter(a => a.status === 'correct').length;
-          const total = attempts.length;
-          const percentage = total > 0 ? (correct / total) * 100 : 0;
-
-          if (percentage < 56) {
-            failedSets++;
-          } else if (percentage <= 85) {
-            mediumSets++;
-          } else {
-            excellentSets++;
-          }
-        });
-
-        // סך כל השאלות בנושא
-        const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
-
-        // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
-        const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
-
-
-
-        return {
-          ...topic,
-          stats: {
-            correct: correctCount,
-            wrong: wrongCount,
-            partial: partialCount,
-            total: topicAttempts.length,
-            progress: progress,
-            uniqueCorrectAnswers: uniqueCorrectAnswers,
-            totalQuestionsInTopic: totalQuestionsInTopic,
-            failedSets: failedSets,
-            mediumSets: mediumSets,
-            excellentSets: excellentSets
-          }
-        };
-      });
-
-      setTopics(topicsWithStats);
-
-      // בדוק אם יש נושא נבחר
+    if (topics.length > 0) {
       const selectedTopicId = sessionStorage.getItem('selectedTopicId');
       if (selectedTopicId) {
-        const topicIdx = topicsWithStats.findIndex((t) => t.topic_id === selectedTopicId);
+        const topicIdx = topics.findIndex((t) => t.topic_id === selectedTopicId);
         if (topicIdx !== -1) {
           setCurrentIndex(topicIdx);
           setTimeout(() => {
@@ -259,18 +28,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         }
         sessionStorage.removeItem('selectedTopicId');
       }
-
-    } catch (error) {
-      console.error("Error loading topics:", error);
-      if (cachedTopics) {
-        setTopics(cachedTopics); // שימוש ב-cache במקרה של שגיאה
-      } else {
-        setTopics([]);
-      }
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [topics]);
 
   const handleStartPractice = async () => {
     const topic = topics[currentIndex];
