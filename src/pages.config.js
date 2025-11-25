@@ -47,7 +47,6 @@ import AdminSmartImport from './pages/AdminSmartImport';
 import AdminListeningManager from './pages/AdminListeningManager';
 import ExtendedReading from './pages/ExtendedReading';
 import AdminTopics from './pages/AdminTopics';
-import Statistics from './pages/Statistics';
 import Vocabulary from './pages/Vocabulary';
 import VocabularyPractice from './pages/VocabularyPractice';
 import CustomWeakExam from './pages/CustomWeakExam';
@@ -63,6 +62,7 @@ import LearningPlan from './pages/LearningPlan';
 import Readiness from './pages/Readiness';
 import Home from './pages/Home';
 import Settings from './pages/Settings';
+import StudyPlan from './pages/StudyPlan';
 import __Layout from './Layout.jsx';
 
 
@@ -116,7 +116,6 @@ export const PAGES = {
     "AdminListeningManager": AdminListeningManager,
     "ExtendedReading": ExtendedReading,
     "AdminTopics": AdminTopics,
-    "Statistics": Statistics,
     "Vocabulary": Vocabulary,
     "VocabularyPractice": VocabularyPractice,
     "CustomWeakExam": CustomWeakExam,
@@ -132,6 +131,7 @@ export const PAGES = {
     "Readiness": Readiness,
     "Home": Home,
     "Settings": Settings,
+    "StudyPlan": StudyPlan,
 }
 
 export const pagesConfig = {
