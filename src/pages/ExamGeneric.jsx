@@ -785,7 +785,7 @@ export default function ExamGenericPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
         <div className="max-w-4xl mx-auto">
-          <div className={`rounded-2xl shadow-xl p-8 mb-6 ${passed ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-orange-500 to-red-500'}`}>
+          <div className="bg-blue-500 mb-6 p-8 rounded-2xl shadow-xl from-orange-500 to-red-500">
             <div className="text-center text-white">
               <motion.div
                 initial={{ scale: 0 }}
@@ -810,8 +810,8 @@ export default function ExamGenericPage() {
             <div className="space-y-4">
               {score.results.map((resultItem, resultIndex) =>
               <div
-                key={resultIndex}
-                className={`p-4 rounded-xl border-2 ${resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                key={resultIndex} className="bg-blue-50 p-4 rounded-xl border-2 border-red-200">
+
 
                   <div className="flex items-start justify-between mb-2">
                     <div className="font-bold text-gray-900">שאלה {resultItem.question_number}</div>
