@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -64,6 +64,14 @@ export default function TopicPracticeNewPage() {
   const [showVocabularyHelp, setShowVocabularyHelp] = useState(false);
   const [adSettings, setAdSettings] = useState(null);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
+
+  const hasNextSet = useMemo(() => {
+    if (!allQuestions || allQuestions.length === 0) return false;
+    const isWritingTopic = currentSetQuestions.some((q) => q.question_type === "writing");
+    const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
+    const nextSetStartIndex = setNumber * questionsPerSet;
+    return nextSetStartIndex < allQuestions.length;
+  }, [setNumber, allQuestions, currentSetQuestions]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -1012,10 +1020,16 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
-                המשך לסט הבא
-                <ChevronLeft className="w-5 h-5 mr-2" />
-              </Button>
+              {hasNextSet ? (
+                <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
+                  המשך לסט הבא
+                  <ChevronLeft className="w-5 h-5 mr-2" />
+                </Button>
+              ) : (
+                <Button onClick={finishPractice} className="w-full bg-green-600 hover:bg-green-700" disabled>
+                  כל הכבוד! סיימת את כל השאלות
+                </Button>
+              )}
               <Button onClick={finishPractice} variant="outline" className="w-full">
                 סיים וחזור לתרגול
               </Button>
