@@ -911,18 +911,20 @@ Return JSON:`,
                               </div>
                             )}
                           </div>
-                        ) : !result?.isCorrect && q.question_type !== "writing" && (
+                        ) : q.question_type !== "writing" && (
                           <div className="space-y-2 mt-3">
-                            <div className="bg-white rounded-lg p-3 border border-red-200">
+                            <div className={`bg-white rounded-lg p-3 border ${result?.isCorrect ? 'border-green-200' : 'border-red-200'}`}>
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                              <div className="text-sm font-semibold text-red-700" dir="ltr">
+                              <div className={`text-sm font-semibold ${result?.isCorrect ? 'text-green-700' : 'text-red-700'}`} dir="ltr">
                                 {result?.userAnswer || "לא נענה"}
                               </div>
                             </div>
-                            <div className="bg-white rounded-lg p-3 border border-green-200">
-                              <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                              <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
-                            </div>
+                            {!result?.isCorrect && result?.correctAnswer && (
+                              <div className="bg-white rounded-lg p-3 border border-green-200">
+                                <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
+                                <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
