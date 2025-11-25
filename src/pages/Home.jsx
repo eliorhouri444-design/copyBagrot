@@ -372,6 +372,22 @@ export default function HomePage() {
         }
 
       </div>
+
+      {/* Rating Dialog - appears after 3 minutes */}
+      <RatingDialog
+        open={showRatingDialog}
+        onOpenChange={setShowRatingDialog}
+        onSubmitRating={handleSubmitRating}
+        onClose={() => setShowRatingDialog(false)}
+      />
+
+      {/* Share Dialog - appears after 5 minutes */}
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        referralCode={getReferralCode()}
+        onClose={() => setShowShareDialog(false)}
+      />
     </div>);
 
 }
