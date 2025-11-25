@@ -8,6 +8,8 @@ import { Target, BookOpen, PlayCircle, CheckCircle, ChevronDown, User
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
+import OverallMasteryCard from "@/components/mastery/OverallMasteryCard";
+import { useMasteryData } from "@/components/mastery/useMasteryData";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import DailyPlanCard from "@/components/home/DailyPlanCard";
 
