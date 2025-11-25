@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 
+// Global event for mastery updates
+const MASTERY_UPDATE_EVENT = 'mastery-update';
+const PRACTICE_COMPLETE_EVENT = 'practice-complete';
+const EXAM_COMPLETE_EVENT = 'exam-complete';
+
 // Hook לחישוב מדדי שליטה לנושאים ושאלונים
 export function useMasteryData(subject, units) {
   const [topicsMastery, setTopicsMastery] = useState([]);
@@ -27,8 +32,8 @@ export function useMasteryData(subject, units) {
       const [user, topics, attempts, examAttempts, modules] = await Promise.all([
         base44.auth.me(),
         base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
-        base44.entities.AttemptNew.list(),
-        base44.entities.ExamAttempt.list(),
+        base44.entities.AttemptNew.list("-created_date", 2000),
+        base44.entities.ExamAttempt.list("-created_date", 500),
         base44.entities.ModuleDefinition.filter({ subject: subject, unit_level: parseInt(units) })
       ]);
 
@@ -58,6 +63,24 @@ export function useMasteryData(subject, units) {
 
   useEffect(() => {
     loadMasteryData();
+  }, [loadMasteryData]);
+
+  // האזנה לאירועי עדכון גלובליים
+  useEffect(() => {
+    const handleUpdate = () => {
+      console.log('🔄 Mastery update triggered');
+      loadMasteryData();
+    };
+
+    window.addEventListener(MASTERY_UPDATE_EVENT, handleUpdate);
+    window.addEventListener(PRACTICE_COMPLETE_EVENT, handleUpdate);
+    window.addEventListener(EXAM_COMPLETE_EVENT, handleUpdate);
+
+    return () => {
+      window.removeEventListener(MASTERY_UPDATE_EVENT, handleUpdate);
+      window.removeEventListener(PRACTICE_COMPLETE_EVENT, handleUpdate);
+      window.removeEventListener(EXAM_COMPLETE_EVENT, handleUpdate);
+    };
   }, [loadMasteryData]);
 
   // פונקציה לעדכון מדדים אחרי פעולה
