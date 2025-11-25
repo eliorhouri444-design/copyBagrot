@@ -1,121 +1,110 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCheckingTopic, setIsCheckingTopic] = useState(false);
-  const [cachedTopics, setCachedTopics] = useState(null);
+  const [lastLoadTime, setLastLoadTime] = useState(null);
 
-  useEffect(() => {
-    // תמיד טען מחדש - ללא cache כדי לראות עדכונים מיידית
-    loadTopics();
-  }, [subject, units]);
-
-  // רענון כשחוזרים לדף (visibility change)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadTopics();
-      }
-    };
+  // פונקציית טעינה מרכזית
+  const loadTopics = useCallback(async () => {
+    if (!subject || !units) return;
     
-    const handleFocus = () => {
-      loadTopics();
-    };
-
-    // האזנה לאירועי עדכון גלובליים
-    const handleMasteryUpdate = () => {
-      console.log('🔄 TopicCarousel: Received update event');
-      loadTopics();
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('mastery-update', handleMasteryUpdate);
-    window.addEventListener('practice-complete', handleMasteryUpdate);
-    window.addEventListener('exam-complete', handleMasteryUpdate);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('mastery-update', handleMasteryUpdate);
-      window.removeEventListener('practice-complete', handleMasteryUpdate);
-      window.removeEventListener('exam-complete', handleMasteryUpdate);
-    };
-  }, [subject, units]);
-
-  const loadTopics = async () => {
     setIsLoading(true);
+    console.log(`🔄 TopicCarousel: Loading topics for ${subject} ${units} units...`);
+    
     try {
-      // Load custom topics first
-      const customTopics = await base44.entities.TopicNew.list();
-      const relevantCustomTopics = customTopics.filter((t) =>
-      t.subject_id === subject &&
-      t.unit_level === parseInt(units) &&
-      t.is_active === true
+      // טעינה מקבילית של כל הנתונים
+      const [user, customTopics, allQuestions, allVocabQuestions, allAttempts] = await Promise.all([
+        base44.auth.me(),
+        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: parseInt(units), is_active: true }),
+        base44.entities.QuestionBank.list(),
+        subject === 'אנגלית' ? base44.entities.VocabularyQuestion.list() : Promise.resolve([]),
+        base44.entities.AttemptNew.list("-created_date", 5000)
+      ]);
+
+      // סינון שאלות רלוונטיות
+      const relevantQuestions = allQuestions.filter(q =>
+        q.subject_id === subject &&
+        parseInt(q.unit_level) === parseInt(units) &&
+        q.is_active === true &&
+        q.topic_id
       );
 
-      // Load questions
-      const allQuestions = await base44.entities.QuestionBank.list();
-      const relevantQuestions = allQuestions.filter((q) =>
-      q.subject_id === subject &&
-      parseInt(q.unit_level) === parseInt(units) &&
-      q.is_active === true &&
-      q.topic_id
+      const relevantVocabQuestions = allVocabQuestions.filter(q =>
+        q.subject_id === subject &&
+        parseInt(q.unit_level) === parseInt(units) &&
+        q.is_active === true
       );
 
-      // Load vocabulary questions if English
-      const allVocabQuestions = subject === 'אנגלית' ? await base44.entities.VocabularyQuestion.list() : [];
-      const relevantVocabQuestions = allVocabQuestions.filter((q) =>
-      q.subject_id === subject &&
-      parseInt(q.unit_level) === parseInt(units) &&
-      q.is_active === true
+      // סינון attempts של המשתמש הנוכחי
+      const userAttempts = allAttempts.filter(a =>
+        a.created_by === user.email &&
+        a.subject_id === subject
       );
 
-      // Build topics map starting from TopicNew
+      console.log(`📊 Found ${relevantQuestions.length} questions, ${userAttempts.length} user attempts`);
+
+      // בניית מפת נושאים
       const topicsMap = {};
 
-      // First, add all custom topics
-      relevantCustomTopics.forEach((topic) => {
+      // הוספת נושאים מותאמים אישית
+      customTopics.forEach(topic => {
         topicsMap[topic.topic_id] = {
           topic_id: topic.topic_id,
+          name: topic.name,
+          icon: topic.icon || "📚",
+          description: topic.description || "",
+          color: topic.color || "from-blue-500 to-blue-600",
+          order: topic.order || 0,
           questions: [],
           vocabQuestions: [],
           subject_id: topic.subject_id,
-          unit_level: topic.unit_level,
-          customTopic: topic
+          unit_level: topic.unit_level
         };
       });
 
-      // Then, add questions to existing topics or create new ones
-      relevantQuestions.forEach((q) => {
-        const topicId = q.topic_id;
-        if (!topicsMap[topicId]) {
-          topicsMap[topicId] = {
-            topic_id: topicId,
+      // הוספת שאלות רגילות
+      relevantQuestions.forEach(q => {
+        if (!topicsMap[q.topic_id]) {
+          const parts = q.topic_id.split('_');
+          const displayName = parts.length >= 3 ? parts.slice(2).join(' ') : q.topic_id;
+          topicsMap[q.topic_id] = {
+            topic_id: q.topic_id,
+            name: displayName,
+            icon: "📚",
+            description: "",
+            color: "from-blue-500 to-blue-600",
+            order: 999,
             questions: [],
             vocabQuestions: [],
             subject_id: q.subject_id,
             unit_level: q.unit_level
           };
         }
-        topicsMap[topicId].questions.push(q);
+        topicsMap[q.topic_id].questions.push(q);
       });
 
-      // Add vocabulary questions to topics
-      relevantVocabQuestions.forEach((q) => {
+      // הוספת שאלות אוצר מילים
+      relevantVocabQuestions.forEach(q => {
         const topicId = q.topic_id || 'vocabulary_general';
         if (!topicsMap[topicId]) {
           topicsMap[topicId] = {
             topic_id: topicId,
+            name: topicId,
+            icon: "📝",
+            description: "",
+            color: "from-green-500 to-green-600",
+            order: 999,
             questions: [],
             vocabQuestions: [],
             subject_id: q.subject_id,
@@ -125,368 +114,335 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         topicsMap[topicId].vocabQuestions.push(q);
       });
 
-      const topicsArray = Object.values(topicsMap).map((topic) => {
-        const customTopic = topic.customTopic;
+      // המרה למערך עם סטטיסטיקות
+      const topicsArray = Object.values(topicsMap)
+        .filter(topic => {
+          // סינון נושאים לא רצויים
+          const id = topic.topic_id?.toLowerCase() || '';
+          const name = topic.name?.toLowerCase() || '';
+          if (id === 'unknown' || name === 'unknown') return false;
+          if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
+          if (!topic.name || topic.name.trim() === '') return false;
+          return true;
+        })
+        .map(topic => {
+          const totalQuestions = topic.questions.length + topic.vocabQuestions.length;
+          const isVocabulary = topic.vocabQuestions.length > 0 && topic.questions.length === 0;
+          const hasReadingText = topic.questions[0]?.reading_text && topic.questions[0].reading_text.length > 50;
 
-        let displayName = topic.topic_id;
-        let icon = "📚";
-        let description = "";
-        let order = 0;
-        let color = "from-blue-500 to-blue-600";
+          // חישוב סטטיסטיקות מה-attempts
+          const topicAttempts = userAttempts.filter(a => a.topic_id === topic.topic_id);
+          
+          // קבלת התשובה האחרונה לכל שאלה ייחודית
+          const latestByQuestion = {};
+          topicAttempts.forEach(a => {
+            const existing = latestByQuestion[a.question_id];
+            if (!existing || new Date(a.created_date) > new Date(existing.created_date)) {
+              latestByQuestion[a.question_id] = a;
+            }
+          });
 
-        if (customTopic) {
-          displayName = customTopic.name;
-          icon = customTopic.icon || "📚";
-          description = customTopic.description || "";
-          order = customTopic.order || 0;
-          color = customTopic.color || "from-blue-500 to-blue-600";
-        } else {
-          const parts = topic.topic_id.split('_');
-          if (parts.length >= 3) {
-            displayName = parts.slice(2).join(' ');
-          }
-        }
+          const latestAttempts = Object.values(latestByQuestion);
+          const uniqueAnswered = latestAttempts.length;
+          const correct = latestAttempts.filter(a => a.status === 'correct').length;
+          const wrong = latestAttempts.filter(a => a.status === 'incorrect').length;
+          const partial = latestAttempts.filter(a => a.status === 'partial').length;
+          const progress = totalQuestions > 0 ? Math.round((uniqueAnswered / totalQuestions) * 100) : 0;
+          const successRate = latestAttempts.length > 0 ? Math.round((correct / latestAttempts.length) * 100) : 0;
 
-        // Store actual count for statistics - include both regular and vocab questions
-        const actualCount = topic.questions.length + topic.vocabQuestions.length;
-        const isVocabulary = topic.vocabQuestions.length > 0 && topic.questions.length === 0;
+          console.log(`📈 ${topic.topic_id}: ${uniqueAnswered}/${totalQuestions} answered, ${correct}✓ ${wrong}✗ ${partial}~`);
 
-        // Check if this is Extended Reading by checking first question
-        const hasReadingText = topic.questions[0]?.reading_text &&
-        topic.questions[0].reading_text.length > 50;
-
-        return {
-          topic_id: topic.topic_id,
-          name: displayName,
-          icon: icon,
-          description: description,
-          color: color,
-          order: order,
-          questionCount: actualCount,
-          actualQuestionCount: actualCount,
-          subject_id: topic.subject_id,
-          unit_level: topic.unit_level,
-          isExtendedReading: hasReadingText,
-          isVocabulary: isVocabulary
-        };
-      });
-
-      topicsArray.sort((a, b) => {
-        if (a.order !== b.order) return a.order - b.order;
-        return b.actualQuestionCount - a.actualQuestionCount;
-      });
-
-      // סינון נושאים לא רצויים
-      const filteredTopics = topicsArray.filter(topic => {
-        const id = topic.topic_id?.toLowerCase() || '';
-        const name = topic.name?.toLowerCase() || '';
-        if (id === 'unknown' || name === 'unknown') return false;
-        if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
-        if (!topic.name || topic.name.trim() === '') return false;
-        return true;
-      });
-
-      // טעינה מקבילה של user ו-attempts - טען יותר attempts
-      const [user, attempts] = await Promise.all([
-      base44.auth.me(),
-      base44.entities.AttemptNew.list("-created_date", 2000)]
-      );
-
-      // סינון לפי המשתמש הנוכחי והמקצוע
-      const relevantAttempts = attempts.filter((a) =>
-      a.created_by === user.email &&
-      a.subject_id === subject
-      );
-      
-      console.log(`📊 Loaded ${attempts.length} attempts, ${relevantAttempts.length} relevant for ${subject}`);
-
-      const topicsWithStats = filteredTopics.
-      map((topic) => {
-        const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
-
-        // Count unique questions answered
-        const uniqueQuestions = new Set(topicAttempts.map((a) => a.question_id));
-        const uniqueAnswered = uniqueQuestions.size;
-
-        // ספירה לפי התוצאה האחרונה של כל שאלה (לא כל הניסיונות)
-        const latestAttemptByQuestion = {};
-        topicAttempts.forEach(a => {
-          const existing = latestAttemptByQuestion[a.question_id];
-          if (!existing || new Date(a.created_date) > new Date(existing.created_date)) {
-            latestAttemptByQuestion[a.question_id] = a;
-          }
+          return {
+            ...topic,
+            questionCount: totalQuestions,
+            actualQuestionCount: totalQuestions,
+            isVocabulary,
+            isExtendedReading: hasReadingText,
+            stats: {
+              correct,
+              wrong,
+              partial,
+              total: latestAttempts.length,
+              progress,
+              uniqueAnswered,
+              successRate
+            }
+          };
+        })
+        .sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+          return b.actualQuestionCount - a.actualQuestionCount;
         });
-        
-        const latestAttempts = Object.values(latestAttemptByQuestion);
-        const correct = latestAttempts.filter((a) => a.status === 'correct').length;
-        const wrong = latestAttempts.filter((a) => a.status === 'incorrect').length;
-        const partial = latestAttempts.filter((a) => a.status === 'partial').length;
-        const total = latestAttempts.length;
 
-        // Calculate progress based on unique questions vs total available
-        const actualTotal = topic.actualQuestionCount || topic.questionCount;
-        const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round(uniqueAnswered / actualTotal * 100) : 0;
-        
-        // חישוב אחוז הצלחה
-        const successRate = total > 0 ? Math.round((correct / total) * 100) : 0;
-
-        console.log(`📈 Topic ${topic.topic_id}: ${topicAttempts.length} attempts, ${uniqueAnswered} unique, ${correct}✓ ${wrong}✗ ${partial}~`);
-
-        return {
-          ...topic,
-          stats: {
-            correct: correct || 0,
-            wrong: wrong || 0,
-            partial: partial || 0,
-            total: total || 0,
-            progress: progress || 0,
-            uniqueAnswered: uniqueAnswered || 0,
-            successRate: successRate || 0
-          }
-        };
-      });
-
-      setTopics(topicsWithStats);
-
-      // בדוק אם יש נושא נבחר
-      const selectedTopicId = sessionStorage.getItem('selectedTopicId');
-      if (selectedTopicId) {
-        const topicIdx = topicsWithStats.findIndex((t) => t.topic_id === selectedTopicId);
-        if (topicIdx !== -1) {
-          setCurrentIndex(topicIdx);
-          setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }, 100);
-        }
-        sessionStorage.removeItem('selectedTopicId');
-      }
+      setTopics(topicsArray);
+      setLastLoadTime(new Date());
+      console.log(`✅ TopicCarousel: Loaded ${topicsArray.length} topics`);
 
     } catch (error) {
-      console.error("Error loading topics:", error);
-      if (cachedTopics) {
-        setTopics(cachedTopics); // שימוש ב-cache במקרה של שגיאה
-      } else {
-        setTopics([]);
-      }
+      console.error("❌ TopicCarousel: Error loading topics:", error);
+      setTopics([]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [subject, units]);
 
-  const handleStartPractice = async () => {
+  // טעינה ראשונית וכשמשתנים הפרמטרים
+  useEffect(() => {
+    loadTopics();
+  }, [loadTopics]);
+
+  // האזנה לאירועי עדכון גלובליים
+  useEffect(() => {
+    const handleUpdate = () => {
+      console.log('🔄 TopicCarousel: Received global update event');
+      loadTopics();
+    };
+
+    window.addEventListener('mastery-update', handleUpdate);
+    window.addEventListener('practice-complete', handleUpdate);
+    window.addEventListener('exam-complete', handleUpdate);
+    
+    // גם כשחוזרים לדף
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadTopics();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('mastery-update', handleUpdate);
+      window.removeEventListener('practice-complete', handleUpdate);
+      window.removeEventListener('exam-complete', handleUpdate);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [loadTopics]);
+
+  const handleStartPractice = () => {
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
-    console.log(`🔍 Starting practice for: ${topic.topic_id}`);
-    console.log(`📖 Is Vocabulary: ${topic.isVocabulary}`);
-    console.log(`📖 Is Extended Reading: ${topic.isExtendedReading}`);
-
     if (topic.isVocabulary) {
-      console.log("→ Navigating to VocabularyPractice");
       navigate(createPageUrl(`VocabularyPractice?topicId=${topicIdParam}`));
-      return;
-    }
-
-    if (topic.isExtendedReading) {
-      console.log("→ Navigating to ExtendedReading");
+    } else if (topic.isExtendedReading) {
       navigate(createPageUrl(`ExtendedReading?topicid=${topicIdParam}`));
     } else {
-      console.log("→ Navigating to TopicPracticeNew");
       navigate(createPageUrl(`TopicPracticeNew?topicid=${topicIdParam}&set=1`));
     }
   };
 
-  const defaultColors = [
-  "from-blue-500 to-blue-600",
-  "from-purple-500 to-purple-600",
-  "from-pink-500 to-pink-600",
-  "from-green-500 to-emerald-600",
-  "from-orange-500 to-orange-600",
-  "from-cyan-500 to-cyan-600"];
-
+  const handleRefresh = () => {
+    loadTopics();
+  };
 
   if (isLoading) {
     return (
-      <div className="bg-indigo-50 rounded-2xl p-8 text-center">
-        <Loader2 className="animate-spin h-10 w-10 text-[#3B82F6] mx-auto mb-3" />
-        <p className="text-[#6E6E6E] text-[13px] font-semibold">טוען נושאים...</p>
-      </div>);
-
+      <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
+        <Loader2 className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-3" />
+        <p className="text-gray-600 text-sm font-semibold">טוען נושאים...</p>
+      </div>
+    );
   }
 
   if (topics.length === 0) {
     return (
-      <div className="bg-indigo-50 rounded-2xl p-6 text-center">
-        <Target className="w-12 h-12 mx-auto mb-3 text-[#3B82F6]" />
-        <h3 className="text-[16px] font-bold text-[#2B2B2B] mb-1">אין שאלות זמינות</h3>
-        <p className="text-[#6E6E6E] text-[12px]">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
-      </div>);
-
+      <div className="bg-white rounded-2xl p-6 text-center shadow-lg">
+        <Target className="w-12 h-12 mx-auto mb-3 text-blue-600" />
+        <h3 className="text-base font-bold text-gray-900 mb-1">אין שאלות זמינות</h3>
+        <p className="text-gray-600 text-sm">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
+      </div>
+    );
   }
 
   const currentTopic = topics[currentIndex];
 
   return (
-    <div className="bg-[#ffffff] p-4 rounded-2xl">
+    <div className="bg-white p-4 rounded-2xl shadow-lg">
+      {/* כפתור רענון */}
+      <div className="flex justify-end mb-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleRefresh}
+          className="text-gray-500 hover:text-blue-600 h-8 px-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </Button>
+      </div>
+
       <div className="relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.2}
             onDragEnd={(e, info) => {
-              const threshold = 50;
-              if (info.offset.x > threshold && topics.length > 1) {
-                setCurrentIndex((prev) => prev === 0 ? topics.length - 1 : prev - 1);
-              } else if (info.offset.x < -threshold && topics.length > 1) {
-                setCurrentIndex((prev) => prev === topics.length - 1 ? 0 : prev + 1);
+              if (info.offset.x > 50 && topics.length > 1) {
+                setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1);
+              } else if (info.offset.x < -50 && topics.length > 1) {
+                setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1);
               }
-            }}>
-
-            <div className="bg-gradient-to-br text-[#3B82F6] mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
-              <div className="text-center">
+            }}
+          >
+            {/* כרטיס הנושא */}
+            <div className={`bg-gradient-to-br ${currentTopic.color} p-4 rounded-xl relative mb-3`}>
+              <div className="text-center text-white">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
-                <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
-                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
+                <h2 className="font-bold text-lg mb-0.5">{currentTopic.name}</h2>
+                <p className="text-white/90 text-sm">
+                  {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו
+                </p>
               </div>
-              {onEditTopic &&
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditTopic(currentTopic);
-                }}
-                className="absolute top-2 left-2 text-white hover:bg-white/20">
 
+              {onEditTopic && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => { e.stopPropagation(); onEditTopic(currentTopic); }}
+                  className="absolute top-2 left-2 text-white hover:bg-white/20"
+                >
                   <Edit2 className="w-5 h-5" />
                 </Button>
-              }
-              {onAddTopic &&
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('🟢 Plus button clicked in carousel!');
-                  onAddTopic();
-                }}
-                className="absolute top-2 right-2 text-white hover:bg-white/20 z-20">
+              )}
 
+              {onAddTopic && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => { e.stopPropagation(); onAddTopic(); }}
+                  className="absolute top-2 right-2 text-white hover:bg-white/20"
+                >
                   <Plus className="w-5 h-5" />
                 </Button>
-              }
+              )}
             </div>
 
-            {currentTopic.stats &&
-            <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
-                
-                <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
-                  <div className="flex justify-center items-center mb-1.5">
-                    <span className="text-[17px] font-bold text-[#3B82F6]">{currentTopic.stats.progress}%</span>
-                  </div>
-                  <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
-                  <div className="h-2 bg-white rounded-full overflow-hidden">
-                    <motion.div
+            {/* סטטיסטיקות */}
+            <div className="bg-gray-50 rounded-xl p-3 mb-3 border border-gray-200">
+              <div className="text-sm font-bold text-center text-gray-900 mb-2">📊 הסטטיסטיקה שלך</div>
+              
+              {/* פס התקדמות */}
+              <div className="bg-blue-50 rounded-xl p-3 mb-3 border border-blue-200">
+                <div className="flex justify-center items-center mb-1">
+                  <span className="text-xl font-bold text-blue-600">{currentTopic.stats.progress}%</span>
+                </div>
+                <div className="text-xs font-semibold text-center text-gray-700 mb-1.5">התקדמות</div>
+                <div className="h-2 bg-white rounded-full overflow-hidden">
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${currentTopic.stats.progress}%` }}
                     transition={{ duration: 0.5 }}
-                    className="h-full bg-[#3B82F6] rounded-full" />
-
-                  </div>
-                  <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
-                    {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
-                  </p>
+                    className="h-full bg-blue-600 rounded-full"
+                  />
                 </div>
+                <p className="text-xs text-gray-600 text-center mt-1">
+                  {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} שאלות נענו
+                </p>
+              </div>
 
-                <div className="grid grid-cols-3 gap-1.5">
-                  <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
-                    <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">שגויות</div>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
-                    <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">נכונות</div>
-                  </div>
-                  <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
-                    <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">חלקיות</div>
-                  </div>
+              {/* ספירת תשובות */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-green-50 rounded-lg p-2 text-center border border-green-200">
+                  <div className="text-lg font-bold text-green-600">{currentTopic.stats.correct}</div>
+                  <div className="text-xs text-gray-600">נכונות</div>
+                </div>
+                <div className="bg-red-50 rounded-lg p-2 text-center border border-red-200">
+                  <div className="text-lg font-bold text-red-600">{currentTopic.stats.wrong}</div>
+                  <div className="text-xs text-gray-600">שגויות</div>
+                </div>
+                <div className="bg-orange-50 rounded-lg p-2 text-center border border-orange-200">
+                  <div className="text-lg font-bold text-orange-600">{currentTopic.stats.partial}</div>
+                  <div className="text-xs text-gray-600">חלקיות</div>
                 </div>
               </div>
-            }
 
+              {/* אחוז הצלחה */}
+              {currentTopic.stats.total > 0 && (
+                <div className="mt-2 text-center">
+                  <span className="text-xs text-gray-600">אחוז הצלחה: </span>
+                  <span className={`text-sm font-bold ${
+                    currentTopic.stats.successRate >= 70 ? 'text-green-600' :
+                    currentTopic.stats.successRate >= 50 ? 'text-orange-600' : 'text-red-600'
+                  }`}>
+                    {currentTopic.stats.successRate}%
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* כפתורי פעולה */}
             <div className="space-y-2">
               <Button
-                onClick={handleStartPractice} className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800">
-
-
+                onClick={handleStartPractice}
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+              >
                 <Play className="w-4 h-4 ml-2" />
                 התחל תרגול
               </Button>
 
-              {isPremium ?
-              <Button
-                onClick={() => {
-                  sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                  navigate(createPageUrl("CustomWeakPractice"));
-                }}
-                className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
-
+              {isPremium ? (
+                <Button
+                  onClick={() => {
+                    sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
+                    navigate(createPageUrl("CustomWeakPractice"));
+                  }}
+                  className="w-full h-10 text-sm font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-xl text-white"
+                >
                   <Target className="w-4 h-4 ml-2" />
                   תרגול טעויות בנושא זה
-                </Button> :
-
-              <Button
-                onClick={() => navigate(createPageUrl("Premium"))} className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800">
-
-
-                  <Lock className="w-4 h-4 ml-2" />
-                  תרגול טעויות
                 </Button>
-              }
+              ) : (
+                <Button
+                  onClick={() => navigate(createPageUrl("Premium"))}
+                  className="w-full h-10 text-sm font-bold bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700"
+                >
+                  <Lock className="w-4 h-4 ml-2" />
+                  תרגול טעויות (פרימיום)
+                </Button>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
 
-        {topics.length > 1 &&
-        <>
+        {/* חצי ניווט */}
+        {topics.length > 1 && (
+          <>
             <button
-            onClick={() => setCurrentIndex((prev) => prev === 0 ? topics.length - 1 : prev - 1)}
-            className="absolute right-0 top-1/3 -translate-y-1/2 -translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]">
-
-              <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
+              onClick={() => setCurrentIndex(prev => prev === 0 ? topics.length - 1 : prev - 1)}
+              className="absolute right-0 top-1/4 -translate-y-1/2 -translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-gray-200"
+            >
+              <ChevronRight className="w-4 h-4 text-blue-600" />
             </button>
 
             <button
-            onClick={() => setCurrentIndex((prev) => prev === topics.length - 1 ? 0 : prev + 1)}
-            className="absolute left-0 top-1/3 -translate-y-1/2 translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-[#E9F0FF]">
-
-              <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
+              onClick={() => setCurrentIndex(prev => prev === topics.length - 1 ? 0 : prev + 1)}
+              className="absolute left-0 top-1/4 -translate-y-1/2 translate-x-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 z-10 border border-gray-200"
+            >
+              <ChevronLeft className="w-4 h-4 text-blue-600" />
             </button>
           </>
-        }
+        )}
       </div>
 
-      {topics.length > 1 &&
-      <div className="flex justify-center gap-1.5 mt-3">
-          {topics.map((_, idx) =>
-        <button
-          key={idx}
-          onClick={() => setCurrentIndex(idx)}
-          className={`h-1.5 rounded-full transition-all ${
-          idx === currentIndex ? 'w-6 bg-[#3B82F6]' : 'w-1.5 bg-gray-300'}`
-          } />
-
-        )}
+      {/* נקודות ניווט */}
+      {topics.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-3">
+          {topics.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`h-1.5 rounded-full transition-all ${
+                idx === currentIndex ? 'w-6 bg-blue-600' : 'w-1.5 bg-gray-300'
+              }`}
+            />
+          ))}
         </div>
-      }
-    </div>);
-
+      )}
+    </div>
+  );
 }
