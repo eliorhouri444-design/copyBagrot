@@ -208,8 +208,8 @@ export default function ModuleCarousel({
                     initial={{ width: 0 }}
                     animate={{ width: `${moduleStats.progress}%` }}
                     transition={{ duration: 0.5 }}
-                    className="h-full bg-[#3B82F6] rounded-full" />
-
+                    className="h-full bg-[#3B82F6] rounded-full"
+                  />
                 </div>
                 <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
                   {moduleStats.totalAttempts} / {moduleStats.maxExams} מבחנים הושלמו
@@ -270,36 +270,36 @@ export default function ModuleCarousel({
                           בגרות אקראית
                         </Button>
 
-                        {isPremium === true ?
-                    <>
+                        {isPremium === true ? (
+                      <>
                         <Button
-                        onClick={() => {
-                          sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
-                          navigate(createPageUrl("CustomWeakExam"));
-                        }}
-                        className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
-
+                          onClick={() => {
+                            sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
+                            navigate(createPageUrl("CustomWeakExam"));
+                          }}
+                          className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                        >
                           <AlertTriangle className="w-4 h-4 ml-2" />
                           בוחן טעויות מהשאלון
                         </Button>
                         <Button
-                        onClick={() => navigate(createPageUrl("CustomWeakExam") + `?module=${currentModule.module_id || currentModule.id}&mode=adaptive`)}
-                        variant="outline"
-                        className="w-full h-10 text-[12px] font-bold border-2 border-purple-300 text-purple-700 hover:bg-purple-50 rounded-[14px]">
-
+                          onClick={() => navigate(createPageUrl("CustomWeakExam") + `?module=${currentModule.module_id || currentModule.id}&mode=adaptive`)}
+                          variant="outline"
+                          className="w-full h-10 text-[12px] font-bold border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:text-purple-800 rounded-[14px]"
+                        >
                           <Target className="w-4 h-4 ml-2" />
                           בוחן מותאם לשאלון
                         </Button>
-                      </> :
-
-                    <Button
-                      onClick={() => navigate(createPageUrl("Premium"))} className="bg-blue-500 text-white px-4 py-2 text-sm font-bold rounded-[14px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 from-amber-500 to-orange-500 inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:from-amber-600 hover:to-orange-600 w-full h-10">
-
-
+                      </>
+                    ) : (
+                      <Button
+                        onClick={() => navigate(createPageUrl("Premium"))}
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:from-amber-600 hover:to-orange-600 w-full h-10"
+                      >
                         <Lock className="w-4 h-4 ml-2" />
                         בוחן טעויות + בוחן מותאם
                       </Button>
-                    }
+                    )}
                       </div>
                   }
 
