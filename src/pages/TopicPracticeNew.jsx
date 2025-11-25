@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react";
-import { triggerPracticeComplete } from "@/components/mastery/useMasteryData";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -777,9 +776,6 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
         percentage: percentage
       });
     }
-
-    // עדכון גלובלי של כל המדדים
-    triggerPracticeComplete();
 
     navigate(createPageUrl("Practice"));
   };
