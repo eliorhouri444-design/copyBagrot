@@ -305,7 +305,9 @@ export default function TopicPracticeNewPage() {
 
         // נרמול התשובה - הסרת כל הרווחים
         const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
-        const isCorrect = normalizedUserAnswer === correctAnswer;
+        
+        // בדיקה נוספת - אם אין תשובה תקינה מהמשתמש
+        const isCorrect = normalizedUserAnswer.length > 0 && normalizedUserAnswer === correctAnswer;
 
         // שמירה ברקע
         saveAttemptInBackground({
