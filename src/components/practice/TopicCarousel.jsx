@@ -158,7 +158,18 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         };
       });
 
-      topicsArray.sort((a, b) => {
+      // סינון נושאים לא רצויים
+      const filteredTopics = topicsArray.filter(topic => {
+        const id = topic.topic_id?.toLowerCase() || '';
+        const name = topic.name?.toLowerCase() || '';
+        // הסרת נושאים עם שמות לא תקינים
+        if (id === 'unknown' || name === 'unknown') return false;
+        if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
+        if (!topic.name || topic.name.trim() === '') return false;
+        return true;
+      });
+
+      filteredTopics.sort((a, b) => {
         if (a.order !== b.order) return a.order - b.order;
         return b.actualQuestionCount - a.actualQuestionCount;
       });
@@ -166,7 +177,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       // טעינה מקבילה של user ו-attempts
       const [user, attempts] = await Promise.all([
       base44.auth.me(),
-      base44.entities.AttemptNew.list()]
+      base44.entities.AttemptNew.list("-created_date", 500)]
       );
 
       const relevantAttempts = attempts.filter((a) =>
@@ -174,7 +185,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       a.subject_id === subject
       );
 
-      const topicsWithStats = topicsArray.
+      const topicsWithStats = filteredTopics.
       map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
