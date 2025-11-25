@@ -162,6 +162,12 @@ export default function HomePage() {
 
   const readinessData = useReadinessCalculator(user, topics, practiceAttempts, examAttempts);
 
+  // מדדי Mastery מחושבים דינמית
+  const { overallMastery, isLoading: masteryLoading } = useMasteryData(
+    user?.selected_subject, 
+    user?.selected_units
+  );
+
   const daysUntilExam = user?.exam_date ?
   Math.max(0, Math.ceil((new Date(user.exam_date) - new Date()) / (1000 * 60 * 60 * 24))) :
   90;
@@ -233,14 +239,20 @@ export default function HomePage() {
       </div>
 
       <div className="px-5 space-y-4">
-        {/* מה המצב שלך */}
+        {/* מוכנות כללית - כרטיס מאוחד */}
+        <OverallMasteryCard 
+          overallMastery={overallMastery} 
+          isLoading={masteryLoading} 
+        />
+
+        {/* מה המצב שלך - פירוט */}
         <CardSimple delay={0.05}>
-          <CardTitle>מה המצב שלך</CardTitle>
+          <CardTitle>פירוט מדדים</CardTitle>
           
           <div className="grid grid-cols-3 gap-3 mb-3">
-            <StatCard value={`${readinessData?.scores.overall || 0}%`} label="מוכנות" color="#3B82F6" />
             <StatCard value={daysUntilExam} label="ימים לבגרות" color="#3B82F6" />
             <StatCard value={user?.target_score || 85} label="ציון מטרה" color="#3B82F6" />
+            <StatCard value={`${readinessData?.current?.totalPractice || 0}`} label="שאלות נפתרו" color="#10B981" />
           </div>
 
           <Button
@@ -248,27 +260,27 @@ export default function HomePage() {
             variant="outline"
             className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#112D57]">
 
-            {showDetails ? 'הסתר פירוט' : 'ראה פירוט'}
+            {showDetails ? 'הסתר פירוט' : 'ראה פירוט מלא'}
             <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
           </Button>
 
           {showDetails && readinessData &&
           <div className="grid grid-cols-2 gap-2 mt-3">
-              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                <div className="text-sm text-[#6E6E6E] mb-1">שליטה</div>
-                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</div>
+              <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                <div className="text-sm text-gray-600 mb-1">שליטה בנושאים</div>
+                <div className="text-2xl font-black text-purple-600">{overallMastery.totalTopicMastery}%</div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                <div className="text-sm text-[#6E6E6E] mb-1">תרגול</div>
-                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</div>
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <div className="text-sm text-gray-600 mb-1">שליטה בבגרויות</div>
+                <div className="text-2xl font-black text-blue-600">{overallMastery.examsMastery}%</div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                <div className="text-sm text-[#6E6E6E] mb-1">בגרויות</div>
-                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</div>
+              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                <div className="text-sm text-gray-600 mb-1">אחוז הצלחה</div>
+                <div className="text-2xl font-black text-green-600">{Math.round(readinessData.current?.currentAccuracy || 0)}%</div>
               </div>
-              <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                <div className="text-sm text-[#6E6E6E] mb-1">מהירות</div>
-                <div className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</div>
+              <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
+                <div className="text-sm text-gray-600 mb-1">בגרויות הושלמו</div>
+                <div className="text-2xl font-black text-orange-600">{readinessData.current?.totalExams || 0}</div>
               </div>
             </div>
           }
