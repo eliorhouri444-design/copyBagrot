@@ -1380,7 +1380,7 @@ export default function ExamsPage() {
                     className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
 
                     <div className="flex items-center gap-3 flex-1">
-                      <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}>
+                      <div className="bg-blue-50 p-2 rounded-lg">
                         {passed ?
                         <CheckCircle className="w-4 h-4 text-green-600" /> :
 
@@ -1439,8 +1439,8 @@ export default function ExamsPage() {
                         } else {
                           navigate(createPageUrl("Premium"));
                         }
-                      }}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+                      }} className="bg-blue-500 text-white px-4 py-2 text-xs font-bold rounded-md whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
+
 
                         {isPremium ?
                       <>
