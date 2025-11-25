@@ -33,33 +33,25 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
 
   return (
     <div className="bg-white rounded-xl p-3 space-y-2.5">
-      {/* מד מוכנות ראשי */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }} className="bg-blue-500 p-3 rounded-xl border-2 border-red-200">
-
-
-        <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center gap-2">
-            <Target className={`w-4 h-4 ${getScoreColor(mainScore)}`} />
-            <span className="text-[#ffffff] font-bold">
-              {isTopic ? "מוכנות בנושא" : "מוכנות בשאלון"}
-            </span>
-          </div>
-          <span className="text-[#ffffff] font-bold">
-            {mainScore}%
-          </span>
+      {/* מד מוכנות ראשי - עיצוב כמו בקרוסלה */}
+      <div className="bg-[#F5F8FF] rounded-xl p-2.5 border border-[#E9F0FF]">
+        <div className="flex justify-center items-center mb-1.5">
+          <span className="text-[17px] font-bold text-[#3B82F6]">{mainScore}%</span>
         </div>
-        
+        <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">
+          {isTopic ? "התקדמות" : "מוכנות בשאלון"}
+        </div>
         <div className="h-2 bg-white rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${mainScore}%` }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`h-full rounded-full ${getProgressColor(mainScore)}`} />
-
+            transition={{ duration: 0.5 }}
+            className="h-full bg-[#3B82F6] rounded-full" />
         </div>
-      </motion.div>
+        <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
+          {mastery.uniqueAnswered || mastery.attemptsCount || 0} / {mastery.totalQuestions || mastery.questionsCount || 0} שאלות נענו
+        </p>
+      </div>
 
       {/* סטטיסטיקות מפורטות */}
       {isTopic ?
