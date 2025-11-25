@@ -423,7 +423,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     />
                   </div>
                   <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
-                    {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
+                    {currentTopic.stats.totalSets || 0} סטים בוצעו (כל סט = 10 שאלות)
                   </p>
                 </div>
 
