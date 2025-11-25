@@ -36,17 +36,17 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
       {/* מד מוכנות ראשי */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`rounded-xl p-3 border-2 ${getScoreBg(mainScore)}`}
-      >
+        animate={{ opacity: 1, y: 0 }} className="bg-blue-500 p-3 rounded-xl border-2 border-red-200">
+
+
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
             <Target className={`w-4 h-4 ${getScoreColor(mainScore)}`} />
-            <span className="text-[12px] font-bold text-gray-900">
+            <span className="text-[#ffffff] font-bold">
               {isTopic ? "מוכנות בנושא" : "מוכנות בשאלון"}
             </span>
           </div>
-          <span className={`text-[18px] font-bold ${getScoreColor(mainScore)}`}>
+          <span className="text-[#ffffff] font-bold">
             {mainScore}%
           </span>
         </div>
@@ -56,15 +56,15 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
             initial={{ width: 0 }}
             animate={{ width: `${mainScore}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`h-full rounded-full ${getProgressColor(mainScore)}`}
-          />
+            className={`h-full rounded-full ${getProgressColor(mainScore)}`} />
+
         </div>
       </motion.div>
 
       {/* סטטיסטיקות מפורטות */}
-      {isTopic ? (
-        // סטטיסטיקות נושא
-        <>
+      {isTopic ?
+      // סטטיסטיקות נושא
+      <>
           <div className="grid grid-cols-3 gap-1.5">
             <div className="bg-green-50 rounded-lg p-2 text-center border border-green-200">
               <div className="text-[16px] font-bold text-green-600">{mastery.correct}</div>
@@ -92,8 +92,8 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
           </div>
 
           {/* אזורים חלשים */}
-          {mastery.weakAreas && mastery.weakAreas.length > 0 && (
-            <div className="bg-red-50 rounded-lg p-2 border border-red-200">
+          {mastery.weakAreas && mastery.weakAreas.length > 0 &&
+        <div className="bg-red-50 rounded-lg p-2 border border-red-200">
               <div className="flex items-center gap-1.5 mb-1">
                 <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                 <span className="text-[10px] font-bold text-red-700">
@@ -101,11 +101,11 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
                 </span>
               </div>
             </div>
-          )}
-        </>
-      ) : (
-        // סטטיסטיקות שאלון
-        <>
+        }
+        </> :
+
+      // סטטיסטיקות שאלון
+      <>
           <div className="grid grid-cols-3 gap-1.5">
             <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-200">
               <div className="text-[16px] font-bold text-blue-600">{mastery.completedExams}</div>
@@ -133,8 +133,8 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
           </div>
 
           {/* נושאים חלשים מהבגרויות */}
-          {mastery.examWeakAreas && mastery.examWeakAreas.length > 0 && (
-            <div className="bg-red-50 rounded-lg p-2 border border-red-200">
+          {mastery.examWeakAreas && mastery.examWeakAreas.length > 0 &&
+        <div className="bg-red-50 rounded-lg p-2 border border-red-200">
               <div className="flex items-center gap-1.5 mb-1">
                 <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                 <span className="text-[10px] font-bold text-red-700">
@@ -142,9 +142,9 @@ export default function MasteryStatsCard({ mastery, type = "topic" }) {
                 </span>
               </div>
             </div>
-          )}
+        }
         </>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
