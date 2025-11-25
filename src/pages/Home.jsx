@@ -10,6 +10,8 @@ import OverallMasteryCard from "@/components/mastery/OverallMasteryCard";
 import { useMasteryData } from "@/components/mastery/useMasteryData";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import DailyPlanCard from "@/components/home/DailyPlanCard";
+import RatingDialog from "@/components/ads/RatingDialog";
+import ShareDialog from "@/components/ads/ShareDialog";
 
 export default function HomePage() {
   const navigate = useNavigate();
