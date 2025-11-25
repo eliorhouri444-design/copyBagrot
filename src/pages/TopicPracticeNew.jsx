@@ -928,10 +928,18 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                       }
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
-                        <div className="text-sm text-gray-700 mb-2">{q.question_text.substring(0, 80)}...</div>
+                        <div className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{q.question_text}</div>
+
+                        {/* תמיד הצג את התשובה של המשתמש */}
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 mb-2">
+                          <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
+                          <div className={`text-sm font-semibold ${result?.isCorrect ? 'text-green-700' : 'text-red-700'}`} dir="ltr">
+                            {result?.userAnswer || "לא נענה"}
+                          </div>
+                        </div>
 
                         {q.question_type === "writing" && result?.writingEvaluation ?
-                        <div className="space-y-2 mt-3">
+                        <div className="space-y-2">
                             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-300">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
@@ -1002,18 +1010,10 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                               </div>
                           }
                           </div> :
-                        !result?.isCorrect && q.question_type !== "writing" &&
-                        <div className="space-y-2 mt-3">
-                            <div className="bg-white rounded-lg p-3 border border-red-200">
-                              <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
-                              <div className="text-sm font-semibold text-red-700" dir="ltr">
-                                {result?.userAnswer || "לא נענה"}
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-lg p-3 border border-green-200">
-                              <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                              <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
-                            </div>
+                        !result?.isCorrect && q.question_type !== "writing" && result?.correctAnswer &&
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                            <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
+                            <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
                           </div>
                         }
                       </div>
