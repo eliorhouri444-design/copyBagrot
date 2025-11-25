@@ -174,16 +174,19 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         return true;
       });
 
-      // טעינה מקבילה של user ו-attempts
+      // טעינה מקבילה של user ו-attempts - טען יותר attempts
       const [user, attempts] = await Promise.all([
       base44.auth.me(),
-      base44.entities.AttemptNew.list("-created_date", 500)]
+      base44.entities.AttemptNew.list("-created_date", 2000)]
       );
 
+      // סינון לפי המשתמש הנוכחי והמקצוע
       const relevantAttempts = attempts.filter((a) =>
       a.created_by === user.email &&
       a.subject_id === subject
       );
+      
+      console.log(`📊 Loaded ${attempts.length} attempts, ${relevantAttempts.length} relevant for ${subject}`);
 
       const topicsWithStats = filteredTopics.
       map((topic) => {
@@ -193,14 +196,29 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         const uniqueQuestions = new Set(topicAttempts.map((a) => a.question_id));
         const uniqueAnswered = uniqueQuestions.size;
 
-        const correct = topicAttempts.filter((a) => a.status === 'correct').length;
-        const wrong = topicAttempts.filter((a) => a.status === 'incorrect').length;
-        const partial = topicAttempts.filter((a) => a.status === 'partial').length;
-        const total = topicAttempts.length;
+        // ספירה לפי התוצאה האחרונה של כל שאלה (לא כל הניסיונות)
+        const latestAttemptByQuestion = {};
+        topicAttempts.forEach(a => {
+          const existing = latestAttemptByQuestion[a.question_id];
+          if (!existing || new Date(a.created_date) > new Date(existing.created_date)) {
+            latestAttemptByQuestion[a.question_id] = a;
+          }
+        });
+        
+        const latestAttempts = Object.values(latestAttemptByQuestion);
+        const correct = latestAttempts.filter((a) => a.status === 'correct').length;
+        const wrong = latestAttempts.filter((a) => a.status === 'incorrect').length;
+        const partial = latestAttempts.filter((a) => a.status === 'partial').length;
+        const total = latestAttempts.length;
 
         // Calculate progress based on unique questions vs total available
         const actualTotal = topic.actualQuestionCount || topic.questionCount;
         const progress = actualTotal > 0 && uniqueAnswered > 0 ? Math.round(uniqueAnswered / actualTotal * 100) : 0;
+        
+        // חישוב אחוז הצלחה
+        const successRate = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        console.log(`📈 Topic ${topic.topic_id}: ${topicAttempts.length} attempts, ${uniqueAnswered} unique, ${correct}✓ ${wrong}✗ ${partial}~`);
 
         return {
           ...topic,
@@ -210,7 +228,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             partial: partial || 0,
             total: total || 0,
             progress: progress || 0,
-            uniqueAnswered: uniqueAnswered || 0
+            uniqueAnswered: uniqueAnswered || 0,
+            successRate: successRate || 0
           }
         };
       });
