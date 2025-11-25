@@ -615,16 +615,17 @@ export default function TopicPracticeNewPage() {
               // רק לתשובות ארוכות - השתמש ב-AI
               try {
                 const aiCheck = await base44.integrations.Core.InvokeLLM({
-                  prompt: `Check if student answer is correct. Be lenient with synonyms and paraphrasing.
-Question: ${currentQuestion.question_text}
-Correct: ${correctAnswer}
-Student: ${userAnswer}
-Return JSON with is_correct (boolean) and similarity_score (0-100)`,
+                  prompt: `בדוק אם תשובת התלמיד נכונה. היה סלחני עם מילים נרדפות וניסוחים שונים.
+שאלה: ${currentQuestion.question_text}
+תשובה נכונה: ${correctAnswer}
+תשובת התלמיד: ${userAnswer}
+החזר JSON עם is_correct (בוליאני), similarity_score (0-100), ו-explanation_hebrew (הסבר קצר בעברית למה התשובה נכונה או לא)`,
                   response_json_schema: {
                     type: "object",
                     properties: {
                       is_correct: { type: "boolean" },
-                      similarity_score: { type: "number" }
+                      similarity_score: { type: "number" },
+                      explanation_hebrew: { type: "string", description: "הסבר קצר בעברית" }
                     }
                   }
                 });
