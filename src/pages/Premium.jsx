@@ -192,7 +192,7 @@ export default function PremiumPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3B82F6] mx-auto mb-4" />
           <p className="text-gray-600">טוען...</p>
         </div>
       </div>
@@ -279,7 +279,7 @@ export default function PremiumPage() {
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-purple-600" />
+                <Sparkles className="w-6 h-6 text-[#3B82F6]" />
                 מה עכשיו?
               </h3>
               <p className="text-gray-700 mb-4">
