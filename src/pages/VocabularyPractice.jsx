@@ -239,6 +239,14 @@ Return JSON:`,
         percentage: avgScore
       });
     }
+    
+    // נקה cache כדי שהקרוסלה תתעדכן
+    const topicIdFromUrl = urlParams.get("topicId");
+    if (topicIdFromUrl) {
+      sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}`);
+      sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}_time`);
+    }
+    
     setShowSummary(true);
   };
 
