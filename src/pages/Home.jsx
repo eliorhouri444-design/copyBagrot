@@ -22,6 +22,9 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [modules, setModules] = useState([]);
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [adSettings, setAdSettings] = useState(null);
 
   // Track referral clicks when someone opens a shared link
   useEffect(() => {
