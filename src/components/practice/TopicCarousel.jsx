@@ -436,19 +436,22 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5">
-                  <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
-                    <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">תשובות שגויות</div>
+                    <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
+                      <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.failedSets || 0}</div>
+                      <div className="text-[9px] text-[#6E6E6E]">סטים נכשלים</div>
+                      <div className="text-[8px] text-red-400">מתחת ל-56%</div>
+                    </div>
+                    <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
+                      <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.mediumSets || 0}</div>
+                      <div className="text-[9px] text-[#6E6E6E]">סטים בינוניים</div>
+                      <div className="text-[8px] text-orange-400">56%-85%</div>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
+                      <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.excellentSets || 0}</div>
+                      <div className="text-[9px] text-[#6E6E6E]">סטים מצוינים</div>
+                      <div className="text-[8px] text-green-400">86%-100%</div>
+                    </div>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
-                    <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">תשובות נכונות</div>
-                  </div>
-                  <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
-                    <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">תשובות חלקיות</div>
-                  </div>
-                </div>
               </div>
             )}
 
