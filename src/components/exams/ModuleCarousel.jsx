@@ -284,19 +284,19 @@ export default function ModuleCarousel({
 
               <div className="grid grid-cols-3 gap-1.5">
                 <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
-                  <div className="text-[16px] font-bold text-green-600">{moduleStats.passedAttempts}</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">עברו</div>
-                  <div className="text-[8px] text-green-500">מעל 56%</div>
+                  <div className="text-[16px] font-bold text-green-600">{moduleStats.excellentAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E] font-semibold">מצוין</div>
+                  <div className="text-[8px] text-green-500">86%–100%</div>
+                </div>
+                <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
+                  <div className="text-[16px] font-bold text-orange-600">{moduleStats.mediumAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E] font-semibold">בינוני</div>
+                  <div className="text-[8px] text-orange-500">56%–85%</div>
                 </div>
                 <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
-                  <div className="text-[16px] font-bold text-red-600">{moduleStats.totalAttempts - moduleStats.passedAttempts}</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">נכשלו</div>
-                  <div className="text-[8px] text-red-500">מתחת ל-56%</div>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-1.5 text-center border border-blue-200">
-                  <div className="text-[16px] font-bold text-blue-600">{moduleStats.avgScore}%</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">ממוצע</div>
-                  <div className="text-[8px] text-blue-500">כל הבגרויות</div>
+                  <div className="text-[16px] font-bold text-red-600">{moduleStats.failedAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E] font-semibold">נמוך</div>
+                  <div className="text-[8px] text-red-500">מתחת ל־56%</div>
                 </div>
               </div>
 
