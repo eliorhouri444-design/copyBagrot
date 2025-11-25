@@ -62,8 +62,8 @@ export default function SubjectSelectionPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            לאיזו בגרות אתה רוצה להתכונן?
+          <h1 className="text-gray-900 mb-2 text-3xl font-bold">לאיזו בגרות אתה רוצה להתכונן?
+
           </h1>
           <p className="text-gray-600">בחר מקצוע ומספר יחידות</p>
         </div>
@@ -79,7 +79,7 @@ export default function SubjectSelectionPage() {
                 {/* Subject Button */}
                 <motion.button
                   whileTap={subject.isLocked ? {} : { scale: 0.98 }}
-                  onClick={() => handleSubjectClick(subject)} className="bg-[#3B82F6] p-6 w-full transition-all from-blue-500 to-blue-600">
+                  onClick={() => handleSubjectClick(subject)} className="bg-[#14a5ff] p-6 opacity-100 w-full transition-all from-blue-500 to-blue-600">
 
 
 
@@ -90,7 +90,7 @@ export default function SubjectSelectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#456bf2] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
+                      <div className="bg-[#008ee6] rounded-xl w-14 h-14 flex items-center justify-center from-purple-500 to-purple-600">
 
 
 
@@ -152,7 +152,7 @@ export default function SubjectSelectionPage() {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleUnitSelect(units)}
-                          disabled={isLoading} className="bg-[#3B82F6] text-white text-lg font-bold rounded-xl w-full h-14 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 from-purple-500 to-purple-600 hover:shadow-lg">
+                          disabled={isLoading} className="bg-[#14a5ff] text-white text-lg font-bold rounded-xl w-full h-14 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 from-purple-500 to-purple-600 hover:shadow-lg">
 
 
                               {isLoading ?
