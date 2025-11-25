@@ -19,7 +19,6 @@ export default function HomePage() {
   const [examAttempts, setExamAttempts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
-  const [showDetails, setShowDetails] = useState(false);
   const [modules, setModules] = useState([]);
 
   // Track referral clicks when someone opens a shared link
