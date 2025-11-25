@@ -27,15 +27,12 @@ export default function PracticePage() {
   const [editingTopicData, setEditingTopicData] = useState(null);
   const [showReorderDialog, setShowReorderDialog] = useState(false);
   const [reorderTopics, setReorderTopics] = useState([]);
-  const [cachedData, setCachedData] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return {
-        subject: localStorage.getItem('selected_subject') || 'אנגלית',
-        units: localStorage.getItem('selected_units') || '3'
-      };
-    }
-    return { subject: 'אנגלית', units: '3' };
-  });
+  const [practiceData, setPracticeData] = useState(null);
+  const [cachedSubject, setCachedSubject] = useState(() => localStorage.getItem('selected_subject') || 'אנגלית');
+  const [cachedUnits, setCachedUnits] = useState(() => localStorage.getItem('selected_units') || '3');
+
+  const displaySubject = user?.selected_subject || cachedSubject;
+  const displayUnits = parseInt(user?.selected_units || cachedUnits);
 
   const subjectColors = {
     "אנגלית": "bg-blue-600",
@@ -49,15 +46,90 @@ export default function PracticePage() {
   const headerColor = subjectColors[displaySubject] || "bg-blue-600";
 
   useEffect(() => {
-    if (user?.selected_subject) {
-      setCachedSubject(user.selected_subject);
-      localStorage.setItem('selected_subject', user.selected_subject);
-    }
-    if (user?.selected_units) {
-      setCachedUnits(user.selected_units.toString());
-      localStorage.setItem('selected_units', user.selected_units.toString());
-    }
-  }, [user]);
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+
+        if (currentUser?.selected_subject) {
+          setCachedSubject(currentUser.selected_subject);
+          localStorage.setItem('selected_subject', currentUser.selected_subject);
+        }
+        if (currentUser?.selected_units) {
+          setCachedUnits(currentUser.selected_units.toString());
+          localStorage.setItem('selected_units', currentUser.selected_units.toString());
+        }
+
+        // Load topics and sessions
+        const subject = currentUser?.selected_subject || cachedSubject;
+        const units = parseInt(currentUser?.selected_units || cachedUnits);
+
+        const [customTopics, allQuestions, recentSessions] = await Promise.all([
+          base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 50),
+          base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 500),
+          base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject, unit_level: units }, '-created_date', 5)
+        ]);
+
+        // Build topics with stats
+        const topicsMap = {};
+        customTopics.forEach((topic) => {
+          topicsMap[topic.topic_id] = {
+            topic_id: topic.topic_id,
+            name: topic.name,
+            icon: topic.icon || '📚',
+            color: topic.color || 'from-blue-500 to-blue-600',
+            order: topic.order || 0,
+            questionCount: 0,
+            stats: { correct: 0, wrong: 0, progress: 0 }
+          };
+        });
+
+        allQuestions.forEach((q) => {
+          if (q.topic_id) {
+            if (!topicsMap[q.topic_id]) {
+              const parts = q.topic_id.split('_');
+              topicsMap[q.topic_id] = {
+                topic_id: q.topic_id,
+                name: parts.length >= 3 ? parts.slice(2).join(' ') : q.topic_id,
+                icon: '📚',
+                color: 'from-blue-500 to-blue-600',
+                order: 999,
+                questionCount: 0,
+                stats: { correct: 0, wrong: 0, progress: 0 }
+              };
+            }
+            topicsMap[q.topic_id].questionCount++;
+          }
+        });
+
+        const topicsArray = Object.values(topicsMap)
+          .filter(t => t.questionCount > 0 || customTopics.some(ct => ct.topic_id === t.topic_id))
+          .sort((a, b) => a.order - b.order);
+
+        // Process recent sessions
+        const sessionsWithTopics = recentSessions.map(session => {
+          const topic = topicsMap[session.topic_id];
+          return {
+            ...session,
+            topicName: topic?.name || session.topic_id?.split('_').slice(2).join(' ') || 'תרגול כללי',
+            icon: topic?.icon || '📚'
+          };
+        });
+
+        setPracticeData({
+          topics: topicsArray,
+          recentSessions: sessionsWithTopics
+        });
+
+      } catch (error) {
+        console.error("Error loading practice data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const handleEditTopic = async (topic) => {
     setEditingTopicData({
