@@ -866,10 +866,10 @@ export default function ExamsPage() {
 
 
                           <div className="flex items-center gap-3 flex-1">
-                            <motion.div className="bg-blue-100 p-1.5 rounded-lg border border-red-200"
-
-                          whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.5 }}>
+                            <motion.div
+                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}>
 
                               {passed ?
                             <CheckCircle className="w-4 h-4 text-green-600" /> :
@@ -1107,7 +1107,7 @@ export default function ExamsPage() {
 
           <div className="space-y-4 py-4">
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 text-center">
-              <Play className="text-blue-500 mb-3 mx-auto lucide lucide-play w-12 h-12" />
+              <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
               <p className="text-sm text-gray-600 mb-4">
                 צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
@@ -1119,8 +1119,8 @@ export default function ExamsPage() {
                   setUnlockedAttempts((prev) => new Set([...prev, showAdDialog.id]));
                   setShowAttemptDetails(showAdDialog);
                   setShowAdDialog(null);
-                }} className="bg-blue-500 text-white px-4 py-2 text-sm font-bold rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 h-12">
-
+                }}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold">
 
                 <Play className="w-5 h-5 mr-2" />
                 צפה בפרסומת
@@ -1136,8 +1136,8 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-indigo-50 p-4 text-center rounded-xl from-amber-50 to-yellow-50 border-2 border-amber-200">
-              <Crown className="w-12 h-12 text-blue-500 mx-auto mb-3" />
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
+              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
               <p className="text-sm text-gray-600 mb-4">
                 גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
@@ -1146,8 +1146,8 @@ export default function ExamsPage() {
                 onClick={() => {
                   setShowAdDialog(null);
                   navigate(createPageUrl("Premium"));
-                }} className="bg-blue-500 text-white px-4 py-2 text-sm font-bold rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 h-12">
-
+                }}
+                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white h-12 font-bold">
 
                 <Crown className="w-5 h-5 mr-2" />
                 שדרג עכשיו
@@ -1380,7 +1380,7 @@ export default function ExamsPage() {
                     className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
 
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="bg-blue-50 p-2 rounded-lg">
+                      <div className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}>
                         {passed ?
                         <CheckCircle className="w-4 h-4 text-green-600" /> :
 
@@ -1439,8 +1439,8 @@ export default function ExamsPage() {
                         } else {
                           navigate(createPageUrl("Premium"));
                         }
-                      }} className="bg-blue-500 text-white px-4 py-2 text-xs font-bold rounded-md whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
-
+                      }}
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
 
                         {isPremium ?
                       <>
