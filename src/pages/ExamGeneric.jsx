@@ -384,6 +384,10 @@ export default function ExamGenericPage() {
       });
 
       setExamFinished(true);
+
+      // Trigger global update
+      triggerExamComplete();
+
     } catch (error) {
       console.error("Error submitting exam:", error);
       alert("שגיאה בשמירת המבחן");
