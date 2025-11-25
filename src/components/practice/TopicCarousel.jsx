@@ -221,7 +221,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
         const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
 
-        // קיבוץ לפי סשנים (סטים) לספירת סטים עם ציון לא עובר
+        // קיבוץ לפי סשנים (סטים) לספירת סטים לפי ציון
         const sessionMap = {};
         topicAttempts.forEach(a => {
           const sessionId = a.session_id || 'unknown';
@@ -230,15 +230,26 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
           }
           sessionMap[sessionId].push(a);
         });
-        // ספירת סטים עם ציון לא עובר (פחות מ-56%)
-        const failedSets = Object.entries(sessionMap)
-          .filter(([key, attempts]) => {
-            if (key === 'unknown') return false;
-            const correct = attempts.filter(a => a.status === 'correct').length;
-            const total = attempts.length;
-            const percentage = total > 0 ? (correct / total) * 100 : 0;
-            return percentage < 56;
-          }).length;
+
+        // ספירת סטים לפי טווחי ציונים
+        let failedSets = 0;    // פחות מ-56%
+        let mediumSets = 0;    // 56% עד 85%
+        let excellentSets = 0; // 86% עד 100%
+
+        Object.entries(sessionMap).forEach(([key, attempts]) => {
+          if (key === 'unknown') return;
+          const correct = attempts.filter(a => a.status === 'correct').length;
+          const total = attempts.length;
+          const percentage = total > 0 ? (correct / total) * 100 : 0;
+
+          if (percentage < 56) {
+            failedSets++;
+          } else if (percentage <= 85) {
+            mediumSets++;
+          } else {
+            excellentSets++;
+          }
+        });
 
         // סך כל השאלות בנושא
         const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
