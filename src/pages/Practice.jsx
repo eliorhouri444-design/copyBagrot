@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target, Settings } from "lucide-react";
+import { BookOpen, Upload, Save, Trash2, ArrowUp, ArrowDown, GripVertical, Crown, Target, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,9 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TopicCarousel from "@/components/practice/TopicCarousel";
 import RecentPracticeSessions from "@/components/practice/RecentPracticeSessions";
 import { motion } from "framer-motion";
-import { differenceInDays } from "date-fns";
-import { calculateCurrentProgress, calculateRecommendedGoals } from "@/components/tracking/GoalsTracker";
-import GoalsDisplay from "@/components/tracking/GoalsDisplay";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +22,7 @@ import {
 export default function PracticePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showTopicEditDialog, setShowTopicEditDialog] = useState(false);
   const [editingTopicData, setEditingTopicData] = useState(null);
   const [showReorderDialog, setShowReorderDialog] = useState(false);
