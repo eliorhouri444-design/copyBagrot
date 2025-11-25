@@ -272,10 +272,9 @@ function LayoutContent({ children, currentPageName }) {
                   to={item.path}
                   className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                     isActive 
-                      ? 'text-[var(--primary-blue)]' 
-                      : 'text-gray-500 hover:text-[var(--primary-blue)]'
+                      ? 'text-[#3B82F6]' 
+                      : 'text-gray-500 hover:text-[#3B82F6]'
                   }`}
-                  style={isActive ? { color: item.color } : {}}
                 >
                   <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
                   <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
@@ -283,8 +282,7 @@ function LayoutContent({ children, currentPageName }) {
                   </span>
                   {isActive && (
                     <div 
-                      className="absolute bottom-0 w-8 h-1 rounded-t-full" 
-                      style={{ backgroundColor: item.color }}
+                      className="absolute bottom-0 w-8 h-1 rounded-t-full bg-[#3B82F6]"
                     />
                   )}
                 </Link>
