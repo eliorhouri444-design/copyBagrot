@@ -13,8 +13,8 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
           <div className="h-16 bg-gray-200 rounded-lg" />
           <div className="h-16 bg-gray-200 rounded-lg" />
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const { totalTopicMastery, examsMastery, readinessScore } = overallMastery;
@@ -40,10 +40,10 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden"
-    >
+      className="bg-white rounded-2xl shadow-lg overflow-hidden">
+
       {/* מד מוכנות כללי */}
-      <div className={`bg-gradient-to-r ${readinessColors.bg} p-4 text-white`}>
+      <div className="bg-blue-500 text-white p-4 from-red-500 to-rose-600">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -58,8 +58,8 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", delay: 0.3 }}
-            className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center"
-          >
+            className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+
             <TrendingUp className="w-8 h-8" />
           </motion.div>
         </div>
@@ -70,8 +70,8 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
             initial={{ width: 0 }}
             animate={{ width: `${readinessScore}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="h-full bg-white rounded-full"
-          />
+            className="h-full bg-white rounded-full" />
+
         </div>
       </div>
 
@@ -82,16 +82,16 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-3 border border-purple-200"
-          >
+            transition={{ delay: 0.2 }} className="bg-blue-100 p-3 rounded-xl from-purple-50 to-indigo-50 border border-purple-200">
+
+
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+              <div className="bg-blue-500 rounded-lg w-8 h-8 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-white" />
               </div>
               <div>
                 <div className="text-[10px] text-gray-600">נושאים</div>
-                <div className="text-lg font-bold text-purple-600">{totalTopicMastery}%</div>
+                <div className="text-blue-500 text-lg font-bold">{totalTopicMastery}%</div>
               </div>
             </div>
             <div className="h-1.5 bg-white rounded-full overflow-hidden">
@@ -99,8 +99,8 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
                 initial={{ width: 0 }}
                 animate={{ width: `${totalTopicMastery}%` }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="h-full bg-purple-500 rounded-full"
-              />
+                className="h-full bg-purple-500 rounded-full" />
+
             </div>
           </motion.div>
 
@@ -108,10 +108,10 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3 border border-blue-200"
-          >
-            <div className="flex items-center gap-2 mb-2">
+            transition={{ delay: 0.3 }} className="bg-blue-100 p-3 rounded-xl from-blue-50 to-cyan-50 border border-blue-200">
+
+
+            <div className="bg-blue-100 mb-2 flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                 <FileText className="w-4 h-4 text-white" />
               </div>
@@ -125,12 +125,12 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
                 initial={{ width: 0 }}
                 animate={{ width: `${examsMastery}%` }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="h-full bg-blue-500 rounded-full"
-              />
+                className="h-full bg-blue-500 rounded-full" />
+
             </div>
           </motion.div>
         </div>
       </div>
-    </motion.div>
-  );
+    </motion.div>);
+
 }
