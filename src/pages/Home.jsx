@@ -170,29 +170,18 @@ export default function HomePage() {
       const subject = currentUser.selected_subject || 'אנגלית';
       const units = parseInt(currentUser.selected_units || 3);
 
+      // טעינה מהירה - רק מה שצריך
       const [allTopics, allAttempts, allExamAttempts, allModules] = await Promise.all([
-      base44.entities.TopicNew.list(),
-      base44.entities.AttemptNew.list("-created_date", 2000),
-      base44.entities.ExamAttempt.list("-created_date", 100),
-      base44.entities.ModuleDefinition.list()]
+      base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }),
+      base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, "-created_date", 200),
+      base44.entities.ExamAttempt.filter({ subject: subject, unit_level: units }, "-created_date", 50),
+      base44.entities.ModuleDefinition.filter({ subject: subject, unit_level: units })]
       );
 
-      const relevantTopics = allTopics.filter(
-        (t) => t.subject_id === subject && parseInt(t.unit_level) === units && t.is_active
-      );
-      setTopics(relevantTopics);
-
-      const userAttempts = allAttempts.filter(
-        (a) => a.created_by === currentUser.email &&
-        a.subject_id === subject &&
-        parseInt(a.unit_level) === units
-      );
-      setPracticeAttempts(userAttempts);
-
-      const userExamAttempts = allExamAttempts.filter(
-        (e) => e.subject === subject && parseInt(e.unit_level) === units
-      );
-      setExamAttempts(userExamAttempts);
+      // הנתונים כבר מסוננים מהשרת
+      setTopics(allTopics);
+      setPracticeAttempts(allAttempts);
+      setExamAttempts(allExamAttempts);
 
       // בניית רשימת מודולים (כולל ברירות מחדל)
       const defaultModulesStructure = {

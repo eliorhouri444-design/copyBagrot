@@ -166,11 +166,11 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         return true;
       });
 
-      // טעינה יעילה של attempts - רק של המשתמש הנוכחי והמקצוע הרלוונטי
+      // טעינה יעילה של attempts - רק של המשתמש הנוכחי והמקצוע הרלוונטי, מוגבל ל-100 אחרונים
       const relevantAttempts = await base44.entities.AttemptNew.filter(
         { created_by: user.email, subject_id: subject },
         "-created_date",
-        500
+        100
       );
 
       const topicsWithStats = filteredTopics.map((topic) => {
