@@ -494,7 +494,7 @@ export default function ExtendedReadingPage() {
   if (listeningText && showListeningIntro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
-        <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+        <div className="bg-blue-500 mb-4 p-4 rounded-b-[2rem] sm:p-6 shadow-xl">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -520,7 +520,7 @@ export default function ExtendedReadingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4">
 
-            <div className="bg-blue-600 rounded-2xl shadow-xl p-6 text-white text-center">
+            <div className="bg-blue-500 text-white p-6 text-center rounded-2xl shadow-xl">
               <div className="text-5xl mb-3">🎧</div>
               <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
               <p className="text-blue-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
