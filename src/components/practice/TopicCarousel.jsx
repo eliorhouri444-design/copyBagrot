@@ -63,15 +63,6 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     "from-cyan-500 to-cyan-600"
   ];
 
-  if (isLoading) {
-    return (
-      <div className="bg-indigo-50 rounded-2xl p-8 text-center">
-        <Loader2 className="animate-spin h-10 w-10 text-[#3B82F6] mx-auto mb-3" />
-        <p className="text-[#6E6E6E] text-[13px] font-semibold">טוען נושאים...</p>
-      </div>
-    );
-  }
-
   if (topics.length === 0) {
     return (
       <div className="bg-indigo-50 rounded-2xl p-6 text-center">
