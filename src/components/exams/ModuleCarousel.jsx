@@ -294,7 +294,7 @@ export default function ModuleCarousel({
                     ) : (
                       <Button
                         onClick={() => navigate(createPageUrl("Premium"))}
-                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:from-amber-600 hover:to-orange-600 w-full h-10"
+                        className="bg-[#1e3a5f] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:bg-[#2d4a6f] w-full h-10"
                       >
                         <Lock className="w-4 h-4 ml-2" />
                         בוחן טעויות + בוחן מותאם
