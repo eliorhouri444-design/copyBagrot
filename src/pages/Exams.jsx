@@ -39,7 +39,6 @@ export default function ExamsPage() {
   const [showAddModuleDialog, setShowAddModuleDialog] = useState(false);
   const [editingModuleData, setEditingModuleData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const queryClient = useQueryClient();
   const [showAdDialog, setShowAdDialog] = useState(null);
   const [unlockedAttempts, setUnlockedAttempts] = useState(new Set());
 
