@@ -269,7 +269,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_8px_8px] from-blue-500 to-indigo-500 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
