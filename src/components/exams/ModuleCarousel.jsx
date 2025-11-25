@@ -63,14 +63,26 @@ export default function ModuleCarousel({
       refreshExamAttempts();
     };
 
+    // גם כשחוזרים לדף
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 ModuleCarousel: Page visible - refreshing');
+        refreshExamAttempts();
+      }
+    };
+
     window.addEventListener('mastery-update', handleUpdate);
     window.addEventListener('practice-complete', handleUpdate);
     window.addEventListener('exam-complete', handleUpdate);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleUpdate);
 
     return () => {
       window.removeEventListener('mastery-update', handleUpdate);
       window.removeEventListener('practice-complete', handleUpdate);
       window.removeEventListener('exam-complete', handleUpdate);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleUpdate);
     };
   }, [refreshExamAttempts]);
 
