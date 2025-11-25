@@ -221,7 +221,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
         const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
 
-        // קיבוץ לפי סשנים (סטים) לספירת סטים לפי ציון
+        // קיבוץ לפי סשנים (סטים) לספירת סטים בוצעו
         const sessionMap = {};
         topicAttempts.forEach(a => {
           const sessionId = a.session_id || 'unknown';
@@ -230,26 +230,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
           }
           sessionMap[sessionId].push(a);
         });
-
-        // ספירת סטים לפי טווחי ציונים
-        let failedSets = 0;    // פחות מ-56%
-        let mediumSets = 0;    // 56% עד 85%
-        let excellentSets = 0; // 86% עד 100%
-
-        Object.entries(sessionMap).forEach(([key, attempts]) => {
-          if (key === 'unknown') return;
-          const correct = attempts.filter(a => a.status === 'correct').length;
-          const total = attempts.length;
-          const percentage = total > 0 ? (correct / total) * 100 : 0;
-
-          if (percentage < 56) {
-            failedSets++;
-          } else if (percentage <= 85) {
-            mediumSets++;
-          } else {
-            excellentSets++;
-          }
-        });
+        const totalSets = Object.keys(sessionMap).filter(k => k !== 'unknown').length;
 
         // סך כל השאלות בנושא
         const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
@@ -257,7 +238,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
         const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, sets: failed=${failedSets}, medium=${mediumSets}, excellent=${excellentSets}`);
+        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, ${totalSets} sets`);
 
         return {
           ...topic,
@@ -269,9 +250,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             progress: progress,
             uniqueCorrectAnswers: uniqueCorrectAnswers,
             totalQuestionsInTopic: totalQuestionsInTopic,
-            failedSets: failedSets,
-            mediumSets: mediumSets,
-            excellentSets: excellentSets
+            totalSets: totalSets
           }
         };
       });
@@ -382,7 +361,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               <div className="text-center">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
                 <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
-                <p className="text-[#ffffff] opacity-90">{(currentTopic.stats.failedSets || 0) + (currentTopic.stats.mediumSets || 0) + (currentTopic.stats.excellentSets || 0)} סטים בוצעו</p>
+                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.totalSets || 0} סטים בוצעו</p>
               </div>
               {onEditTopic && (
                 <Button
@@ -415,7 +394,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
             {currentTopic.stats && (
               <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">רמת השליטה בנושא</div>
+                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">בקיאות בנושא</div>
                 
                 <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
                   <div className="flex justify-center items-center mb-1.5">
@@ -436,22 +415,19 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5">
-                    <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
-                      <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.excellentSets || 0}</div>
-                      <div className="text-[9px] text-[#6E6E6E] font-semibold">מצוין</div>
-                      <div className="text-[8px] text-green-500">86%–100%</div>
-                    </div>
-                    <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
-                      <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.mediumSets || 0}</div>
-                      <div className="text-[9px] text-[#6E6E6E] font-semibold">בינוני</div>
-                      <div className="text-[8px] text-orange-500">56%–85%</div>
-                    </div>
-                    <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
-                      <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.failedSets || 0}</div>
-                      <div className="text-[9px] text-[#6E6E6E] font-semibold">נמוך</div>
-                      <div className="text-[8px] text-red-500">מתחת ל־56%</div>
-                    </div>
+                  <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
+                    <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות שגויות</div>
                   </div>
+                  <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
+                    <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות נכונות</div>
+                  </div>
+                  <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
+                    <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות חלקיות</div>
+                  </div>
+                </div>
               </div>
             )}
 
