@@ -43,7 +43,7 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
       className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
       {/* מד מוכנות כללי */}
-      <div className="bg-blue-500 text-white p-4 from-red-500 to-rose-600">
+      <div className={`bg-gradient-to-r text-white p-4 ${readinessColors.bg}`}>
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
