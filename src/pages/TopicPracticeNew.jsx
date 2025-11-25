@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, Check, X, Calculator, Pencil, Loader2, ChevronRight, Trophy, AlertCircle, Crown, BookOpen, Wand2, FileText } from "lucide-react";
+import { triggerPracticeComplete } from "@/components/mastery/useMasteryData";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
@@ -16,8 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter } from
-"@/components/ui/dialog";
+  DialogFooter
+} from "@/components/ui/dialog";
 import AdManager from "../components/ads/AdManager";
 import RatingDialog from "../components/ads/RatingDialog";
 
@@ -70,7 +71,7 @@ export default function TopicPracticeNewPage() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-
+        
         // Load ad settings
         const settings = await base44.entities.UserAdSettings.list();
         if (settings.length > 0) {
@@ -104,12 +105,12 @@ export default function TopicPracticeNewPage() {
   const loadQuestions = async () => {
     setIsLoading(true);
     setLoadError(null);
-
+    
     try {
       const allQuestionsRaw = await base44.entities.QuestionBank.list();
 
-      const questionsForTopic = allQuestionsRaw.filter((q) =>
-      q.topic_id === topicId && q.is_active !== false
+      const questionsForTopic = allQuestionsRaw.filter(q => 
+        q.topic_id === topicId && q.is_active !== false
       );
 
       if (questionsForTopic.length === 0) {
@@ -123,7 +124,7 @@ export default function TopicPracticeNewPage() {
       setTopicName(name);
 
       // Check if this is a writing topic
-      const isWritingTopic = questionsForTopic.some((q) => q.question_type === "writing");
+      const isWritingTopic = questionsForTopic.some(q => q.question_type === "writing");
       const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
 
       // Ensure minimum questions per set by duplicating if needed
@@ -136,7 +137,7 @@ export default function TopicPracticeNewPage() {
       // Now get all sets
       const totalSets = Math.ceil(expandedQuestions.length / questionsPerSet);
       let allSetsQuestions = [];
-
+      
       for (let i = 0; i < totalSets; i++) {
         const start = i * questionsPerSet;
         const end = start + questionsPerSet;
@@ -148,7 +149,7 @@ export default function TopicPracticeNewPage() {
       const startIndex = (setNumber - 1) * questionsPerSet;
       const endIndex = startIndex + questionsPerSet;
       const setQuestions = allSetsQuestions.slice(startIndex, endIndex);
-
+      
       if (setQuestions.length === 0) {
         setLoadError(`לא נמצאו שאלות לסט ${setNumber}`);
         setIsLoading(false);
@@ -158,9 +159,9 @@ export default function TopicPracticeNewPage() {
       setCurrentSetQuestions(setQuestions);
 
       // Check if this is listening comprehension
-      const isListeningComprehension = topicId.toLowerCase().includes('listening') ||
-      topicId.toLowerCase().includes('האזנה');
-
+      const isListeningComprehension = topicId.toLowerCase().includes('listening') || 
+                                       topicId.toLowerCase().includes('האזנה');
+      
       if (isListeningComprehension && setQuestions[0]?.reading_text) {
         setListeningText(setQuestions[0].reading_text);
         setShowListeningIntro(true);
@@ -169,9 +170,9 @@ export default function TopicPracticeNewPage() {
         setShowReadingText(false);
       } else {
         // Check if this is reading comprehension and get reading text
-        const isReadingComprehension = topicId.toLowerCase().includes('reading') ||
-        topicId.toLowerCase().includes('הבנת הנקרא');
-
+        const isReadingComprehension = topicId.toLowerCase().includes('reading') || 
+                                       topicId.toLowerCase().includes('הבנת הנקרא');
+        
         if (isReadingComprehension && setQuestions[0]?.reading_text) {
           setReadingText(setQuestions[0].reading_text);
           setShowReadingText(true);
@@ -188,11 +189,11 @@ export default function TopicPracticeNewPage() {
         subject_id: questionsForTopic[0].subject_id,
         unit_level: questionsForTopic[0].unit_level,
         topic_id: topicId,
-        questions: setQuestions.map((q) => q.question_id),
+        questions: setQuestions.map(q => q.question_id),
         started_at: new Date().toISOString(),
         is_completed: false
       });
-
+      
       setSessionId(session.id);
       setIsLoading(false);
     } catch (error) {
@@ -205,7 +206,7 @@ export default function TopicPracticeNewPage() {
   const handleSaveWritingDraft = async (text, wordCount) => {
     setIsSavingDraft(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-
+    
     try {
       const existingDrafts = await base44.entities.WritingAttempt.filter({
         question_id: currentQuestion.question_id,
@@ -238,8 +239,8 @@ export default function TopicPracticeNewPage() {
 
   // שמירת attempt ברקע - לא מחכים לתוצאה
   const saveAttemptInBackground = (attemptData) => {
-    base44.entities.AttemptNew.create(attemptData).catch((err) =>
-    console.error("Error saving attempt:", err)
+    base44.entities.AttemptNew.create(attemptData).catch(err => 
+      console.error("Error saving attempt:", err)
     );
   };
 
@@ -248,9 +249,9 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    const userAnswer = typeof providedAnswer === 'object' && providedAnswer !== null && 'text' in providedAnswer ?
-    String(providedAnswer.text) :
-    String(providedAnswer || answers[currentQuestion.question_id] || "");
+    const userAnswer = (typeof providedAnswer === 'object' && providedAnswer !== null && 'text' in providedAnswer) 
+      ? String(providedAnswer.text) 
+      : String(providedAnswer || answers[currentQuestion.question_id] || "");
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
@@ -261,12 +262,12 @@ export default function TopicPracticeNewPage() {
       if ((currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0) {
         // מציאת התשובה הנכונה מהאופציות או מהשדה correct_answer
         let correctAnswer = "";
-
+        
         // אם יש שדה correct_answer בשאלה
         if (currentQuestion.correct_answer) {
           correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase().replace(/\s/g, '');
         }
-
+        
         // נרמול התשובה - הסרת כל הרווחים
         const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
         const isCorrect = normalizedUserAnswer === correctAnswer;
@@ -278,14 +279,14 @@ export default function TopicPracticeNewPage() {
           topic_id: topicId,
           session_id: sessionId,
           user_answer_text: userAnswer,
-          score: isCorrect ? currentQuestion.max_score || 100 : 0,
+          score: isCorrect ? (currentQuestion.max_score || 100) : 0,
           max_score: currentQuestion.max_score || 100,
           percentage: isCorrect ? 100 : 0,
           status: isCorrect ? "correct" : "incorrect",
           time_spent_seconds: 0
         });
 
-        setResults((prev) => ({
+        setResults(prev => ({
           ...prev,
           [currentQuestion.question_id]: { isCorrect, status: isCorrect ? "correct" : "incorrect", correctAnswer, userAnswer }
         }));
@@ -293,7 +294,7 @@ export default function TopicPracticeNewPage() {
         // מעבר מיידי לשאלה הבאה
         setIsSubmitting(false);
         if (currentQuestionIndex < currentSetQuestions.length - 1) {
-          setCurrentQuestionIndex((prev) => prev + 1);
+          setCurrentQuestionIndex(prev => prev + 1);
         } else {
           saveWeakTopicsStats();
           setShowSummary(true);
@@ -305,8 +306,8 @@ export default function TopicPracticeNewPage() {
       if (currentQuestion.question_type === "writing") {
         console.log("🎯 Starting writing evaluation...");
         // Use AI to evaluate writing
-        const wordCount = userAnswer.trim().split(/\s+/).filter((w) => w).length;
-
+        const wordCount = userAnswer.trim().split(/\s+/).filter(w => w).length;
+        
         console.log("📝 Sending to AI for evaluation...");
         const evaluation = await base44.integrations.Core.InvokeLLM({
           prompt: `אתה בודק אנגלית קפדני לבגרות ישראלית. בדוק בדיוק כמו בוחן אמיתי של משרד החינוך.
@@ -390,9 +391,9 @@ export default function TopicPracticeNewPage() {
                 },
                 description: "ניתוח משפט אחר משפט"
               },
-              grammar_errors: {
-                type: "array",
-                items: {
+              grammar_errors: { 
+                type: "array", 
+                items: { 
                   type: "object",
                   properties: {
                     error: { type: "string" },
@@ -403,7 +404,7 @@ export default function TopicPracticeNewPage() {
               },
               spelling_errors: {
                 type: "array",
-                items: {
+                items: { 
                   type: "object",
                   properties: {
                     word: { type: "string" },
@@ -458,13 +459,13 @@ export default function TopicPracticeNewPage() {
                 },
                 description: "מילות קישור לשימוש"
               },
-              strengths: {
-                type: "array",
+              strengths: { 
+                type: "array", 
                 items: { type: "string" },
                 description: "נקודות חוזק (בעברית)"
               },
-              areas_to_improve: {
-                type: "array",
+              areas_to_improve: { 
+                type: "array", 
                 items: { type: "string" },
                 description: "תחומים לשיפור (בעברית)"
               }
@@ -493,9 +494,9 @@ export default function TopicPracticeNewPage() {
           time_spent_seconds: 0
         });
 
-        setResults((prev) => ({
+        setResults(prev => ({
           ...prev,
-          [currentQuestion.question_id]: {
+          [currentQuestion.question_id]: { 
             isCorrect: percentage >= 70,
             status: percentage >= 70 ? "correct" : "partial",
             correctAnswer: "",
@@ -525,12 +526,12 @@ export default function TopicPracticeNewPage() {
 
         // נסה קודם בדיקה פשוטה ללא AI - הסרת כל הרווחים
         const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
-
+        
         // בדוק אם יש תשובה נכונה בשאלה עצמה
         if (currentQuestion.correct_answer) {
           correctAnswer = String(currentQuestion.correct_answer);
           const normalizedCorrect = correctAnswer.trim().toLowerCase().replace(/\s/g, '');
-
+          
           if (normalizedUserAnswer === normalizedCorrect) {
             isCorrect = true;
             status = "correct";
@@ -553,10 +554,10 @@ export default function TopicPracticeNewPage() {
             }
 
             // בדיקת התאמה מדויקת - מהירה (הסרת כל הרווחים)
-            const exactMatch = correctAnswers.some((ans) =>
-            ans.value?.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
-            ) || acceptableVariants.some((variant) =>
-            variant.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
+            const exactMatch = correctAnswers.some(ans => 
+              ans.value?.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
+            ) || acceptableVariants.some(variant => 
+              variant.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
             );
 
             if (exactMatch) {
@@ -603,7 +604,7 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           time_spent_seconds: 0
         });
 
-        setResults((prev) => ({
+        setResults(prev => ({
           ...prev,
           [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer }
         }));
@@ -611,7 +612,7 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
         // מעבר מיידי לשאלה הבאה או לסיכום
         setIsSubmitting(false);
         if (currentQuestionIndex < currentSetQuestions.length - 1) {
-          setCurrentQuestionIndex((prev) => prev + 1);
+          setCurrentQuestionIndex(prev => prev + 1);
         } else {
           saveWeakTopicsStats();
           setShowSummary(true);
@@ -627,7 +628,7 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
 
   const saveWeakTopicsStats = async () => {
     try {
-      const wrongQuestions = currentSetQuestions.filter((q) => {
+      const wrongQuestions = currentSetQuestions.filter(q => {
         const result = results[q.question_id];
         return result && !result.isCorrect;
       });
@@ -639,9 +640,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
         subject_id: currentSetQuestions[0].subject_id,
         unit_level: currentSetQuestions[0].unit_level,
         total_questions: currentSetQuestions.length,
-        correct_answers: Object.values(results).filter((r) => r.isCorrect).length,
+        correct_answers: Object.values(results).filter(r => r.isCorrect).length,
         wrong_answers: wrongQuestions.length,
-        accuracy_percent: Math.round(Object.values(results).filter((r) => r.isCorrect).length / currentSetQuestions.length * 100)
+        accuracy_percent: Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)
       };
 
       const existingStats = await base44.entities.WeakTopic.filter({
@@ -672,24 +673,24 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
 
   const handleContinueToNextSet = () => {
     const nextSet = setNumber + 1;
-    const isWritingTopic = currentSetQuestions.some((q) => q.question_type === "writing");
+    const isWritingTopic = currentSetQuestions.some(q => q.question_type === "writing");
     const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
     const nextSetStartIndex = (nextSet - 1) * questionsPerSet;
-
+    
     if (nextSetStartIndex >= allQuestions.length) {
       finishPractice();
       return;
     }
 
     const isPremiumUser = user?.is_premium;
-
+    
     if (isPremiumUser) {
       continueToNextSet(nextSet);
     } else {
       // Check if user has bonus days left
       const today = new Date().toISOString().split('T')[0];
       const hasActiveBonus = adSettings?.bonus_active_until && adSettings.bonus_active_until >= today;
-
+      
       if (hasActiveBonus) {
         continueToNextSet(nextSet);
       } else if (!adSettings?.has_rated) {
@@ -726,18 +727,18 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
       if (rating === 5) {
         const bonusEndDate = new Date();
         bonusEndDate.setDate(bonusEndDate.getDate() + 1);
-
+        
         await base44.entities.UserAdSettings.update(adSettings.id, {
           has_rated: true,
           rating_date: new Date().toISOString(),
           bonus_active_until: bonusEndDate.toISOString().split('T')[0]
         });
-
+        
         const updatedSettings = await base44.entities.UserAdSettings.filter({ id: adSettings.id });
         if (updatedSettings.length > 0) {
           setAdSettings(updatedSettings[0]);
         }
-
+        
         setShowRatingDialog(false);
         alert("🎉 תודה על הדירוג! קיבלת יום אחד ללא פרסומות!");
         const nextSet = setNumber + 1;
@@ -747,12 +748,12 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           has_rated: true,
           rating_date: new Date().toISOString()
         });
-
+        
         const updatedSettings = await base44.entities.UserAdSettings.filter({ id: adSettings.id });
         if (updatedSettings.length > 0) {
           setAdSettings(updatedSettings[0]);
         }
-
+        
         setShowRatingDialog(false);
         setShowAdDialog(true);
       }
@@ -764,9 +765,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
 
   const finishPractice = async () => {
     if (sessionId) {
-      const correctCount = Object.values(results).filter((r) => r.isCorrect).length;
+      const correctCount = Object.values(results).filter(r => r.isCorrect).length;
       const totalQuestions = Object.keys(results).length;
-      const percentage = totalQuestions > 0 ? correctCount / totalQuestions * 100 : 0;
+      const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
 
       await base44.entities.PracticeSessionNew.update(sessionId, {
         completed_at: new Date().toISOString(),
@@ -787,8 +788,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <Loader2 className="animate-spin h-16 w-16 text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600 font-semibold text-lg">טוען שאלות...</p>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   if (loadError) {
@@ -800,14 +801,14 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <p className="text-gray-700 mb-6">{loadError}</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700">
-
+            className="w-full bg-blue-600 hover:bg-blue-700"
+          >
             <ChevronRight className="w-5 h-5 ml-2" />
             חזור לתרגול
           </Button>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   if (currentSetQuestions.length === 0) {
@@ -819,13 +820,13 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <p className="text-gray-600 mb-6">לא נמצאו שאלות עבור נושא זה</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700">
-
+            className="w-full bg-blue-600 hover:bg-blue-700"
+          >
             חזור לתרגול
           </Button>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   if (showSummary) {
@@ -835,8 +836,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6">
-
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6"
+          >
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Trophy className="w-10 h-10 text-white" />
@@ -848,11 +849,11 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
               <div className="text-center mb-4">
                 <div className="text-5xl font-bold text-blue-600">
-                  {Object.values(results).filter((r) => r.isCorrect).length} / {currentSetQuestions.length}
+                  {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
                 </div>
                 <div className="text-sm text-gray-600 mt-2">תשובות נכונות</div>
                 <div className="text-3xl font-bold text-gray-900 mt-3">
-                  {Math.round(Object.values(results).filter((r) => r.isCorrect).length / currentSetQuestions.length * 100)}%
+                  {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
                 </div>
               </div>
             </div>
@@ -862,26 +863,26 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                 const result = results[q.question_id];
                 return (
                   <div key={idx} className={`rounded-xl p-4 border-2 ${
-                  q.question_type === "writing" ?
-                  'bg-blue-50 border-blue-300' :
-                  result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`
-                  }>
+                    q.question_type === "writing" 
+                      ? 'bg-blue-50 border-blue-300' 
+                      : result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'
+                  }`}>
                     <div className="flex items-start gap-3">
-                      {q.question_type === "writing" ?
-                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                      {q.question_type === "writing" ? (
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           {Math.round(result?.percentage || 0)}
-                        </div> :
-                      result?.isCorrect ?
-                      <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" /> :
-
-                      <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-                      }
+                        </div>
+                      ) : result?.isCorrect ? (
+                        <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      ) : (
+                        <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                      )}
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
                         <div className="text-sm text-gray-700 mb-2">{q.question_text.substring(0, 80)}...</div>
 
-                        {q.question_type === "writing" && result?.writingEvaluation ?
-                        <div className="space-y-2 mt-3">
+                        {q.question_type === "writing" && result?.writingEvaluation ? (
+                          <div className="space-y-2 mt-3">
                             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-300">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
@@ -911,49 +912,49 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                               </div>
                             </div>
 
-                            {result.writingEvaluation.strengths?.length > 0 &&
-                          <div className="bg-white rounded-lg p-3 border border-green-200">
+                            {result.writingEvaluation.strengths?.length > 0 && (
+                              <div className="bg-white rounded-lg p-3 border border-green-200">
                                 <div className="text-xs font-bold text-green-900 mb-1">✅ נקודות חוזק:</div>
                                 <ul className="text-sm text-gray-700 list-disc list-inside">
-                                  {result.writingEvaluation.strengths.map((strength, i) =>
-                              <li key={i}>{strength}</li>
-                              )}
+                                  {result.writingEvaluation.strengths.map((strength, i) => (
+                                    <li key={i}>{strength}</li>
+                                  ))}
                                 </ul>
                               </div>
-                          }
+                            )}
 
-                            {result.writingEvaluation.areas_to_improve?.length > 0 &&
-                          <div className="bg-white rounded-lg p-3 border border-orange-200">
+                            {result.writingEvaluation.areas_to_improve?.length > 0 && (
+                              <div className="bg-white rounded-lg p-3 border border-orange-200">
                                 <div className="text-xs font-bold text-orange-900 mb-1">🎯 תחומים לשיפור:</div>
                                 <ul className="text-sm text-gray-700 list-disc list-inside">
-                                  {result.writingEvaluation.areas_to_improve.map((area, i) =>
-                              <li key={i}>{area}</li>
-                              )}
+                                  {result.writingEvaluation.areas_to_improve.map((area, i) => (
+                                    <li key={i}>{area}</li>
+                                  ))}
                                 </ul>
                               </div>
-                          }
+                            )}
 
                             {/* Corrected: grammar_errors items are objects, not strings */}
-                            {result.writingEvaluation.grammar_errors?.length > 0 &&
-                          <div className="bg-white rounded-lg p-3 border border-red-200">
+                            {result.writingEvaluation.grammar_errors?.length > 0 && (
+                              <div className="bg-white rounded-lg p-3 border border-red-200">
                                 <div className="text-xs font-bold text-red-900 mb-1">⚠️ שגיאות דקדוק:</div>
                                 <ul className="text-sm text-gray-700 list-disc list-inside">
-                                  {result.writingEvaluation.grammar_errors.map((err, i) =>
-                              <li key={i}>{err.error || JSON.stringify(err)}</li>
-                              )}
+                                  {result.writingEvaluation.grammar_errors.map((err, i) => (
+                                    <li key={i}>{err.error || JSON.stringify(err)}</li>
+                                  ))}
                                 </ul>
                               </div>
-                          }
+                            )}
 
-                            {result.writingEvaluation.suggestions &&
-                          <div className="bg-white rounded-lg p-3 border border-blue-200">
+                            {result.writingEvaluation.suggestions && (
+                              <div className="bg-white rounded-lg p-3 border border-blue-200">
                                 <div className="text-xs font-bold text-blue-900 mb-1">💡 הצעות:</div>
                                 <div className="text-sm text-gray-700">{result.writingEvaluation.suggestions}</div>
                               </div>
-                          }
-                          </div> :
-                        !result?.isCorrect && q.question_type !== "writing" &&
-                        <div className="space-y-2 mt-3">
+                            )}
+                          </div>
+                        ) : !result?.isCorrect && q.question_type !== "writing" && (
+                          <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
                               <div className="text-sm font-semibold text-red-700" dir="ltr">
@@ -965,11 +966,11 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                               <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
                             </div>
                           </div>
-                        }
+                        )}
                       </div>
                     </div>
-                  </div>);
-
+                  </div>
+                );
               })}
             </div>
 
@@ -984,17 +985,17 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             </div>
           </motion.div>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   const currentQuestion = currentSetQuestions[currentQuestionIndex];
-  const progress = (currentQuestionIndex + 1) / currentSetQuestions.length * 100;
+  const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
   const displayUnits = user?.selected_units || 3;
   const isMathSubject = currentQuestion?.subject_id === 'מתמטיקה';
-  const isListeningTopic = topicId?.toLowerCase().includes('listening') ||
-  topicId?.toLowerCase().includes('האזנה');
+  const isListeningTopic = topicId?.toLowerCase().includes('listening') || 
+                           topicId?.toLowerCase().includes('האזנה');
 
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
@@ -1006,8 +1007,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
               variant="ghost"
               size="icon"
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="text-white hover:bg-white/20 h-9 w-9">
-
+              className="text-white hover:bg-white/20 h-9 w-9"
+            >
               <ChevronRight className="w-5 h-5" />
             </Button>
 
@@ -1024,19 +1025,19 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4">
-
+            className="space-y-4"
+          >
             <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white text-center">
               <div className="text-5xl mb-3">🎧</div>
               <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
               <p className="text-indigo-100">שים לב - תוכל לשמוע את הקטע מספר פעמים</p>
             </div>
 
-            <ListeningPlayer
-              audioText={listeningText}
+            <ListeningPlayer 
+              audioText={listeningText} 
               maxPlays={2}
-              onMaxPlaysReached={() => setCanProceedToQuestions(true)} />
-
+              onMaxPlaysReached={() => setCanProceedToQuestions(true)}
+            />
 
             <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
               <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
@@ -1062,23 +1063,23 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             <Button
               onClick={() => setShowListeningIntro(false)}
               disabled={!canProceedToQuestions}
-              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
-
-              {canProceedToQuestions ?
-              <>
+              className="w-full h-14 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {canProceedToQuestions ? (
+                <>
                   ✓ התחל לענות על השאלות
                   <ChevronLeft className="w-5 h-5 mr-2" />
-                </> :
-
-              <>
+                </>
+              ) : (
+                <>
                   <span className="text-sm sm:text-base">שמע את הקטע פעמיים כדי להמשיך</span>
                 </>
-              }
+              )}
             </Button>
           </motion.div>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   // Show reading text if exists and requested
@@ -1091,8 +1092,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
               variant="ghost"
               size="icon"
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="text-white hover:bg-white/20 h-9 w-9">
-
+              className="text-white hover:bg-white/20 h-9 w-9"
+            >
               <ChevronRight className="w-5 h-5" />
             </Button>
 
@@ -1109,8 +1110,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto">
-
+            className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-2xl mx-auto"
+          >
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5 border-b-2 border-blue-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1125,14 +1126,14 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
 
             <div className="p-4 sm:p-6">
               <div className="bg-white rounded-lg border-2 border-gray-200">
-                <div
+                <div 
                   className="text-base sm:text-lg leading-[1.8] text-gray-900 p-4 sm:p-6 whitespace-pre-wrap text-left"
-                  style={{
+                  style={{ 
                     fontFamily: "Georgia, 'Times New Roman', serif",
                     direction: 'ltr',
                     lineHeight: '1.8'
-                  }}>
-
+                  }}
+                >
                   {readingText}
                 </div>
               </div>
@@ -1141,28 +1142,28 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             <div className="p-4 sm:p-5 pt-0">
               <Button
                 onClick={() => setShowReadingText(false)}
-                className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-md">
-
+                className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-md"
+              >
                 יאללה לקרוא - המשך לשאלות
                 <ChevronLeft className="w-5 h-5 mr-2" />
               </Button>
             </div>
           </motion.div>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
-      <div className="bg-[#3B82F6] p-4 shadow-xl flex-shrink-0">
+      <div className="bg-blue-600 p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10">
-
+            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
+          >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
 
@@ -1171,16 +1172,16 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && !isListeningTopic &&
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowStoryDialog(true)}
-            className="text-white hover:bg-white/20">
-
+          {readingText && !isListeningTopic && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowStoryDialog(true)}
+              className="text-white hover:bg-white/20"
+            >
               <BookOpen className="w-5 h-5" />
             </Button>
-          }
+          )}
         </div>
 
         <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
@@ -1188,15 +1189,15 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
-            className="h-full bg-white" />
-
+            className="h-full bg-white"
+          />
         </div>
         </div>
 
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-2 sm:p-3 gap-3">
         {/* Reading text panel on the right */}
-        {readingText && !isListeningTopic &&
-        <div className="hidden md:flex md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden flex-col">
+        {readingText && !isListeningTopic && (
+          <div className="hidden md:flex md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden flex-col">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5" />
@@ -1205,49 +1206,49 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <div
-              className="text-base leading-[1.8] text-gray-900 whitespace-pre-wrap text-left"
-              style={{
-                fontFamily: "Georgia, 'Times New Roman', serif",
-                direction: 'ltr',
-                lineHeight: '1.8'
-              }}>
-
+                className="text-base leading-[1.8] text-gray-900 whitespace-pre-wrap text-left"
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  direction: 'ltr',
+                  lineHeight: '1.8'
+                }}
+              >
                 {readingText}
               </div>
             </div>
           </div>
-        }
+        )}
 
         {/* Main question area */}
         <motion.div
-          key={currentQuestion.question_id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden">
-
+            key={currentQuestion.question_id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden"
+          >
           <div className="flex-1 overflow-y-auto p-4 pb-4 pt-6">
-          {currentQuestion.question_type === "writing" ?
+          {currentQuestion.question_type === "writing" ? (
             <WritingEditor
               prompt={currentQuestion.question_text}
               initialText={answers[currentQuestion.question_id] || ""}
               minWords={user?.selected_units === 4 ? 60 : user?.selected_units === 5 ? 80 : 60}
               maxWords={user?.selected_units === 4 ? 100 : user?.selected_units === 5 ? 120 : 100}
               onSaveDraft={(text, wordCount) => {
-                setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: text }));
+                setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: text }));
                 handleSaveWritingDraft(text, wordCount);
               }}
               onSubmit={(text, wordCount) => {
-                setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: text }));
+                setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: text }));
                 handleSubmitAnswer(text);
               }}
               isSaving={isSavingDraft}
-              isSubmitting={isSubmitting} /> :
-
-
+              isSubmitting={isSubmitting}
+            />
+          ) : (
             <>
           {/* Separator after reading text */}
-          {readingText && currentQuestionIndex === 0 &&
-              <div className="mb-6">
+          {readingText && currentQuestionIndex === 0 && (
+            <div className="mb-6">
               <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-center shadow-md mb-6">
                 <div className="flex items-center justify-center gap-2 text-white">
                   <BookOpen className="w-5 h-5" />
@@ -1256,122 +1257,122 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
               </div>
               <div className="border-b-4 border-blue-200 mb-6" />
             </div>
-              }
+          )}
 
           <div className="mb-6">
             <div className="flex items-start gap-3 mb-4">
-              <div className="bg-[#3B82F6] rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
                 <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
               </div>
               <p
-                    className="flex-1 text-base sm:text-lg text-gray-900 leading-[1.7] whitespace-pre-wrap pt-1"
-                    dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
-                    style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-
+                className="flex-1 text-base sm:text-lg text-gray-900 leading-[1.7] whitespace-pre-wrap pt-1"
+                dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
+                style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
+              >
                 {currentQuestion.question_text}
               </p>
             </div>
             
-            {currentQuestion.question_image_url &&
-                <img
-                  src={currentQuestion.question_image_url}
-                  alt="Question"
-                  className="mt-4 rounded-xl max-w-full shadow-md border-2 border-gray-200" />
-
-                }
+            {currentQuestion.question_image_url && (
+              <img
+                src={currentQuestion.question_image_url}
+                alt="Question"
+                className="mt-4 rounded-xl max-w-full shadow-md border-2 border-gray-200"
+              />
+            )}
           </div>
 
-          {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 &&
-              <div className="space-y-3">
+          {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
+            <div className="space-y-3">
               {currentQuestion.options.map((option, idx) => {
-                  let optionText = '';
-                  if (typeof option === 'object' && option !== null) {
-                    if ('text' in option) {
-                      optionText = String(option.text);
-                    } else if ('value' in option) {
-                      optionText = String(option.value);
-                    } else {
-                      optionText = JSON.stringify(option);
-                    }
+                let optionText = '';
+                if (typeof option === 'object' && option !== null) {
+                  if ('text' in option) {
+                    optionText = String(option.text);
+                  } else if ('value' in option) {
+                    optionText = String(option.value);
                   } else {
-                    optionText = String(option || '');
+                    optionText = JSON.stringify(option);
                   }
-
-                  const currentAnswer = answers[currentQuestion.question_id];
-                  const isSelected = String(currentAnswer || '').trim() === optionText.trim();
-
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: optionText }))}
-                      className={`w-full p-4 rounded-xl border-2 transition-all shadow-sm ${
-                      isSelected ?
-                      'border-blue-600 bg-blue-50 shadow-md' :
-                      'border-gray-300 hover:border-blue-400 hover:bg-gray-50'} cursor-pointer`
-                      }
-                      dir="ltr">
-
+                } else {
+                  optionText = String(option || '');
+                }
+                
+                const currentAnswer = answers[currentQuestion.question_id];
+                const isSelected = String(currentAnswer || '').trim() === optionText.trim();
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: optionText }))}
+                    className={`w-full p-4 rounded-xl border-2 transition-all shadow-sm ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-50 shadow-md'
+                        : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                    } cursor-pointer`}
+                    dir="ltr"
+                  >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                        isSelected ?
-                        'border-blue-600 bg-blue-600' :
-                        'border-gray-400'}`
-                        }>
-                        {isSelected &&
+                        isSelected
+                          ? 'border-blue-600 bg-blue-600'
+                          : 'border-gray-400'
+                      }`}>
+                        {isSelected && (
                           <div className="w-3 h-3 bg-white rounded-full" />
-                          }
+                        )}
                       </div>
                       <span className="text-base font-medium text-gray-900 flex-1 leading-relaxed text-left">{optionText}</span>
                     </div>
-                  </button>);
-
-                })}
+                  </button>
+                );
+              })}
             </div>
-              }
+          )}
             </>
-            }
+          )}
           </div>
 
           {/* Answer input area - fixed at bottom */}
-          {currentQuestion.question_type !== "writing" &&
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
+          {currentQuestion.question_type !== "writing" && (
+            <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
               <div className="space-y-3 max-w-2xl mx-auto">
-                {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ?
-              <div></div> :
-
-              <Textarea
-                value={answers[currentQuestion.question_id] || ""}
-                onChange={(e) => setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                placeholder="הקלד את תשובתך כאן..."
-                className="w-full h-24 text-base resize-none border-2 border-gray-300 focus:border-blue-500 rounded-lg"
-                dir="ltr" />
-
-              }
+                {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
+                  <div></div>
+                ) : (
+                  <Textarea
+                    value={answers[currentQuestion.question_id] || ""}
+                    onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                    placeholder="הקלד את תשובתך כאן..."
+                    className="w-full h-24 text-base resize-none border-2 border-gray-300 focus:border-blue-500 rounded-lg"
+                    dir="ltr"
+                  />
+                )}
 
                 <Button
-                onClick={() => handleSubmitAnswer()}
-                disabled={!hasAnswered || isSubmitting} className="bg-[#3B82F6] text-primary-foreground px-4 py-2 text-base font-bold rounded-xl inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 w-full h-14 hover:bg-blue-700 disabled:opacity-50 shadow-lg">
-
-
+                  onClick={() => handleSubmitAnswer()}
+                  disabled={!hasAnswered || isSubmitting}
+                  className="w-full h-14 text-base font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl shadow-lg"
+                >
                   {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </Button>
               </div>
             </div>
-          }
+          )}
         </motion.div>
       </div>
 
-      {showCalculator &&
-      <MathCalculator onClose={() => setShowCalculator(false)} />
-      }
+      {showCalculator && (
+        <MathCalculator onClose={() => setShowCalculator(false)} />
+      )}
 
-      {showDrawingBoard &&
-      <DrawingCanvas
-        onClose={() => setShowDrawingBoard(false)}
-        questionText={currentQuestion.question_text} />
-
-      }
+      {showDrawingBoard && (
+        <DrawingCanvas 
+          onClose={() => setShowDrawingBoard(false)} 
+          questionText={currentQuestion.question_text}
+        />
+      )}
 
       {/* Story Dialog */}
       <Dialog open={showStoryDialog} onOpenChange={setShowStoryDialog}>
@@ -1380,12 +1381,12 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
             <DialogTitle className="text-center text-xl font-bold" dir="rtl">📖 הסיפור</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto max-h-[60vh] p-4">
-            <div
+            <div 
               className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
-              style={{
+              style={{ 
                 fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
-              }}>
-
+              }}
+            >
               {readingText}
             </div>
           </div>
@@ -1401,8 +1402,8 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
       <RatingDialog
         open={showRatingDialog}
         onOpenChange={setShowRatingDialog}
-        onSubmitRating={handleSubmitRating} />
-
+        onSubmitRating={handleSubmitRating}
+      />
 
       {/* Continue Dialog */}
       <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
@@ -1417,11 +1418,11 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <div className="bg-blue-50 rounded-xl p-4 my-4">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-600 mb-2">
-                {Object.values(results).filter((r) => r.isCorrect).length} / {currentSetQuestions.length}
+                {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
               </div>
               <div className="text-sm text-gray-600 mb-3">תשובות נכונות</div>
               <div className="text-2xl font-bold text-gray-900 mt-3">
-                {Math.round(Object.values(results).filter((r) => r.isCorrect).length / currentSetQuestions.length * 100)}%
+                {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
               </div>
               <div className="text-xs text-gray-600">דרגת השליטה בנושא</div>
             </div>
@@ -1432,19 +1433,19 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
               const result = results[q.question_id];
               return (
                 <div key={q.question_id} className={`p-3 rounded-lg border-2 ${
-                result?.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`
-                }>
+                  result?.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                }`}>
                   <div className="flex items-center gap-2">
-                    {result?.isCorrect ?
-                    <Check className="w-5 h-5 text-green-600" /> :
-
-                    <X className="w-5 h-5 text-red-600" />
-                    }
+                    {result?.isCorrect ? (
+                      <Check className="w-5 h-5 text-green-600" />
+                    ) : (
+                      <X className="w-5 h-5 text-red-600" />
+                    )}
                     <span className="font-semibold text-gray-900">שאלה {idx + 1}</span>
                   </div>
                   <p className="text-sm text-gray-700 mt-1">{q.question_text.substring(0, 80)}...</p>
-                </div>);
-
+                </div>
+              );
             })}
           </div>
 
@@ -1494,9 +1495,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center gap-3">
               <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold ${
-              writingFeedbackData?.percentage >= 70 ? 'bg-green-500' :
-              writingFeedbackData?.percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`
-              }>
+                writingFeedbackData?.percentage >= 70 ? 'bg-green-500' : 
+                writingFeedbackData?.percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+              }`}>
                 {Math.round(writingFeedbackData?.percentage || 0)}
               </div>
               <div className="flex-1">
@@ -1504,48 +1505,48 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                 <div className="text-base font-normal text-gray-600">
                   {writingFeedbackData?.wordCount} מילים • {writingFeedbackData?.displayUnits} יחידות
                 </div>
-                {writingFeedbackData?.evaluation?.bagrut_realistic_score &&
-                <div className="text-sm text-blue-600 font-semibold mt-1">
+                {writingFeedbackData?.evaluation?.bagrut_realistic_score && (
+                  <div className="text-sm text-blue-600 font-semibold mt-1">
                     ציון בגרות מוערך: {writingFeedbackData.evaluation.bagrut_realistic_score}
                   </div>
-                }
+                )}
               </div>
             </DialogTitle>
           </DialogHeader>
 
-          {writingFeedbackData?.evaluation &&
-          <div className="space-y-4 py-4">
+          {writingFeedbackData?.evaluation && (
+            <div className="space-y-4 py-4">
               {/* Opening Summary */}
-              {writingFeedbackData.evaluation.opening_sentence &&
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white">
+              {writingFeedbackData.evaluation.opening_sentence && (
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white">
                   <div className="text-sm font-bold mb-2">📋 סיכום ראשוני</div>
                   <div className="text-base leading-relaxed">{writingFeedbackData.evaluation.opening_sentence}</div>
                 </div>
-            }
+              )}
 
               {/* Quick Action Buttons */}
               <div className="grid grid-cols-3 gap-2">
                 <Button
-                onClick={() => setShowRewriteOptions(!showRewriteOptions)}
-                variant="outline"
-                className="border-2 border-purple-400 text-purple-700 hover:bg-purple-50">
-
+                  onClick={() => setShowRewriteOptions(!showRewriteOptions)}
+                  variant="outline"
+                  className="border-2 border-purple-400 text-purple-700 hover:bg-purple-50"
+                >
                   <Wand2 className="w-4 h-4 mr-2" />
                   גרסאות משופרות
                 </Button>
                 <Button
-                onClick={() => setShowSentenceAnalysis(!showSentenceAnalysis)}
-                variant="outline"
-                className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50">
-
+                  onClick={() => setShowSentenceAnalysis(!showSentenceAnalysis)}
+                  variant="outline"
+                  className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50"
+                >
                   <FileText className="w-4 h-4 mr-2" />
                   ניתוח משפט-משפט
                 </Button>
                 <Button
-                onClick={() => setShowVocabularyHelp(!showVocabularyHelp)}
-                variant="outline"
-                className="border-2 border-green-400 text-green-700 hover:bg-green-50">
-
+                  onClick={() => setShowVocabularyHelp(!showVocabularyHelp)}
+                  variant="outline"
+                  className="border-2 border-green-400 text-green-700 hover:bg-green-50"
+                >
                   <BookOpen className="w-4 h-4 mr-2" />
                   מילים ומשפטים
                 </Button>
@@ -1594,10 +1595,10 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
               </div>
 
               {/* Rewrite Options */}
-              {showRewriteOptions &&
-            <div className="space-y-3">
-                  {writingFeedbackData.evaluation.rewritten_version_90_plus &&
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-300">
+              {showRewriteOptions && (
+                <div className="space-y-3">
+                  {writingFeedbackData.evaluation.rewritten_version_90_plus && (
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-300">
                       <div className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
                         <Crown className="w-5 h-5" />
                         גרסה משודרגת (90+)
@@ -1606,10 +1607,10 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                         {writingFeedbackData.evaluation.rewritten_version_90_plus}
                       </div>
                     </div>
-              }
+                  )}
 
-                  {writingFeedbackData.evaluation.rewritten_with_connectors &&
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
+                  {writingFeedbackData.evaluation.rewritten_with_connectors && (
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
                       <div className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         גרסה עם מילות קישור
@@ -1618,10 +1619,10 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                         {writingFeedbackData.evaluation.rewritten_with_connectors}
                       </div>
                     </div>
-              }
+                  )}
 
-                  {writingFeedbackData.evaluation.rewritten_advanced_vocabulary &&
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
+                  {writingFeedbackData.evaluation.rewritten_advanced_vocabulary && (
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
                       <div className="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         גרסה עם אוצר מילים מתקדם
@@ -1630,107 +1631,107 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                         {writingFeedbackData.evaluation.rewritten_advanced_vocabulary}
                       </div>
                     </div>
-              }
+                  )}
                 </div>
-            }
+              )}
 
               {/* Sentence Analysis */}
-              {showSentenceAnalysis && writingFeedbackData.evaluation.sentence_by_sentence_analysis?.length > 0 &&
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
+              {showSentenceAnalysis && writingFeedbackData.evaluation.sentence_by_sentence_analysis?.length > 0 && (
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
                   <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">🔍</span>
                     ניתוח משפט אחר משפט
                   </div>
                   <div className="space-y-3">
-                    {writingFeedbackData.evaluation.sentence_by_sentence_analysis.map((analysis, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-blue-200">
+                    {writingFeedbackData.evaluation.sentence_by_sentence_analysis.map((analysis, i) => (
+                      <div key={i} className="bg-white rounded-lg p-3 border border-blue-200">
                         <div className="text-xs font-bold text-gray-500 mb-1">משפט {i + 1}:</div>
                         <div className="text-sm text-gray-900 mb-2" dir="ltr">{analysis.original_sentence}</div>
-                        {analysis.what_is_good &&
-                  <div className="text-xs text-green-700 mb-1">✓ {analysis.what_is_good}</div>
-                  }
-                        {analysis.what_needs_fixing &&
-                  <div className="text-xs text-red-700 mb-1">✗ {analysis.what_needs_fixing}</div>
-                  }
-                        {analysis.improved_version &&
-                  <div className="bg-green-50 rounded p-2 mt-2">
+                        {analysis.what_is_good && (
+                          <div className="text-xs text-green-700 mb-1">✓ {analysis.what_is_good}</div>
+                        )}
+                        {analysis.what_needs_fixing && (
+                          <div className="text-xs text-red-700 mb-1">✗ {analysis.what_needs_fixing}</div>
+                        )}
+                        {analysis.improved_version && (
+                          <div className="bg-green-50 rounded p-2 mt-2">
                             <div className="text-xs font-semibold text-green-900 mb-1">→ גרסה משופרת:</div>
                             <div className="text-sm text-green-800" dir="ltr">{analysis.improved_version}</div>
                           </div>
-                  }
+                        )}
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* Vocabulary and Phrases Help */}
-              {showVocabularyHelp &&
-            <div className="space-y-3">
-                  {writingFeedbackData.evaluation.connectors_to_use?.length > 0 &&
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
+              {showVocabularyHelp && (
+                <div className="space-y-3">
+                  {writingFeedbackData.evaluation.connectors_to_use?.length > 0 && (
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
                       <div className="text-sm font-bold text-purple-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         מילות קישור לשימוש
                       </div>
                       <div className="grid grid-cols-1 gap-2">
-                        {writingFeedbackData.evaluation.connectors_to_use.map((conn, i) =>
-                  <div key={i} className="bg-white rounded-lg p-3 border border-purple-200">
+                        {writingFeedbackData.evaluation.connectors_to_use.map((conn, i) => (
+                          <div key={i} className="bg-white rounded-lg p-3 border border-purple-200">
                             <div className="font-bold text-purple-700" dir="ltr">{conn.connector}</div>
                             <div className="text-xs text-gray-700 mt-1">{conn.usage_hebrew}</div>
                             <div className="text-xs text-gray-600 mt-1 italic" dir="ltr">"{conn.example}"</div>
                           </div>
-                  )}
+                        ))}
                       </div>
                     </div>
-              }
+                  )}
 
-                  {writingFeedbackData.evaluation.advanced_vocabulary?.length > 0 &&
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
+                  {writingFeedbackData.evaluation.advanced_vocabulary?.length > 0 && (
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
                       <div className="text-sm font-bold text-green-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         מילים מתקדמות לשדרוג
                       </div>
                       <div className="grid grid-cols-1 gap-2">
-                        {writingFeedbackData.evaluation.advanced_vocabulary.map((vocab, i) =>
-                  <div key={i} className="bg-white rounded-lg p-3 border border-green-200">
+                        {writingFeedbackData.evaluation.advanced_vocabulary.map((vocab, i) => (
+                          <div key={i} className="bg-white rounded-lg p-3 border border-green-200">
                             <div className="font-bold text-green-700">{vocab.word}</div>
                             <div className="text-xs text-gray-700 mt-1">{vocab.meaning_hebrew}</div>
                             <div className="text-xs text-gray-600 mt-1 italic" dir="ltr">"{vocab.example_sentence}"</div>
                           </div>
-                  )}
+                        ))}
                       </div>
                     </div>
-              }
+                  )}
 
-                  {writingFeedbackData.evaluation.useful_phrases?.length > 0 &&
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
+                  {writingFeedbackData.evaluation.useful_phrases?.length > 0 && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
                       <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">💬</span>
                         ביטויים שימושיים לבגרות
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        {writingFeedbackData.evaluation.useful_phrases.map((phrase, i) =>
-                  <div key={i} className="bg-white rounded-lg p-2 border border-blue-200">
+                        {writingFeedbackData.evaluation.useful_phrases.map((phrase, i) => (
+                          <div key={i} className="bg-white rounded-lg p-2 border border-blue-200">
                             <div className="text-sm text-blue-800" dir="ltr">{phrase}</div>
                           </div>
-                  )}
+                        ))}
                       </div>
                     </div>
-              }
+                  )}
                 </div>
-            }
+              )}
 
               {/* Recurring Mistakes */}
-              {writingFeedbackData.evaluation.recurring_mistakes?.length > 0 &&
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-300">
+              {writingFeedbackData.evaluation.recurring_mistakes?.length > 0 && (
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-300">
                   <div className="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">⚠️</span>
                     טעויות שחוזרות על עצמן
                   </div>
                   <div className="space-y-2">
-                    {writingFeedbackData.evaluation.recurring_mistakes.map((mistake, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-red-200">
+                    {writingFeedbackData.evaluation.recurring_mistakes.map((mistake, i) => (
+                      <div key={i} className="bg-white rounded-lg p-3 border border-red-200">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold">
                             {mistake.count}x
@@ -1742,193 +1743,193 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                           💡 {mistake.how_to_fix}
                         </div>
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* Strengths */}
-              {writingFeedbackData.evaluation.strengths?.length > 0 &&
-            <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+              {writingFeedbackData.evaluation.strengths?.length > 0 && (
+                <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
                   <div className="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">✅</span>
                     נקודות חוזק
                   </div>
                   <ul className="space-y-1">
-                    {writingFeedbackData.evaluation.strengths.map((strength, i) =>
-                <li key={i} className="text-sm text-green-800 flex items-start gap-2">
+                    {writingFeedbackData.evaluation.strengths.map((strength, i) => (
+                      <li key={i} className="text-sm text-green-800 flex items-start gap-2">
                         <span className="text-green-600">•</span>
                         <span>{strength}</span>
                       </li>
-                )}
+                    ))}
                   </ul>
                 </div>
-            }
+              )}
 
               {/* Areas to Improve */}
-              {writingFeedbackData.evaluation.areas_to_improve?.length > 0 &&
-            <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
+              {writingFeedbackData.evaluation.areas_to_improve?.length > 0 && (
+                <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
                   <div className="text-sm font-bold text-orange-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">🎯</span>
                     תחומים לשיפור
                   </div>
                   <ul className="space-y-1">
-                    {writingFeedbackData.evaluation.areas_to_improve.map((area, i) =>
-                <li key={i} className="text-sm text-orange-800 flex items-start gap-2">
+                    {writingFeedbackData.evaluation.areas_to_improve.map((area, i) => (
+                      <li key={i} className="text-sm text-orange-800 flex items-start gap-2">
                         <span className="text-orange-600">•</span>
                         <span>{area}</span>
                       </li>
-                )}
+                    ))}
                   </ul>
                 </div>
-            }
+              )}
 
               {/* Grammar Errors */}
-              {writingFeedbackData.evaluation.grammar_errors?.length > 0 &&
-            <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+              {writingFeedbackData.evaluation.grammar_errors?.length > 0 && (
+                <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
                   <div className="text-sm font-bold text-red-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">⚠️</span>
                     שגיאות דקדוק שזוהו
                   </div>
                   <div className="space-y-2">
-                    {writingFeedbackData.evaluation.grammar_errors.map((err, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-red-200">
+                    {writingFeedbackData.evaluation.grammar_errors.map((err, i) => (
+                      <div key={i} className="bg-white rounded-lg p-3 border border-red-200">
                         <div className="text-sm text-red-800 font-semibold mb-1">{err.error || err}</div>
-                        {err.explanation_hebrew &&
-                  <div className="text-xs text-gray-700 leading-relaxed">{err.explanation_hebrew}</div>
-                  }
+                        {err.explanation_hebrew && (
+                          <div className="text-xs text-gray-700 leading-relaxed">{err.explanation_hebrew}</div>
+                        )}
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* Spelling Errors */}
-              {writingFeedbackData.evaluation.spelling_errors?.length > 0 &&
-            <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200">
+              {writingFeedbackData.evaluation.spelling_errors?.length > 0 && (
+                <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200">
                   <div className="text-sm font-bold text-pink-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">✏️</span>
                     שגיאות כתיב שזוהו
                   </div>
                   <div className="grid grid-cols-1 gap-2">
-                    {writingFeedbackData.evaluation.spelling_errors.map((err, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-pink-200">
+                    {writingFeedbackData.evaluation.spelling_errors.map((err, i) => (
+                      <div key={i} className="bg-white rounded-lg p-3 border border-pink-200">
                         <div className="flex items-center gap-2 text-sm mb-1">
                           <span className="text-red-600 line-through font-semibold">{err.word || err}</span>
                           <span className="text-gray-400">→</span>
                           <span className="text-green-600 font-semibold">{err.correction || '?'}</span>
                         </div>
-                        {err.explanation_hebrew &&
-                  <div className="text-xs text-gray-700">{err.explanation_hebrew}</div>
-                  }
+                        {err.explanation_hebrew && (
+                          <div className="text-xs text-gray-700">{err.explanation_hebrew}</div>
+                        )}
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* What to Do Next Time */}
-              {writingFeedbackData.evaluation.what_to_do_next_time &&
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white">
+              {writingFeedbackData.evaluation.what_to_do_next_time && (
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white">
                   <div className="text-sm font-bold mb-2 flex items-center gap-2">
                     <span className="text-xl">🎯</span>
                     מה לעשות בפעם הבאה
                   </div>
                   <div className="text-base leading-relaxed">{writingFeedbackData.evaluation.what_to_do_next_time}</div>
                 </div>
-            }
+              )}
 
               {/* Tense Errors */}
-              {writingFeedbackData.evaluation.tense_errors?.length > 0 &&
-            <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
+              {writingFeedbackData.evaluation.tense_errors?.length > 0 && (
+                <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
                   <div className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">⏰</span>
                     שגיאות זמנים (עבר/הווה/עתיד)
                   </div>
                   <div className="space-y-2">
-                    {writingFeedbackData.evaluation.tense_errors.map((err, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-amber-200">
+                    {writingFeedbackData.evaluation.tense_errors.map((err, i) => (
+                      <div key={i} className="bg-white rounded-lg p-3 border border-amber-200">
                         <div className="flex items-start gap-2 mb-1">
                           <span className="text-red-600 font-semibold text-sm">✗</span>
                           <span className="text-sm text-gray-900">{err.error || err}</span>
                         </div>
-                        {err.correction &&
-                  <div className="flex items-start gap-2 mb-1">
+                        {err.correction && (
+                          <div className="flex items-start gap-2 mb-1">
                             <span className="text-green-600 font-semibold text-sm">✓</span>
                             <span className="text-sm text-green-700 font-semibold">{err.correction}</span>
                           </div>
-                  }
-                        {err.explanation &&
-                  <div className="text-xs text-gray-600 mt-1 pr-5">
+                        )}
+                        {err.explanation && (
+                          <div className="text-xs text-gray-600 mt-1 pr-5">
                             💡 {err.explanation}
                           </div>
-                  }
+                        )}
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* Agreement Errors */}
-              {writingFeedbackData.evaluation.agreement_errors?.length > 0 &&
-            <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200">
+              {writingFeedbackData.evaluation.agreement_errors?.length > 0 && (
+                <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200">
                   <div className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">🔢</span>
                     שגיאות הסכמה (יחיד/רבים)
                   </div>
                   <div className="space-y-2">
-                    {writingFeedbackData.evaluation.agreement_errors.map((err, i) =>
-                <div key={i} className="bg-white rounded-lg p-2 border border-purple-200">
+                    {writingFeedbackData.evaluation.agreement_errors.map((err, i) => (
+                      <div key={i} className="bg-white rounded-lg p-2 border border-purple-200">
                         <div className="flex items-center gap-2 text-sm">
                           <span className="text-red-600 font-semibold">{err.error || err}</span>
                           <span className="text-gray-400">→</span>
                           <span className="text-green-600 font-semibold">{err.correction || ''}</span>
                         </div>
                       </div>
-                )}
+                    ))}
                   </div>
                 </div>
-            }
+              )}
 
               {/* Punctuation Errors */}
-              {writingFeedbackData.evaluation.punctuation_errors?.length > 0 &&
-            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+              {writingFeedbackData.evaluation.punctuation_errors?.length > 0 && (
+                <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
                   <div className="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">📝</span>
                     שגיאות ניקוד ואותיות גדולות
                   </div>
                   <ul className="space-y-1">
-                    {writingFeedbackData.evaluation.punctuation_errors.map((err, i) =>
-                <li key={i} className="text-sm text-blue-800 flex items-start gap-2">
+                    {writingFeedbackData.evaluation.punctuation_errors.map((err, i) => (
+                      <li key={i} className="text-sm text-blue-800 flex items-start gap-2">
                         <span className="text-blue-600">•</span>
                         <span>{err}</span>
                       </li>
-                )}
+                    ))}
                   </ul>
                 </div>
-            }
+              )}
             </div>
-          }
+          )}
 
           <DialogFooter>
             <Button
               onClick={() => {
                 setShowWritingFeedback(false);
                 if (currentQuestionIndex < currentSetQuestions.length - 1) {
-                  setCurrentQuestionIndex((prev) => prev + 1);
+                  setCurrentQuestionIndex(prev => prev + 1);
                 } else {
                   saveWeakTopicsStats();
                   setShowSummary(true);
                 }
               }}
-              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold">
-
+              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold"
+            >
               {currentQuestionIndex < currentSetQuestions.length - 1 ? 'המשך לשאלה הבאה' : 'סיים וראה סיכום'}
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>);
-
+    </div>
+  );
 }
