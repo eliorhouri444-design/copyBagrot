@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import { Target, BookOpen, PlayCircle, CheckCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
+import { CardSimple, CardTitle } from "@/components/ui/card-simple";
 import OverallMasteryCard from "@/components/mastery/OverallMasteryCard";
 import { useMasteryData } from "@/components/mastery/useMasteryData";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
