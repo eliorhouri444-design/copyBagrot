@@ -358,7 +358,9 @@ export default function PracticePage() {
           transition={{ delay: 0.15 }}>
 
           <RecentPracticeSessions
-            sessions={practiceData?.recentSessions || []}
+            subject={displaySubject}
+            units={displayUnits}
+            userEmail={user?.email}
             isPremium={user?.is_premium}
           />
 
