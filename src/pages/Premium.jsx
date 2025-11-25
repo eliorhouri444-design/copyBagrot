@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,10 @@ import {
   Target,
   Shield,
   Calendar,
-  CreditCard
+  CreditCard,
+  Brain,
+  FileCheck,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +78,7 @@ export default function PremiumPage() {
       name: "מנוי חודשי",
       price: 49.99,
       period: "לחודש",
-      color: "from-blue-500 to-indigo-600",
+      color: "from-[#3B82F6] to-blue-600",
       features: [
         "כל התכונות של פרימיום",
         "ביטול בכל עת",
@@ -111,7 +113,7 @@ export default function PremiumPage() {
       description: "גישה מלאה למאגר עצום של שאלות, תרגולים ופתרונות בכל מקצועות הבגרות.",
       free: "עד 100 שאלות בלבד",
       premium: "גישה מלאה ללא הגבלה",
-      gradient: "from-blue-500 to-cyan-500"
+      gradient: "from-[#3B82F6] to-blue-600"
     },
     {
       icon: Target,
@@ -119,7 +121,7 @@ export default function PremiumPage() {
       description: "תרגול לפי נושא, לפי רמה, מבחני סימולציה מדויקים כמו בבגרות.",
       free: "עשרות בחנים בלבד",
       premium: "מאות בחנים מלאים",
-      gradient: "from-purple-500 to-pink-500"
+      gradient: "from-purple-500 to-[#3B82F6]"
     },
     {
       icon: Shield,
@@ -127,7 +129,31 @@ export default function PremiumPage() {
       description: "כל הלמידה נקייה, מהירה וללא הסחות דעת.",
       free: "פרסומות במבחנים",
       premium: "ללא פרסומות כלל",
-      gradient: "from-amber-500 to-yellow-500"
+      gradient: "from-amber-500 to-orange-500"
+    },
+    {
+      icon: Brain,
+      title: "תרגולים מותאמים אישית על הטעויות",
+      description: "המערכת מזהה את הטעויות שלך ובונה לך תרגול אישי שמתמקד בדיוק בנקודות החלשות.",
+      free: "אין אפשרות",
+      premium: "תרגול חכם על כל הטעויות שלך",
+      gradient: "from-red-500 to-orange-500"
+    },
+    {
+      icon: FileCheck,
+      title: "בגרויות על נושאים לשיפור",
+      description: "מבחני בגרות מותאמים אישית שמתמקדים בדיוק בנושאים שאתה צריך לשפר.",
+      free: "אין אפשרות",
+      premium: "מבחנים ממוקדים לפי החולשות שלך",
+      gradient: "from-[#3B82F6] to-indigo-600"
+    },
+    {
+      icon: TrendingUp,
+      title: "בניית תוכנית אישית להצלחה בבגרות",
+      description: "תוכנית למידה מותאמת אישית שלוקחת בחשבון את הזמן עד הבגרות, הרמה שלך והיעדים.",
+      free: "אין אפשרות",
+      premium: "תוכנית אישית מלאה עם מעקב התקדמות",
+      gradient: "from-green-500 to-emerald-600"
     }
   ];
 
@@ -275,7 +301,7 @@ export default function PremiumPage() {
               </ul>
               <Button
                 onClick={() => navigate(createPageUrl("Home"))}
-                className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl"
+                className="mt-6 w-full bg-[#3B82F6] hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl"
               >
                 חזור לדף הבית
               </Button>
@@ -341,7 +367,7 @@ export default function PremiumPage() {
 
                     <Button
                       onClick={() => handleSelectPlan(plan)}
-                      className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}
+                      className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-[#3B82F6] hover:bg-blue-700 text-white'}`}
                     >
                       בחר מסלול
                     </Button>
@@ -377,7 +403,7 @@ export default function PremiumPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-6"
                 >
-                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#3B82F6] to-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
                     <Target className="w-6 h-6" />
                     מה מקבלים בפרימיום?
                   </div>
