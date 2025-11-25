@@ -443,7 +443,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     </div>
                     <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
                       <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.mediumSets || 0}</div>
-                      <div className="text-[9px] text-[#6E6E6E] font-semibold">דרוש חיזוק</div>
+                      <div className="text-[9px] text-[#6E6E6E] font-semibold">בינוני</div>
                       <div className="text-[8px] text-orange-500">56%–85%</div>
                     </div>
                     <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
