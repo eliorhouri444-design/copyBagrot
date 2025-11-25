@@ -34,7 +34,9 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
       s.is_completed
       );
     },
-    enabled: !!userEmail
+    enabled: !!userEmail,
+    staleTime: 0, // תמיד רענן
+    refetchOnMount: true
   });
 
   const { data: allTopics = [] } = useQuery({
