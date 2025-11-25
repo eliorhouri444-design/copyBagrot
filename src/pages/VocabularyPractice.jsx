@@ -102,10 +102,11 @@ export default function VocabularyPracticePage() {
     const question = questions[currentIndex];
 
     try {
-      // Check exact match first
-      const normalized = userAnswer.trim().toLowerCase();
-      const exactMatch = normalized === question.english_answer.toLowerCase() ||
-                        question.acceptable_answers?.some(a => a.toLowerCase() === normalized);
+      // Check exact match first - עם נרמול רווחים
+      const normalized = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+      const correctNormalized = question.english_answer.toLowerCase().replace(/\s+/g, ' ');
+      const exactMatch = normalized === correctNormalized ||
+                        question.acceptable_answers?.some(a => a.toLowerCase().replace(/\s+/g, ' ') === normalized);
 
       if (exactMatch) {
         setIsCorrect(true);
@@ -240,12 +241,11 @@ Return JSON:`,
       });
     }
     
-    // נקה cache כדי שהקרוסלה תתעדכן
-    const topicIdFromUrl = urlParams.get("topicId");
-    if (topicIdFromUrl) {
-      sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}`);
-      sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}_time`);
-    }
+    // נקה את כל ה-cache כדי שהקרוסלה תתעדכן
+    sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}`);
+    sessionStorage.removeItem(`topics_${displaySubject}_${displayUnits}_time`);
+    // נקה גם cache של attempts
+    sessionStorage.removeItem(`attempts_${displaySubject}_${displayUnits}`);
     
     setShowSummary(true);
   };

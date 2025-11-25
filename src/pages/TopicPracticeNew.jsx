@@ -264,15 +264,12 @@ export default function TopicPracticeNewPage() {
         
         // אם יש שדה correct_answer בשאלה
         if (currentQuestion.correct_answer) {
-          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase();
+          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase().replace(/\s+/g, ' ');
         }
         
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
-        const isCorrect = normalizedUserAnswer === correctAnswer || 
-                         (currentQuestion.options?.findIndex((opt, idx) => {
-                           const optText = typeof opt === 'object' ? (opt.text || opt.value || '') : String(opt);
-                           return optText.trim().toLowerCase() === normalizedUserAnswer && idx === 0; // הנחה שהתשובה הראשונה נכונה
-                         }) === 0);
+        // נרמול התשובה - הסרת רווחים מיותרים
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+        const isCorrect = normalizedUserAnswer === correctAnswer;
 
         // שמירה ברקע
         saveAttemptInBackground({
@@ -526,13 +523,13 @@ export default function TopicPracticeNewPage() {
         let status = "incorrect";
         let correctAnswer = "";
 
-        // נסה קודם בדיקה פשוטה ללא AI
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase();
+        // נסה קודם בדיקה פשוטה ללא AI - נרמול רווחים
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
         
         // בדוק אם יש תשובה נכונה בשאלה עצמה
         if (currentQuestion.correct_answer) {
           correctAnswer = String(currentQuestion.correct_answer);
-          const normalizedCorrect = correctAnswer.trim().toLowerCase();
+          const normalizedCorrect = correctAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
           
           if (normalizedUserAnswer === normalizedCorrect) {
             isCorrect = true;
@@ -555,11 +552,11 @@ export default function TopicPracticeNewPage() {
               correctAnswer = correctAnswers[0].value || "";
             }
 
-            // בדיקת התאמה מדויקת - מהירה
+            // בדיקת התאמה מדויקת - מהירה (עם נרמול רווחים)
             const exactMatch = correctAnswers.some(ans => 
-              ans.value?.toLowerCase().trim() === normalizedUserAnswer
+              ans.value?.toLowerCase().trim().replace(/\s+/g, ' ') === normalizedUserAnswer
             ) || acceptableVariants.some(variant => 
-              variant.toLowerCase().trim() === normalizedUserAnswer
+              variant.toLowerCase().trim().replace(/\s+/g, ' ') === normalizedUserAnswer
             );
 
             if (exactMatch) {
