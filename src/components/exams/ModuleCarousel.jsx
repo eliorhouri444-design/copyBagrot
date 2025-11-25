@@ -196,53 +196,40 @@ export default function ModuleCarousel({
 
             {/* Content */}
             <div className="bg-white rounded-xl p-3 space-y-2.5">
-              {/* Description */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-[#2B2B2B] text-[12px] leading-relaxed">
-
-                {currentModule.details}
-              </motion.p>
-
-              {/* Mastery Stats Card */}
-              <MasteryStatsCard 
-                mastery={{
-                  examMastery: moduleStats.avgScore > 0 
-                    ? Math.round(
-                        moduleStats.avgScore * 0.4 +
-                        (moduleStats.totalAttempts >= 3 ? Math.max(0, 100 - 20) : 50) * 0.3 +
-                        (moduleStats.passedAttempts / Math.max(1, moduleStats.totalAttempts)) * 100 * 0.3
-                      )
-                    : 0,
-                  completedExams: moduleStats.totalAttempts,
-                  totalAvailable: moduleStats.maxExams,
-                  averageExamScore: moduleStats.avgScore,
-                  passedExams: moduleStats.passedAttempts,
-                  examWeakAreas: [],
-                  bestScore: moduleStats.avgScore,
-                  lastScore: moduleStats.avgScore
-                }}
-                type="module"
-              />
-
-              {/* Module info */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="flex items-center justify-between text-[11px] text-[#6E6E6E] pt-2 border-t border-[#E9F0FF]">
-
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{currentModule.duration} דקות</span>
+              <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
+              
+              <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
+                <div className="flex justify-center items-center mb-1.5">
+                  <span className="text-[17px] font-bold text-[#3B82F6]">{moduleStats.progress}%</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Target className="w-3.5 h-3.5" />
-                  <span>{currentModule.points} נקודות</span>
+                <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
+                <div className="h-2 bg-white rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${moduleStats.progress}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full bg-[#3B82F6] rounded-full"
+                  />
                 </div>
-              </motion.div>
+                <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
+                  {moduleStats.totalAttempts} / {moduleStats.maxExams} מבחנים הושלמו
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
+                  <div className="text-[16px] font-bold text-red-600">{moduleStats.totalAttempts - moduleStats.passedAttempts}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">נכשלו</div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
+                  <div className="text-[16px] font-bold text-green-600">{moduleStats.passedAttempts}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">עברו</div>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-1.5 text-center border border-blue-200">
+                  <div className="text-[16px] font-bold text-blue-600">{moduleStats.avgScore}%</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ממוצע</div>
+                </div>
+              </div>
 
               {/* Action buttons */}
               <motion.div
