@@ -136,15 +136,21 @@ export default function ModuleCarousel({
   };
 
   const handleStartExam = (callback) => {
+    // משתמש פרימיום - תמיד עובר ישירות
+    if (isPremium === true) {
+      callback();
+      return;
+    }
+    
     // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה בגרות היום)
-    if (isPremium !== true && todayExamCount >= FREE_DAILY_EXAM) {
+    if (todayExamCount >= FREE_DAILY_EXAM) {
       // הצג דיאלוג קטן במקום פרסומת
       setPendingExamCallback(() => callback);
       setShowAdDialog(true);
       return;
     }
 
-    // בגרות חינמית או פרימיום
+    // בגרות חינמית
     incrementExamCount();
     callback();
   };
