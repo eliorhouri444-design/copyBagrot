@@ -394,7 +394,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
             {currentTopic.stats && (
               <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 בקיאות בנושא</div>
+                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">בקיאות בנושא</div>
                 
                 <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
                   <div className="flex justify-center items-center mb-1.5">
