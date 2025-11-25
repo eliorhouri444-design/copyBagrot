@@ -257,7 +257,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
         const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, ${failedSets} failed sets`);
+        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, sets: failed=${failedSets}, medium=${mediumSets}, excellent=${excellentSets}`);
 
         return {
           ...topic,
@@ -269,7 +269,9 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             progress: progress,
             uniqueCorrectAnswers: uniqueCorrectAnswers,
             totalQuestionsInTopic: totalQuestionsInTopic,
-            failedSets: failedSets
+            failedSets: failedSets,
+            mediumSets: mediumSets,
+            excellentSets: excellentSets
           }
         };
       });
