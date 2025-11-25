@@ -7,24 +7,30 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle } from "@/components/ui/card-simple";
 import OverallMasteryCard from "@/components/mastery/OverallMasteryCard";
-import { useMasteryData } from "@/components/mastery/useMasteryData";
 import { useReadinessCalculator } from "@/components/readiness/ReadinessCalculator";
 import DailyPlanCard from "@/components/home/DailyPlanCard";
 import RatingDialog from "@/components/ads/RatingDialog";
 import ShareDialog from "@/components/ads/ShareDialog";
+import { useHomeData } from "@/components/cache/useHomeData";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [topics, setTopics] = useState([]);
-  const [practiceAttempts, setPracticeAttempts] = useState([]);
-  const [examAttempts, setExamAttempts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
-  const [modules, setModules] = useState([]);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [adSettings, setAdSettings] = useState(null);
+  
+  // קריאה אחת לכל הנתונים עם Cache
+  const { data: homeData, isLoading, error } = useHomeData();
+  
+  // Extract data from homeData
+  const user = homeData?.user;
+  const topics = homeData?.topics || [];
+  const practiceAttempts = homeData?.attempts || [];
+  const examAttempts = homeData?.examAttempts || [];
+  const modules = homeData?.modules || [];
+  const lastActivity = homeData?.lastActivity;
+  const stats = homeData?.stats || {};
 
   // Track referral clicks when someone opens a shared link
   useEffect(() => {
