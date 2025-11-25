@@ -829,12 +829,12 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="bg-blue-500 p-4 rounded-2xl">
+          transition={{ delay: 0.25 }} className="bg-[#5294ff] p-4 rounded-2xl">
 
 
           <div className="flex items-center gap-2 mb-3">
             <div className="flex-1 text-right">
-              <h3 className="text-[#fffafa] text-base font-bold">בגרויות אחרונות</h3>
+              <h3 className="text-[#ffffff] text-base font-bold">בגרויות אחרונות</h3>
             </div>
             <CheckCircle className="w-5 h-5 text-white" />
           </div>
@@ -866,10 +866,10 @@ export default function ExamsPage() {
 
 
                           <div className="flex items-center gap-3 flex-1">
-                            <motion.div className="bg-blue-50 p-1.5 rounded-lg border border-red-200"
-
-                          whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.5 }}>
+                            <motion.div
+                            className={`p-1.5 rounded-lg ${passed ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}>
 
                               {passed ?
                             <CheckCircle className="w-4 h-4 text-green-600" /> :
@@ -1097,9 +1097,9 @@ export default function ExamsPage() {
       </Dialog>
 
       <Dialog open={!!showAdDialog} onOpenChange={() => {setShowAdDialog(null);}}>
-        <DialogContent dir="rtl" className="bg-background mx-auto pr-5 pb-6 pl-5 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border shadow-lg duration-200 sm:rounded-lg sm:max-w-md">
-          <DialogHeader className="text-center flex flex-col space-y-1.5 sm:text-left">
-            <DialogTitle className="text-xl font-bold tracking-tight">צפייה בציון המבחן</DialogTitle>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">צפייה בציון המבחן</DialogTitle>
             <DialogDescription>
               בחר אופציה לצפייה בפרטי המבחן והציון
             </DialogDescription>
@@ -1137,7 +1137,7 @@ export default function ExamsPage() {
             </div>
 
             <div className="bg-indigo-50 p-4 text-center rounded-xl from-amber-50 to-yellow-50 border-2 border-amber-200">
-              <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
+              <Crown className="w-12 h-12 text-blue-500 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
               <p className="text-sm text-gray-600 mb-4">
                 גישה בלתי מוגבלת לכל הציונים והמשוב - ללא פרסומות!
@@ -1422,14 +1422,14 @@ export default function ExamsPage() {
                   </button>
 
                   {hasMistakes &&
-                  <div className="bg-blue-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-orange-200">
+                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                       <div className="flex items-center gap-2 mb-2">
                         <Crown className="w-4 h-4 text-orange-600" />
-                        <h4 className="text-[#000000] text-sm font-bold">תרגול טעויות ממבחן זה</h4>
+                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                       </div>
-                      <p className="text-slate-950 mb-2 text-xs">חזור על השאלות שטעית בהן במבחן זה
-
-                    </p>
+                      <p className="text-xs text-gray-600 mb-2">
+                        חזור על השאלות שטעית בהן במבחן זה
+                      </p>
                       <Button
                       onClick={(e) => {
                         e.stopPropagation();
