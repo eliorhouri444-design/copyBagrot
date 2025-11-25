@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle, AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import MasteryStatsCard from "@/components/mastery/MasteryStatsCard";
+import { base44 } from "@/api/base44Client";
 
 export default function ModuleCarousel({
   modules,
@@ -14,13 +15,32 @@ export default function ModuleCarousel({
   onEditModule,
   isPremium,
   onUpgrade,
-  examAttempts = [],
+  examAttempts: initialExamAttempts = [],
   onShowAd
 }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [todayExamCount, setTodayExamCount] = useState(0);
+  const [examAttempts, setExamAttempts] = useState(initialExamAttempts);
   const FREE_DAILY_EXAM = 1; // בגרות אחת בחינם ליום
+
+  // עדכון examAttempts כשה-prop משתנה
+  useEffect(() => {
+    setExamAttempts(initialExamAttempts);
+  }, [initialExamAttempts]);
+
+  // פונקציה לטעינת נתונים מעודכנים
+  const refreshExamAttempts = useCallback(async () => {
+    try {
+      const user = await base44.auth.me();
+      const allAttempts = await base44.entities.ExamAttempt.list("-created_date", 500);
+      const userAttempts = allAttempts.filter(a => a.created_by === user.email);
+      setExamAttempts(userAttempts);
+      console.log('🔄 ModuleCarousel: Refreshed exam attempts', userAttempts.length);
+    } catch (error) {
+      console.error('Error refreshing exam attempts:', error);
+    }
+  }, []);
 
   // בדוק כמה בגרויות עשה היום
   useEffect(() => {
@@ -35,6 +55,24 @@ export default function ModuleCarousel({
     const yesterdayKey = `exam_count_${yesterday.toISOString().split('T')[0]}`;
     localStorage.removeItem(yesterdayKey);
   }, []);
+
+  // האזנה לאירועי עדכון גלובליים
+  useEffect(() => {
+    const handleUpdate = () => {
+      console.log('🔄 ModuleCarousel: Received update event');
+      refreshExamAttempts();
+    };
+
+    window.addEventListener('mastery-update', handleUpdate);
+    window.addEventListener('practice-complete', handleUpdate);
+    window.addEventListener('exam-complete', handleUpdate);
+
+    return () => {
+      window.removeEventListener('mastery-update', handleUpdate);
+      window.removeEventListener('practice-complete', handleUpdate);
+      window.removeEventListener('exam-complete', handleUpdate);
+    };
+  }, [refreshExamAttempts]);
 
   // בדוק אם יש שאלון נבחר אחרי שה-modules נטענו
   useEffect(() => {
