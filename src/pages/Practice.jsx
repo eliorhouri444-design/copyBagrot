@@ -55,6 +55,7 @@ export default function PracticePage() {
 
   useEffect(() => {
     const loadUser = async () => {
+      setIsLoading(true);
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
@@ -72,6 +73,8 @@ export default function PracticePage() {
         });
       } catch (error) {
         console.error("Error loading user:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadUser();
