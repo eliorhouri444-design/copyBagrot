@@ -829,12 +829,12 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }} className="bg-[#5294ff] p-4 rounded-2xl">
+          transition={{ delay: 0.25 }} className="bg-blue-500 p-4 rounded-2xl">
 
 
           <div className="flex items-center gap-2 mb-3">
             <div className="flex-1 text-right">
-              <h3 className="text-[#ffffff] text-base font-bold">בגרויות אחרונות</h3>
+              <h3 className="text-[#fffafa] text-base font-bold">בגרויות אחרונות</h3>
             </div>
             <CheckCircle className="w-5 h-5 text-white" />
           </div>
@@ -866,7 +866,7 @@ export default function ExamsPage() {
 
 
                           <div className="flex items-center gap-3 flex-1">
-                            <motion.div className="bg-blue-100 p-1.5 rounded-lg border border-red-200"
+                            <motion.div className="bg-blue-50 p-1.5 rounded-lg border border-red-200"
 
                           whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.5 }}>
@@ -1422,7 +1422,7 @@ export default function ExamsPage() {
                   </button>
 
                   {hasMistakes &&
-                  <div className="bg-indigo-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-orange-200">
+                  <div className="bg-blue-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-orange-200">
                       <div className="flex items-center gap-2 mb-2">
                         <Crown className="w-4 h-4 text-orange-600" />
                         <h4 className="text-[#000000] text-sm font-bold">תרגול טעויות ממבחן זה</h4>
