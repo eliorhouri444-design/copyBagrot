@@ -207,7 +207,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       const topicsWithStats = filteredTopics.map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
-        // ספירת שאלות ייחודיות שנענו נכון
+        // ספירת שאלות ייחודיות שנענו נכון (לחישוב התקדמות)
         const correctAnswersMap = {};
         topicAttempts.forEach(a => {
           if (a.status === 'correct') {
@@ -221,13 +221,24 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
         const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
 
+        // קיבוץ לפי סשנים (סטים) לספירת סטים בוצעו
+        const sessionMap = {};
+        topicAttempts.forEach(a => {
+          const sessionId = a.session_id || 'unknown';
+          if (!sessionMap[sessionId]) {
+            sessionMap[sessionId] = [];
+          }
+          sessionMap[sessionId].push(a);
+        });
+        const totalSets = Object.keys(sessionMap).filter(k => k !== 'unknown').length;
+
         // סך כל השאלות בנושא
         const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
 
         // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
         const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique answers = ${progress}%`);
+        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique = ${progress}%, ${totalSets} sets`);
 
         return {
           ...topic,
@@ -238,7 +249,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             total: topicAttempts.length,
             progress: progress,
             uniqueCorrectAnswers: uniqueCorrectAnswers,
-            totalQuestionsInTopic: totalQuestionsInTopic
+            totalQuestionsInTopic: totalQuestionsInTopic,
+            totalSets: totalSets
           }
         };
       });
