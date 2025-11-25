@@ -398,22 +398,22 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     />
                   </div>
                   <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
-                    {currentTopic.stats.totalSets || 0} סטים בוצעו (כל סט = 10 שאלות)
+                    {currentTopic.stats.uniqueCorrectAnswers || 0} / {currentTopic.stats.totalQuestionsInTopic || 0} שאלות נכונות
                   </p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5">
                   <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
                     <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">סטים שגויים</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות שגויות</div>
                   </div>
                   <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
                     <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">סטים נכונים</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות נכונות</div>
                   </div>
                   <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
                     <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
-                    <div className="text-[9px] text-[#6E6E6E]">סטים חלקיים</div>
+                    <div className="text-[9px] text-[#6E6E6E]">תשובות חלקיות</div>
                   </div>
                 </div>
               </div>
