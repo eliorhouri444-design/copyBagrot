@@ -15,27 +15,8 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
   const [cachedTopics, setCachedTopics] = useState(null);
 
   useEffect(() => {
-    const cacheKey = `topics_${subject}_${units}`;
-    const cached = sessionStorage.getItem(cacheKey);
-
-    if (cached) {
-      try {
-        const parsedCache = JSON.parse(cached);
-        setTopics(parsedCache);
-        setCachedTopics(parsedCache);
-        setIsLoading(false);
-      } catch (e) {
-        console.error('Cache parse error:', e);
-      }
-    }
-
-    // טען רק אם אין cache או אם עברו יותר מ-2 דקות
-    const lastUpdate = sessionStorage.getItem(`${cacheKey}_time`);
-    const shouldUpdate = !cached || !lastUpdate || Date.now() - parseInt(lastUpdate) > 120000;
-
-    if (shouldUpdate) {
-      loadTopics();
-    }
+    // תמיד טען מחדש - ללא cache כדי לראות עדכונים מיידית
+    loadTopics();
   }, [subject, units]);
 
   const loadTopics = async () => {
@@ -162,10 +143,20 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         return b.actualQuestionCount - a.actualQuestionCount;
       });
 
+      // סינון נושאים לא רצויים
+      const filteredTopics = topicsArray.filter(topic => {
+        const id = topic.topic_id?.toLowerCase() || '';
+        const name = topic.name?.toLowerCase() || '';
+        if (id === 'unknown' || name === 'unknown') return false;
+        if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
+        if (!topic.name || topic.name.trim() === '') return false;
+        return true;
+      });
+
       // טעינה מקבילה של user ו-attempts
       const [user, attempts] = await Promise.all([
       base44.auth.me(),
-      base44.entities.AttemptNew.list()]
+      base44.entities.AttemptNew.list("-created_date", 500)]
       );
 
       const relevantAttempts = attempts.filter((a) =>
@@ -173,7 +164,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       a.subject_id === subject
       );
 
-      const topicsWithStats = topicsArray.
+      const topicsWithStats = filteredTopics.
       map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
@@ -204,10 +195,6 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       });
 
       setTopics(topicsWithStats);
-
-      const cacheKey = `topics_${subject}_${units}`;
-      sessionStorage.setItem(cacheKey, JSON.stringify(topicsWithStats));
-      sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
 
       // בדוק אם יש נושא נבחר
       const selectedTopicId = sessionStorage.getItem('selectedTopicId');
