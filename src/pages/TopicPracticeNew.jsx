@@ -653,9 +653,29 @@ export default function TopicPracticeNewPage() {
           time_spent_seconds: 0
         });
 
+        // שמור גם הסבר אם קיים מה-AI
+        let explanation = "";
+        if (!isCorrect && correctAnswer) {
+          // אם יש תשובה נכונה אבל התלמיד טעה - נוסיף הסבר
+          try {
+            const explainResult = await base44.integrations.Core.InvokeLLM({
+              prompt: `הסבר בקצרה בעברית למה התשובה "${userAnswer}" שגויה לשאלה: "${currentQuestion.question_text}". התשובה הנכונה היא: "${correctAnswer}". תן הסבר קצר וברור של 1-2 משפטים.`,
+              response_json_schema: {
+                type: "object",
+                properties: {
+                  explanation: { type: "string", description: "הסבר קצר בעברית" }
+                }
+              }
+            });
+            explanation = explainResult.explanation || "";
+          } catch (err) {
+            console.error("Error getting explanation:", err);
+          }
+        }
+
         setResults((prev) => ({
           ...prev,
-          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer }
+          [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer, explanation }
         }));
 
         // מעבר מיידי לשאלה הבאה או לסיכום
