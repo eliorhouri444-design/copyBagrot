@@ -264,11 +264,11 @@ export default function TopicPracticeNewPage() {
         
         // אם יש שדה correct_answer בשאלה
         if (currentQuestion.correct_answer) {
-          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase().replace(/\s+/g, ' ');
+          correctAnswer = String(currentQuestion.correct_answer).trim().toLowerCase().replace(/\s/g, '');
         }
         
-        // נרמול התשובה - הסרת רווחים מיותרים
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+        // נרמול התשובה - הסרת כל הרווחים
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
         const isCorrect = normalizedUserAnswer === correctAnswer;
 
         // שמירה ברקע
@@ -523,13 +523,13 @@ export default function TopicPracticeNewPage() {
         let status = "incorrect";
         let correctAnswer = "";
 
-        // נסה קודם בדיקה פשוטה ללא AI - נרמול רווחים
-        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+        // נסה קודם בדיקה פשוטה ללא AI - הסרת כל הרווחים
+        const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
         
         // בדוק אם יש תשובה נכונה בשאלה עצמה
         if (currentQuestion.correct_answer) {
           correctAnswer = String(currentQuestion.correct_answer);
-          const normalizedCorrect = correctAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
+          const normalizedCorrect = correctAnswer.trim().toLowerCase().replace(/\s/g, '');
           
           if (normalizedUserAnswer === normalizedCorrect) {
             isCorrect = true;
@@ -552,11 +552,11 @@ export default function TopicPracticeNewPage() {
               correctAnswer = correctAnswers[0].value || "";
             }
 
-            // בדיקת התאמה מדויקת - מהירה (עם נרמול רווחים)
+            // בדיקת התאמה מדויקת - מהירה (הסרת כל הרווחים)
             const exactMatch = correctAnswers.some(ans => 
-              ans.value?.toLowerCase().trim().replace(/\s+/g, ' ') === normalizedUserAnswer
+              ans.value?.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
             ) || acceptableVariants.some(variant => 
-              variant.toLowerCase().trim().replace(/\s+/g, ' ') === normalizedUserAnswer
+              variant.toLowerCase().trim().replace(/\s/g, '') === normalizedUserAnswer
             );
 
             if (exactMatch) {

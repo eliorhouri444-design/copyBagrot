@@ -102,11 +102,11 @@ export default function VocabularyPracticePage() {
     const question = questions[currentIndex];
 
     try {
-      // Check exact match first - עם נרמול רווחים
-      const normalized = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
-      const correctNormalized = question.english_answer.toLowerCase().replace(/\s+/g, ' ');
+      // Check exact match first - הסרת כל הרווחים
+      const normalized = userAnswer.trim().toLowerCase().replace(/\s/g, '');
+      const correctNormalized = question.english_answer.toLowerCase().replace(/\s/g, '');
       const exactMatch = normalized === correctNormalized ||
-                        question.acceptable_answers?.some(a => a.toLowerCase().replace(/\s+/g, ' ') === normalized);
+                        question.acceptable_answers?.some(a => a.toLowerCase().replace(/\s/g, '') === normalized);
 
       if (exactMatch) {
         setIsCorrect(true);
