@@ -17,8 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  DialogFooter } from
+"@/components/ui/dialog";
 
 export default function ExamGenericPage() {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function ExamGenericPage() {
   const [score, setScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [direction, setDirection] = useState(1);
-  
+
   const [displayMode, setDisplayMode] = useState('carousel');
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -58,7 +58,7 @@ export default function ExamGenericPage() {
       try {
         const u = await base44.auth.me();
         setUser(u);
-        
+
         if (mode === 'edit' && u?.role === 'admin') {
           setIsEditMode(true);
         }
@@ -99,7 +99,7 @@ export default function ExamGenericPage() {
   useEffect(() => {
     if (examStarted && !examFinished && timeLeft > 0) {
       const timer = setInterval(() => {
-        setTimeLeft(prev => {
+        setTimeLeft((prev) => {
           if (prev <= 1) {
             handleSubmit();
             return 0;
@@ -121,7 +121,7 @@ export default function ExamGenericPage() {
     const handleBeforeUnload = (e) => {
       saveProgress();
       e.preventDefault();
-      e.returnValue = ''; 
+      e.returnValue = '';
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -171,7 +171,7 @@ export default function ExamGenericPage() {
 
       setUserAnswers(JSON.parse(JSON.stringify(savedProgress.user_answers || {})));
       setCurrentQuestion(savedProgress.current_question || 0);
-      setTimeLeft(savedProgress.time_left || (exam.duration_minutes * 60));
+      setTimeLeft(savedProgress.time_left || exam.duration_minutes * 60);
 
       const savedMode = savedProgress.display_mode;
       console.log('Setting display mode to:', savedMode);
@@ -221,7 +221,7 @@ export default function ExamGenericPage() {
   };
 
   const handleAnswerChange = (questionNumber, answer) => {
-    setUserAnswers(prev => ({
+    setUserAnswers((prev) => ({
       ...prev,
       [questionNumber]: answer
     }));
@@ -322,7 +322,7 @@ export default function ExamGenericPage() {
           } else {
             aiResult = await checkAnswerWithAI(userAnswer, questionItem.correct_answer, questionItem.question_text);
             isCorrect = aiResult.is_correct;
-            
+
             if (isCorrect) {
               pointsAwarded = questionItem.points;
               if (aiResult.has_spelling_error) {
@@ -331,7 +331,7 @@ export default function ExamGenericPage() {
               }
             }
           }
-          
+
           earnedScore += pointsAwarded;
         }
 
@@ -357,7 +357,7 @@ export default function ExamGenericPage() {
         });
       }
 
-      const scorePercent = (earnedScore / totalScore) * 100;
+      const scorePercent = earnedScore / totalScore * 100;
 
       await base44.entities.ExamAttempt.create({
         exam_id: examId,
@@ -407,8 +407,8 @@ export default function ExamGenericPage() {
             חזרה למבחנים
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (examLoading) {
@@ -418,8 +418,8 @@ export default function ExamGenericPage() {
           <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">טוען מבחן...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (examError || !exam) {
@@ -435,8 +435,8 @@ export default function ExamGenericPage() {
             חזרה למבחנים
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (isEditMode) {
@@ -448,8 +448,8 @@ export default function ExamGenericPage() {
               variant="ghost"
               size="icon"
               onClick={() => navigate(createPageUrl("AdminExamEditor"))}
-              className="text-white hover:bg-white/20"
-            >
+              className="text-white hover:bg-white/20">
+
               <ArrowLeft className="w-6 h-6" />
             </Button>
 
@@ -475,8 +475,8 @@ export default function ExamGenericPage() {
                 </p>
                 <Button
                   onClick={() => window.open('https://app.base44.co/dashboard', '_blank')}
-                  className="bg-amber-600 hover:bg-amber-700 text-white"
-                >
+                  className="bg-amber-600 hover:bg-amber-700 text-white">
+
                   פתח את ה-Dashboard
                 </Button>
               </div>
@@ -517,19 +517,19 @@ export default function ExamGenericPage() {
             </div>
           </div>
 
-          {exam.instructions && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          {exam.instructions &&
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
               <h3 className="text-xl font-bold text-gray-900 mb-3">הוראות:</h3>
               <p className="text-gray-700 whitespace-pre-wrap">{exam.instructions}</p>
             </div>
-          )}
+          }
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">שאלות ({exam.questions?.length || 0})</h3>
             
             <div className="space-y-4">
-              {exam.questions?.map((questionItem, questionIndex) => (
-                <div key={questionIndex} className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-lg p-4">
+              {exam.questions?.map((questionItem, questionIndex) =>
+              <div key={questionIndex} className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-bold text-indigo-900 text-lg">שאלה {questionItem.question_number || questionIndex + 1}</span>
                     <div className="flex items-center gap-2">
@@ -542,57 +542,57 @@ export default function ExamGenericPage() {
                     <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{questionItem.question_text}</p>
                   </div>
 
-                  {questionItem.question_image_url && (
-                    <div className="bg-blue-50 rounded p-3 mb-3">
+                  {questionItem.question_image_url &&
+                <div className="bg-blue-50 rounded p-3 mb-3">
                       <div className="text-xs font-semibold text-blue-700 mb-1">תמונה:</div>
-                      <a 
-                        href={questionItem.question_image_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-xs break-all"
-                      >
+                      <a
+                    href={questionItem.question_image_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-xs break-all">
+
                         {questionItem.question_image_url}
                       </a>
                     </div>
-                  )}
+                }
 
-                  {questionItem.options && questionItem.options.length > 0 && (
-                    <div className="bg-white rounded-lg p-3 mb-3">
+                  {questionItem.options && questionItem.options.length > 0 &&
+                <div className="bg-white rounded-lg p-3 mb-3">
                       <div className="text-xs font-semibold text-gray-700 mb-2">אפשרויות:</div>
                       <div className="space-y-1">
-                        {questionItem.options.map((optionValue, optionIndex) => (
-                          <div key={optionIndex} className="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2">
+                        {questionItem.options.map((optionValue, optionIndex) =>
+                    <div key={optionIndex} className="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2">
                             {String.fromCharCode(65 + optionIndex)}. {optionValue}
                           </div>
-                        ))}
+                    )}
                       </div>
                     </div>
-                  )}
+                }
 
                   <div className="bg-green-50 rounded-lg p-3 mb-3">
                     <span className="text-xs font-semibold text-green-700">תשובה נכונה: </span>
                     <span className="text-sm text-green-600 font-medium">{questionItem.correct_answer}</span>
                   </div>
 
-                  {questionItem.explanation && (
-                    <div className="bg-blue-50 rounded-lg p-3">
+                  {questionItem.explanation &&
+                <div className="bg-blue-50 rounded-lg p-3">
                       <div className="text-xs font-semibold text-blue-700 mb-1">הסבר:</div>
                       <p className="text-sm text-gray-700">{questionItem.explanation}</p>
                     </div>
-                  )}
+                }
 
-                  {questionItem.topic && (
-                    <div className="mt-3">
+                  {questionItem.topic &&
+                <div className="mt-3">
                       <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">נושא: {questionItem.topic}</span>
                     </div>
-                  )}
+                }
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (savedProgress && !examStarted && !showModeDialog) {
@@ -622,8 +622,8 @@ export default function ExamGenericPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
-    );
+      </Dialog>);
+
   }
 
   if (showModeDialog && !examStarted) {
@@ -642,8 +642,8 @@ export default function ExamGenericPage() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleStartExam('normal')}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
-            >
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg">
+
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
                   <FileText className="w-8 h-8 text-white" />
@@ -670,8 +670,8 @@ export default function ExamGenericPage() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleStartExam('carousel')}
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
-            >
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg">
+
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
                   <Zap className="w-8 h-8 text-white" />
@@ -695,8 +695,8 @@ export default function ExamGenericPage() {
             </motion.button>
           </div>
         </DialogContent>
-      </Dialog>
-    );
+      </Dialog>);
+
   }
 
   if (!examStarted) {
@@ -751,32 +751,32 @@ export default function ExamGenericPage() {
                   <p>סה"כ {exam.questions.length} שאלות • {exam.total_points} נקודות • ציון עובר: {exam.passing_grade}</p>
                 </div>
 
-                {exam.reading_text && (
-                  <div className="bg-white rounded-lg p-3 border border-green-100">
+                {exam.reading_text &&
+                <div className="bg-white rounded-lg p-3 border border-green-100">
                     <div className="font-semibold text-gray-900 mb-1">📖 טקסט קריאה</div>
                     <p>המבחן כולל קטע קריאה שיופיע לצד השאלות במהלך המבחן</p>
                   </div>
-                )}
+                }
 
-                {exam.instructions && (
-                  <div className="bg-white rounded-lg p-3 border border-amber-100">
+                {exam.instructions &&
+                <div className="bg-white rounded-lg p-3 border border-amber-100">
                     <div className="font-semibold text-gray-900 mb-1">ℹ️ הוראות מיוחדות</div>
                     <p className="whitespace-pre-wrap">{exam.instructions}</p>
                   </div>
-                )}
+                }
               </div>
             </div>
 
             <Button
               onClick={() => setShowModeDialog(true)}
-              className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold"
-            >
+              className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold">
+
               התחל מבחן
             </Button>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (examFinished && score) {
@@ -790,13 +790,13 @@ export default function ExamGenericPage() {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", duration: 0.5 }}
-              >
-                {passed ? (
-                  <CheckCircle className="w-20 h-20 mx-auto mb-4" />
-                ) : (
-                  <X className="w-20 h-20 mx-auto mb-4" />
-                )}
+                transition={{ type: "spring", duration: 0.5 }}>
+
+                {passed ?
+                <CheckCircle className="w-20 h-20 mx-auto mb-4" /> :
+
+                <X className="w-20 h-20 mx-auto mb-4" />
+                }
               </motion.div>
               <h1 className="text-4xl font-bold mb-2">{Math.round(score.percent)}</h1>
               <p className="text-xl">{passed ? 'עברת את המבחן!' : 'לא עברת את המבחן'}</p>
@@ -808,11 +808,11 @@ export default function ExamGenericPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">סקירת תשובות</h2>
             
             <div className="space-y-4">
-              {score.results.map((resultItem, resultIndex) => (
-                <div
-                  key={resultIndex}
-                  className={`p-4 rounded-xl border-2 ${resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}
-                >
+              {score.results.map((resultItem, resultIndex) =>
+              <div
+                key={resultIndex}
+                className={`p-4 rounded-xl border-2 ${resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+
                   <div className="flex items-start justify-between mb-2">
                     <div className="font-bold text-gray-900">שאלה {resultItem.question_number}</div>
                     <div className={`text-sm font-bold ${resultItem.is_correct ? 'text-green-600' : 'text-red-600'}`}>
@@ -824,81 +824,81 @@ export default function ExamGenericPage() {
                     <strong>תשובתך:</strong> {resultItem.user_answer || 'לא נענה'}
                   </div>
 
-                  {!resultItem.is_correct && (
-                    <div className="text-sm text-green-700 mb-2">
+                  {!resultItem.is_correct &&
+                <div className="text-sm text-green-700 mb-2">
                       <strong>תשובה נכונה:</strong> {resultItem.correct_answer}
                     </div>
-                  )}
+                }
 
-                  {resultItem.explanation && (
-                    <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
+                  {resultItem.explanation &&
+                <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
                       <strong className="text-blue-600">הסבר:</strong> {resultItem.explanation}
                     </div>
-                  )}
+                }
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">
               <Button
                 onClick={() => navigate(createPageUrl("Exams"))}
                 variant="outline"
-                className="flex-1"
-              >
+                className="flex-1">
+
                 חזרה למבחנים
               </Button>
-              {user?.subscription_status === 'premium' ? (
-                <Button
-                  onClick={() => window.location.reload()}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
+              {user?.subscription_status === 'premium' ?
+              <Button
+                onClick={() => window.location.reload()}
+                className="flex-1 bg-blue-600 hover:bg-blue-700">
+
+                  נסה שוב
+                </Button> :
+
+              <Button
+                onClick={() => setShowRetryAd(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700">
+
                   נסה שוב
                 </Button>
-              ) : (
-                <Button
-                  onClick={() => setShowRetryAd(true)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
-                  נסה שוב
-                </Button>
-              )}
+              }
             </div>
           </div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   // Helper function to detect and extract American-style options from question text
   const extractAmericanOptions = (questionText) => {
     if (!questionText) return null;
-    
+
     // Pattern 1: A) ... B) ... C) ... D) ... (multiline safe)
     const patternParens = /([A-E])\)\s*([^\n]+?)(?=\s*[A-E]\)|$)/gi;
     // Pattern 2: A. ... B. ... C. ... D. ... (multiline safe)
     const patternDots = /([A-E])\.\s*([^\n]+?)(?=\s*[A-E]\.|$)/gi;
-    
+
     let matches = [...questionText.matchAll(patternParens)];
     let separator = ')';
-    
+
     if (matches.length === 0) {
       matches = [...questionText.matchAll(patternDots)];
       separator = '.';
     }
-    
+
     if (matches.length >= 2 && matches.length <= 5) {
-      const options = matches.map(match => match[2].trim());
+      const options = matches.map((match) => match[2].trim());
       const firstOptionIndex = questionText.indexOf(`A${separator}`);
       const mainQuestion = questionText.substring(0, firstOptionIndex).trim();
-      
+
       return { mainQuestion, options, hasOptions: true };
     }
-    
+
     return null;
   };
 
   const question = exam.questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / exam.questions.length) * 100;
+  const progress = (currentQuestion + 1) / exam.questions.length * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -936,10 +936,10 @@ export default function ExamGenericPage() {
           setShowRetryAd(false);
           window.location.reload();
         }}
-        actionType="exam_retry"
-      />
+        actionType="exam_retry" />
 
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-b-xl p-3 shadow-lg mb-3">
+
+      <div className="bg-blue-600 mb-3 p-3 rounded-b-xl from-blue-600 to-purple-600 shadow-lg">
         <div className="flex items-center justify-between mb-2">
           <Button variant="ghost" size="icon" onClick={handleExitExam} className="text-white hover:bg-white/20 h-8 w-8">
             <ArrowLeft className="w-5 h-5" />
@@ -960,10 +960,10 @@ export default function ExamGenericPage() {
         </div>
       </div>
 
-      {displayMode === 'carousel' ? (
-        <div className="px-4 pb-6 flex flex-col" style={{ height: 'calc(100vh - 150px)' }}>
-          {exam.reading_text && (
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-3" style={{ height: '30%', minHeight: '200px' }}>
+      {displayMode === 'carousel' ?
+      <div className="px-4 pb-6 flex flex-col" style={{ height: 'calc(100vh - 150px)' }}>
+          {exam.reading_text &&
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-3" style={{ height: '30%', minHeight: '200px' }}>
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2.5">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <BookOpen className="w-4 h-4" />
@@ -976,17 +976,17 @@ export default function ExamGenericPage() {
                 </div>
               </div>
             </div>
-          )}
+        }
 
           <div className="flex-1 bg-white rounded-xl shadow-lg p-6 flex flex-col">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentQuestion}
-                initial={{ opacity: 0, x: 20 * direction }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 * direction }}
-                className="flex-1 flex flex-col"
-              >
+              key={currentQuestion}
+              initial={{ opacity: 0, x: 20 * direction }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 * direction }}
+              className="flex-1 flex flex-col">
+
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-2xl font-bold text-gray-900">
                     {exam.subject === 'אנגלית' ? `Question ${question.question_number}` : `שאלה ${question.question_number}`}
@@ -998,141 +998,145 @@ export default function ExamGenericPage() {
 
                 <div className="flex-1 overflow-y-auto mb-4">
                   {(() => {
-                    const extracted = extractAmericanOptions(question.question_text);
-                    if (extracted && extracted.hasOptions) {
-                      return (
-                        <>
+                  const extracted = extractAmericanOptions(question.question_text);
+                  if (extracted && extracted.hasOptions) {
+                    return (
+                      <>
                           <p className="text-gray-800 text-base leading-relaxed mb-4" dir="ltr">
                             {extracted.mainQuestion}
                           </p>
                           <div className="space-y-2">
-                            {extracted.options.map((optionValue, optionIndex) => (
-                              <button
-                                key={optionIndex}
-                                onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
-                                  userAnswers[question.question_number] === optionValue
-                                    ? 'bg-blue-100 border-blue-500 shadow-md'
-                                    : 'bg-white border-gray-200 hover:border-blue-300'
-                                }`}
-                                dir="ltr"
-                              >
+                            {extracted.options.map((optionValue, optionIndex) =>
+                          <button
+                            key={optionIndex}
+                            onClick={() => handleAnswerChange(question.question_number, optionValue)}
+                            className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
+                            userAnswers[question.question_number] === optionValue ?
+                            'bg-blue-100 border-blue-500 shadow-md' :
+                            'bg-white border-gray-200 hover:border-blue-300'}`
+                            }
+                            dir="ltr">
+
                                 {optionValue}
                               </button>
-                            ))}
+                          )}
                           </div>
-                        </>
-                      );
-                    }
-                    return (
-                      <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                        {question.question_text}
-                      </p>
-                    );
-                  })()}
+                        </>);
 
-                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions && (
-                    <div className="space-y-2">
-                      {question.options.map((optionValue, optionIndex) => (
-                        <button
-                          key={optionIndex}
-                          onClick={() => handleAnswerChange(question.question_number, optionValue)}
-                          className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
-                            userAnswers[question.question_number] === optionValue
-                              ? 'bg-blue-100 border-blue-500 shadow-md'
-                              : 'bg-white border-gray-200 hover:border-blue-300'
-                          }`}
-                          dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                        >
+                  }
+                  return (
+                    <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                        {question.question_text}
+                      </p>);
+
+                })()}
+
+                  {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions &&
+                <div className="space-y-2">
+                      {question.options.map((optionValue, optionIndex) =>
+                  <button
+                    key={optionIndex}
+                    onClick={() => handleAnswerChange(question.question_number, optionValue)}
+                    className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
+                    userAnswers[question.question_number] === optionValue ?
+                    'bg-blue-100 border-blue-500 shadow-md' :
+                    'bg-white border-gray-200 hover:border-blue-300'}`
+                    }
+                    dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+
                           {optionValue}
                         </button>
-                      ))}
+                  )}
                     </div>
-                  )}
+                }
 
-                  {question.question_type === 'short_answer' && !extractAmericanOptions(question.question_text)?.hasOptions && (
-                    <Input
-                      value={userAnswers[question.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                      className="w-full h-12 text-base"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                  {question.question_type === 'short_answer' && !extractAmericanOptions(question.question_text)?.hasOptions &&
+                <Input
+                  value={userAnswers[question.question_number] || ''}
+                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                  placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
+                  className="w-full h-12 text-base"
+                  dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
 
-                  {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && !extractAmericanOptions(question.question_text)?.hasOptions && (
-                    <Textarea
-                      value={userAnswers[question.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                      className="w-full h-32 text-base resize-none"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                }
 
-                  {question.question_type !== 'multiple_choice' && 
-                   question.question_type !== 'short_answer' &&
-                   question.question_type !== 'open_question' &&
-                   question.question_type !== 'calculation' &&
-                   question.question_type !== 'proof' &&
-                   !extractAmericanOptions(question.question_text)?.hasOptions && (
-                    <Textarea
-                      value={userAnswers[question.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
-                      className="w-full h-32 text-base resize-none"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                  {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && !extractAmericanOptions(question.question_text)?.hasOptions &&
+                <Textarea
+                  value={userAnswers[question.question_number] || ''}
+                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                  placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
+                  className="w-full h-32 text-base resize-none"
+                  dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+
+                }
+
+                  {question.question_type !== 'multiple_choice' &&
+                question.question_type !== 'short_answer' &&
+                question.question_type !== 'open_question' &&
+                question.question_type !== 'calculation' &&
+                question.question_type !== 'proof' &&
+                !extractAmericanOptions(question.question_text)?.hasOptions &&
+                <Textarea
+                  value={userAnswers[question.question_number] || ''}
+                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
+                  placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                  className="w-full h-32 text-base resize-none"
+                  dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+
+                }
                 </div>
 
                 <div className="flex gap-3 border-t pt-4">
                   <Button
-                    onClick={() => {
-                      if (currentQuestion > 0) {
-                        setDirection(-1);
-                        setTimeout(() => setCurrentQuestion(prev => prev - 1), 0);
-                      }
-                    }}
-                    disabled={currentQuestion === 0}
-                    variant="outline"
-                    className="flex-1 h-12"
-                  >
+                  onClick={() => {
+                    if (currentQuestion > 0) {
+                      setDirection(-1);
+                      setTimeout(() => setCurrentQuestion((prev) => prev - 1), 0);
+                    }
+                  }}
+                  disabled={currentQuestion === 0}
+                  variant="outline"
+                  className="flex-1 h-12">
+
                     <ChevronRight className="w-5 h-5 ml-2" />
                     הקודם
                   </Button>
 
-                  {currentQuestion === exam.questions.length - 1 ? (
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
-                    >
+                  {currentQuestion === exam.questions.length - 1 ?
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700">
+
                       {isSubmitting ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" />שומר...</> : 'סיים מבחן'}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        if (currentQuestion < exam.questions.length - 1) {
-                          setDirection(1);
-                          setTimeout(() => setCurrentQuestion(prev => prev + 1), 0);
-                        }
-                      }}
-                      className="flex-1 h-12 bg-blue-600"
-                    >
+                    </Button> :
+
+                <Button
+                  onClick={() => {
+                    const hasAnswer = userAnswers[question.question_number]?.trim();
+                    if (!hasAnswer) return;
+
+                    if (currentQuestion < exam.questions.length - 1) {
+                      setDirection(1);
+                      setTimeout(() => setCurrentQuestion((prev) => prev + 1), 0);
+                    }
+                  }}
+                  disabled={!userAnswers[question.question_number]?.trim()}
+                  className="flex-1 h-12 bg-blue-600">
+
                       הבא
                       <ChevronLeft className="w-5 h-5 mr-2" />
                     </Button>
-                  )}
+                }
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
-        </div>
-      ) : (
-        <div className="max-w-6xl mx-auto px-6 pb-6">
-          {exam.reading_text && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        </div> :
+
+      <div className="max-w-6xl mx-auto px-6 pb-6">
+          {exam.reading_text &&
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-600" />
                 {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
@@ -1141,12 +1145,12 @@ export default function ExamGenericPage() {
                 {exam.reading_text}
               </div>
             </div>
-          )}
+        }
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="space-y-6">
-              {exam.questions.map((questionItem, qIdx) => (
-                <div key={qIdx} className="pb-6 border-b last:border-b-0">
+              {exam.questions.map((questionItem, qIdx) =>
+            <div key={qIdx} className="pb-6 border-b last:border-b-0">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-xl font-bold text-gray-900">
                       {exam.subject === 'אנגלית' ? `Question ${questionItem.question_number}` : `שאלה ${questionItem.question_number}`}
@@ -1157,110 +1161,110 @@ export default function ExamGenericPage() {
                   </div>
 
                   {(() => {
-                    const extracted = extractAmericanOptions(questionItem.question_text);
-                    if (extracted && extracted.hasOptions) {
-                      return (
-                        <>
+                const extracted = extractAmericanOptions(questionItem.question_text);
+                if (extracted && extracted.hasOptions) {
+                  return (
+                    <>
                           <p className="text-gray-800 text-base leading-relaxed mb-4" dir="ltr">
                             {extracted.mainQuestion}
                           </p>
                           <div className="space-y-2">
-                            {extracted.options.map((optionValue, optionIndex) => (
-                              <button
-                                key={optionIndex}
-                                onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                                className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
-                                  userAnswers[questionItem.question_number] === optionValue
-                                    ? 'bg-blue-100 border-blue-500 shadow-md'
-                                    : 'bg-white border-gray-200 hover:border-blue-300'
-                                }`}
-                                dir="ltr"
-                              >
-                                {optionValue}
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      );
-                    }
-                    return (
-                      <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                        {questionItem.question_text}
-                      </p>
-                    );
-                  })()}
-
-                  {/* Multiple choice with options array - only if no American style detected */}
-                  {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                    <div className="space-y-2">
-                      {questionItem.options.map((optionValue, optionIndex) => (
+                            {extracted.options.map((optionValue, optionIndex) =>
                         <button
                           key={optionIndex}
                           onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
-                          className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
-                            userAnswers[questionItem.question_number] === optionValue
-                              ? 'bg-blue-100 border-blue-500 shadow-md'
-                              : 'bg-white border-gray-200 hover:border-blue-300'
-                          }`}
-                          dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                        >
+                          className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
+                          userAnswers[questionItem.question_number] === optionValue ?
+                          'bg-blue-100 border-blue-500 shadow-md' :
+                          'bg-white border-gray-200 hover:border-blue-300'}`
+                          }
+                          dir="ltr">
+
+                                {optionValue}
+                              </button>
+                        )}
+                          </div>
+                        </>);
+
+                }
+                return (
+                  <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                        {questionItem.question_text}
+                      </p>);
+
+              })()}
+
+                  {/* Multiple choice with options array - only if no American style detected */}
+                  {questionItem.question_type === 'multiple_choice' && questionItem.options && questionItem.options.length > 0 && !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
+              <div className="space-y-2">
+                      {questionItem.options.map((optionValue, optionIndex) =>
+                <button
+                  key={optionIndex}
+                  onClick={() => handleAnswerChange(questionItem.question_number, optionValue)}
+                  className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
+                  userAnswers[questionItem.question_number] === optionValue ?
+                  'bg-blue-100 border-blue-500 shadow-md' :
+                  'bg-white border-gray-200 hover:border-blue-300'}`
+                  }
+                  dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+
                           {optionValue}
                         </button>
-                      ))}
+                )}
                     </div>
-                  )}
+              }
 
                   {/* Short answer - only if no American style */}
-                  {questionItem.question_type === 'short_answer' && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                    <Input
-                      value={userAnswers[questionItem.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
-                      className="w-full h-12"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                  {questionItem.question_type === 'short_answer' && !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
+              <Input
+                value={userAnswers[questionItem.question_number] || ''}
+                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                placeholder={exam.subject === 'אנגלית' ? "Type answer..." : "הקלד תשובה..."}
+                className="w-full h-12"
+                dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+
+              }
 
                   {/* Open questions, calculations, proofs - only if no American style */}
-                  {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                    <Textarea
-                      value={userAnswers[questionItem.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                      className="w-full h-32"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                  {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
+              <Textarea
+                value={userAnswers[questionItem.question_number] || ''}
+                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
+                className="w-full h-32"
+                dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+
+              }
 
                   {/* Fallback for any other question type - as long as not American style */}
-                  {questionItem.question_type !== 'multiple_choice' && 
-                   questionItem.question_type !== 'short_answer' &&
-                   questionItem.question_type !== 'open_question' &&
-                   questionItem.question_type !== 'calculation' &&
-                   questionItem.question_type !== 'proof' &&
-                   !extractAmericanOptions(questionItem.question_text)?.hasOptions && (
-                    <Textarea
-                      value={userAnswers[questionItem.question_number] || ''}
-                      onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                      placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
-                      className="w-full h-32"
-                      dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}
-                    />
-                  )}
+                  {questionItem.question_type !== 'multiple_choice' &&
+              questionItem.question_type !== 'short_answer' &&
+              questionItem.question_type !== 'open_question' &&
+              questionItem.question_type !== 'calculation' &&
+              questionItem.question_type !== 'proof' &&
+              !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
+              <Textarea
+                value={userAnswers[questionItem.question_number] || ''}
+                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
+                placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                className="w-full h-32"
+                dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+
+              }
                 </div>
-              ))}
+            )}
             </div>
 
             <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold mt-6"
-            >
+            onClick={handleSubmit}
+            disabled={isSubmitting} className="bg-blue-500 text-white mt-6 px-4 py-2 text-sm font-bold rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-14 hover:bg-blue-700">
+
+
               {isSubmitting ? <><Loader2 className="animate-spin w-5 h-5 ml-2" />שומר...</> : 'סיים מבחן'}
             </Button>
           </div>
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
