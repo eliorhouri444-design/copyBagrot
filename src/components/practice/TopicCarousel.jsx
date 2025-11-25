@@ -207,63 +207,38 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       const topicsWithStats = filteredTopics.map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
-        // קיבוץ לפי סשנים (סטים)
-        const sessionMap = {};
+        // ספירת שאלות ייחודיות שנענו נכון
+        const correctAnswersMap = {};
         topicAttempts.forEach(a => {
-          const sessionId = a.session_id || 'unknown';
-          if (!sessionMap[sessionId]) {
-            sessionMap[sessionId] = [];
-          }
-          sessionMap[sessionId].push(a);
-        });
-
-        // חישוב סטטיסטיקות לפי סטים
-        let correctSets = 0;
-        let wrongSets = 0;
-        let partialSets = 0;
-        let totalSets = Object.keys(sessionMap).length;
-
-        Object.values(sessionMap).forEach(setAttempts => {
-          if (setAttempts.length === 0) return;
-          
-          const correctInSet = setAttempts.filter(a => a.status === 'correct').length;
-          const wrongInSet = setAttempts.filter(a => a.status === 'incorrect').length;
-          const totalInSet = setAttempts.length;
-          
-          // אם רוב התשובות נכונות - סט נכון
-          // אם רוב התשובות שגויות - סט שגוי
-          // אחרת - סט חלקי
-          if (correctInSet > totalInSet / 2) {
-            correctSets++;
-          } else if (wrongInSet > totalInSet / 2) {
-            wrongSets++;
-          } else {
-            partialSets++;
+          if (a.status === 'correct') {
+            correctAnswersMap[a.question_id] = true;
           }
         });
+        const uniqueCorrectAnswers = Object.keys(correctAnswersMap).length;
 
-        // Count unique questions answered
-        const uniqueQuestions = new Set(topicAttempts.map((a) => a.question_id));
-        const uniqueAnswered = uniqueQuestions.size;
+        // ספירת כל התשובות לפי סטטוס
+        const correctCount = topicAttempts.filter(a => a.status === 'correct').length;
+        const wrongCount = topicAttempts.filter(a => a.status === 'incorrect').length;
+        const partialCount = topicAttempts.filter(a => a.status === 'partial').length;
 
-        // Calculate progress based on sets completed
-        const QUESTIONS_PER_SET = 10;
-        const actualTotal = topic.actualQuestionCount || topic.questionCount;
-        const totalPossibleSets = Math.ceil(actualTotal / QUESTIONS_PER_SET);
-        const progress = totalPossibleSets > 0 && totalSets > 0 ? Math.min(100, Math.round(totalSets / totalPossibleSets * 100)) : 0;
+        // סך כל השאלות בנושא
+        const totalQuestionsInTopic = topic.actualQuestionCount || topic.questionCount;
 
-        console.log(`📈 Topic ${topic.topic_id}: ${totalSets} sets, ${correctSets}✓ ${wrongSets}✗ ${partialSets}~`);
+        // חישוב התקדמות: שאלות נכונות ייחודיות חלקי סך השאלות בנושא
+        const progress = totalQuestionsInTopic > 0 ? Math.min(100, Math.round((uniqueCorrectAnswers / totalQuestionsInTopic) * 100)) : 0;
+
+        console.log(`📈 Topic ${topic.topic_id}: ${uniqueCorrectAnswers}/${totalQuestionsInTopic} correct unique answers = ${progress}%`);
 
         return {
           ...topic,
           stats: {
-            correct: correctSets,
-            wrong: wrongSets,
-            partial: partialSets,
-            total: totalSets,
+            correct: correctCount,
+            wrong: wrongCount,
+            partial: partialCount,
+            total: topicAttempts.length,
             progress: progress,
-            uniqueAnswered: uniqueAnswered,
-            totalSets: totalSets
+            uniqueCorrectAnswers: uniqueCorrectAnswers,
+            totalQuestionsInTopic: totalQuestionsInTopic
           }
         };
       });
