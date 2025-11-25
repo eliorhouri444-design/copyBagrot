@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, CheckCircle, X, TrendingUp, Crown, Target, Lock, Play } from "lucide-react";
 import { createPageUrl } from "@/utils";
@@ -17,10 +17,29 @@ import {
 
 export default function RecentPracticeSessions({ subject, units, userEmail, isPremium = false }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [showAllSessions, setShowAllSessions] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
   const [showAdDialog, setShowAdDialog] = useState(null);
   const [unlockedSessions, setUnlockedSessions] = useState(new Set());
+
+  // האזנה לאירועי עדכון גלובליים
+  useEffect(() => {
+    const handleUpdate = () => {
+      console.log('🔄 RecentPracticeSessions: Received update event');
+      queryClient.invalidateQueries({ queryKey: ['practice-sessions', subject, units, userEmail] });
+    };
+
+    window.addEventListener('mastery-update', handleUpdate);
+    window.addEventListener('practice-complete', handleUpdate);
+    window.addEventListener('exam-complete', handleUpdate);
+
+    return () => {
+      window.removeEventListener('mastery-update', handleUpdate);
+      window.removeEventListener('practice-complete', handleUpdate);
+      window.removeEventListener('exam-complete', handleUpdate);
+    };
+  }, [queryClient, subject, units, userEmail]);
 
   const { data: practiceSessions = [] } = useQuery({
     queryKey: ['practice-sessions', subject, units, userEmail],
