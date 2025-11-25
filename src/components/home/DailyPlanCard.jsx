@@ -162,36 +162,6 @@ export default function DailyPlanCard({
     };
   }, [readinessData, todayProgress]);
 
-  // חישוב סטטיסטיקות כוללות לנושאים
-  const topicOverallStats = useMemo(() => {
-    if (!topics || topics.length === 0) return { mastery: 0, total: 0, mastered: 0 };
-
-    const topicStats = {};
-    practiceAttempts.forEach((attempt) => {
-      const topicId = attempt.topic_id;
-      if (!topicId) return;
-      if (!topicStats[topicId]) topicStats[topicId] = { total: 0, correct: 0 };
-      topicStats[topicId].total++;
-      if (attempt.status === "correct") topicStats[topicId].correct++;
-    });
-
-    let totalMastery = 0;
-    let masteredCount = 0;
-    
-    topics.forEach((topic) => {
-      const stats = topicStats[topic.topic_id];
-      if (stats && stats.total > 0) {
-        const accuracy = (stats.correct / stats.total) * 100;
-        totalMastery += accuracy;
-        if (accuracy >= 70) masteredCount++;
-      }
-    });
-
-    const avgMastery = topics.length > 0 ? Math.round(totalMastery / topics.length) : 0;
-    
-    return { mastery: avgMastery, total: topics.length, mastered: masteredCount };
-  }, [topics, practiceAttempts]);
-
   // חישוב נושאים מומלצים לתרגול
   const recommendedTopics = useMemo(() => {
     if (!topics || topics.length === 0) return [];
@@ -349,24 +319,19 @@ export default function DailyPlanCard({
             return (
               <div
                 key={task.id}
-                onClick={() => !isLocked && !isCompleted && handleTaskClick(task)}
+                onClick={() => !isCompleted && handleTaskClick(task)}
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                  isLocked 
-                    ? 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'
-                    : isCompleted
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-white border-[#E9F0FF] hover:border-[#3B82F6] cursor-pointer'
+                  isCompleted
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-white border-[#E9F0FF] hover:border-[#3B82F6] cursor-pointer'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                   isCompleted 
                     ? 'bg-green-500 border-green-500' 
-                    : isLocked 
-                      ? 'border-gray-300'
-                      : 'border-[#3B82F6]'
+                    : 'border-[#3B82F6]'
                 }`}>
                   {isCompleted && <CheckCircle className="w-4 h-4 text-white" />}
-                  {isLocked && <Lock className="w-3 h-3 text-gray-400" />}
                 </div>
                 
                 <Icon className={`w-4 h-4 flex-shrink-0 ${
