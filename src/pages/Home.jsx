@@ -210,7 +210,7 @@ export default function HomePage() {
         {/* מוכנות כללית - כרטיס מאוחד */}
         <OverallMasteryCard
           overallMastery={overallMastery}
-          isLoading={masteryLoading} />
+          isLoading={isLoading} />
 
 
         {/* נושאים ושאלונים + משימות היום */}
