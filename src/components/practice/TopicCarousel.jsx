@@ -439,7 +439,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
                     sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
                     navigate(createPageUrl("CustomWeakPractice"));
                   }}
-                  className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                  className="w-full h-11 text-[13px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
                 >
                   <Target className="w-4 h-4 ml-2" />
                   תרגול טעויות בנושא זה
@@ -447,7 +447,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               ) : (
                 <Button
                   onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800"
+                  className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800"
                 >
                   <Lock className="w-4 h-4 ml-2" />
                   תרגול טעויות
