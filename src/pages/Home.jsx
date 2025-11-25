@@ -165,99 +165,14 @@ export default function HomePage() {
     return btoa(user.email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
   };
 
-  const loadAllData = async () => {
-    setIsLoading(true);
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      if (!currentUser.subject_selected) {
-        navigate(createPageUrl("Onboarding"));
-        return;
-      }
-
-      const subject = currentUser.selected_subject || 'אנגלית';
-      const units = parseInt(currentUser.selected_units || 3);
-
-      // טעינה מהירה - רק מה שצריך
-      const [allTopics, allAttempts, allExamAttempts, allModules] = await Promise.all([
-      base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }),
-      base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, "-created_date", 200),
-      base44.entities.ExamAttempt.filter({ subject: subject, unit_level: units }, "-created_date", 50),
-      base44.entities.ModuleDefinition.filter({ subject: subject, unit_level: units })]
-      );
-
-      // הנתונים כבר מסוננים מהשרת
-      setTopics(allTopics);
-      setPracticeAttempts(allAttempts);
-      setExamAttempts(allExamAttempts);
-
-      // בניית רשימת מודולים (כולל ברירות מחדל)
-      const defaultModulesStructure = {
-        "אנגלית": {
-          3: [
-          { id: "C", title: "מודול C", color: "from-purple-500 to-purple-600" },
-          { id: "A", title: "מודול A", color: "from-blue-500 to-blue-600" },
-          { id: "B", title: "מודול B", color: "from-cyan-500 to-cyan-600" }],
-
-          4: [
-          { id: "C", title: "מודול C", color: "from-blue-500 to-blue-600" },
-          { id: "D", title: "מודול D", color: "from-orange-500 to-orange-600" },
-          { id: "E", title: "מודול E", color: "from-pink-500 to-pink-600" }],
-
-          5: [
-          { id: "E", title: "מודול E", color: "from-indigo-500 to-indigo-600" },
-          { id: "F", title: "מודול F", color: "from-rose-500 to-rose-600" },
-          { id: "G", title: "מודול G", color: "from-green-500 to-green-600" }]
-
-        },
-        "מתמטיקה": {
-          3: [
-          { id: "801", title: "שאלון 801", color: "from-purple-500 to-purple-600" },
-          { id: "802", title: "שאלון 802", color: "from-blue-500 to-blue-600" }],
-
-          4: [
-          { id: "803", title: "שאלון 803", color: "from-green-500 to-green-600" },
-          { id: "804", title: "שאלון 804", color: "from-purple-500 to-purple-600" }],
-
-          5: [
-          { id: "805", title: "שאלון 805", color: "from-indigo-500 to-indigo-600" },
-          { id: "806", title: "שאלון 806", color: "from-purple-500 to-purple-600" }]
-
-        }
-      };
-
-      const defaultMods = defaultModulesStructure[subject]?.[units] || [];
-      const customMods = allModules.filter((m) => m.subject === subject && parseInt(m.unit_level) === units);
-
-      const modulesMap = new Map();
-      defaultMods.forEach((mod) => modulesMap.set(mod.id, mod));
-      customMods.forEach((mod) => {
-        const existing = modulesMap.get(mod.module_id);
-        if (existing) {
-          modulesMap.set(mod.module_id, { ...existing, ...mod, id: mod.module_id });
-        } else {
-          modulesMap.set(mod.module_id, { ...mod, id: mod.module_id });
-        }
-      });
-
-      const finalModules = Array.from(modulesMap.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
-      setModules(finalModules);
-
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const readinessData = useReadinessCalculator(user, topics, practiceAttempts, examAttempts);
 
-  // מדדי Mastery מחושבים דינמית
-  const { overallMastery, isLoading: masteryLoading } = useMasteryData(
-    user?.selected_subject,
-    user?.selected_units
-  );
+  // חישוב overallMastery מ-stats (כבר מחושב ב-useHomeData)
+  const overallMastery = useMemo(() => ({
+    topicMastery: stats.practiceAccuracy || 0,
+    examMastery: stats.examAverage || 0,
+    readinessScore: stats.overallMastery || 0
+  }), [stats]);
 
   const daysUntilExam = user?.exam_date ?
   Math.max(0, Math.ceil((new Date(user.exam_date) - new Date()) / (1000 * 60 * 60 * 24))) :
