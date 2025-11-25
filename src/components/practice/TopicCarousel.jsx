@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Loader2, Target, Edit2, Plus, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import MasteryStatsCard from "@/components/mastery/MasteryStatsCard";
 
 export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
@@ -158,18 +157,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
         };
       });
 
-      // סינון נושאים לא רצויים
-      const filteredTopics = topicsArray.filter(topic => {
-        const id = topic.topic_id?.toLowerCase() || '';
-        const name = topic.name?.toLowerCase() || '';
-        // הסרת נושאים עם שמות לא תקינים
-        if (id === 'unknown' || name === 'unknown') return false;
-        if (id === 'vocabulary_general' || name === 'vocabulary_general') return false;
-        if (!topic.name || topic.name.trim() === '') return false;
-        return true;
-      });
-
-      filteredTopics.sort((a, b) => {
+      topicsArray.sort((a, b) => {
         if (a.order !== b.order) return a.order - b.order;
         return b.actualQuestionCount - a.actualQuestionCount;
       });
@@ -177,7 +165,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       // טעינה מקבילה של user ו-attempts
       const [user, attempts] = await Promise.all([
       base44.auth.me(),
-      base44.entities.AttemptNew.list("-created_date", 500)]
+      base44.entities.AttemptNew.list()]
       );
 
       const relevantAttempts = attempts.filter((a) =>
@@ -185,7 +173,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
       a.subject_id === subject
       );
 
-      const topicsWithStats = filteredTopics.
+      const topicsWithStats = topicsArray.
       map((topic) => {
         const topicAttempts = relevantAttempts.filter((a) => a.topic_id === topic.topic_id);
 
@@ -346,72 +334,73 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
             </div>
 
             {currentTopic.stats &&
-              <MasteryStatsCard 
-                mastery={{
-                  subjectMastery: currentTopic.stats.progress > 0 
-                    ? Math.round((currentTopic.stats.correct / Math.max(1, currentTopic.stats.total)) * 100 * 0.5 + 
-                        Math.min(100, (currentTopic.stats.total / 20) * 100) * 0.3 +
-                        Math.min(100, (currentTopic.stats.uniqueAnswered / 10) * 100) * 0.2)
-                    : 0,
-                  attemptsCount: currentTopic.stats.total,
-                  correctPercentage: currentTopic.stats.total > 0 
-                    ? Math.round((currentTopic.stats.correct / currentTopic.stats.total) * 100) 
-                    : 0,
-                  errorPercentage: currentTopic.stats.total > 0 
-                    ? Math.round((currentTopic.stats.wrong / currentTopic.stats.total) * 100) 
-                    : 0,
-                  weakAreas: [],
-                  uniqueQuestions: currentTopic.stats.uniqueAnswered,
-                  correct: currentTopic.stats.correct,
-                  wrong: currentTopic.stats.wrong,
-                  partial: currentTopic.stats.partial
-                }}
-                type="topic"
-              />
+            <div className="bg-white rounded-xl p-3 mb-3">
+                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
+                
+                <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
+                  <div className="flex justify-center items-center mb-1.5">
+                    <span className="text-[17px] font-bold text-[#3B82F6]">{currentTopic.stats.progress}%</span>
+                  </div>
+                  <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
+                  <div className="h-2 bg-white rounded-full overflow-hidden">
+                    <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${currentTopic.stats.progress}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full bg-[#3B82F6] rounded-full" />
+
+                  </div>
+                  <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
+                    {currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount || currentTopic.questionCount} שאלות נענו
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5">
+                  <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
+                    <div className="text-[16px] font-bold text-red-600">{currentTopic.stats.wrong}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">שגויות</div>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
+                    <div className="text-[16px] font-bold text-green-600">{currentTopic.stats.correct}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">נכונות</div>
+                  </div>
+                  <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
+                    <div className="text-[16px] font-bold text-orange-600">{currentTopic.stats.partial}</div>
+                    <div className="text-[9px] text-[#6E6E6E]">חלקיות</div>
+                  </div>
+                </div>
+              </div>
             }
 
             <div className="space-y-2">
               <Button
-                onClick={handleStartPractice}
-                className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow w-full h-11 hover:bg-blue-700"
-              >
+                onClick={handleStartPractice} className="bg-[#3B82F6] text-[#fafafa] px-4 py-2 font-bold rounded-[14px] \u05E4\u05E8\u05D9\u05DE\u05D9\u05D5\u05DD \u05DE\u05D5\u05EA\u05D0\u05DD \u05D0\u05D9\u05E9\u05D9\u05EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700">
+
+
                 <Play className="w-4 h-4 ml-2" />
                 התחל תרגול
               </Button>
 
-              {isPremium ? (
-                <>
-                  <Button
-                    onClick={() => {
-                      sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                      navigate(createPageUrl("CustomWeakPractice"));
-                    }}
-                    className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
-                  >
-                    <AlertTriangle className="w-4 h-4 ml-2" />
-                    תרגול טעויות בנושא
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      sessionStorage.setItem('customQuizTopic', currentTopic.topic_id);
-                      navigate(createPageUrl("TopicPracticeNew") + `?topicid=${encodeURIComponent(currentTopic.topic_id)}&mode=quiz`);
-                    }}
-                    variant="outline"
-                    className="w-full h-10 text-[12px] font-bold border-2 border-purple-300 text-purple-700 hover:bg-purple-50 rounded-[14px]"
-                  >
-                    <Target className="w-4 h-4 ml-2" />
-                    בוחן מותאם לנושא
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors shadow hover:from-amber-600 hover:to-orange-600 w-full h-10"
-                >
+              {isPremium ?
+              <Button
+                onClick={() => {
+                  sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
+                  navigate(createPageUrl("CustomWeakPractice"));
+                }}
+                className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
+
+                  <Target className="w-4 h-4 ml-2" />
+                  תרגול טעויות בנושא זה
+                </Button> :
+
+              <Button
+                onClick={() => navigate(createPageUrl("Premium"))} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full h-10 from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700">
+
+
                   <Lock className="w-4 h-4 ml-2" />
-                  תרגול טעויות + בוחן מותאם
+                  תרגול טעויות
                 </Button>
-              )}
+              }
             </div>
           </motion.div>
         </AnimatePresence>
