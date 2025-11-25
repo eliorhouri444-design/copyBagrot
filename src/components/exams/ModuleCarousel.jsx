@@ -249,7 +249,7 @@ export default function ModuleCarousel({
               <div className="text-center">
                 <div className="text-3xl mb-1.5">📝</div>
                 <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentModule.title}</h2>
-                <p className="text-[#ffffff] opacity-90">{moduleStats.totalAttempts} בגרויות שבוצעו</p>
+                <p className="text-[#ffffff] opacity-90">{moduleStats.totalAttempts} בגרויות בוצעו</p>
                 
                 {isLocked &&
                 <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
