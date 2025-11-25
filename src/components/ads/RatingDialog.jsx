@@ -83,20 +83,30 @@ export default function RatingDialog({ open, onOpenChange, onSubmitRating, onClo
            "בחר את דירוגך"}
         </p>
         
-        <DialogFooter className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="flex-1"
-          >
-            ביטול
-          </Button>
+        <DialogFooter className="flex flex-col gap-2">
           <Button
             onClick={handleSubmit}
             disabled={rating === 0}
-            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
           >
             שלח דירוג
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            className="w-full"
+          >
+            אולי אחר כך
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              localStorage.setItem('never_show_rating_dialog', 'true');
+              handleClose();
+            }}
+            className="w-full text-gray-400 text-sm"
+          >
+            אל תראה לי שוב
           </Button>
         </DialogFooter>
       </DialogContent>

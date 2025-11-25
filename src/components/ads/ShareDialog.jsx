@@ -101,6 +101,16 @@ export default function ShareDialog({ open, onOpenChange, referralCode, onClose 
           >
             אולי אחר כך
           </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              localStorage.setItem('never_show_share_dialog', 'true');
+              onClose();
+            }}
+            className="w-full text-gray-400 text-sm"
+          >
+            אל תראה לי שוב
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
