@@ -349,7 +349,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               <div className="text-center">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
                 <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
-                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.uniqueCorrectAnswers || 0} / {currentTopic.stats.totalQuestionsInTopic || 0} שאלות נכונות</p>
+                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.totalSets || 0} סטים בוצעו</p>
               </div>
               {onEditTopic && (
                 <Button
@@ -382,7 +382,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
 
             {currentTopic.stats && (
               <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
+                <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 רמת הבקיאות</div>
                 
                 <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
                   <div className="flex justify-center items-center mb-1.5">
