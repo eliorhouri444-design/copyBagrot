@@ -1260,7 +1260,7 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
 
           <div className="mb-6">
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+              <div className="bg-[#3B82F6] rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
                 <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
               </div>
               <p
