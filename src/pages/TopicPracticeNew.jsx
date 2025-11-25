@@ -70,8 +70,10 @@ export default function TopicPracticeNewPage() {
     if (!allQuestions || allQuestions.length === 0) return false;
     const isWritingTopic = currentSetQuestions.some((q) => q.question_type === "writing");
     const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
-    const nextSetStartIndex = setNumber * questionsPerSet;
-    return nextSetStartIndex < allQuestions.length;
+    const totalQuestionsAnswered = setNumber * questionsPerSet;
+    // יש סט נוסף אם יש עוד שאלות מעבר למה שענינו
+    console.log(`📊 hasNextSet check: totalAnswered=${totalQuestionsAnswered}, allQuestions=${allQuestions.length}, hasNext=${totalQuestionsAnswered < allQuestions.length}`);
+    return totalQuestionsAnswered < allQuestions.length;
   }, [setNumber, allQuestions, currentSetQuestions]);
 
   useEffect(() => {
@@ -723,12 +725,16 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
     const questionsPerSet = isWritingTopic ? WRITING_QUESTIONS_PER_SET : QUESTIONS_PER_SET;
     const nextSetStartIndex = (nextSet - 1) * questionsPerSet;
 
+    console.log(`🔄 handleContinueToNextSet: nextSet=${nextSet}, startIndex=${nextSetStartIndex}, totalQuestions=${allQuestions.length}`);
+
     if (nextSetStartIndex >= allQuestions.length) {
+      console.log("✅ No more questions - finishing practice");
       finishPractice();
       return;
     }
 
     const isPremiumUser = user?.is_premium;
+    console.log(`👤 User premium status: ${isPremiumUser}`);
 
     if (isPremiumUser) {
       continueToNextSet(nextSet);
@@ -748,13 +754,9 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
   };
 
   const continueToNextSet = (nextSet) => {
-    const isListening = topicId?.toLowerCase().includes('listening') || topicId?.toLowerCase().includes('האזנה');
-    setAnswers({});
-    setResults({});
-    setCurrentQuestionIndex(0);
-    setShowReadingText(true);
-    setShowListeningIntro(isListening && listeningText);
-    window.location.href = createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`);
+    console.log(`🚀 Navigating to set ${nextSet}`);
+    // ניווט לסט הבא באמצעות React Router - ללא רענון דף
+    navigate(createPageUrl(`TopicPracticeNew?topicid=${encodeURIComponent(topicId)}&set=${nextSet}`));
   };
 
   const handleConfirmWatchAd = () => {
