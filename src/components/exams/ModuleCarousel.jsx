@@ -138,20 +138,27 @@ export default function ModuleCarousel({
   const handleStartExam = (callback) => {
     // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה בגרות היום)
     if (isPremium !== true && todayExamCount >= FREE_DAILY_EXAM) {
-      // צריך לראות פרסומת קודם
-      if (onShowAd) {
-        onShowAd(() => {
-          // אחרי הפרסומת - המשך לבגרות
-          incrementExamCount();
-          callback();
-        });
-      }
+      // הצג דיאלוג קטן במקום פרסומת
+      setPendingExamCallback(() => callback);
+      setShowAdDialog(true);
       return;
     }
 
     // בגרות חינמית או פרימיום
     incrementExamCount();
     callback();
+  };
+
+  const handleWatchAdAndContinue = () => {
+    if (onShowAd && pendingExamCallback) {
+      onShowAd(() => {
+        incrementExamCount();
+        pendingExamCallback();
+        setShowAdDialog(false);
+        setPendingExamCallback(null);
+      });
+    }
+    setShowAdDialog(false);
   };
 
   const currentModule = modules[currentIndex];
