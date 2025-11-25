@@ -26,12 +26,12 @@ export default function HomePage() {
     const trackReferral = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const refCode = urlParams.get('ref');
-      
+
       if (refCode) {
         try {
           // Check if this visitor already clicked (using localStorage)
           const clickedRefs = JSON.parse(localStorage.getItem('clicked_refs') || '[]');
-          
+
           if (!clickedRefs.includes(refCode)) {
             // Record the click
             await base44.entities.ReferralClick.create({
@@ -39,12 +39,12 @@ export default function HomePage() {
               clicked_at: new Date().toISOString(),
               visitor_id: Math.random().toString(36).substring(7)
             });
-            
+
             // Mark as clicked
             clickedRefs.push(refCode);
             localStorage.setItem('clicked_refs', JSON.stringify(clickedRefs));
           }
-          
+
           // Clean URL
           window.history.replaceState({}, '', window.location.pathname);
         } catch (error) {
@@ -52,7 +52,7 @@ export default function HomePage() {
         }
       }
     };
-    
+
     trackReferral();
   }, []);
 
@@ -161,7 +161,7 @@ export default function HomePage() {
 
   // מדדי Mastery מחושבים דינמית
   const { overallMastery, isLoading: masteryLoading } = useMasteryData(
-    user?.selected_subject, 
+    user?.selected_subject,
     user?.selected_units
   );
 
@@ -225,7 +225,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 from-blue-500 to-indigo-500 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
           <p className="text-[11px] text-white/90">{user?.selected_subject} • {user?.selected_units} יחידות</p>
@@ -237,10 +237,10 @@ export default function HomePage() {
 
       <div className="px-5 space-y-4">
         {/* מוכנות כללית - כרטיס מאוחד */}
-        <OverallMasteryCard 
-          overallMastery={overallMastery} 
-          isLoading={masteryLoading} 
-        />
+        <OverallMasteryCard
+          overallMastery={overallMastery}
+          isLoading={masteryLoading} />
+
 
         {/* נושאים ושאלונים + משימות היום */}
         <DailyPlanCard
