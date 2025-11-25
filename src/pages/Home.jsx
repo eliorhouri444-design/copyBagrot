@@ -178,44 +178,6 @@ export default function HomePage() {
   Math.max(0, Math.ceil((new Date(user.exam_date) - new Date()) / (1000 * 60 * 60 * 24))) :
   90;
 
-
-
-  const lastActivity = useMemo(() => {
-    // מצא את התרגול האחרון שלא הושלם
-    const sortedPractice = [...practiceAttempts].
-    filter((a) => !a.is_completed).
-    sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
-
-    // מצא את הבגרות האחרונה שלא הושלמה
-    const sortedExams = [...examAttempts].
-    filter((e) => !e.is_completed).
-    sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
-
-    const incompletePractice = sortedPractice[0];
-    const incompleteExam = sortedExams[0];
-
-    if (!incompletePractice && !incompleteExam) return null;
-
-    // בחר את האחרון לפי תאריך
-    if (!incompleteExam || incompletePractice && new Date(incompletePractice.created_date) > new Date(incompleteExam.created_date)) {
-      return {
-        type: 'practice',
-        topic: topics.find((t) => t.topic_id === incompletePractice.topic_id)?.name || 'תרגול',
-        sessionId: incompletePractice.session_id,
-        topicId: incompletePractice.topic_id
-      };
-    } else {
-      // מצא את המודול של הבגרות
-      const examModule = modules.find((m) => incompleteExam.module_id === m.id);
-      return {
-        type: 'exam',
-        topic: examModule?.title || incompleteExam.module_id || 'שאלון',
-        examId: incompleteExam.exam_id,
-        moduleId: incompleteExam.module_id
-      };
-    }
-  }, [practiceAttempts, examAttempts, topics, modules]);
-
   const toggleTask = (taskId) => {
     if (completedTasks.includes(taskId)) {
       setCompletedTasks(completedTasks.filter((t) => t !== taskId));
