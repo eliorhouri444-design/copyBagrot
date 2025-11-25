@@ -374,7 +374,7 @@ export default function TopicCarousel({ subject, units, onEditTopic, onAddTopic,
               <div className="text-center">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
                 <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
-                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.uniqueAnswered} / {currentTopic.actualQuestionCount} נענו</p>
+                <p className="text-[#ffffff] opacity-90">{currentTopic.stats.totalSets || 0} סטים בוצעו</p>
               </div>
               {onEditTopic && (
                 <Button
