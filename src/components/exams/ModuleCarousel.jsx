@@ -29,6 +29,8 @@ export default function ModuleCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [todayExamCount, setTodayExamCount] = useState(0);
   const [examAttempts, setExamAttempts] = useState(initialExamAttempts);
+  const [showAdDialog, setShowAdDialog] = useState(false);
+  const [pendingExamCallback, setPendingExamCallback] = useState(null);
   const FREE_DAILY_EXAM = 1; // בגרות אחת בחינם ליום
 
   // עדכון examAttempts כשה-prop משתנה
