@@ -248,9 +248,45 @@ export default function TopicPracticeNewPage() {
 
     setIsSubmitting(true);
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
-    const userAnswer = typeof providedAnswer === 'object' && providedAnswer !== null && 'text' in providedAnswer ?
-    String(providedAnswer.text) :
-    String(providedAnswer || answers[currentQuestion.question_id] || "");
+    const rawAnswer = providedAnswer || answers[currentQuestion.question_id];
+    const userAnswer = typeof rawAnswer === 'object' && rawAnswer !== null && 'text' in rawAnswer ?
+    String(rawAnswer.text) :
+    String(rawAnswer || "");
+
+    // בדיקה חשובה: אם אין תשובה בכלל - סמן כשגוי
+    if (!userAnswer || userAnswer.trim() === "") {
+      saveAttemptInBackground({
+        question_id: currentQuestion.question_id,
+        subject_id: currentQuestion.subject_id,
+        topic_id: topicId,
+        session_id: sessionId,
+        user_answer_text: "",
+        score: 0,
+        max_score: currentQuestion.max_score || 100,
+        percentage: 0,
+        status: "unanswered",
+        time_spent_seconds: 0
+      });
+
+      setResults((prev) => ({
+        ...prev,
+        [currentQuestion.question_id]: { 
+          isCorrect: false, 
+          status: "unanswered", 
+          correctAnswer: currentQuestion.correct_answer || "", 
+          userAnswer: "" 
+        }
+      }));
+
+      setIsSubmitting(false);
+      if (currentQuestionIndex < currentSetQuestions.length - 1) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      } else {
+        saveWeakTopicsStats();
+        setShowSummary(true);
+      }
+      return;
+    }
 
     // Moved displayUnits here to make it accessible to the AI prompt
     const displayUnits = user?.selected_units || 3;
