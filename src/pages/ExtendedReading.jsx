@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
+  DialogFooter } from
+"@/components/ui/dialog";
 import AdManager from "../components/ads/AdManager";
 
 const QUESTIONS_PER_SET = 10;
@@ -70,12 +70,12 @@ export default function ExtendedReadingPage() {
   const loadQuestions = async () => {
     setIsLoading(true);
     setLoadError(null);
-    
+
     try {
       const allQuestionsRaw = await base44.entities.QuestionBank.list();
 
-      const questionsForTopic = allQuestionsRaw.filter(q => 
-        q.topic_id === topicId && q.is_active !== false
+      const questionsForTopic = allQuestionsRaw.filter((q) =>
+      q.topic_id === topicId && q.is_active !== false
       );
 
       if (questionsForTopic.length === 0) {
@@ -98,7 +98,7 @@ export default function ExtendedReadingPage() {
       // Now get all sets
       const totalSets = Math.ceil(expandedQuestions.length / QUESTIONS_PER_SET);
       let allSetsQuestions = [];
-      
+
       for (let i = 0; i < totalSets; i++) {
         const start = i * QUESTIONS_PER_SET;
         const end = start + QUESTIONS_PER_SET;
@@ -110,7 +110,7 @@ export default function ExtendedReadingPage() {
       const startIndex = (setNumber - 1) * QUESTIONS_PER_SET;
       const endIndex = startIndex + QUESTIONS_PER_SET;
       const setQuestions = allSetsQuestions.slice(startIndex, endIndex);
-      
+
       if (setQuestions.length === 0) {
         setLoadError(`לא נמצאו שאלות לסט ${setNumber}`);
         setIsLoading(false);
@@ -120,9 +120,9 @@ export default function ExtendedReadingPage() {
       setCurrentSetQuestions(setQuestions);
 
       // Check if this is listening comprehension
-      const isListeningComprehension = topicId.toLowerCase().includes('listening') || 
-                                       topicId.toLowerCase().includes('האזנה');
-      
+      const isListeningComprehension = topicId.toLowerCase().includes('listening') ||
+      topicId.toLowerCase().includes('האזנה');
+
       if (isListeningComprehension && setQuestions[0]?.reading_text) {
         setListeningText(setQuestions[0].reading_text);
         setShowListeningIntro(true);
@@ -147,11 +147,11 @@ export default function ExtendedReadingPage() {
         subject_id: questionsForTopic[0].subject_id,
         unit_level: questionsForTopic[0].unit_level,
         topic_id: topicId,
-        questions: setQuestions.map(q => q.question_id),
+        questions: setQuestions.map((q) => q.question_id),
         started_at: new Date().toISOString(),
         is_completed: false
       });
-      
+
       setSessionId(session.id);
       setIsLoading(false);
     } catch (error) {
@@ -166,7 +166,7 @@ export default function ExtendedReadingPage() {
 
     const currentQuestion = currentSetQuestions[currentQuestionIndex];
     const userAnswer = String(answers[currentQuestion.question_id] || "").trim();
-    
+
     // Don't allow empty answers
     if (!userAnswer) {
       return;
@@ -193,11 +193,11 @@ export default function ExtendedReadingPage() {
         }
 
         const normalizedUserAnswer = userAnswer.trim().toLowerCase();
-        
-        isCorrect = correctAnswers.some(ans => 
-          ans.value?.toLowerCase() === normalizedUserAnswer
-        ) || acceptableVariants.some(variant => 
-          variant.toLowerCase() === normalizedUserAnswer
+
+        isCorrect = correctAnswers.some((ans) =>
+        ans.value?.toLowerCase() === normalizedUserAnswer
+        ) || acceptableVariants.some((variant) =>
+        variant.toLowerCase() === normalizedUserAnswer
         );
 
         status = isCorrect ? "correct" : "incorrect";
@@ -216,14 +216,14 @@ export default function ExtendedReadingPage() {
         time_spent_seconds: 0
       });
 
-      setResults(prev => ({
+      setResults((prev) => ({
         ...prev,
         [currentQuestion.question_id]: { isCorrect, status, correctAnswer, userAnswer }
       }));
 
       // Move to next question or summary
       if (currentQuestionIndex < currentSetQuestions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
+        setCurrentQuestionIndex((prev) => prev + 1);
       } else {
         setShowSummary(true);
       }
@@ -238,14 +238,14 @@ export default function ExtendedReadingPage() {
   const handleContinueToNextSet = () => {
     const nextSet = setNumber + 1;
     const nextSetStartIndex = (nextSet - 1) * QUESTIONS_PER_SET;
-    
+
     if (nextSetStartIndex >= allQuestions.length) {
       finishPractice();
       return;
     }
 
     const isPremium = user?.is_premium;
-    
+
     if (isPremium) {
       // Premium users go directly to next set
       setAnswers({});
@@ -276,9 +276,9 @@ export default function ExtendedReadingPage() {
 
   const finishPractice = async () => {
     if (sessionId) {
-      const correctCount = Object.values(results).filter(r => r.isCorrect).length;
+      const correctCount = Object.values(results).filter((r) => r.isCorrect).length;
       const totalQuestions = Object.keys(results).length;
-      const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+      const percentage = totalQuestions > 0 ? correctCount / totalQuestions * 100 : 0;
 
       await base44.entities.PracticeSessionNew.update(sessionId, {
         completed_at: new Date().toISOString(),
@@ -299,8 +299,8 @@ export default function ExtendedReadingPage() {
           <Loader2 className="animate-spin h-16 w-16 text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600 font-semibold text-lg">טוען שאלות...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (loadError) {
@@ -312,14 +312,14 @@ export default function ExtendedReadingPage() {
           <p className="text-gray-700 mb-6">{loadError}</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700"
-          >
+            className="w-full bg-blue-600 hover:bg-blue-700">
+
             <ChevronRight className="w-5 h-5 ml-2" />
             חזור לתרגול
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (currentSetQuestions.length === 0) {
@@ -331,26 +331,26 @@ export default function ExtendedReadingPage() {
           <p className="text-gray-600 mb-6">לא נמצאו שאלות עבור נושא זה</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700"
-          >
+            className="w-full bg-blue-600 hover:bg-blue-700">
+
             חזור לתרגול
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   if (showSummary) {
-    const nextSetExists = ((setNumber) * QUESTIONS_PER_SET) < allQuestions.length;
-    
+    const nextSetExists = setNumber * QUESTIONS_PER_SET < allQuestions.length;
+
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 overflow-y-auto">
         <div className="min-h-screen flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6"
-          >
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6">
+
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Trophy className="w-10 h-10 text-white" />
@@ -362,11 +362,11 @@ export default function ExtendedReadingPage() {
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
               <div className="text-center mb-4">
                 <div className="text-5xl font-bold text-blue-600">
-                  {Object.values(results).filter(r => r.isCorrect).length} / {currentSetQuestions.length}
+                  {Object.values(results).filter((r) => r.isCorrect).length} / {currentSetQuestions.length}
                 </div>
                 <div className="text-sm text-gray-600 mt-2">תשובות נכונות</div>
                 <div className="text-3xl font-bold text-gray-900 mt-3">
-                  {Math.round((Object.values(results).filter(r => r.isCorrect).length / currentSetQuestions.length) * 100)}%
+                  {Math.round(Object.values(results).filter((r) => r.isCorrect).length / currentSetQuestions.length * 100)}%
                 </div>
               </div>
             </div>
@@ -376,20 +376,20 @@ export default function ExtendedReadingPage() {
                 const result = results[q.question_id];
                 return (
                   <div key={idx} className={`rounded-xl p-4 border-2 ${
-                    result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'
-                  }`}>
+                  result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`
+                  }>
                     <div className="flex items-start gap-3">
-                      {result?.isCorrect ? (
-                        <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                      ) : (
-                        <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-                      )}
+                      {result?.isCorrect ?
+                      <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" /> :
+
+                      <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                      }
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
                         <div className="text-sm text-gray-700 mb-2" dir="ltr">{q.question_text.substring(0, 80)}...</div>
 
-                        {!result?.isCorrect && (
-                          <div className="space-y-2 mt-3">
+                        {!result?.isCorrect &&
+                        <div className="space-y-2 mt-3">
                             <div className="bg-white rounded-lg p-3 border border-red-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
                               <div className="text-sm font-semibold text-red-700">{result?.userAnswer || "לא נענה"}</div>
@@ -399,21 +399,21 @@ export default function ExtendedReadingPage() {
                               <div className="text-sm font-semibold text-green-700">{result?.correctAnswer}</div>
                             </div>
                           </div>
-                        )}
+                        }
                       </div>
                     </div>
-                  </div>
-                );
+                  </div>);
+
               })}
             </div>
 
             <div className="flex flex-col gap-2">
-              {nextSetExists && (
-                <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
+              {nextSetExists &&
+              <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
                   המשך לסט הבא
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </Button>
-              )}
+              }
               <Button onClick={finishPractice} variant="outline" className="w-full">
                 סיים וחזור לתרגול
               </Button>
@@ -446,8 +446,8 @@ export default function ExtendedReadingPage() {
             <DialogFooter className="flex flex-col sm:flex-col gap-2">
               <Button
                 onClick={handleConfirmWatchAd}
-                className="w-full bg-blue-600 hover:bg-blue-700"
-              >
+                className="w-full bg-blue-600 hover:bg-blue-700">
+
                 צפה בסרטון והמשך
               </Button>
               <Button variant="outline" onClick={finishPractice} className="w-full">
@@ -480,15 +480,15 @@ export default function ExtendedReadingPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
-    );
+      </div>);
+
   }
 
   const currentQuestion = currentSetQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / currentSetQuestions.length) * 100;
-  const hasAnswered = !!(answers[currentQuestion.question_id]?.trim());
-  const isListeningTopic = topicId?.toLowerCase().includes('listening') || 
-                           topicId?.toLowerCase().includes('האזנה');
+  const progress = (currentQuestionIndex + 1) / currentSetQuestions.length * 100;
+  const hasAnswered = !!answers[currentQuestion.question_id]?.trim();
+  const isListeningTopic = topicId?.toLowerCase().includes('listening') ||
+  topicId?.toLowerCase().includes('האזנה');
 
   // Show listening intro if exists and requested
   if (listeningText && showListeningIntro) {
@@ -500,8 +500,8 @@ export default function ExtendedReadingPage() {
               variant="ghost"
               size="icon"
               onClick={() => navigate(createPageUrl("Practice"))}
-              className="text-white hover:bg-white/20 h-9 w-9"
-            >
+              className="text-white hover:bg-white/20 h-9 w-9">
+
               <ChevronRight className="w-5 h-5" />
             </Button>
 
@@ -518,19 +518,19 @@ export default function ExtendedReadingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
+            className="space-y-4">
+
             <div className="bg-blue-600 rounded-2xl shadow-xl p-6 text-white text-center">
               <div className="text-5xl mb-3">🎧</div>
               <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
               <p className="text-blue-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
             </div>
 
-            <ListeningPlayer 
-              audioText={listeningText} 
+            <ListeningPlayer
+              audioText={listeningText}
               maxPlays={2}
-              onMaxPlaysReached={() => setCanProceedToQuestions(true)}
-            />
+              onMaxPlaysReached={() => setCanProceedToQuestions(true)} />
+
 
             <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-indigo-200">
               <h3 className="font-bold text-gray-900 text-lg mb-3 flex items-center gap-2">
@@ -556,34 +556,34 @@ export default function ExtendedReadingPage() {
             <Button
               onClick={() => setShowListeningIntro(false)}
               disabled={!canProceedToQuestions}
-              className="w-full h-14 sm:h-16 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {canProceedToQuestions ? (
-                <>
+              className="w-full h-14 sm:h-16 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+
+              {canProceedToQuestions ?
+              <>
                   ✓ התחל לענות על השאלות
                   <ChevronLeft className="w-5 h-5 mr-2" />
-                </>
-              ) : (
-                'שמע את הקטע פעמיים כדי להמשיך'
-              )}
+                </> :
+
+              'שמע את הקטע פעמיים כדי להמשיך'
+              }
             </Button>
           </motion.div>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
       {/* Header */}
-      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+      <div className="bg-blue-500 p-3 sm:p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-          >
+            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10">
+
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
 
@@ -592,16 +592,16 @@ export default function ExtendedReadingPage() {
             <p className="text-xs sm:text-sm opacity-90">שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && !isListeningTopic && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowStoryDialog(true)}
-              className="text-white hover:bg-white/20"
-            >
+          {readingText && !isListeningTopic &&
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowStoryDialog(true)}
+            className="text-white hover:bg-white/20">
+
               <BookOpen className="w-5 h-5" />
             </Button>
-          )}
+          }
         </div>
 
         <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
@@ -609,8 +609,8 @@ export default function ExtendedReadingPage() {
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
-            className="h-full bg-white"
-          />
+            className="h-full bg-white" />
+
         </div>
       </div>
 
@@ -623,12 +623,12 @@ export default function ExtendedReadingPage() {
               <DialogTitle className="text-center text-xl font-bold" dir="rtl">📖 Reading Text</DialogTitle>
             </DialogHeader>
             <div className="overflow-y-auto max-h-[60vh] p-4">
-              <div 
+              <div
                 className="text-base leading-relaxed text-gray-800 whitespace-pre-wrap"
-                style={{ 
+                style={{
                   fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif"
-                }}
-              >
+                }}>
+
                 {readingText}
               </div>
             </div>
@@ -641,33 +641,33 @@ export default function ExtendedReadingPage() {
         </Dialog>
 
         {/* Top Half - Reading Text */}
-        {readingText && (
-          <div className="h-[45%] border-b-4 border-blue-300 bg-white rounded-t-xl sm:rounded-t-2xl overflow-hidden flex flex-col shadow-lg mb-2">
+        {readingText &&
+        <div className="h-[45%] border-b-4 border-blue-300 bg-white rounded-t-xl sm:rounded-t-2xl overflow-hidden flex flex-col shadow-lg mb-2">
             <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 flex items-center justify-center gap-2 flex-shrink-0">
               <BookOpen className="w-5 h-5 text-white" />
               <span className="text-white font-bold text-sm">Reading Text</span>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
-              <div 
-                className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
-                style={{ 
-                  fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
-                  direction: 'ltr'
-                }}
-              >
+              <div
+              className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-wrap text-left"
+              style={{
+                fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+                direction: 'ltr'
+              }}>
+
                 {readingText}
               </div>
             </div>
           </div>
-        )}
+        }
 
         {/* Bottom Half - Question */}
         <motion.div
           key={currentQuestion.question_id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden"
-        >
+          className="flex-1 flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
+
           <div className="flex-1 overflow-y-auto p-3 sm:p-4 pb-3 sm:pb-4 pt-6 sm:pt-8">
             <div className="flex items-start gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -677,90 +677,90 @@ export default function ExtendedReadingPage() {
                 <p
                   className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap text-left"
                   dir="ltr"
-                  style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}
-                >
+                  style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+
                   {currentQuestion.question_text}
                 </p>
                 
-                {currentQuestion.question_image_url && (
-                  <img
-                    src={currentQuestion.question_image_url}
-                    alt="Question"
-                    className="mt-4 rounded-lg max-w-full"
-                  />
-                )}
+                {currentQuestion.question_image_url &&
+                <img
+                  src={currentQuestion.question_image_url}
+                  alt="Question"
+                  className="mt-4 rounded-lg max-w-full" />
+
+                }
               </div>
             </div>
 
-            {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 && (
-              <div className="space-y-2">
-                {currentQuestion.options.map((option, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: option }))}
-                    className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
-                      answers[currentQuestion.question_id] === option
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                    } cursor-pointer`}
-                    dir="ltr"
-                  >
+            {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 &&
+            <div className="space-y-2">
+                {currentQuestion.options.map((option, idx) =>
+              <button
+                key={idx}
+                onClick={() => setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: option }))}
+                className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
+                answers[currentQuestion.question_id] === option ?
+                'border-blue-500 bg-blue-50' :
+                'border-gray-200 hover:border-blue-300'} cursor-pointer`
+                }
+                dir="ltr">
+
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                        answers[currentQuestion.question_id] === option
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300'
-                      }`}>
-                        {answers[currentQuestion.question_id] === option && (
-                          <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                        )}
+                  answers[currentQuestion.question_id] === option ?
+                  'border-blue-500 bg-blue-500' :
+                  'border-gray-300'}`
+                  }>
+                        {answers[currentQuestion.question_id] === option &&
+                    <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                    }
                       </div>
                       <span className="text-sm font-medium text-gray-900">{option}</span>
                     </div>
                   </button>
-                ))}
+              )}
               </div>
-            )}
+            }
           </div>
 
           {/* Answer input area - fixed at bottom */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-3 sm:p-4 z-20">
             <div className="max-w-md mx-auto space-y-2 sm:space-y-3">
-              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ? (
-                <div className="text-center text-sm text-gray-600">
+              {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ?
+              <div className="text-center text-sm text-gray-600">
                   בחר תשובה למעלה ↑
-                </div>
-              ) : (
-                <Textarea
-                  value={answers[currentQuestion.question_id] || ""}
-                  onChange={(e) => setAnswers(prev => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
-                  placeholder="הקלד את תשובתך כאן..."
-                  className="w-full h-28 text-base resize-none"
-                  dir="ltr"
-                />
-              )}
+                </div> :
+
+              <Textarea
+                value={answers[currentQuestion.question_id] || ""}
+                onChange={(e) => setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
+                placeholder="הקלד את תשובתך כאן..."
+                className="w-full h-28 text-base resize-none"
+                dir="ltr" />
+
+              }
 
               <Button
                 onClick={handleSubmitAnswer}
-                disabled={!hasAnswered || isSubmitting}
-                className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-xl shadow-lg"
-              >
-                {isSubmitting ? (
-                  <>
+                disabled={!hasAnswered || isSubmitting} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-bold rounded-xl inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 w-full h-12 sm:h-14 sm:text-base hover:bg-green-700 disabled:opacity-50 shadow-lg">
+
+
+                {isSubmitting ?
+                <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     בודק...
-                  </>
-                ) : (
-                  <>
+                  </> :
+
+                <>
                     {currentQuestionIndex < currentSetQuestions.length - 1 ? 'שאלה הבאה' : 'סיים וראה תוצאות'}
                     <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   </>
-                )}
+                }
               </Button>
             </div>
           </div>
         </motion.div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
