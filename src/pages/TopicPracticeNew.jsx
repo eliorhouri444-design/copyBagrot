@@ -945,27 +945,27 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-300">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
-                                Detailed Score Breakdown
+                                פירוט הציון
                               </div>
                               <div className="space-y-2">
                                 <div className="flex justify-between items-center bg-white rounded-lg p-2">
-                                  <span className="text-xs font-semibold text-gray-700">Task Achievement</span>
+                                  <span className="text-xs font-semibold text-gray-700">השגת המשימה</span>
                                   <span className="text-sm font-bold text-blue-600">{result.writingEvaluation.task_achievement}/25</span>
                                 </div>
                                 <div className="flex justify-between items-center bg-white rounded-lg p-2">
-                                  <span className="text-xs font-semibold text-gray-700">Organization</span>
+                                  <span className="text-xs font-semibold text-gray-700">ארגון</span>
                                   <span className="text-sm font-bold text-purple-600">{result.writingEvaluation.organization}/25</span>
                                 </div>
                                 <div className="flex justify-between items-center bg-white rounded-lg p-2">
-                                  <span className="text-xs font-semibold text-gray-700">Grammar</span>
+                                  <span className="text-xs font-semibold text-gray-700">דקדוק</span>
                                   <span className="text-sm font-bold text-green-600">{result.writingEvaluation.grammar}/25</span>
                                 </div>
                                 <div className="flex justify-between items-center bg-white rounded-lg p-2">
-                                  <span className="text-xs font-semibold text-gray-700">Vocabulary</span>
+                                  <span className="text-xs font-semibold text-gray-700">אוצר מילים</span>
                                   <span className="text-sm font-bold text-orange-600">{result.writingEvaluation.vocabulary}/25</span>
                                 </div>
                                 <div className="flex justify-between items-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-2 mt-2">
-                                  <span className="text-sm font-bold text-white">Total Score</span>
+                                  <span className="text-sm font-bold text-white">ציון סופי</span>
                                   <span className="text-lg font-bold text-white">{result.writingEvaluation.total_score}/100</span>
                                 </div>
                               </div>
@@ -993,7 +993,6 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                               </div>
                           }
 
-                            {/* Corrected: grammar_errors items are objects, not strings */}
                             {result.writingEvaluation.grammar_errors?.length > 0 &&
                           <div className="bg-white rounded-lg p-3 border border-red-200">
                                 <div className="text-xs font-bold text-red-900 mb-1">⚠️ שגיאות דקדוק:</div>
@@ -1012,10 +1011,20 @@ Return JSON with is_correct (boolean) and similarity_score (0-100)`,
                               </div>
                           }
                           </div> :
-                        !result?.isCorrect && q.question_type !== "writing" && result?.correctAnswer &&
-                        <div className="bg-white rounded-lg p-3 border border-green-200">
-                            <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
-                            <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
+                        !result?.isCorrect && q.question_type !== "writing" &&
+                        <div className="space-y-2">
+                            {result?.correctAnswer &&
+                            <div className="bg-white rounded-lg p-3 border border-green-200">
+                              <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
+                              <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
+                            </div>
+                            }
+                            {result?.explanation &&
+                            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                              <div className="text-xs font-bold text-blue-900 mb-1">💡 הסבר:</div>
+                              <div className="text-sm text-gray-700">{result?.explanation}</div>
+                            </div>
+                            }
                           </div>
                         }
                       </div>
