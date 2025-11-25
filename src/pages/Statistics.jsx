@@ -17,7 +17,7 @@ export default function StatisticsPage() {
   const [user, setUser] = useState(null);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
-  
+
   const [cachedData, setCachedData] = useState(() => {
     if (typeof window !== 'undefined') {
       return {
@@ -37,7 +37,7 @@ export default function StatisticsPage() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
         setIsUserLoaded(true);
-        
+
         if (currentUser?.selected_subject) {
           setCachedData({
             subject: currentUser.selected_subject,
@@ -67,8 +67,8 @@ export default function StatisticsPage() {
     queryFn: async () => {
       if (!user?.email) return [];
       const attempts = await base44.entities.ExamAttempt.list("-created_date", 100);
-      return attempts.filter((a) => 
-        a.subject === displaySubject && a.unit_level === displayUnits && a.created_by === user.email
+      return attempts.filter((a) =>
+      a.subject === displaySubject && a.unit_level === displayUnits && a.created_by === user.email
       );
     },
     enabled: !!user?.email && isUserLoaded,
@@ -79,7 +79,7 @@ export default function StatisticsPage() {
     queryKey: ['topics-stats', displaySubject, displayUnits],
     queryFn: async () => {
       const topics = await base44.entities.TopicNew.list();
-      return topics.filter(t => t.subject_id === displaySubject && t.unit_level === displayUnits && t.is_active);
+      return topics.filter((t) => t.subject_id === displaySubject && t.unit_level === displayUnits && t.is_active);
     },
     enabled: isUserLoaded,
     initialData: []
@@ -90,29 +90,29 @@ export default function StatisticsPage() {
   const statistics = useMemo(() => {
     const totalPractice = practiceAttempts.length;
     const totalExams = examAttempts.length;
-    
-    const correctPractice = practiceAttempts.filter(a => a.status === "correct").length;
-    const practiceAccuracy = totalPractice > 0 ? (correctPractice / totalPractice * 100) : 0;
+
+    const correctPractice = practiceAttempts.filter((a) => a.status === "correct").length;
+    const practiceAccuracy = totalPractice > 0 ? correctPractice / totalPractice * 100 : 0;
 
     // חישוב זמן ממוצע לשאלה
-    const attemptsWithTime = practiceAttempts.filter(a => a.time_seconds && a.time_seconds > 0);
-    const avgTimePerQuestion = attemptsWithTime.length > 0 
-      ? Math.round(attemptsWithTime.reduce((sum, a) => sum + a.time_seconds, 0) / attemptsWithTime.length)
-      : 0;
+    const attemptsWithTime = practiceAttempts.filter((a) => a.time_seconds && a.time_seconds > 0);
+    const avgTimePerQuestion = attemptsWithTime.length > 0 ?
+    Math.round(attemptsWithTime.reduce((sum, a) => sum + a.time_seconds, 0) / attemptsWithTime.length) :
+    0;
 
     // טעויות השבוע
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const weekErrors = practiceAttempts.filter(a => 
-      a.status === "incorrect" && new Date(a.created_date) >= weekAgo
+    const weekErrors = practiceAttempts.filter((a) =>
+    a.status === "incorrect" && new Date(a.created_date) >= weekAgo
     ).length;
 
     const topicStats = {};
-    allTopics.forEach(topic => {
+    allTopics.forEach((topic) => {
       topicStats[topic.topic_id] = { name: topic.name, total: 0, correct: 0 };
     });
 
-    practiceAttempts.forEach(attempt => {
+    practiceAttempts.forEach((attempt) => {
       const topic = attempt.topic_id;
       if (topicStats[topic]) {
         topicStats[topic].total++;
@@ -120,21 +120,21 @@ export default function StatisticsPage() {
       }
     });
 
-    const weakTopics = Object.entries(topicStats)
-      .filter(([_, stats]) => stats.total >= 3)
-      .sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))
-      .slice(0, 5);
+    const weakTopics = Object.entries(topicStats).
+    filter(([_, stats]) => stats.total >= 3).
+    sort((a, b) => a[1].correct / a[1].total - b[1].correct / b[1].total).
+    slice(0, 5);
 
-    const strongTopics = Object.entries(topicStats)
-      .filter(([_, stats]) => stats.total >= 3)
-      .sort((a, b) => (b[1].correct / b[1].total) - (a[1].correct / a[1].total))
-      .slice(0, 5);
+    const strongTopics = Object.entries(topicStats).
+    filter(([_, stats]) => stats.total >= 3).
+    sort((a, b) => b[1].correct / b[1].total - a[1].correct / a[1].total).
+    slice(0, 5);
 
     // התקדמות חודשית
     const monthAgo = new Date();
     monthAgo.setMonth(monthAgo.getMonth() - 1);
-    const monthPractice = practiceAttempts.filter(a => new Date(a.created_date) >= monthAgo);
-    const monthExams = examAttempts.filter(a => new Date(a.created_date) >= monthAgo);
+    const monthPractice = practiceAttempts.filter((a) => new Date(a.created_date) >= monthAgo);
+    const monthExams = examAttempts.filter((a) => new Date(a.created_date) >= monthAgo);
     const monthMinutes = monthPractice.length * 2;
 
     const last7Days = [];
@@ -142,7 +142,7 @@ export default function StatisticsPage() {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      const dayPractice = practiceAttempts.filter(a => a.created_date?.split('T')[0] === dateStr);
+      const dayPractice = practiceAttempts.filter((a) => a.created_date?.split('T')[0] === dateStr);
       last7Days.push({
         day: date.toLocaleDateString('he-IL', { weekday: 'short' }),
         minutes: dayPractice.length * 2
@@ -150,8 +150,8 @@ export default function StatisticsPage() {
     }
 
     // חישוב קצב שיפור בבגרויות
-    const sortedExams = [...examAttempts].sort((a, b) => 
-      new Date(a.created_date) - new Date(b.created_date)
+    const sortedExams = [...examAttempts].sort((a, b) =>
+    new Date(a.created_date) - new Date(b.created_date)
     );
     let examTrend = 0;
     if (sortedExams.length >= 2) {
@@ -160,14 +160,14 @@ export default function StatisticsPage() {
       examTrend = recentAvg - olderAvg;
     }
 
-    return { 
-      totalPractice, 
-      totalExams, 
-      practiceAccuracy, 
+    return {
+      totalPractice,
+      totalExams,
+      practiceAccuracy,
       avgTimePerQuestion,
       weekErrors,
-      weakTopics, 
-      strongTopics, 
+      weakTopics,
+      strongTopics,
       last7Days,
       monthMinutes,
       monthPractice: monthPractice.length,
@@ -180,15 +180,15 @@ export default function StatisticsPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
-      </div>
-    );
+      </div>);
+
   }
 
   const hasData = statistics.totalPractice > 0 || statistics.totalExams > 0;
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 mb-6 flex items-center justify-between">
+      <div className="bg-gradient-to-r mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">הנתונים שלי</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
@@ -198,28 +198,28 @@ export default function StatisticsPage() {
         </div>
       </div>
 
-      {!hasData ? (
-        <div className="px-5">
+      {!hasData ?
+      <div className="px-5">
           <CardSimple>
             <div className="text-center py-8">
               <div className="text-6xl mb-4">📊</div>
               <h3 className="text-[18px] font-bold text-[#2B2B2B] mb-2">התחל ללמוד</h3>
               <p className="text-[15px] text-[#6E6E6E] mb-6">עדיין לא ביצעת תרגולים או בחינות</p>
               <Button
-                onClick={() => navigate(createPageUrl("Practice"))}
-                className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
-              >
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
+
                 <BookOpen className="w-5 h-5 ml-2" />
                 התחל תרגול
               </Button>
             </div>
           </CardSimple>
-        </div>
-      ) : (
-        <div className="px-5 space-y-4">
+        </div> :
+
+      <div className="px-5 space-y-4">
           {/* 1. מדד מוכנות - 4 מדדים */}
-          {readinessData && (
-            <CardSimple delay={0.05}>
+          {readinessData &&
+        <CardSimple delay={0.05}>
               <CardTitle icon={Target}>מדד מוכנות</CardTitle>
               
               <div className="grid grid-cols-4 gap-2">
@@ -249,7 +249,7 @@ export default function StatisticsPage() {
                 </div>
               </div>
             </CardSimple>
-          )}
+        }
 
           {/* 2. סטטיסטיקת הצלחה אמיתית */}
           <CardSimple delay={0.1}>
@@ -285,16 +285,16 @@ export default function StatisticsPage() {
             <ResponsiveContainer width="100%" height={100}>
               <BarChart data={statistics.last7Days}>
                 <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '2px solid #E9F0FF', 
-                    borderRadius: '12px',
-                    direction: 'rtl',
-                    fontSize: '11px'
-                  }}
-                  formatter={(value) => [`${value} דקות`]}
-                />
+                <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '2px solid #E9F0FF',
+                  borderRadius: '12px',
+                  direction: 'rtl',
+                  fontSize: '11px'
+                }}
+                formatter={(value) => [`${value} דקות`]} />
+
                 <Bar dataKey="minutes" fill="#3B82F6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -308,57 +308,57 @@ export default function StatisticsPage() {
             </div>
             
             {/* חזקים - בסיסי לכולם */}
-            {statistics.strongTopics.length > 0 && (
-              <div className="mb-3">
+            {statistics.strongTopics.length > 0 &&
+          <div className="mb-3">
                 <div className="text-[12px] font-bold text-green-600 mb-2 flex items-center gap-1">
                   <Award className="w-4 h-4" />
                   הכי חזקים
                 </div>
                 <div className="space-y-1.5">
-                  {statistics.strongTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) => (
-                    <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
+                  {statistics.strongTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) =>
+              <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-green-600 w-4">{idx + 1}</span>
                         <span className="text-[12px] font-semibold text-[#2B2B2B]">{stats.name}</span>
                       </div>
                       <span className="text-[13px] font-black text-green-600">
-                        {Math.round((stats.correct / stats.total) * 100)}%
+                        {Math.round(stats.correct / stats.total * 100)}%
                       </span>
                     </div>
-                  ))}
+              )}
                 </div>
               </div>
-            )}
+          }
 
             {/* חלשים - בסיסי לכולם */}
-            {statistics.weakTopics.length > 0 && (
-              <div>
+            {statistics.weakTopics.length > 0 &&
+          <div>
                 <div className="text-[12px] font-bold text-red-600 mb-2 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
                   הכי חלשים
                 </div>
                 <div className="space-y-1.5">
-                  {statistics.weakTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) => (
-                    <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
+                  {statistics.weakTopics.slice(0, user?.is_premium ? 5 : 2).map(([topicId, stats], idx) =>
+              <div key={topicId} className="bg-white rounded-lg p-2 border border-[#E9F0FF] flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-red-600 w-4">{idx + 1}</span>
                         <span className="text-[12px] font-semibold text-[#2B2B2B]">{stats.name}</span>
                       </div>
                       <span className="text-[13px] font-black text-red-600">
-                        {Math.round((stats.correct / stats.total) * 100)}%
+                        {Math.round(stats.correct / stats.total * 100)}%
                       </span>
                     </div>
-                  ))}
+              )}
                 </div>
               </div>
-            )}
+          }
 
-            {!user?.is_premium && (statistics.strongTopics.length > 2 || statistics.weakTopics.length > 2) && (
-              <PremiumUpsell 
-                message="שדרג לפרימיום לניתוח מלא של כל הנושאים"
-                className="mt-3"
-              />
-            )}
+            {!user?.is_premium && (statistics.strongTopics.length > 2 || statistics.weakTopics.length > 2) &&
+          <PremiumUpsell
+            message="שדרג לפרימיום לניתוח מלא של כל הנושאים"
+            className="mt-3" />
+
+          }
           </CardSimple>
 
           {/* 5. התקדמות בבגרויות */}
@@ -367,28 +367,28 @@ export default function StatisticsPage() {
             
             <div className="grid grid-cols-3 gap-3 mb-3">
               <StatCard value={examAttempts.length} label="בגרויות" color="#3B82F6" />
-              <StatCard 
-                value={examAttempts.length > 0 ? Math.round(examAttempts.reduce((sum, e) => sum + e.score_percent, 0) / examAttempts.length) : 0} 
-                label="ממוצע" 
-                color="#10B981" 
-              />
+              <StatCard
+              value={examAttempts.length > 0 ? Math.round(examAttempts.reduce((sum, e) => sum + e.score_percent, 0) / examAttempts.length) : 0}
+              label="ממוצע"
+              color="#10B981" />
+
               <div className="text-center">
                 <div className="flex items-center justify-center mb-1 h-10">
-                  {statistics.examTrend > 0 ? (
-                    <ArrowUp className="w-8 h-8 text-green-600" />
-                  ) : statistics.examTrend < 0 ? (
-                    <ArrowDown className="w-8 h-8 text-red-600" />
-                  ) : (
-                    <div className="w-8 h-1 bg-gray-400 rounded" />
-                  )}
+                  {statistics.examTrend > 0 ?
+                <ArrowUp className="w-8 h-8 text-green-600" /> :
+                statistics.examTrend < 0 ?
+                <ArrowDown className="w-8 h-8 text-red-600" /> :
+
+                <div className="w-8 h-1 bg-gray-400 rounded" />
+                }
                 </div>
                 <div className="text-[10px] text-[#6E6E6E]">מגמה</div>
               </div>
             </div>
 
             <div className="space-y-2">
-              {examAttempts.slice(0, 3).map((exam) => (
-                <div key={exam.id} className="bg-white rounded-lg p-2 flex items-center justify-between border border-[#E9F0FF]">
+              {examAttempts.slice(0, 3).map((exam) =>
+            <div key={exam.id} className="bg-white rounded-lg p-2 flex items-center justify-between border border-[#E9F0FF]">
                   <span className="text-[11px] text-[#6E6E6E]">
                     {new Date(exam.created_date).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}
                   </span>
@@ -396,14 +396,14 @@ export default function StatisticsPage() {
                     {Math.round(exam.score_percent)}
                   </span>
                 </div>
-              ))}
+            )}
             </div>
           </CardSimple>
 
           {/* 6. מפת דרך לציון המטרה - פרימיום בלבד */}
           {readinessData && (
-            user?.is_premium ? (
-              <CardSimple delay={0.3}>
+        user?.is_premium ?
+        <CardSimple delay={0.3}>
                 <CardTitle icon={Award}>מפת דרך ל-{user?.target_score || 85}</CardTitle>
                 
                 <div className="space-y-2">
@@ -432,61 +432,61 @@ export default function StatisticsPage() {
                     </span>
                   </div>
                 </div>
-              </CardSimple>
-            ) : (
-              <LockedFeatureCard
-                title="מפת דרך לציון המטרה"
-                description="שדרג לפרימיום כדי לראות בדיוק כמה שאלות ובגרויות צריך להגיע ל-85."
-              />
-            )
-          )}
+              </CardSimple> :
+
+        <LockedFeatureCard
+          title="מפת דרך לציון המטרה"
+          description="שדרג לפרימיום כדי לראות בדיוק כמה שאלות ובגרויות צריך להגיע ל-85." />)
+
+
+        }
 
           {/* 7. תובנות AI חודשיות */}
           <CardSimple delay={0.35}>
             <CardTitle icon={Zap}>תובנות חכמות</CardTitle>
             
             <div className="space-y-2">
-              {statistics.strongTopics.length > 0 && (
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+              {statistics.strongTopics.length > 0 &&
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="text-[11px] font-semibold text-green-600 mb-0.5">🎯 הישג החודש</div>
                   <p className="text-[12px] text-[#2B2B2B]">
                     {statistics.strongTopics[0][1].name}
                   </p>
                 </div>
-              )}
+            }
               
-              {statistics.examTrend !== 0 && (
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+              {statistics.examTrend !== 0 &&
+            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                   <div className="text-[11px] font-semibold text-blue-600 mb-0.5">📈 קצב שיפור</div>
                   <p className="text-[12px] text-[#2B2B2B]">
-                    {statistics.examTrend > 0 
-                      ? `עלית ב-${Math.abs(Math.round(statistics.examTrend))} נקודות`
-                      : statistics.examTrend < 0
-                      ? `ירדת ב-${Math.abs(Math.round(statistics.examTrend))} נקודות`
-                      : 'יציב'}
+                    {statistics.examTrend > 0 ?
+                `עלית ב-${Math.abs(Math.round(statistics.examTrend))} נקודות` :
+                statistics.examTrend < 0 ?
+                `ירדת ב-${Math.abs(Math.round(statistics.examTrend))} נקודות` :
+                'יציב'}
                   </p>
                 </div>
-              )}
+            }
 
               {statistics.last7Days.length > 0 && (() => {
-                const bestDay = statistics.last7Days.reduce((max, day) => 
-                  day.minutes > max.minutes ? day : max
-                , statistics.last7Days[0]);
-                return (
-                  <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
+              const bestDay = statistics.last7Days.reduce((max, day) =>
+              day.minutes > max.minutes ? day : max,
+              statistics.last7Days[0]);
+              return (
+                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
                     <div className="text-[11px] font-semibold text-purple-600 mb-0.5">⏰ יום מוצלח</div>
                     <p className="text-[12px] text-[#2B2B2B]">
                       <span className="font-bold">{bestDay.day}</span>
                     </p>
-                  </div>
-                );
-              })()}
+                  </div>);
+
+            })()}
             </div>
           </CardSimple>
 
           {/* צפי ציון */}
-          {readinessData && examAttempts.length > 0 && (
-            <CardSimple delay={0.4}>
+          {readinessData && examAttempts.length > 0 &&
+        <CardSimple delay={0.4}>
               <CardTitle icon={Award}>צפי ציון</CardTitle>
               
               <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
@@ -506,9 +506,9 @@ export default function StatisticsPage() {
                 </div>
               </div>
             </CardSimple>
-          )}
+        }
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
