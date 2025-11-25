@@ -94,18 +94,22 @@ export default function HomePage() {
         // אם כבר דירג - לא מציגים
         if (currentSettings.has_rated) return;
         
+        // בדוק אם המשתמש ביקש לא לראות שוב
+        const neverShowRating = localStorage.getItem('never_show_rating_dialog') === 'true';
+        const neverShowShare = localStorage.getItem('never_show_share_dialog') === 'true';
+        
         // Show rating dialog after 3 minutes (180000ms)
         const ratingTimer = setTimeout(() => {
-          // אל תציג אם כבר הוצג היום
-          if (lastRatingShown === today) return;
+          // אל תציג אם כבר הוצג היום או אם ביקש לא לראות
+          if (lastRatingShown === today || neverShowRating) return;
           setShowRatingDialog(true);
           localStorage.setItem('last_rating_dialog_date', today);
         }, 180000); // 3 דקות
         
         // Show share dialog after 5 minutes (300000ms)
         const shareTimer = setTimeout(() => {
-          // אל תציג אם כבר הוצג היום
-          if (lastShareShown === today) return;
+          // אל תציג אם כבר הוצג היום או אם ביקש לא לראות
+          if (lastShareShown === today || neverShowShare) return;
           setShowShareDialog(true);
           localStorage.setItem('last_share_dialog_date', today);
         }, 300000); // 5 דקות
