@@ -458,6 +458,66 @@ export default function ModuleCarousel({
 
         )}
       </div>
+
+      {/* Ad Dialog */}
+      <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+              <Crown className="w-6 h-6 text-amber-500" />
+              נדרשת צפייה בפרסומת
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              ניצלת את הבגרות החינמית שלך להיום
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4 space-y-4">
+            <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-200">
+              <div className="text-4xl mb-2">📺</div>
+              <p className="text-gray-700 text-sm">
+                צפה בפרסומת קצרה כדי להמשיך לבגרות נוספת
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 text-center border border-amber-200">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Crown className="w-5 h-5 text-amber-600" />
+                <span className="font-bold text-amber-900">או שדרג לפרימיום</span>
+              </div>
+              <p className="text-amber-800 text-xs">
+                בגרויות ללא הגבלה, ללא פרסומות
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={handleWatchAdAndContinue}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+            >
+              📺 צפה בפרסומת והמשך
+            </Button>
+            <Button
+              onClick={() => {
+                setShowAdDialog(false);
+                navigate(createPageUrl("Premium"));
+              }}
+              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl"
+            >
+              <Crown className="w-5 h-5 ml-2" />
+              שדרג לפרימיום
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setShowAdDialog(false)}
+              className="w-full text-gray-500"
+            >
+              ביטול
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>);
 
 }
