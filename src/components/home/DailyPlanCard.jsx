@@ -162,6 +162,36 @@ export default function DailyPlanCard({
     };
   }, [readinessData, todayProgress]);
 
+  // חישוב סטטיסטיקות כוללות לנושאים
+  const topicOverallStats = useMemo(() => {
+    if (!topics || topics.length === 0) return { mastery: 0, total: 0, mastered: 0 };
+
+    const topicStats = {};
+    practiceAttempts.forEach((attempt) => {
+      const topicId = attempt.topic_id;
+      if (!topicId) return;
+      if (!topicStats[topicId]) topicStats[topicId] = { total: 0, correct: 0 };
+      topicStats[topicId].total++;
+      if (attempt.status === "correct") topicStats[topicId].correct++;
+    });
+
+    let totalMastery = 0;
+    let masteredCount = 0;
+    
+    topics.forEach((topic) => {
+      const stats = topicStats[topic.topic_id];
+      if (stats && stats.total > 0) {
+        const accuracy = (stats.correct / stats.total) * 100;
+        totalMastery += accuracy;
+        if (accuracy >= 70) masteredCount++;
+      }
+    });
+
+    const avgMastery = topics.length > 0 ? Math.round(totalMastery / topics.length) : 0;
+    
+    return { mastery: avgMastery, total: topics.length, mastered: masteredCount };
+  }, [topics, practiceAttempts]);
+
   // חישוב נושאים מומלצים לתרגול
   const recommendedTopics = useMemo(() => {
     if (!topics || topics.length === 0) return [];
