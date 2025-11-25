@@ -76,7 +76,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   const currentTopic = topics[currentIndex];
 
   return (
-    <div className="bg-[#ffffff] p-4 rounded-2xl">
+    <div className="bg-indigo-50 p-4 rounded-xl">
       <div className="relative">
         <AnimatePresence mode="wait">
           <motion.div
@@ -97,7 +97,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               }
             }}
           >
-            <div className="bg-gradient-to-br text-[#3B82F6] mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
+            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               <div className="text-center">
                 <div className="text-3xl mb-1.5">{currentTopic.icon}</div>
                 <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentTopic.name}</h2>
@@ -133,7 +133,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             </div>
 
             {currentTopic.stats && (
-              <div className="bg-white rounded-xl p-3 mb-3">
+              <div className="bg-white rounded-xl p-3 mb-3 border border-[#E9F0FF]">
                 <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">רמת השליטה בנושא</div>
                 
                 <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">

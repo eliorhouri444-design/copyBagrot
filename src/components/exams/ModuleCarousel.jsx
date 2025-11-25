@@ -247,9 +247,9 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-[#ffffff] p-4 rounded-2xl">
+          <div className="bg-indigo-50 p-4 rounded-xl">
             {/* Header with gradient */}
-            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl from-blue-500 to-blue-600 relative">
+            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
               <Button
                 variant="ghost"
@@ -278,7 +278,7 @@ export default function ModuleCarousel({
             </div>
 
             {/* Content */}
-            <div className="bg-white rounded-xl p-3 space-y-2.5">
+            <div className="bg-white rounded-xl p-3 space-y-2.5 border border-[#E9F0FF]">
               <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
               
               <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
