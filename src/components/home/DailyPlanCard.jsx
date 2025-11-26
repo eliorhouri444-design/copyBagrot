@@ -396,15 +396,50 @@ export default function DailyPlanCard({
 
   return (
     <div className="space-y-4">
+      {/* Alert from Engine */}
+      {engineData?.dailyPlan?.alert && (
+        <div className={`rounded-xl p-3 border-2 flex items-center gap-2 ${
+          engineData.dailyPlan.alert.type === 'success' 
+            ? 'bg-green-50 border-green-300'
+            : engineData.dailyPlan.alert.type === 'critical'
+              ? 'bg-red-50 border-red-300'
+              : 'bg-amber-50 border-amber-300'
+        }`}>
+          <AlertTriangle className={`w-5 h-5 ${
+            engineData.dailyPlan.alert.type === 'success' 
+              ? 'text-green-600'
+              : engineData.dailyPlan.alert.type === 'critical'
+                ? 'text-red-600'
+                : 'text-amber-600'
+          }`} />
+          <p className={`text-[12px] font-medium ${
+            engineData.dailyPlan.alert.type === 'success' 
+              ? 'text-green-800'
+              : engineData.dailyPlan.alert.type === 'critical'
+                ? 'text-red-800'
+                : 'text-amber-800'
+          }`}>
+            {engineData.dailyPlan.alert.message}
+          </p>
+        </div>
+      )}
+
       {/* משימות היום */}
       <CardSimple delay={0.15}>
         <div className="flex items-center justify-between mb-3">
           <CardTitle icon={CheckCircle}>משימות היום</CardTitle>
-          <div className="text-[12px] text-[#6E6E6E]">{completedCount}/{totalTasks}</div>
+          <div className="flex items-center gap-2">
+            {engineData?.dailyPlan?.estimatedMinutes && (
+              <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                {engineData.dailyPlan.estimatedMinutes} דק'
+              </span>
+            )}
+            <div className="text-[12px] text-[#6E6E6E]">{completedCount}/{totalTasks}</div>
+          </div>
         </div>
 
         <div className="space-y-2 mb-3">
-          {dailyTasks.tasks.map((task, idx) => {
+          {finalTasks.map((task, idx) => {
             const Icon = task.icon;
             const isCompleted = task.isCompleted;
             const progressPct = task.target > 0 ? Math.min(100, Math.round((task.current / task.target) * 100)) : 0;
