@@ -525,47 +525,169 @@ export const calculateWeightedScore = (skillScores) => {
 };
 
 /**
- * יצירת מבחן אבחון ראשוני
+ * יצירת מבחן אבחון ראשוני (Diagnostic Test)
+ * בודק 3-5 נושאים מכל קטגוריה
  */
-export const createDiagnosticTest = (moduleLevel) => {
+export const createDiagnosticTest = (moduleLevel, unitLevel = 5) => {
+  const sections = [
+    {
+      type: SKILL_TYPES.VOCABULARY,
+      title: 'אוצר מילים',
+      questionsCount: 10,
+      duration: 5,
+      topics: unitLevel === 5 
+        ? ['Academic Words', 'Collocations', 'Phrasal Verbs']
+        : ['Basic Verbs', 'Time Expressions', 'Common Phrases']
+    },
+    {
+      type: SKILL_TYPES.READING,
+      title: 'קטע קריאה קצר',
+      questionsCount: 5,
+      duration: 10,
+      topics: ['Main Idea', 'Details', 'Inference']
+    },
+    {
+      type: SKILL_TYPES.GRAMMAR,
+      title: 'דקדוק',
+      questionsCount: 5,
+      duration: 5,
+      topics: unitLevel === 5 
+        ? ['Conditionals 0-3', 'Passive Voice', 'Reported Speech', 'Relative Clauses']
+        : ['Tenses', 'Modals', 'Comparatives']
+    }
+  ];
+
   return {
-    title: 'מבחן אבחון ראשוני',
-    description: 'מבחן קצר לזיהוי רמה נוכחית',
-    sections: [
-      {
-        type: SKILL_TYPES.VOCABULARY,
-        title: 'אוצר מילים',
-        questionsCount: 10,
-        duration: 5
-      },
-      {
-        type: SKILL_TYPES.READING,
-        title: 'קטע קריאה קצר',
-        questionsCount: 5,
-        duration: 10
-      },
-      {
-        type: SKILL_TYPES.GRAMMAR,
-        title: 'דקדוק',
-        questionsCount: 5,
-        duration: 5
-      }
-    ],
+    title: 'מבחן מיפוי ראשוני',
+    description: 'מבחן קצר ליצירת "מפת חולשות" אישית',
+    sections,
     totalDuration: 20,
-    moduleLevel
+    moduleLevel,
+    unitLevel,
+    purpose: 'baseline'
   };
+};
+
+/**
+ * תיקון מסלול שבועי (Weekly Course Correction)
+ * The Guarantee Loop
+ */
+export const weeklyCoursCorrection = ({
+  targetScore,
+  weeklyScores = [],
+  weakAreas = [],
+  currentPlan
+}) => {
+  const weeklyAverage = calculateWeeklyAverage(weeklyScores);
+  const performanceGap = calculatePerformanceGap(targetScore, weeklyAverage);
+  
+  const correction = {
+    weeklyAverage,
+    performanceGap,
+    adjustments: [],
+    newMode: 'normal'
+  };
+
+  if (performanceGap > 10) {
+    // פער גדול - מצב אינטנסיבי
+    correction.adjustments.push({
+      type: 'add_time',
+      value: 10,
+      description: 'הוספת 10 דקות למידה יומית'
+    });
+    correction.adjustments.push({
+      type: 'focus_priority_1',
+      description: 'ביטול Priority 2, התמקדות 100% בתיקון פערים'
+    });
+    correction.newMode = 'intensive';
+    correction.alert = {
+      type: 'critical',
+      message: `פער של ${performanceGap} נקודות! השבוע הבא מוקדש לתיקון ${weakAreas[0]?.skill ? getSkillName(weakAreas[0].skill) : 'נושאים חלשים'}`
+    };
+  } else if (weeklyAverage >= targetScore) {
+    // הגענו ליעד - מצב סימולציה
+    correction.adjustments.push({
+      type: 'simulation_mode',
+      description: '3 ימי סימולציה רצופים'
+    });
+    correction.newMode = 'simulation';
+    correction.alert = {
+      type: 'success',
+      message: `מעולה! הממוצע ${weeklyAverage} עבר את היעד ${targetScore}! עוברים למצב סימולציות`
+    };
+  } else if (performanceGap > 0 && performanceGap <= 10) {
+    // פער קטן - המשך רגיל עם דגש
+    correction.adjustments.push({
+      type: 'focus_weak',
+      description: `דגש על ${weakAreas[0]?.skill ? getSkillName(weakAreas[0].skill) : 'נושאים לשיפור'}`
+    });
+    correction.newMode = 'normal';
+  }
+
+  return correction;
+};
+
+/**
+ * בדיקה אם להעלות רמת קושי בקריאה
+ * כלל: אם סיים ב-10% פחות מהזמן = טקסט קשה יותר
+ */
+export const shouldUpgradeReadingLevel = (completionTime, allowedTime, accuracy) => {
+  const timeEfficiency = (allowedTime - completionTime) / allowedTime;
+  return timeEfficiency >= 0.10 && accuracy >= 80;
+};
+
+/**
+ * בחירת מילים יומיות לפי Leitner
+ */
+export const selectDailyVocabulary = (allWords, count = 10, unitLevel = 5) => {
+  const today = new Date();
+  
+  // מילים שצריך לחזור עליהן היום
+  const dueWords = allWords.filter(w => {
+    if (w.isMastered) return false;
+    if (!w.nextReviewDate) return true;
+    return new Date(w.nextReviewDate) <= today;
+  });
+
+  // תיעדוף לפי קופסת Leitner (קופסה נמוכה = עדיפות גבוהה)
+  dueWords.sort((a, b) => (a.box || 1) - (b.box || 1));
+
+  // סינון לפי רמה
+  const levelTags = {
+    3: ['basic', 'time_expressions', 'common'],
+    4: ['intermediate', 'phrasal_verbs', 'expressions'],
+    5: ['academic', 'collocations', 'advanced']
+  };
+
+  const preferredTags = levelTags[unitLevel] || levelTags[5];
+  
+  // העדפה למילים מהרמה הנכונה
+  const prioritized = dueWords.sort((a, b) => {
+    const aMatch = preferredTags.some(tag => a.category?.toLowerCase().includes(tag)) ? 0 : 1;
+    const bMatch = preferredTags.some(tag => b.category?.toLowerCase().includes(tag)) ? 0 : 1;
+    return aMatch - bMatch;
+  });
+
+  return prioritized.slice(0, count);
 };
 
 export default {
   SKILL_TYPES,
   MODULE_LEVELS,
+  TIME_ALLOCATION,
+  TASK_PRIORITY,
   calculateAllowedTime,
   calculateNextReview,
   calculateMovingAverage,
+  calculateWeeklyAverage,
+  calculatePerformanceGap,
   shouldIncreaseDifficulty,
   identifyWeakAreas,
   buildDailyPlan,
   getSkillName,
   calculateWeightedScore,
-  createDiagnosticTest
+  createDiagnosticTest,
+  weeklyCoursCorrection,
+  shouldUpgradeReadingLevel,
+  selectDailyVocabulary
 };
