@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Target, Zap, Brain, CheckCircle, XCircle, ChevronLeft, Trophy, Crown } from "lucide-react";
+import { ArrowLeft, Target, Zap, BookOpen, CheckCircle, XCircle, ChevronLeft, Trophy, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +21,8 @@ export default function CustomWeakExamPage() {
   const [showSummary, setShowSummary] = useState(false);
   const [audioPlayed, setAudioPlayed] = useState(false);
   const [currentAudio, setCurrentAudio] = useState(null);
+  const [weakTopics, setWeakTopics] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadUserAndQuestions();
