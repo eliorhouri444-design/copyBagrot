@@ -352,37 +352,31 @@ export default function ModuleCarousel({
               }
             </div>
 
-            {/* Stats Cards - מציג סטטיסטיקות בגרויות מתעדכנות */}
+            {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className={`p-3 text-center rounded-xl ${moduleStats.excellentAttempts > 0 ? 'bg-green-50 border border-green-200' : 'bg-slate-100'}`}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-1 ${moduleStats.excellentAttempts > 0 ? 'bg-green-500' : 'bg-gray-400'}`}>
+              <div className="bg-slate-100 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
-                  <div className={`text-lg font-bold ${moduleStats.excellentAttempts > 0 ? 'text-green-600' : 'text-[#2B2B2B]'}`}>
-                    {moduleStats.excellentAttempts || 0}
-                  </div>
-                  <div className="text-[9px] text-[#6E6E6E]">86-100</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
                 </div>
-                <div className={`p-3 text-center rounded-xl ${moduleStats.mediumAttempts > 0 ? 'bg-amber-50 border border-amber-200' : 'bg-slate-100'}`}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-1 ${moduleStats.mediumAttempts > 0 ? 'bg-amber-500' : 'bg-gray-400'}`}>
+                <div className="bg-slate-100 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <TrendingUp className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
-                  <div className={`text-lg font-bold ${moduleStats.mediumAttempts > 0 ? 'text-amber-600' : 'text-[#2B2B2B]'}`}>
-                    {moduleStats.mediumAttempts || 0}
-                  </div>
-                  <div className="text-[9px] text-[#6E6E6E]">56-85</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
                 </div>
-                <div className={`p-3 text-center rounded-xl ${moduleStats.failedAttempts > 0 ? 'bg-red-50 border border-red-200' : 'bg-slate-100'}`}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-1 ${moduleStats.failedAttempts > 0 ? 'bg-red-500' : 'bg-gray-400'}`}>
+                <div className="bg-slate-100 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <TrendingDown className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נכשל</div>
-                  <div className={`text-lg font-bold ${moduleStats.failedAttempts > 0 ? 'text-red-600' : 'text-[#2B2B2B]'}`}>
-                    {moduleStats.failedAttempts || 0}
-                  </div>
-                  <div className="text-[9px] text-[#6E6E6E]">0-55</div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
                 </div>
             </div>
 
