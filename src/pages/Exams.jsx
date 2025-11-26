@@ -1370,41 +1370,45 @@ export default function ExamsPage() {
                     </div>
                   </button>
 
-                  {hasMistakes &&
-                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Crown className="w-4 h-4 text-orange-600" />
-                        <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
+                  {hasMistakes && (() => {
+                    const wrongCount = attempt.answers?.filter(a => !a.is_correct).length || 0;
+                    return (
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target className="w-4 h-4 text-orange-600" />
+                          <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">
+                          {wrongCount} שאלות שטעית בהן במבחן הזה
+                        </p>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowAllExams(false);
+                            if (isPremium) {
+                              sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
+                              sessionStorage.setItem('mistakesExamId', attempt.exam_id);
+                              navigate(createPageUrl("ExamMistakesPractice"));
+                            } else {
+                              navigate(createPageUrl("Premium"));
+                            }
+                          }}
+                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+                          {isPremium ? (
+                            <>
+                              <Target className="w-3 h-3" />
+                              <span>תרגל {wrongCount} טעויות</span>
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-3 h-3" />
+                              <span>שדרג לפרימיום</span>
+                            </>
+                          )}
+                        </Button>
                       </div>
-                      <p className="text-xs text-gray-600 mb-2">
-                        חזור על השאלות שטעית בהן במבחן זה
-                      </p>
-                      <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowAllExams(false);
-                        if (isPremium) {
-                          navigate(createPageUrl("CustomWeakExam"));
-                        } else {
-                          navigate(createPageUrl("Premium"));
-                        }
-                      }}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
-
-                        {isPremium ?
-                      <>
-                            <Target className="w-3 h-3" />
-                            <span>מבחן טעויות</span>
-                          </> :
-
-                      <>
-                            <Lock className="w-3 h-3" />
-                            <span>שדרג לפרימיום</span>
-                          </>
-                      }
-                      </Button>
-                    </div>
-                  }
+                    );
+                  })()}
                 </div>);
 
             })}
