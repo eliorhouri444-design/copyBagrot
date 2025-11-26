@@ -171,18 +171,28 @@ export default function ModuleCarousel({
 
   const currentModule = modules[currentIndex];
 
+  // חישוב מד מוכנות לשאלון לפי הנוסחה:
+  // ExamReadiness = 0.50 * TopicMastery + 0.30 * PracticePerformance + 0.20 * ExamPerformance
   const moduleStats = useMemo(() => {
-    if (!currentModule || !examAttempts || examAttempts.length === 0) {
+    if (!currentModule) {
       return {
         totalAttempts: 0,
         passedAttempts: 0,
         avgScore: 0,
         progress: 0,
-        maxExams: isPremium === true ? 100 : 5
+        readiness: 0,
+        topicMastery: 0,
+        practicePerformance: 0,
+        examPerformance: 0,
+        maxExams: isPremium === true ? 100 : 5,
+        excellentAttempts: 0,
+        mediumAttempts: 0,
+        failedAttempts: 0
       };
     }
 
-    const moduleAttempts = examAttempts.filter((attemptItem) => {
+    // סינון מבחנים לפי מודול
+    const moduleAttempts = (examAttempts || []).filter((attemptItem) => {
       if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
       if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
       if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
@@ -192,10 +202,7 @@ export default function ModuleCarousel({
 
     const totalAttempts = moduleAttempts.length;
     const passedAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 56).length;
-    const avgScore = totalAttempts > 0 ?
-    Math.round(moduleAttempts.reduce((sum, attemptItem) => sum + (attemptItem.score_percent || 0), 0) / totalAttempts) :
-    0;
-
+    
     // חלוקה לפי טווחי ציונים
     const excellentAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 86).length;
     const mediumAttempts = moduleAttempts.filter((attemptItem) => {
@@ -204,20 +211,79 @@ export default function ModuleCarousel({
     }).length;
     const failedAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) < 56).length;
 
+    // === חישוב TopicMastery (50%) ===
+    // ממוצע הדיוק בנושאים הרלוונטיים לשאלון
+    let topicMastery = 0;
+    const moduleTopics = currentModule.parts || [];
+    if (Object.keys(topicStats).length > 0 && moduleTopics.length > 0) {
+      const relevantTopicScores = moduleTopics
+        .map(part => topicStats[part]?.accuracy || topicStats[part.toLowerCase()]?.accuracy || 0)
+        .filter(score => score > 0);
+      if (relevantTopicScores.length > 0) {
+        topicMastery = relevantTopicScores.reduce((a, b) => a + b, 0) / relevantTopicScores.length;
+      }
+    } else if (practiceAttempts.length > 0) {
+      // אם אין topicStats, חשב מתוך practiceAttempts
+      const correctCount = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+      topicMastery = practiceAttempts.length > 0 ? (correctCount / practiceAttempts.length) * 100 : 0;
+    }
+
+    // === חישוב PracticePerformance (30%) ===
+    // 0.70 * Accuracy + 0.20 * SpeedScore + 0.10 * ReducedErrors
+    let practicePerformance = 0;
+    if (practiceAttempts.length > 0) {
+      const correctPractice = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+      const accuracy = (correctPractice / practiceAttempts.length) * 100;
+      
+      // חישוב מהירות (אם יש)
+      const avgTime = practiceAttempts.reduce((sum, a) => sum + (a.time_spent_seconds || 60), 0) / practiceAttempts.length;
+      const speedScore = avgTime < 30 ? 100 : avgTime < 60 ? 80 : avgTime < 120 ? 60 : 40;
+      
+      // חישוב הפחתת שגיאות (השוואה בין ניסיונות ראשונים לאחרונים)
+      const recentAttempts = practiceAttempts.slice(-10);
+      const olderAttempts = practiceAttempts.slice(0, Math.max(10, practiceAttempts.length - 10));
+      const recentErrors = recentAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+      const olderErrors = olderAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+      const reducedErrors = olderErrors > 0 && recentErrors < olderErrors ? 100 : recentErrors === 0 ? 100 : 50;
+      
+      practicePerformance = 0.70 * accuracy + 0.20 * speedScore + 0.10 * reducedErrors;
+    }
+
+    // === חישוב ExamPerformance (20%) ===
+    // ממוצע ציונים במבחנים של השאלון
+    let examPerformance = 0;
+    if (moduleAttempts.length > 0) {
+      examPerformance = moduleAttempts.reduce((sum, a) => sum + (a.score_percent || 0), 0) / moduleAttempts.length;
+    }
+
+    // === חישוב מד מוכנות סופי ===
+    const readiness = Math.round(
+      0.50 * topicMastery +
+      0.30 * practicePerformance +
+      0.20 * examPerformance
+    );
+
     const maxExams = isPremium === true ? 100 : 5;
     const progress = totalAttempts > 0 ? Math.min(100, Math.round(totalAttempts / maxExams * 100)) : 0;
+    const avgScore = moduleAttempts.length > 0 
+      ? Math.round(moduleAttempts.reduce((sum, a) => sum + (a.score_percent || 0), 0) / moduleAttempts.length)
+      : 0;
 
     return {
       totalAttempts,
       passedAttempts,
       avgScore,
       progress,
+      readiness,
+      topicMastery: Math.round(topicMastery),
+      practicePerformance: Math.round(practicePerformance),
+      examPerformance: Math.round(examPerformance),
       maxExams,
       excellentAttempts,
       mediumAttempts,
       failedAttempts
     };
-  }, [currentModule, examAttempts, isPremium]);
+  }, [currentModule, examAttempts, practiceAttempts, topicStats, isPremium]);
 
   const getProgressColor = (p) => {
     if (p < 30) return '#EF4444';
