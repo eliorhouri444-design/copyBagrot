@@ -419,7 +419,7 @@ export default function ModuleCarousel({
                   </>
                 }
               </motion.div>
-          </div>
+            </div>
         </motion.div>
       </AnimatePresence>
 
