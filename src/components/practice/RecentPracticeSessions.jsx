@@ -168,7 +168,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                   <div className="text-right">
                     {isPremium ?
                     <>
-                        <motion.div className="text-[#000000] text-lg font-bold"
+                        <motion.div className="text-[#1E3A8A] text-lg font-bold"
 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -373,7 +373,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                             {passed ?
                             <CheckCircle className="w-6 h-6 text-green-600" /> :
 
-                            <TrendingUp className="text-[#000000] lucide lucide-trending-up w-6 h-6" />
+                            <TrendingUp className="text-[#1E3A8A] w-6 h-6" />
                             }
                           </div>
                           <div className="text-right flex-1 min-w-0">
@@ -392,7 +392,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           <div className="text-left">
                             {isPremium ?
                             <>
-                                <div className="text-[#000000] font-black">
+                                <div className="text-[#1E3A8A] font-black">
                                   {Math.round(session.percentage)}%
                                 </div>
                                 <div className="text-[10px] text-gray-500">
