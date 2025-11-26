@@ -12,6 +12,12 @@ import DailyPlanCard from "@/components/home/DailyPlanCard";
 import RatingDialog from "@/components/ads/RatingDialog";
 import ShareDialog from "@/components/ads/ShareDialog";
 import { useHomeData } from "@/components/cache/useHomeData";
+import {
+  fetchUserPerformanceData,
+  calculateFullReadiness,
+  calculateGapAndRequirements,
+  buildCompleteDailyPlan
+} from "@/components/studyplan/ReadinessEngine";
 
 export default function HomePage() {
   const navigate = useNavigate();
