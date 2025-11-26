@@ -159,7 +159,7 @@ export default function ExamsPage() {
     }
   };
 
-  const customModules = examsData?.modules?.filter(m => !defaultModulesStructure[displaySubject]?.[displayUnits]?.some(dm => dm.id === m.id)) || [];
+  const customModules = examsData?.modules?.filter((m) => !defaultModulesStructure[displaySubject]?.[displayUnits]?.some((dm) => dm.id === m.id)) || [];
 
   const currentModules = examsData?.modules || [];
 
@@ -217,11 +217,11 @@ export default function ExamsPage() {
 
       if (existing) {
         await base44.entities.ModuleDefinition.update(existing.id, moduleData);
-        } else {
+      } else {
         await base44.entities.ModuleDefinition.create(moduleData);
-        }
-        DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
-        queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
+      }
+      DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
+      queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
 
       alert('המודול עודכן בהצלחה! ✅');
       setShowModuleEditDialog(false);
@@ -657,7 +657,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 pb-4">
+    <div className="bg-[#ffffff] pb-4 min-h-screen from-blue-50 via-indigo-50 to-blue-100">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -671,7 +671,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      <div className="px-6 space-y-6 pb-6">
+      <div className="bg-gray-50 pb-6 px-6 space-y-6">
 
 
         <motion.div
@@ -722,8 +722,8 @@ export default function ExamsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden"
-        >
+          className="bg-white rounded-2xl shadow-lg overflow-hidden">
+
           <div className="flex items-center justify-between bg-blue-500 text-white p-4">
             <div className="text-right">
               <h3 className="font-bold text-lg">בגרויות אחרונות</h3>
@@ -733,46 +733,46 @@ export default function ExamsPage() {
           </div>
 
           <div className="p-4">
-            {examAttempts.length > 0 ? (
-              <>
+            {examAttempts.length > 0 ?
+            <>
                 <div className="space-y-2">
                   {examAttempts.slice(0, 2).map((attempt, idx) => {
-                    const examData = allExamsMap.get(attempt.exam_id);
-                    const passed = attempt.score_percent >= 56;
-                    const hasMistakes = attempt.score_percent < 56;
+                  const examData = allExamsMap.get(attempt.exam_id);
+                  const passed = attempt.score_percent >= 56;
+                  const hasMistakes = attempt.score_percent < 56;
 
-                    return (
-                      <div key={attempt.id} className="space-y-2">
+                  return (
+                    <div key={attempt.id} className="space-y-2">
                         <motion.button
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + idx * 0.1 }}
-                          whileHover={{ scale: 1.02, x: -5 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            if (isPremium || unlockedAttempts.has(attempt.id)) {
-                              setShowAttemptDetails(attempt);
-                            } else {
-                              setShowAdDialog(attempt);
-                            }
-                          }}
-                          className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between"
-                        >
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + idx * 0.1 }}
+                        whileHover={{ scale: 1.02, x: -5 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          if (isPremium || unlockedAttempts.has(attempt.id)) {
+                            setShowAttemptDetails(attempt);
+                          } else {
+                            setShowAdDialog(attempt);
+                          }
+                        }}
+                        className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between">
+
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
-                              className={`p-1.5 rounded-lg ${
-                                passed
-                                  ? 'bg-green-50 border border-green-200'
-                                  : 'bg-red-50 border border-red-200'
-                              }`}
-                              whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.5 }}
-                            >
-                              {passed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                              ) : (
-                                <X className="w-4 h-4 text-red-600" />
-                              )}
+                            className={`p-1.5 rounded-lg ${
+                            passed ?
+                            'bg-green-50 border border-green-200' :
+                            'bg-red-50 border border-red-200'}`
+                            }
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}>
+
+                              {passed ?
+                            <CheckCircle className="w-4 h-4 text-green-600" /> :
+
+                            <X className="w-4 h-4 text-red-600" />
+                            }
                             </motion.div>
                             <div className="flex-1 text-right">
                               <div className="text-[13px] font-semibold text-[#2B2B2B]">
@@ -780,41 +780,41 @@ export default function ExamsPage() {
                               </div>
                               <div className="text-[11px] text-[#6E6E6E]">
                                 {new Date(attempt.created_date).toLocaleDateString('he-IL', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            {isPremium ? (
-                              <>
+                            {isPremium ?
+                          <>
                                 <motion.div
-                                  className={`text-[17px] font-bold ${
-                                    passed ? 'text-green-600' : 'text-red-600'
-                                  }`}
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{ delay: 0.5 + idx * 0.1, type: 'spring' }}
-                                >
+                              className={`text-[17px] font-bold ${
+                              passed ? 'text-green-600' : 'text-red-600'}`
+                              }
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.5 + idx * 0.1, type: 'spring' }}>
+
                                   {Math.round(attempt.score_percent)}
                                 </motion.div>
                                 <div className="text-[10px] text-gray-500">
                                   {passed ? 'עבר' : 'נכשל'}
                                 </div>
-                              </>
-                            ) : (
-                              <div className="flex items-center gap-1">
+                              </> :
+
+                          <div className="flex items-center gap-1">
                                 <Lock className="w-5 h-5 text-gray-400" />
                               </div>
-                            )}
+                          }
                           </div>
                         </motion.button>
 
-                        {hasMistakes && isPremium && (
-                          <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
+                        {hasMistakes && isPremium &&
+                      <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
                             <div className="flex items-center gap-2 mb-2">
                               <Crown className="w-4 h-4 text-[#3B82F6]" />
                               <h4 className="font-bold text-[#2B2B2B] text-[12px]">
@@ -825,43 +825,43 @@ export default function ExamsPage() {
                               חזרה על השאלות שטעית בהן
                             </p>
                             <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                sessionStorage.setItem('weakExamSource', attempt.exam_id);
-                                navigate(createPageUrl("CustomWeakExam"));
-                              }}
-                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]"
-                            >
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            sessionStorage.setItem('weakExamSource', attempt.exam_id);
+                            navigate(createPageUrl("CustomWeakExam"));
+                          }}
+                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+
                               בגרות אישית
                             </Button>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                      }
+                      </div>);
+
+                })}
                 </div>
 
-                {examAttempts.length > 2 && (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {examAttempts.length > 2 &&
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
-                      onClick={() => setShowAllExams(true)}
-                      variant="outline"
-                      className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]"
-                    >
+                  onClick={() => setShowAllExams(true)}
+                  variant="outline"
+                  className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
+
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
                   </motion.div>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-8 px-4">
+              }
+              </> :
+
+            <div className="text-center py-8 px-4">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <BookOpen className="w-8 h-8 text-gray-400" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-800 mb-1">אין בגרויות עדיין</h4>
                 <p className="text-gray-500 text-sm">התחל לפתור בגרויות כדי לראות את ההתקדמות שלך</p>
               </div>
-            )}
+            }
           </div>
         </motion.div>
 
