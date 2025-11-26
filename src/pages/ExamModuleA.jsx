@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, BookOpen, Zap, Loader2, Flag } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2, Home, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -466,6 +467,7 @@ export default function ExamModuleAPage() {
             total_points: 100,
             earned_points: score.finalScore,
             exam_type: 'module_a',
+            module_id: 'A',
             user_id: user?.id // Ensure user_id is saved with the attempt
           });
         }
