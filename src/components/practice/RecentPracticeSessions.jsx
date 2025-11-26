@@ -369,7 +369,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
 
                         <div className="flex items-center gap-3">
-                          <div className="bg-indigo-700 rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0">
+                          <div className="bg-blue-100 rounded-xl flex-shrink-0 w-12 h-12 flex items-center justify-center">
                             {passed ?
                             <CheckCircle className="w-6 h-6 text-green-600" /> :
 
