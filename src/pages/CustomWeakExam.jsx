@@ -40,14 +40,41 @@ export default function CustomWeakExamPage() {
         sessionStorage.removeItem('weakExamSource'); // Clean up
       }
 
+      // Check if there's a specific module to filter by (from ModuleCarousel)
+      const specificModuleId = sessionStorage.getItem('weakExamModule');
+      const specificModuleEntity = sessionStorage.getItem('weakExamModuleEntity');
+      if (specificModuleId) {
+        sessionStorage.removeItem('weakExamModule');
+        sessionStorage.removeItem('weakExamModuleEntity');
+      }
+
       // Get all exam attempts (not practice attempts)
       const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
-      const userExamAttempts = examAttempts.filter(a => 
+      
+      // Filter by user, subject, units, and optionally by specific exam or module
+      let userExamAttempts = examAttempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject === currentUser.selected_subject &&
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
         (!specificExamId || a.exam_id === specificExamId)
       );
+
+      // If filtering by module, further filter by module_id or exam_type
+      if (specificModuleId && !specificExamId) {
+        userExamAttempts = userExamAttempts.filter(a => {
+          // Check by module_id
+          if (a.module_id === specificModuleId) return true;
+          // Check by exam_type for Module A/B/C
+          if (specificModuleId === 'A' && a.exam_type === 'module_a') return true;
+          if (specificModuleId === 'B' && a.exam_type === 'module_b') return true;
+          if (specificModuleId === 'C' && a.exam_type === 'module_c') return true;
+          // Check by entity type
+          if (specificModuleEntity === 'ModuleAExam' && a.exam_type === 'module_a') return true;
+          if (specificModuleEntity === 'ModuleBExam' && a.exam_type === 'module_b') return true;
+          if (specificModuleEntity === 'ModuleCExam' && a.exam_type === 'module_c') return true;
+          return false;
+        });
+      }
 
       // Store source attempt info if filtering by specific exam
       if (specificExamId && userExamAttempts.length > 0) {
@@ -80,7 +107,7 @@ export default function CustomWeakExamPage() {
         }
       });
 
-      console.log('Found wrong answers:', wrongQuestionIds.size);
+      console.log('Found wrong answers:', wrongQuestionIds.size, 'for module:', specificModuleId || 'all');
 
       // Now fetch the actual exam questions
       const [genericExams, moduleAExams, moduleBExams, moduleCExams] = await Promise.all([
@@ -98,6 +125,14 @@ export default function CustomWeakExamPage() {
         if (sourceExamData) {
           setSourceExam(sourceExamData);
         }
+      }
+
+      // If filtering by module, set module info for display
+      if (specificModuleId && !specificExamId) {
+        setSourceExam({ 
+          title: `שאלון ${specificModuleId}`,
+          module_id: specificModuleId
+        });
       }
       
       // Extract questions from wrong answers
