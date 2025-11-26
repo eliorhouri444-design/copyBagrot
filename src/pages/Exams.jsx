@@ -536,11 +536,11 @@ export default function ExamsPage() {
         if (moduleId === 'C' && a.exam_type === 'module_c') return true;
         return false;
       }).length;
-      
+
       // Calculate which exam to show (cycle through the 5 available)
       const examIndex = moduleAttemptCount % moduleExams.length;
       const examToStart = moduleExams[examIndex];
-      
+
       if (examToStart) {
         console.log('✅ Starting exam (free user cycle):', examToStart.id, 'Module:', moduleId, 'Index:', examIndex);
         handleExamClick(examToStart);
@@ -681,7 +681,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="bg-gray-50 pb-4 min-h-screen">
+    <div className="bg-gray-100 pb-4 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -695,7 +695,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      <div className="bg-gray-50 pb-6 px-6 space-y-6">
+      <div className="bg-gray-100 pb-6 px-6 space-y-6">
 
 
         <motion.div
@@ -1033,9 +1033,9 @@ export default function ExamsPage() {
               {showAdDialog?.isExamStart ? 'התחלת מבחן' : 'צפייה בציון המבחן'}
             </DialogTitle>
             <DialogDescription>
-              {showAdDialog?.isExamStart 
-                ? 'צפה בפרסומת קצרה כדי להתחיל את המבחן'
-                : 'בחר אופציה לצפייה בפרטי המבחן והציון'}
+              {showAdDialog?.isExamStart ?
+              'צפה בפרסומת קצרה כדי להתחיל את המבחן' :
+              'בחר אופציה לצפייה בפרטי המבחן והציון'}
             </DialogDescription>
           </DialogHeader>
 
@@ -1044,15 +1044,15 @@ export default function ExamsPage() {
               <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
               <p className="text-sm text-gray-600 mb-4">
-                {showAdDialog?.isExamStart 
-                  ? 'צפה בפרסומת קצרה כדי להתחיל את המבחן'
-                  : 'צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב'}
+                {showAdDialog?.isExamStart ?
+                'צפה בפרסומת קצרה כדי להתחיל את המבחן' :
+                'צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב'}
               </p>
               <Button
                 onClick={async () => {
                   alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
                   await new Promise((resolve) => setTimeout(resolve, 2000));
-                  
+
                   if (showAdDialog?.isExamStart) {
                     // Start the exam after watching ad
                     const examToStart = showAdDialog;
@@ -1288,8 +1288,8 @@ export default function ExamsPage() {
               </button>
             )}
 
-            {!isPremium && showAllExamsModule && (
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 mt-3">
+            {!isPremium && showAllExamsModule &&
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 mt-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Crown className="w-5 h-5 text-amber-600" />
                   <h4 className="font-bold text-gray-900 text-sm">מוגבל ל-5 מבחנים</h4>
@@ -1298,16 +1298,16 @@ export default function ExamsPage() {
                   שדרג לפרימיום כדי לקבל גישה לכל המבחנים ללא הגבלה
                 </p>
                 <Button
-                  onClick={() => {
-                    setShowAllExamsModule(null);
-                    navigate(createPageUrl("Premium"));
-                  }}
-                  className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2">
+                onClick={() => {
+                  setShowAllExamsModule(null);
+                  navigate(createPageUrl("Premium"));
+                }}
+                className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2">
                   <Crown className="w-3.5 h-3.5" />
                   לגישה מלאה 100+ מבחנים
                 </Button>
               </div>
-            )}
+            }
           </div>
 
           <DialogFooter className="mt-4">
