@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-indigo-50 p-4 rounded-2xl">
+          <div className="bg-[#ffffff] p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -296,7 +296,7 @@ export default function ModuleCarousel({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-[#ffffff] p-3 text-center rounded-xl">
+              <div className="bg-slate-100 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
@@ -304,7 +304,7 @@ export default function ModuleCarousel({
                   <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
                   <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
                 </div>
-                <div className="bg-white rounded-xl p-3 text-center">
+                <div className="bg-slate-100 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <TrendingUp className="w-4 h-4 text-white" />
                   </div>
@@ -312,7 +312,7 @@ export default function ModuleCarousel({
                   <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
                   <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
                 </div>
-                <div className="bg-white rounded-xl p-3 text-center">
+                <div className="bg-slate-100 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <TrendingDown className="w-4 h-4 text-white" />
                   </div>
@@ -355,8 +355,8 @@ export default function ModuleCarousel({
                     onClick={() => {
                       sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
                       navigate(createPageUrl("CustomWeakExam"));
-                    }}
-                    className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
+                    }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full h-10 from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700">
+
 
                             <Target className="w-4 h-4 ml-2" />
                             בוחן טעויות מהשאלון
