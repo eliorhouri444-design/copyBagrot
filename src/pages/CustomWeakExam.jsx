@@ -232,16 +232,16 @@ Return JSON:`,
 
   if (!user || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">בונה בגרות אישית...</h3>
           <p className="text-gray-600 font-semibold">
             {sourceExam ? `מנתח טעויות מ: ${sourceExam.title}` : 'מחפש טעויות מבגרויות קודמות'}
           </p>
@@ -258,23 +258,23 @@ Return JSON:`,
       : 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full"
         >
           <div className="text-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Trophy className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">מבחן מותאם מבגרויות</p>
+            <p className="text-gray-600">בגרות אישית</p>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-6 border-2 border-orange-200">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
             <div className="text-center">
-              <div className="text-6xl font-black text-orange-600 mb-2">
+              <div className="text-6xl font-black text-blue-600 mb-2">
                 {correctCount} / {totalAnswered}
               </div>
               <div className="text-sm text-gray-600 mb-4">תשובות נכונות</div>
@@ -288,7 +288,7 @@ Return JSON:`,
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg"
+              className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg"
             >
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
@@ -312,8 +312,8 @@ Return JSON:`,
   const canAnswer = !hasAudio || audioPlayed;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex flex-col">
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 p-4 shadow-xl flex-shrink-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex flex-col">
+      <div className="bg-blue-500 p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
@@ -327,7 +327,7 @@ Return JSON:`,
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-lg font-bold">
-                {sourceExam ? `מבחן מותאם: ${sourceExam.title}` : 'מבחן מותאם מבגרויות'}
+                {sourceExam ? `בגרות אישית: ${sourceExam.title}` : 'בגרות אישית'}
               </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
@@ -350,16 +350,16 @@ Return JSON:`,
           animate={{ opacity: 1, x: 0 }}
           className="bg-white rounded-3xl shadow-2xl w-full max-w-lg"
         >
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-t-3xl border-b-2 border-orange-100">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-t-3xl border-b-2 border-blue-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600 font-medium">
                   {sourceExam ? `שאלה ${question.question_number} מהמבחן המקורי` : 'שאלה מבגרות קודמות'}
                 </div>
-                <div className="text-xs text-orange-600">⚡ שאלה שטעית בה במבחן</div>
+                <div className="text-xs text-blue-600">⚡ שאלה שטעית בה במבחן</div>
               </div>
             </div>
 
@@ -454,7 +454,7 @@ Return JSON:`,
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
                   placeholder={canAnswer ? "הקלד את תשובתך..." : "האזן לקטע תחילה..."}
-                  className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
+                  className="w-full h-32 p-4 text-base border-2 border-blue-200 focus:border-blue-500 rounded-2xl resize-none"
                   autoFocus={canAnswer}
                   disabled={isChecking || !canAnswer}
                 />
@@ -463,7 +463,7 @@ Return JSON:`,
                   <Button
                     onClick={checkAnswer}
                     disabled={!userAnswer.trim() || isChecking || !canAnswer}
-                    className="flex-1 h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg disabled:opacity-50"
+                    className="flex-1 h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg disabled:opacity-50"
                   >
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />
