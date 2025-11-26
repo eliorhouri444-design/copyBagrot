@@ -57,6 +57,17 @@ export default function PremiumPage() {
           const currentUser = await base44.auth.me();
           setUser(currentUser);
           setIsUserLoaded(true);
+          
+          // Check for plan parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const planParam = urlParams.get('plan');
+          if (planParam === 'yearly') {
+            const yearlyPlan = plans.find(p => p.id === 'yearly');
+            if (yearlyPlan) {
+              setSelectedPlan(yearlyPlan);
+              setShowPaymentDialog(true);
+            }
+          }
           return;
         } catch (error) {
           console.error(`Error loading user (retries left: ${retries - 1}):`, error);
