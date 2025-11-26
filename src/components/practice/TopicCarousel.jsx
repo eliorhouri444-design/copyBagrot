@@ -196,7 +196,10 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     תרגול טעויות בנושא זה
                   </Button>
                   <Button
-                  onClick={handleStartPractice}
+                  onClick={() => {
+                    sessionStorage.setItem('selectedTopicForPractice', currentTopic.topic_id);
+                    navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
+                  }}
                   variant="outline"
                   className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
                     בחר תרגול ספציפי (מעל 500 שאלות)
