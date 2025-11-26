@@ -12,7 +12,10 @@ import { differenceInDays } from 'date-fns';
 import {
   buildDailyPlan,
   calculateMovingAverage,
+  calculateWeeklyAverage,
+  calculatePerformanceGap,
   identifyWeakAreas,
+  weeklyCoursCorrection,
   getSkillName,
   SKILL_TYPES
 } from './EnglishStudyEngine';
