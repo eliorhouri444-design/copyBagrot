@@ -1222,7 +1222,7 @@ export default function ExamsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-2 overflow-y-auto max-h-[50vh] px-1">
+          <div className="space-y-2 overflow-y-auto max-h-[70vh] px-1">
             {showAllExamsModule && getModuleExams(showAllExamsModule).map((exam) =>
             <button
               key={exam.id}
