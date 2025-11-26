@@ -424,7 +424,7 @@ export default function ExamsPage() {
 
     const isPremium = user?.is_premium === true;
     if (!isPremium) {
-      exams = exams.slice(0, 10);
+      exams = exams.slice(0, 5);
     }
 
     return exams;
@@ -1242,6 +1242,27 @@ export default function ExamsPage() {
                 </div>
                 <ChevronLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
               </button>
+            )}
+
+            {!isPremium && showAllExamsModule && (
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 mt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="w-5 h-5 text-amber-600" />
+                  <h4 className="font-bold text-gray-900 text-sm">מוגבל ל-5 מבחנים</h4>
+                </div>
+                <p className="text-xs text-gray-600 mb-3">
+                  שדרג לפרימיום כדי לקבל גישה לכל המבחנים ללא הגבלה
+                </p>
+                <Button
+                  onClick={() => {
+                    setShowAllExamsModule(null);
+                    navigate(createPageUrl("Premium"));
+                  }}
+                  className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-xs font-bold flex items-center justify-center gap-2">
+                  <Crown className="w-3.5 h-3.5" />
+                  לגישה מלאה 100+ מבחנים
+                </Button>
+              </div>
             )}
           </div>
 
