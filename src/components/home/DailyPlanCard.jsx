@@ -300,9 +300,40 @@ export default function DailyPlanCard({
       .slice(0, 3);
   }, [modules, examAttempts]);
 
+  // שימוש במשימות מה-Engine אם קיימות
+  const engineTasks = useMemo(() => {
+    if (!engineData?.dailyPlan?.tasks) return null;
+    
+    return engineData.dailyPlan.tasks.map(task => {
+      const iconMap = {
+        'mistakes': Repeat,
+        'topic': Target,
+        'questions': BookOpen,
+        'exam': FileCheck,
+        'vocabulary': BookOpen
+      };
+      
+      return {
+        id: task.id,
+        type: task.type,
+        title: task.title,
+        description: task.description,
+        target: task.count || 1,
+        current: 0,
+        remaining: task.count || 1,
+        isCompleted: false,
+        icon: iconMap[task.type] || Target,
+        duration: task.duration
+      };
+    });
+  }, [engineData]);
+
+  // בחירה בין המשימות מה-Engine או החישוב הישן
+  const finalTasks = engineTasks || dailyTasks.tasks;
+
   // חישוב התקדמות אוטומטית מהמשימות
-  const completedCount = dailyTasks.tasks.filter(t => t.isCompleted).length;
-  const totalTasks = dailyTasks.tasks.length;
+  const completedCount = finalTasks.filter(t => t.isCompleted).length;
+  const totalTasks = finalTasks.length;
   const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
   const handleTaskClick = (task) => {
