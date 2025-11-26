@@ -87,7 +87,7 @@ export default function StudyPlanPage() {
   const displayUnits = user?.selected_units || 3;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
+    <div className="bg-[#ffffff] pb-24 min-h-screen from-blue-50 via-purple-50 to-pink-50">
       {/* Header */}
       <div className="bg-blue-500 mb-6 p-6 rounded-b-[2rem] from-[#3B82F6] to-[#8B5CF6] shadow-xl">
         <div className="flex items-center justify-between text-white mb-4">
