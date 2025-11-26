@@ -263,53 +263,59 @@ export default function ModuleCarousel({
                 </Button>
               }
               
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-2">
-                  <FileText className="w-6 h-6 text-white" />
+              <div className="flex items-center gap-4">
+                {/* Progress Circle */}
+                <div className="relative w-16 h-16 flex-shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                    <circle 
+                      cx="18" cy="18" r="14" fill="none" 
+                      stroke="white" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${moduleStats.progress}, 100`}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-                <h2 className="text-white text-lg font-bold">{currentModule.title}</h2>
-                <p className="text-white/80 text-sm">{moduleStats.totalAttempts} בגרויות בוצעו</p>
+                
+                <div className="flex-1 text-right">
+                  <h2 className="text-white text-lg font-bold mb-0.5">{currentModule.title}</h2>
+                  <div className="text-3xl font-black text-white">{moduleStats.progress}%</div>
+                  <p className="text-white/80 text-sm">{moduleStats.totalAttempts} בגרויות בוצעו</p>
+                </div>
               </div>
               
               {isLocked &&
-              <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2 mx-auto">
+              <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
                   <Crown className="w-3 h-3" />
                   פרימיום
                 </div>
               }
             </div>
 
-            {/* Statistics Section */}
-            <div className="bg-white rounded-xl p-4 mb-3">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="text-lg">📊</span>
-                <h3 className="text-[14px] font-bold text-[#2B2B2B]">הסטטיסטיקה שלך</h3>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <Target className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
               </div>
-              
-              {/* Progress */}
-              <div className="bg-[#F5F8FF] rounded-xl p-3 mb-3 text-center">
-                <div className="text-3xl font-black text-green-500 mb-1">{moduleStats.avgScore || 0}%</div>
-                <div className="text-[12px] text-[#6E6E6E] font-medium">התקדמות</div>
-                <div className="text-[11px] text-[#9E9E9E] mt-1">{moduleStats.totalAttempts} / {moduleStats.maxExams} מבחנים הושלמו</div>
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <TrendingUp className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
               </div>
-
-              {/* Stats Cards */}
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-green-50 rounded-xl p-2.5 text-center border border-green-200">
-                  <div className="text-xl font-bold text-green-500">{moduleStats.excellentAttempts || 0}</div>
-                  <div className="text-[11px] text-[#2B2B2B] font-semibold">מצוין</div>
-                  <div className="text-[9px] text-green-600">100%-86%</div>
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <AlertTriangle className="w-4 h-4 text-white" />
                 </div>
-                <div className="bg-orange-50 rounded-xl p-2.5 text-center border border-orange-200">
-                  <div className="text-xl font-bold text-orange-500">{moduleStats.mediumAttempts || 0}</div>
-                  <div className="text-[11px] text-[#2B2B2B] font-semibold">בינוני</div>
-                  <div className="text-[9px] text-orange-600">85%-56%</div>
-                </div>
-                <div className="bg-red-50 rounded-xl p-2.5 text-center border border-red-200">
-                  <div className="text-xl font-bold text-red-500">{moduleStats.failedAttempts || 0}</div>
-                  <div className="text-[11px] text-[#2B2B2B] font-semibold">נמוך</div>
-                  <div className="text-[9px] text-red-600">מתחת ל-56%</div>
-                </div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
               </div>
             </div>
 
