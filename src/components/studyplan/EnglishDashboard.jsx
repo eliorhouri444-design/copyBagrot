@@ -86,14 +86,18 @@ export default function EnglishDashboard({
       dayOfWeek,
       targetScore: stats.targetScore,
       currentAverage: stats.currentAverage,
+      weeklyAverage: stats.weeklyAverage,
       daysUntilExam: stats.daysUntilExam,
       moduleLevel: stats.moduleLevel,
+      unitLevel: stats.unitLevel,
       weakAreas: stats.weakAreas,
       vocabularyWords: vocabularyProgress,
-      completedToday: completedTasks
+      completedToday: completedTasks,
+      weeklyScores: examAttempts,
+      isSimulationMode: stats.mode === 'simulation'
     });
     setDailyPlan(plan);
-  }, [stats, vocabularyProgress, completedTasks]);
+  }, [stats, vocabularyProgress, completedTasks, examAttempts]);
 
   const handleCompleteTask = (taskId) => {
     setCompletedTasks(prev => [...prev, taskId]);
