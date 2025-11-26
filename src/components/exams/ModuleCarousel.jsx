@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-indigo-50 p-4 rounded-2xl overflow-hidden">
+          <div className="bg-indigo-50 p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -382,7 +382,7 @@ export default function ModuleCarousel({
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                  <div className="bg-[#F5F8FF] rounded-lg p-2.5 border border-[#E9F0FF]">
+                  <div className="bg-[#ffffff] p-2.5 rounded-lg border border-[#E9F0FF]">
                             <div className="text-center mb-2">
                               <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
                               <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
