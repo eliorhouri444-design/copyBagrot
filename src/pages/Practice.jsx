@@ -371,7 +371,7 @@ export default function PracticePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
 
-          <div className="bg-blue-50 p-4 rounded-2xl">
+          <div className="bg-[#ffffff] p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-[#3B82F6]" />
               <h3 className="text-base font-bold text-[#2B2B2B]">תרגול פרימיום מותאם אישית</h3>
