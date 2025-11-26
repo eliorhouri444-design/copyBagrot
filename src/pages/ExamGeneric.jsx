@@ -361,6 +361,8 @@ export default function ExamGenericPage() {
 
       await base44.entities.ExamAttempt.create({
         exam_id: examId,
+        exam_type: 'generic',
+        module_id: exam.module_id || '',
         subject: exam.subject,
         unit_level: exam.unit_level,
         started_at: new Date().toISOString(),
