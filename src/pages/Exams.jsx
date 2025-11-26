@@ -714,33 +714,7 @@ export default function ExamsPage() {
 
         </motion.div>
 
-        {isPremium &&
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }} className="bg-[#ffffff] p-4 rounded-2xl">
 
-
-            <div className="flex items-center gap-2 mb-3">
-              <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">בגרות מותאמת אישית</h3>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[#6E6E6E] text-[13px] mb-3">בגרות שמבוססת על הנושאים שבהן טעית בעבר, כדי לחזק בדיוק את מה שצריך.
-            </p>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                onClick={() => navigate(createPageUrl("WeakExamSelection"))} className="bg-blue-500 text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 h-11 flex items-center justify-center gap-2">
-
-
-                  <Target className="w-4 h-4" />
-                  <span className="">התחל בגרות</span>
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
-        }
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
