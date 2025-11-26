@@ -195,71 +195,137 @@ export default function StudyPlanPage() {
       </div>
 
       <div className="px-4 space-y-4">
-        {/* Timeline Alert */}
-        {daysUntilExam !== null &&
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`rounded-2xl p-4 flex items-center gap-3 ${
-          daysUntilExam <= 7 ? 'bg-red-100 border-2 border-red-300' :
-          daysUntilExam <= 14 ? 'bg-yellow-100 border-2 border-yellow-300' :
-          'bg-green-100 border-2 border-green-300'}`
-          }>
-
-            <Calendar className={`w-8 h-8 ${
-          daysUntilExam <= 7 ? 'text-red-600' :
-          daysUntilExam <= 14 ? 'text-yellow-600' : 'text-green-600'}`
-          } />
+        {/* Pace Status */}
+        {paceStatus && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl p-4 flex items-center gap-3 ${
+              paceStatus.status === 'ahead' ? 'bg-green-100 border-2 border-green-300' :
+              paceStatus.status === 'on_track' ? 'bg-blue-100 border-2 border-blue-300' :
+              paceStatus.status === 'behind' ? 'bg-yellow-100 border-2 border-yellow-300' :
+              'bg-red-100 border-2 border-red-300'
+            }`}>
+            <span className="text-3xl">{paceStatus.icon}</span>
             <div className="flex-1">
-              <div className="font-bold text-gray-900">{daysUntilExam} ימים לבגרות</div>
+              <div className="font-bold text-gray-900">{paceStatus.message}</div>
               <div className="text-sm text-gray-600">
-                {daysUntilExam <= 7 ? 'זמן להגביר מאמצים!' :
-              daysUntilExam <= 14 ? 'המשך בקצב הנוכחי' : 'אתה על המסלול הנכון'}
+                {daysUntilExam !== null && `${daysUntilExam} ימים לבגרות`}
               </div>
             </div>
           </motion.div>
-        }
+        )}
+
+        {/* Alert from Daily Plan */}
+        {dailyPlan?.alert && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`rounded-xl p-4 border-2 ${
+              dailyPlan.alert.type === 'success' 
+                ? 'bg-green-50 border-green-300'
+                : dailyPlan.alert.type === 'critical'
+                  ? 'bg-red-50 border-red-300'
+                  : 'bg-amber-50 border-amber-300'
+            }`}>
+            <p className={`font-medium text-sm ${
+              dailyPlan.alert.type === 'success' 
+                ? 'text-green-800'
+                : dailyPlan.alert.type === 'critical'
+                  ? 'text-red-800'
+                  : 'text-amber-800'
+            }`}>
+              {dailyPlan.alert.message}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Gap & Requirements Card */}
+        {requirements && gap > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl shadow-lg p-5">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5 text-orange-600" />
+              מה צריך כדי להגיע ל-{targetScore}
+            </h2>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">שאלות לפתור</span>
+                <span className="font-bold text-blue-600">
+                  {requirements.requirements.questionsNeeded} ({requirements.requirements.questionsPerDay}/יום)
+                </span>
+              </div>
+              <Progress value={Math.min(100, (performanceData?.totalQuestions || 0) / (requirements.requirements.questionsNeeded + (performanceData?.totalQuestions || 0)) * 100)} className="h-2" />
+              
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">בגרויות מלאות</span>
+                <span className="font-bold text-purple-600">
+                  {requirements.requirements.examsNeeded} ({requirements.requirements.examsPerWeek}/שבוע)
+                </span>
+              </div>
+              <Progress value={Math.min(100, (performanceData?.totalExams || 0) / (requirements.requirements.examsNeeded + (performanceData?.totalExams || 0)) * 100)} className="h-2" />
+              
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">נושאים לשליטה</span>
+                <span className="font-bold text-green-600">
+                  {requirements.requirements.topicsToMaster}
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">טעויות לתקן</span>
+                <span className="font-bold text-red-600">
+                  {requirements.requirements.mistakesToFix} ({requirements.requirements.mistakesPerDay}/יום)
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-blue-50 rounded-xl text-center">
+              <span className="text-sm text-blue-800">
+                צפי להגעה ליעד: <strong>{requirements.estimatedDaysToTarget} ימים</strong>
+              </span>
+            </div>
+          </motion.div>
+        )}
 
         {/* Progress Summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.15 }}
           className="bg-white rounded-2xl shadow-lg p-5">
 
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-            איפה אתה עומד כרגע
+            <BarChart3 className="w-5 h-5 text-blue-600" />
+            הביצועים שלך
           </h2>
           
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 p-4 rounded-xl">
-              <div className="text-sm text-blue-800 font-semibold mb-1">שאלות</div>
-              <div className="text-2xl font-bold text-blue-900">{stats.completedQuestions}</div>
-              <div className="text-xs text-blue-600">מתוך {stats.totalQuestions}</div>
-              <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
-                <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${practiceProgress}%` }} />
-              </div>
+              <div className="text-sm text-blue-800 font-semibold mb-1">שאלות שנפתרו</div>
+              <div className="text-2xl font-bold text-blue-900">{performanceData?.totalQuestions || 0}</div>
+              <div className="text-xs text-blue-600">דיוק: {performanceData?.overallAccuracy || 0}%</div>
             </div>
             
             <div className="bg-purple-50 p-4 rounded-xl">
               <div className="text-sm text-purple-800 font-semibold mb-1">בגרויות</div>
-              <div className="text-2xl font-bold text-purple-900">{stats.completedExams}</div>
-              <div className="text-xs text-purple-600">מתוך {stats.totalExams}</div>
-              <div className="w-full bg-purple-200 rounded-full h-2 mt-2">
-                <div className="bg-purple-500 h-2 rounded-full transition-all" style={{ width: `${examProgress}%` }} />
-              </div>
+              <div className="text-2xl font-bold text-purple-900">{performanceData?.totalExams || 0}</div>
+              <div className="text-xs text-purple-600">ממוצע: {performanceData?.avgExamScore || 0}</div>
             </div>
             
             <div className="bg-orange-50 p-4 rounded-xl">
               <div className="text-sm text-orange-800 font-semibold mb-1">נושאים חלשים</div>
-              <div className="text-2xl font-bold text-orange-900">{stats.weakTopics}</div>
+              <div className="text-2xl font-bold text-orange-900">{performanceData?.weakTopics?.length || 0}</div>
               <div className="text-xs text-orange-600">צריכים חיזוק</div>
             </div>
             
             <div className="bg-red-50 p-4 rounded-xl">
               <div className="text-sm text-red-800 font-semibold mb-1">טעויות פעילות</div>
-              <div className="text-2xl font-bold text-red-900">{stats.activeMistakes}</div>
+              <div className="text-2xl font-bold text-red-900">{performanceData?.activeMistakes || 0}</div>
               <div className="text-xs text-red-600">לתרגול חוזר</div>
             </div>
           </div>
