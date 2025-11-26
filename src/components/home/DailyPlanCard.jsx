@@ -487,6 +487,9 @@ export default function DailyPlanCard({
                 </div>
 
                 {!isCompleted && <Play className="w-4 h-4 text-[#3B82F6]" />}
+                {task.duration && !isCompleted && (
+                  <span className="text-[10px] text-[#6E6E6E] ml-2">{task.duration} דק'</span>
+                )}
               </div>
             );
           })}
@@ -497,6 +500,9 @@ export default function DailyPlanCard({
           <Progress value={progressPercent} className="h-2" />
           <div className="text-[11px] text-[#6E6E6E] mt-1 text-center">
             הושלמו {completedCount} מתוך {totalTasks} משימות
+            {engineData?.dailyPlan?.expectedImprovement > 0 && (
+              <span className="text-green-600 mr-2">• שיפור צפוי: +{engineData.dailyPlan.expectedImprovement}%</span>
+            )}
           </div>
         </div>
 
