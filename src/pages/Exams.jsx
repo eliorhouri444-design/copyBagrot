@@ -811,29 +811,33 @@ export default function ExamsPage() {
                           </div>
                         </motion.button>
 
-                        {hasMistakes && isPremium &&
-                      <div className="bg-white rounded-xl p-3 border border-[#E9F0FF] mr-2">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Crown className="w-4 h-4 text-[#3B82F6]" />
-                              <h4 className="font-bold text-[#2B2B2B] text-[12px]">
-                                בגרות מותאמת עבורך
-                              </h4>
+                        {hasMistakes && isPremium && (() => {
+                          const wrongCount = attempt.answers?.filter(a => !a.is_correct).length || 0;
+                          return (
+                            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Target className="w-4 h-4 text-orange-600" />
+                                <h4 className="font-bold text-gray-900 text-[12px]">
+                                  תרגול טעויות מבחינה זו
+                                </h4>
+                              </div>
+                              <p className="text-[11px] text-gray-600 mb-2">
+                                {wrongCount} שאלות שטעית בהן במבחן הזה
+                              </p>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
+                                  sessionStorage.setItem('mistakesExamId', attempt.exam_id);
+                                  navigate(createPageUrl("ExamMistakesPractice"));
+                                }} 
+                                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-[11px] px-4 py-2 font-bold rounded-[14px] w-full h-9 flex items-center justify-center gap-2">
+                                <Target className="w-3.5 h-3.5" />
+                                תרגל {wrongCount} טעויות
+                              </Button>
                             </div>
-                            <p className="text-[11px] text-[#6E6E6E] mb-2">
-                              חזרה על השאלות שטעית בהן
-                            </p>
-                            <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            sessionStorage.setItem('weakExamSource', attempt.exam_id);
-                            navigate(createPageUrl("CustomWeakExam"));
-                          }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
-
-
-                              בגרות אישית
-                            </Button>
-                          </div>
-                      }
+                          );
+                        })()}
                       </div>);
 
                 })}
