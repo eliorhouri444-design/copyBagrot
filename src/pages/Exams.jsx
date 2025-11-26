@@ -718,8 +718,8 @@ export default function ExamsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-indigo-50 rounded-2xl p-4">
+          transition={{ delay: 0.2 }} className="bg-[#ffffff] p-4 rounded-2xl">
+
 
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-[#3B82F6]" />
@@ -731,8 +731,8 @@ export default function ExamsPage() {
             </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                onClick={() => navigate(createPageUrl("WeakExamSelection"))}
-                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white h-11 text-[13px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+                onClick={() => navigate(createPageUrl("WeakExamSelection"))} className="bg-blue-500 text-[13px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 h-11 flex items-center justify-center gap-2">
+
 
                   <Target className="w-4 h-4" />
                   <span className="">התחל בגרות</span>
@@ -853,8 +853,8 @@ export default function ExamsPage() {
                             e.stopPropagation();
                             sessionStorage.setItem('weakExamSource', attempt.exam_id);
                             navigate(createPageUrl("CustomWeakExam"));
-                          }}
-                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+                          }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
+
 
                               בגרות אישית
                             </Button>
