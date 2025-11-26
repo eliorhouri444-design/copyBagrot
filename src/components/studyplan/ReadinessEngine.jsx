@@ -294,7 +294,204 @@ export const calculateReadinessScore = ({
 };
 
 /**
- * חישוב מלא של מוכנות מנתוני ביצוע
+ * חישוב TopicReadiness לנושא בודד
+ * TopicReadiness = 0.60 * Accuracy + 0.20 * DifficultyScore + 0.10 * ErrorReduction + 0.10 * SpeedScore
+ */
+export const calculateTopicReadiness = (topicAttempts) => {
+  if (!topicAttempts || topicAttempts.length === 0) {
+    return { readiness: 0, category: 'weak', accuracy: 0, difficulty: 0, errorReduction: 0, speed: 0 };
+  }
+
+  // === Accuracy Score (60%) ===
+  const correctCount = topicAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+  const accuracy = (correctCount / topicAttempts.length) * 100;
+
+  // === Difficulty Score (20%) ===
+  const difficultyScores = { easy: 1.0, medium: 1.2, hard: 1.5 };
+  let weightedScore = 0;
+  let weightedMax = 0;
+  topicAttempts.forEach(a => {
+    const diff = a.difficulty_level || 'medium';
+    const weight = difficultyScores[diff] || 1.0;
+    const isCorrect = a.status === 'correct' || a.percentage >= 70;
+    weightedScore += isCorrect ? weight : 0;
+    weightedMax += weight;
+  });
+  const difficultyScore = weightedMax > 0 ? (weightedScore / weightedMax) * 100 : 0;
+
+  // === Error Reduction Score (10%) ===
+  const recentAttempts = topicAttempts.slice(-5);
+  const olderAttempts = topicAttempts.slice(0, Math.max(5, topicAttempts.length - 5));
+  const recentErrors = recentAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+  const olderErrors = olderAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+  let errorReductionScore = 50;
+  if (olderErrors > 0 && recentErrors < olderErrors) {
+    errorReductionScore = 100;
+  } else if (recentErrors === 0) {
+    errorReductionScore = 100;
+  } else if (recentErrors > olderErrors) {
+    errorReductionScore = 25;
+  }
+
+  // === Speed Score (10%) ===
+  const timesWithData = topicAttempts.filter(a => a.time_spent_seconds > 0);
+  let speedScore = 50;
+  if (timesWithData.length > 0) {
+    const avgTime = timesWithData.reduce((sum, a) => sum + a.time_spent_seconds, 0) / timesWithData.length;
+    speedScore = avgTime < 30 ? 100 : avgTime < 60 ? 80 : avgTime < 120 ? 60 : 40;
+  }
+
+  // === Final Topic Readiness ===
+  const readiness = Math.round(
+    TOPIC_READINESS_WEIGHTS.ACCURACY * accuracy +
+    TOPIC_READINESS_WEIGHTS.DIFFICULTY * difficultyScore +
+    TOPIC_READINESS_WEIGHTS.ERROR_REDUCTION * errorReductionScore +
+    TOPIC_READINESS_WEIGHTS.SPEED * speedScore
+  );
+
+  // Category
+  let category = 'weak';
+  if (readiness >= 86) category = 'excellent';
+  else if (readiness >= 56) category = 'medium';
+
+  return {
+    readiness,
+    category,
+    accuracy: Math.round(accuracy),
+    difficulty: Math.round(difficultyScore),
+    errorReduction: Math.round(errorReductionScore),
+    speed: Math.round(speedScore)
+  };
+};
+
+/**
+ * חישוב ExamReadiness לשאלון בודד
+ * ExamReadiness = 0.50 * TopicMastery + 0.30 * PracticePerformance + 0.20 * ExamPerformance
+ */
+export const calculateExamReadiness = (moduleAttempts, practiceAttempts, topicStats) => {
+  // === Topic Mastery (50%) ===
+  let topicMastery = 0;
+  if (Object.keys(topicStats).length > 0) {
+    const scores = Object.values(topicStats).map(t => t.readiness || t.score || 0);
+    topicMastery = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  } else if (practiceAttempts.length > 0) {
+    const correctCount = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+    topicMastery = (correctCount / practiceAttempts.length) * 100;
+  }
+
+  // === Practice Performance (30%) ===
+  let practicePerformance = 0;
+  if (practiceAttempts.length > 0) {
+    const correctPractice = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+    const accuracy = (correctPractice / practiceAttempts.length) * 100;
+    
+    const avgTime = practiceAttempts.reduce((sum, a) => sum + (a.time_spent_seconds || 60), 0) / practiceAttempts.length;
+    const speedScore = avgTime < 30 ? 100 : avgTime < 60 ? 80 : avgTime < 120 ? 60 : 40;
+    
+    const recentAttempts = practiceAttempts.slice(-10);
+    const olderAttempts = practiceAttempts.slice(0, Math.max(10, practiceAttempts.length - 10));
+    const recentErrors = recentAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+    const olderErrors = olderAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+    const reducedErrors = olderErrors > 0 && recentErrors < olderErrors ? 100 : recentErrors === 0 ? 100 : 50;
+    
+    practicePerformance = 0.70 * accuracy + 0.20 * speedScore + 0.10 * reducedErrors;
+  }
+
+  // === Exam Performance (20%) ===
+  let examPerformance = 0;
+  if (moduleAttempts.length > 0) {
+    examPerformance = moduleAttempts.reduce((sum, a) => sum + (a.score_percent || 0), 0) / moduleAttempts.length;
+  }
+
+  // === Final Exam Readiness ===
+  const readiness = Math.round(
+    EXAM_READINESS_WEIGHTS.TOPIC_MASTERY * topicMastery +
+    EXAM_READINESS_WEIGHTS.PRACTICE_PERFORMANCE * practicePerformance +
+    EXAM_READINESS_WEIGHTS.EXAM_PERFORMANCE * examPerformance
+  );
+
+  return {
+    readiness,
+    topicMastery: Math.round(topicMastery),
+    practicePerformance: Math.round(practicePerformance),
+    examPerformance: Math.round(examPerformance)
+  };
+};
+
+/**
+ * חישוב Error Mastery
+ * מדד שיורד ככל שיש יותר טעויות חוזרות פעילות
+ */
+export const calculateErrorMastery = (attempts) => {
+  if (!attempts || attempts.length === 0) return 100;
+
+  // ספירת טעויות חוזרות לפי שאלה/נושא
+  const mistakeCount = {};
+  attempts.filter(a => a.status === 'incorrect').forEach(a => {
+    const key = a.question_id || `${a.topic_id}_${a.created_date}`;
+    mistakeCount[key] = (mistakeCount[key] || 0) + 1;
+  });
+
+  // טעויות פעילות = טעויות שחזרו יותר מפעם אחת
+  const activeMistakes = Object.values(mistakeCount).filter(c => c >= 2).length;
+  const totalQuestions = attempts.length;
+
+  // ErrorMastery = 100 - (activeMistakes / totalQuestions * 100)
+  const errorRatio = totalQuestions > 0 ? (activeMistakes / totalQuestions) : 0;
+  const errorMastery = Math.max(0, Math.round(100 - errorRatio * 200)); // משקל כפול לטעויות
+
+  return errorMastery;
+};
+
+/**
+ * חישוב FullExamReadiness - מד המוכנות הכולל לבגרות
+ * FullExamReadiness = 0.50 * ExamsMastery + 0.40 * TopicsMastery + 0.10 * ErrorMastery
+ */
+export const calculateFullExamReadiness = ({
+  examReadinessScores,  // מערך של ExamReadiness לכל שאלון
+  topicReadinessScores, // מערך של TopicReadiness לכל נושא
+  errorMastery          // ציון Error Mastery
+}) => {
+  // === Exams Mastery (50%) - ממוצע משוקלל של מוכנות לשאלונים ===
+  let examsMastery = 0;
+  if (examReadinessScores && examReadinessScores.length > 0) {
+    examsMastery = examReadinessScores.reduce((sum, e) => sum + (e.readiness || 0), 0) / examReadinessScores.length;
+  }
+
+  // === Topics Mastery (40%) - ממוצע משוקלל של מוכנות לנושאים ===
+  let topicsMastery = 0;
+  if (topicReadinessScores && topicReadinessScores.length > 0) {
+    topicsMastery = topicReadinessScores.reduce((sum, t) => sum + (t.readiness || 0), 0) / topicReadinessScores.length;
+  }
+
+  // === Final Full Exam Readiness ===
+  const fullReadiness = Math.round(
+    FULL_READINESS_WEIGHTS.EXAMS_MASTERY * examsMastery +
+    FULL_READINESS_WEIGHTS.TOPICS_MASTERY * topicsMastery +
+    FULL_READINESS_WEIGHTS.ERROR_MASTERY * (errorMastery || 100)
+  );
+
+  // Category
+  let category = 'weak';
+  if (fullReadiness >= 86) category = 'excellent';
+  else if (fullReadiness >= 56) category = 'medium';
+
+  return {
+    fullReadiness,
+    category,
+    examsMastery: Math.round(examsMastery),
+    topicsMastery: Math.round(topicsMastery),
+    errorMastery: errorMastery || 100,
+    breakdown: {
+      exams: { score: Math.round(examsMastery), weight: FULL_READINESS_WEIGHTS.EXAMS_MASTERY, contribution: Math.round(examsMastery * FULL_READINESS_WEIGHTS.EXAMS_MASTERY) },
+      topics: { score: Math.round(topicsMastery), weight: FULL_READINESS_WEIGHTS.TOPICS_MASTERY, contribution: Math.round(topicsMastery * FULL_READINESS_WEIGHTS.TOPICS_MASTERY) },
+      errors: { score: errorMastery || 100, weight: FULL_READINESS_WEIGHTS.ERROR_MASTERY, contribution: Math.round((errorMastery || 100) * FULL_READINESS_WEIGHTS.ERROR_MASTERY) }
+    }
+  };
+};
+
+/**
+ * חישוב מלא של מוכנות מנתוני ביצוע (Legacy + New)
  */
 export const calculateFullReadiness = (performanceData, subject, unitLevel) => {
   if (!performanceData) {
@@ -304,10 +501,12 @@ export const calculateFullReadiness = (performanceData, subject, unitLevel) => {
       practiceScore: 0,
       examScore: 0,
       speedScore: 0,
+      fullExamReadiness: 0,
       breakdown: null
     };
   }
 
+  // Legacy calculations
   const contentScore = calculateContentMasteryScore(
     performanceData.topicMastery, 
     subject, 
@@ -335,12 +534,43 @@ export const calculateFullReadiness = (performanceData, subject, unitLevel) => {
     speedScore
   });
 
+  // New: Calculate Error Mastery
+  const errorMastery = calculateErrorMastery(performanceData.raw?.attempts || []);
+
+  // New: Calculate Topic Readiness for each topic
+  const topicReadinessScores = [];
+  if (performanceData.topicMastery) {
+    Object.entries(performanceData.topicMastery).forEach(([topicId, stats]) => {
+      // We need the raw attempts for each topic
+      const topicAttempts = (performanceData.raw?.attempts || []).filter(a => a.topic_id === topicId);
+      const topicReadiness = calculateTopicReadiness(topicAttempts);
+      topicReadinessScores.push({ topicId, ...topicReadiness });
+    });
+  }
+
+  // New: Calculate Exam Readiness (simplified - using overall stats)
+  const examReadinessScores = [{
+    readiness: Math.round(0.50 * contentScore + 0.30 * practiceScore + 0.20 * examScore)
+  }];
+
+  // New: Calculate Full Exam Readiness
+  const fullExamReadinessData = calculateFullExamReadiness({
+    examReadinessScores,
+    topicReadinessScores,
+    errorMastery
+  });
+
   return {
     readinessScore,
     contentScore,
     practiceScore,
     examScore,
     speedScore,
+    // New fields
+    fullExamReadiness: fullExamReadinessData.fullReadiness,
+    fullExamReadinessData,
+    topicReadinessScores,
+    errorMastery,
     breakdown: {
       content: { score: contentScore, weight: READINESS_WEIGHTS.CONTENT_MASTERY, contribution: Math.round(contentScore * READINESS_WEIGHTS.CONTENT_MASTERY) },
       practice: { score: practiceScore, weight: READINESS_WEIGHTS.PRACTICE_SCORE, contribution: Math.round(practiceScore * READINESS_WEIGHTS.PRACTICE_SCORE) },
