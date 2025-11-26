@@ -521,7 +521,7 @@ Return JSON:`,
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
                   placeholder={canAnswer ? "הקלד את תשובתך..." : "האזן לקטע תחילה..."}
-                  className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
+                  className="w-full h-32 p-4 text-base border-2 border-blue-200 focus:border-blue-500 rounded-2xl resize-none"
                   autoFocus={canAnswer}
                   disabled={isChecking || !canAnswer}
                 />
@@ -530,7 +530,7 @@ Return JSON:`,
                   <Button
                     onClick={checkAnswer}
                     disabled={!userAnswer.trim() || isChecking || !canAnswer}
-                    className="flex-1 h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg disabled:opacity-50"
+                    className="flex-1 h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg disabled:opacity-50"
                   >
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />
