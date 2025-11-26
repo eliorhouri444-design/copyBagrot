@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-indigo-50 p-4 rounded-2xl">
+          <div className="bg-indigo-50 p-4 rounded-2xl overflow-hidden">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
