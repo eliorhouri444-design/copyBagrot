@@ -32,59 +32,92 @@ export default function CustomWeakExamPage() {
   const [sourceAttempt, setSourceAttempt] = useState(null);
 
   const loadUserAndQuestions = async () => {
+    setIsLoading(true);
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Check if there's a specific exam ID to filter by
-      const specificExamId = sessionStorage.getItem('weakExamSource');
-      if (specificExamId) {
-        sessionStorage.removeItem('weakExamSource'); // Clean up
+      // Check if there's a specific module to filter by (from ModuleCarousel)
+      const specificModuleId = sessionStorage.getItem('weakExamModule');
+      const specificModuleEntity = sessionStorage.getItem('weakExamModuleEntity');
+      if (specificModuleId) {
+        sessionStorage.removeItem('weakExamModule');
+        sessionStorage.removeItem('weakExamModuleEntity');
       }
 
-      // Get all exam attempts (not practice attempts)
-      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
-      const userExamAttempts = examAttempts.filter(a => 
+      // Get all exam attempts
+      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 200);
+      
+      // Filter by user, subject, units
+      let userExamAttempts = examAttempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject === currentUser.selected_subject &&
-        parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
-        (!specificExamId || a.exam_id === specificExamId)
+        parseInt(a.unit_level) === parseInt(currentUser.selected_units)
       );
 
-      // Store source attempt info if filtering by specific exam
-      if (specificExamId && userExamAttempts.length > 0) {
-        const sourceAttemptData = userExamAttempts[0];
-        setSourceAttempt(sourceAttemptData);
+      // If filtering by module, further filter by module_id or exam_type
+      if (specificModuleId) {
+        userExamAttempts = userExamAttempts.filter(a => {
+          if (a.module_id === specificModuleId) return true;
+          if (specificModuleId === 'A' && a.exam_type === 'module_a') return true;
+          if (specificModuleId === 'B' && a.exam_type === 'module_b') return true;
+          if (specificModuleId === 'C' && a.exam_type === 'module_c') return true;
+          if (specificModuleEntity === 'ModuleAExam' && a.exam_type === 'module_a') return true;
+          if (specificModuleEntity === 'ModuleBExam' && a.exam_type === 'module_b') return true;
+          if (specificModuleEntity === 'ModuleCExam' && a.exam_type === 'module_c') return true;
+          return false;
+        });
+        
+        setSourceExam({ 
+          title: `שאלון ${specificModuleId}`,
+          module_id: specificModuleId
+        });
       }
 
-      // Collect all wrong answers from all exam attempts
-      const wrongQuestionIds = new Set();
-      const questionErrorDetails = {};
-
+      // === Analyze weak TOPICS from all exams ===
+      const topicErrorStats = {};
+      
       userExamAttempts.forEach(attempt => {
         if (attempt.answers && Array.isArray(attempt.answers)) {
           attempt.answers.forEach((answer, idx) => {
+            const topicKey = answer.topic || answer.topic_key || `question_${idx}`;
+            
+            if (!topicErrorStats[topicKey]) {
+              topicErrorStats[topicKey] = {
+                topic: topicKey,
+                totalQuestions: 0,
+                wrongAnswers: 0,
+                questions: []
+              };
+            }
+            
+            topicErrorStats[topicKey].totalQuestions++;
+            
             if (!answer.is_correct) {
-              const questionKey = `${attempt.exam_id}_${idx}`;
-              wrongQuestionIds.add(questionKey);
-              
-              if (!questionErrorDetails[questionKey]) {
-                questionErrorDetails[questionKey] = {
-                  exam_id: attempt.exam_id,
-                  question_index: idx,
-                  errors: 0,
-                  last_attempt: attempt.created_date
-                };
-              }
-              questionErrorDetails[questionKey].errors++;
+              topicErrorStats[topicKey].wrongAnswers++;
+              topicErrorStats[topicKey].questions.push({
+                exam_id: attempt.exam_id,
+                question_index: idx,
+                answer: answer
+              });
             }
           });
         }
       });
 
-      console.log('Found wrong answers:', wrongQuestionIds.size);
+      // Calculate weakness percentage for each topic and sort
+      const sortedWeakTopics = Object.values(topicErrorStats)
+        .map(t => ({
+          ...t,
+          errorRate: t.totalQuestions > 0 ? (t.wrongAnswers / t.totalQuestions) * 100 : 0
+        }))
+        .filter(t => t.wrongAnswers > 0)
+        .sort((a, b) => b.errorRate - a.errorRate);
 
-      // Now fetch the actual exam questions
+      console.log('📊 Weak topics found:', sortedWeakTopics.map(t => `${t.topic}: ${Math.round(t.errorRate)}%`));
+      setWeakTopics(sortedWeakTopics.slice(0, 5));
+
+      // Fetch all exams to get actual questions
       const [genericExams, moduleAExams, moduleBExams, moduleCExams] = await Promise.all([
         base44.entities.GenericExam.list(),
         base44.entities.ModuleAExam.list(),
@@ -93,48 +126,49 @@ export default function CustomWeakExamPage() {
       ]);
 
       const allExams = [...genericExams, ...moduleAExams, ...moduleBExams, ...moduleCExams];
-      
-      // Find and store the source exam if we're filtering by specific exam
-      if (specificExamId) {
-        const sourceExamData = allExams.find(e => e.id === specificExamId);
-        if (sourceExamData) {
-          setSourceExam(sourceExamData);
-        }
-      }
-      
-      // Extract questions from wrong answers
-      const weakQuestions = [];
-      wrongQuestionIds.forEach(questionKey => {
-        const details = questionErrorDetails[questionKey];
-        const exam = allExams.find(e => e.id === details.exam_id);
 
-        if (exam && exam.questions && exam.questions[details.question_index]) {
-          const question = exam.questions[details.question_index];
-          weakQuestions.push({
-            ...question,
-            reading_text: question.reading_text || exam.reading_text,
-            exam_id: details.exam_id,
-            exam_title: exam.title || 'מבחן בגרות',
-            question_number: details.question_index + 1,
-            _metadata: {
-              failures: details.errors,
-              attempts: details.errors,
-              lastScore: 0,
-              from_exam: true
-            }
-          });
-        }
+      // Build questions from WEAK TOPICS
+      const weakQuestions = [];
+      const usedQuestionKeys = new Set();
+
+      sortedWeakTopics.forEach(topicInfo => {
+        topicInfo.questions.forEach(qInfo => {
+          const questionKey = `${qInfo.exam_id}_${qInfo.question_index}`;
+          if (usedQuestionKeys.has(questionKey)) return;
+          
+          const exam = allExams.find(e => e.id === qInfo.exam_id);
+          if (exam && exam.questions && exam.questions[qInfo.question_index]) {
+            const question = exam.questions[qInfo.question_index];
+            weakQuestions.push({
+              ...question,
+              reading_text: question.reading_text || exam.reading_text,
+              exam_id: qInfo.exam_id,
+              exam_title: exam.title || 'מבחן בגרות',
+              question_number: qInfo.question_index + 1,
+              weak_topic: topicInfo.topic,
+              _metadata: {
+                topic: topicInfo.topic,
+                topicErrorRate: topicInfo.errorRate,
+                failures: topicInfo.wrongAnswers,
+                from_exam: true
+              }
+            });
+            usedQuestionKeys.add(questionKey);
+          }
+        });
       });
 
-      // Sort by number of errors
-      const sortedQuestions = weakQuestions.sort((a, b) => 
-        (b._metadata?.failures || 0) - (a._metadata?.failures || 0)
-      ).slice(0, 20);
+      // Sort by topic error rate (weakest topics first)
+      const sortedQuestions = weakQuestions
+        .sort((a, b) => (b._metadata?.topicErrorRate || 0) - (a._metadata?.topicErrorRate || 0))
+        .slice(0, 20);
 
-      console.log('Loaded weak questions from exams:', sortedQuestions.length);
+      console.log('📝 Loaded weak topic questions:', sortedQuestions.length);
       setQuestions(sortedQuestions);
     } catch (error) {
       console.error("Error loading questions:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
