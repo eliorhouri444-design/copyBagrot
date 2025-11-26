@@ -323,7 +323,9 @@ export default function DailyPlanCard({
         remaining: task.count || 1,
         isCompleted: false,
         icon: iconMap[task.type] || Target,
-        duration: task.duration
+        duration: task.duration,
+        topic_id: task.topic_id,
+        exam_id: task.exam_id
       };
     });
   }, [engineData]);
