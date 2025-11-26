@@ -25,6 +25,7 @@ export default function HomePage() {
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [adSettings, setAdSettings] = useState(null);
+  const [engineData, setEngineData] = useState(null);
   
   // קריאה אחת לכל הנתונים עם Cache
   const { data: homeData, isLoading, error } = useHomeData();
@@ -37,6 +38,48 @@ export default function HomePage() {
   const modules = homeData?.modules || [];
   const lastActivity = homeData?.lastActivity;
   const stats = homeData?.stats || {};
+
+  // טעינת נתונים מה-Readiness Engine
+  useEffect(() => {
+    const loadEngineData = async () => {
+      if (!user?.email) return;
+      
+      const subject = user?.selected_subject || 'אנגלית';
+      const unitLevel = user?.selected_units || 5;
+      const targetScore = user?.target_score || 85;
+      const examDate = user?.exam_date ? new Date(user.exam_date) : null;
+      const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : 60;
+
+      try {
+        const perfData = await fetchUserPerformanceData(base44, user.email, subject, unitLevel);
+        if (perfData) {
+          const readinessData = calculateFullReadiness(perfData, subject, unitLevel);
+          const reqs = calculateGapAndRequirements({
+            targetScore,
+            readinessScore: readinessData.readinessScore,
+            performanceData: perfData,
+            subject,
+            unitLevel,
+            daysUntilExam
+          });
+          const plan = buildCompleteDailyPlan({
+            performanceData: perfData,
+            requirements: reqs,
+            targetScore,
+            daysUntilExam,
+            subject,
+            unitLevel,
+            dayOfWeek: new Date().getDay()
+          });
+
+          setEngineData({ readiness: readinessData, requirements: reqs, dailyPlan: plan, performanceData: perfData });
+        }
+      } catch (error) {
+        console.error("Error loading engine data:", error);
+      }
+    };
+    loadEngineData();
+  }, [user]);
 
   // Track referral clicks when someone opens a shared link
   useEffect(() => {
