@@ -6,22 +6,28 @@ import { motion } from "framer-motion";
 import {
   Loader2, Target, CheckCircle, BookOpen, Repeat, AlertTriangle,
   Clock, Play, Zap, Crown, Lock, TrendingUp, FileCheck,
-  Calendar, Award, ChevronLeft } from
+  Calendar, Award, ChevronLeft, Trophy, BarChart3 } from
 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  fetchUserPerformanceData,
+  calculateFullReadiness,
+  calculateGapAndRequirements,
+  buildCompleteDailyPlan,
+  checkPaceStatus,
+  TARGET_REQUIREMENTS
+} from "@/components/studyplan/ReadinessEngine";
 
 export default function StudyPlanPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalQuestions: 0,
-    completedQuestions: 0,
-    totalExams: 0,
-    completedExams: 0,
-    weakTopics: 0,
-    activeMistakes: 0
-  });
+  const [performanceData, setPerformanceData] = useState(null);
+  const [readiness, setReadiness] = useState(null);
+  const [requirements, setRequirements] = useState(null);
+  const [dailyPlan, setDailyPlan] = useState(null);
+  const [paceStatus, setPaceStatus] = useState(null);
 
   const isPremium = user?.is_premium;
 
@@ -31,24 +37,54 @@ export default function StudyPlanPage() {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        // Load real stats
-        const [attempts, sessions, weakTopics] = await Promise.all([
-        base44.entities.AttemptNew.filter({ created_by: currentUser.email }, '-created_date', 500),
-        base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, is_completed: true }, '-created_date', 100),
-        base44.entities.WeakTopic.filter({}, null, 50)]
-        );
+        const subject = currentUser?.selected_subject || 'אנגלית';
+        const unitLevel = currentUser?.selected_units || 5;
+        const targetScore = currentUser?.target_score || 85;
+        const examDate = currentUser?.exam_date ? new Date(currentUser.exam_date) : null;
+        const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : 60;
 
-        const correctAttempts = attempts.filter((a) => a.status === 'correct').length;
-        const wrongAttempts = attempts.filter((a) => a.status === 'incorrect' || a.status === 'partial').length;
+        // קריאת נתוני ביצוע אמיתיים
+        const perfData = await fetchUserPerformanceData(base44, currentUser.email, subject, unitLevel);
+        setPerformanceData(perfData);
 
-        setStats({
-          totalQuestions: 700,
-          completedQuestions: attempts.length,
-          totalExams: 6,
-          completedExams: sessions.filter((s) => s.session_type === 'exam').length,
-          weakTopics: weakTopics.length,
-          activeMistakes: wrongAttempts
-        });
+        if (perfData) {
+          // חישוב מוכנות מלא
+          const readinessData = calculateFullReadiness(perfData, subject, unitLevel);
+          setReadiness(readinessData);
+
+          // חישוב פער ודרישות
+          const reqs = calculateGapAndRequirements({
+            targetScore,
+            readinessScore: readinessData.readinessScore,
+            performanceData: perfData,
+            subject,
+            unitLevel,
+            daysUntilExam
+          });
+          setRequirements(reqs);
+
+          // בניית תוכנית יומית
+          const plan = buildCompleteDailyPlan({
+            performanceData: perfData,
+            requirements: reqs,
+            targetScore,
+            daysUntilExam,
+            subject,
+            unitLevel,
+            dayOfWeek: new Date().getDay()
+          });
+          setDailyPlan(plan);
+
+          // בדיקת קצב
+          const pace = checkPaceStatus({
+            targetScore,
+            currentReadiness: readinessData.readinessScore,
+            daysUntilExam,
+            startReadiness: currentUser?.start_readiness || 30,
+            startDaysUntilExam: currentUser?.start_days_until_exam || 90
+          });
+          setPaceStatus(pace);
+        }
 
       } catch (error) {
         console.error("Error loading data:", error);
@@ -58,22 +94,6 @@ export default function StudyPlanPage() {
     };
     loadData();
   }, []);
-
-  // Calculate readiness
-  const practiceProgress = stats.totalQuestions > 0 ? Math.round(stats.completedQuestions / stats.totalQuestions * 100) : 0;
-  const examProgress = stats.totalExams > 0 ? Math.round(stats.completedExams / stats.totalExams * 100) : 0;
-  const overallReadiness = Math.round(practiceProgress * 0.5 + examProgress * 0.3 + Math.max(0, 100 - stats.weakTopics * 10) * 0.2);
-
-  // Days until exam
-  const examDate = user?.exam_date ? new Date(user.exam_date) : null;
-  const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : null;
-
-  // Daily limits for free users
-  const freeUserLimits = {
-    questionsPerDay: 10,
-    topicsPerDay: 1,
-    mistakesPerDay: 3
-  };
 
   if (isLoading) {
     return (
