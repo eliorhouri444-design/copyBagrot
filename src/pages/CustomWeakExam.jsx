@@ -376,8 +376,8 @@ Return JSON:`,
   const canAnswer = !hasAudio || audioPlayed;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex flex-col">
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 p-4 shadow-xl flex-shrink-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex flex-col">
+      <div className="bg-blue-500 p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
@@ -391,13 +391,13 @@ Return JSON:`,
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-lg font-bold">
-                {sourceExam ? `מבחן מותאם: ${sourceExam.title}` : 'מבחן מותאם מבגרויות'}
+                {sourceExam ? `בגרות נושאים חלשים: ${sourceExam.title}` : 'בגרות על נושאים חלשים'}
               </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
             <p className="text-sm opacity-90">
               שאלה {currentIndex + 1} / {questions.length}
-              {sourceAttempt && ` • ציון מקורי: ${Math.round(sourceAttempt.score_percent)}`}
+              {weakTopics.length > 0 && ` • ${weakTopics.length} נושאים חלשים`}
             </p>
           </div>
 
