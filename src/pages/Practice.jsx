@@ -120,7 +120,8 @@ export default function PracticePage() {
 
         setPracticeData({
           topics: topicsArray,
-          recentSessions: sessionsWithTopics
+          recentSessions: sessionsWithTopics,
+          practiceAttempts: allPracticeAttempts
         });
 
       } catch (error) {
