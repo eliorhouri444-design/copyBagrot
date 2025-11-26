@@ -322,23 +322,23 @@ Return JSON:`,
       : 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full"
         >
           <div className="text-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Trophy className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">מבחן מותאם מבגרויות</p>
+            <p className="text-gray-600">בגרות על נושאים חלשים</p>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-6 border-2 border-orange-200">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
             <div className="text-center">
-              <div className="text-6xl font-black text-orange-600 mb-2">
+              <div className="text-6xl font-black text-blue-600 mb-2">
                 {correctCount} / {totalAnswered}
               </div>
               <div className="text-sm text-gray-600 mb-4">תשובות נכונות</div>
@@ -352,7 +352,7 @@ Return JSON:`,
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-lg font-bold shadow-lg"
+              className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg"
             >
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
