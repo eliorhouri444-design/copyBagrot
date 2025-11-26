@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -184,26 +184,52 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                 התחל תרגול
               </Button>
 
-              {isPremium ?
-              <Button
-                onClick={() => {
-                  sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                  navigate(createPageUrl("CustomWeakPractice"));
-                }}
-                className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
-
-                  <Target className="w-4 h-4 ml-2" />
-                  תרגול טעויות בנושא זה
-                </Button> :
-
-              <Button
-                onClick={() => navigate(createPageUrl("Premium"))}
-                className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800">
-
-                  <Lock className="w-4 h-4 ml-2" />
-                  תרגול טעויות
-                </Button>
-              }
+              {isPremium ? (
+                <>
+                  <Button
+                    onClick={() => {
+                      sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
+                      navigate(createPageUrl("CustomWeakPractice"));
+                    }}
+                    className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
+                    <Target className="w-4 h-4 ml-2" />
+                    תרגול טעויות בנושא זה
+                  </Button>
+                  <Button
+                    onClick={handleStartPractice}
+                    variant="outline"
+                    className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
+                    בחר תרגול ספציפי (מעל 500 שאלות)
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => navigate(createPageUrl("Premium"))}
+                    className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800">
+                    <Lock className="w-4 h-4 ml-2" />
+                    תרגול טעויות
+                  </Button>
+                  <div className="bg-[#ffffff] p-2.5 rounded-lg border border-[#E9F0FF]">
+                    <div className="text-center mb-2">
+                      <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-10 תרגולים</h4>
+                      <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-10 התרגולים הראשונים בנושא</p>
+                    </div>
+                    <Button
+                      onClick={handleStartPractice}
+                      variant="outline"
+                      className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
+                      בחר תרגול (מוגבל ל-10)
+                    </Button>
+                    <Button
+                      onClick={() => navigate(createPageUrl("Premium"))}
+                      className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+                      <Crown className="w-3.5 h-3.5" />
+                      לגישה מלאה 500+ תרגולים
+                    </Button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         </motion.div>
