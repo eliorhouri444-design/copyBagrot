@@ -1,6 +1,6 @@
 /**
  * English Study Engine - מנוע תוכנית לימודים לאנגלית
- * מבוסס על 3 רכיבים: אוצר מילים, קריאה עם לחץ, כתיבה מדורגת
+ * אלגוריתם חכם: להגיע לציון X = שליטה ב-90% מהנושאים + עמידה ב-90% מהזמן
  */
 
 // Skill Types
@@ -16,97 +16,185 @@ export const SKILL_TYPES = {
 // Module Levels
 export const MODULE_LEVELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
-/**
- * חישוב זמן מותר לקריאה - יורד ככל שמתקרבים לבגרות
- * @param {number} standardTime - זמן סטנדרטי בדקות
- * @param {number} daysPassed - ימים שעברו מתחילת התוכנית
- * @param {number} totalDays - סה"כ ימים עד הבגרות
- * @returns {number} זמן מותר בדקות
- */
-export const calculateAllowedTime = (standardTime, daysPassed, totalDays) => {
-  const reductionFactor = 0.2; // הפחתה מקסימלית של 20%
-  const reduction = (daysPassed / totalDays) * reductionFactor;
-  return Math.round(standardTime * (1 - reduction));
+// הקצאת זמן קבועה לפי קטגוריה
+export const TIME_ALLOCATION = {
+  [SKILL_TYPES.VOCABULARY]: 0.30,  // 30% - חובה יומית
+  [SKILL_TYPES.GRAMMAR]: 0.20,     // 20% - דגש על חולשות
+  [SKILL_TYPES.READING]: 0.40,     // 40% - חובה עם טיימר
+  [SKILL_TYPES.LISTENING]: 0.05,   // 5% - פעם ביומיים
+  [SKILL_TYPES.WRITING]: 0.05      // 5% - פעם ב-3 ימים
+};
+
+// חלוקת עדיפות משימות יומיות
+export const TASK_PRIORITY = {
+  GAP_FIXING: 0.60,      // 60% - תיקון פערים (SkillScore < 80)
+  REINFORCEMENT: 0.20,   // 20% - חזרה Spaced Repetition
+  SIMULATION: 0.20       // 20% - סימולציה מלאה
 };
 
 /**
- * מנוע Spaced Repetition לאוצר מילים
+ * חישוב זמן מותר לקריאה - יורד ככל שמתקרבים לבגרות
  */
-export const calculateNextReview = (word, isCorrect, consecutiveCorrect) => {
+export const calculateAllowedTime = (standardTime, daysPassed, totalDays) => {
+  const reductionFactor = 0.2;
+  const reduction = (daysPassed / Math.max(totalDays, 1)) * reductionFactor;
+  return Math.round(standardTime * (1 - Math.min(reduction, 0.2)));
+};
+
+/**
+ * מנוע Leitner/Spaced Repetition לאוצר מילים
+ * מרווחים: 1, 2, 4, 7, 14, 30 ימים
+ */
+export const calculateNextReview = (word, isCorrect, consecutiveCorrect, box = 1) => {
   if (!isCorrect) {
     return {
-      nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // מחר
+      nextReviewDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
       consecutiveCorrect: 0,
+      box: 1, // חוזר לקופסה 1
       isMastered: false
     };
   }
   
   const newConsecutive = consecutiveCorrect + 1;
+  const newBox = Math.min(box + 1, 6);
   
-  if (newConsecutive >= 5) {
+  if (newBox >= 6 && newConsecutive >= 5) {
     return {
-      nextReviewDate: null, // יצא מהסייקל
+      nextReviewDate: null,
       consecutiveCorrect: newConsecutive,
+      box: 6,
       isMastered: true
     };
   }
   
-  // מרווחים הולכים וגדלים: 1, 3, 7, 14 ימים
-  const intervals = [1, 3, 7, 14];
-  const daysUntilNext = intervals[Math.min(newConsecutive - 1, intervals.length - 1)];
+  // Leitner intervals
+  const intervals = [1, 2, 4, 7, 14, 30];
+  const daysUntilNext = intervals[newBox - 1] || 30;
   
   return {
     nextReviewDate: new Date(Date.now() + daysUntilNext * 24 * 60 * 60 * 1000),
     consecutiveCorrect: newConsecutive,
+    box: newBox,
     isMastered: false
   };
 };
 
 /**
- * חישוב ממוצע נע של 5 תרגולים אחרונים
+ * חישוב ממוצע שבועי
+ */
+export const calculateWeeklyAverage = (scores, days = 7) => {
+  if (!scores || scores.length === 0) return 0;
+  const weekAgo = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recentScores = scores.filter(s => new Date(s.date || s.created_date) >= weekAgo);
+  if (recentScores.length === 0) return calculateMovingAverage(scores);
+  return Math.round(recentScores.reduce((sum, s) => sum + (s.score || s.score_percent || 0), 0) / recentScores.length);
+};
+
+/**
+ * חישוב ממוצע נע
  */
 export const calculateMovingAverage = (scores) => {
   if (!scores || scores.length === 0) return 0;
   const lastFive = scores.slice(-5);
-  return Math.round(lastFive.reduce((sum, s) => sum + s, 0) / lastFive.length);
+  const values = lastFive.map(s => typeof s === 'number' ? s : (s.score || s.score_percent || 0));
+  return Math.round(values.reduce((sum, s) => sum + s, 0) / values.length);
 };
 
 /**
- * בדיקה אם להעלות רמת קושי
+ * חישוב פער ביצועים
+ * PerformanceGap = TargetScore - WeeklyAverage
  */
-export const shouldIncreaseDifficulty = (movingAverage, targetScore) => {
-  return movingAverage >= targetScore;
+export const calculatePerformanceGap = (targetScore, weeklyAverage) => {
+  return targetScore - weeklyAverage;
 };
 
 /**
- * זיהוי נושאים חלשים מתוך היסטוריית תשובות
+ * זיהוי נושאים חלשים עם SkillScore
+ * נושא חלש = SkillScore < 80
  */
-export const identifyWeakAreas = (attempts) => {
+export const identifyWeakAreas = (attempts, threshold = 80) => {
   const skillStats = {};
   
   attempts.forEach(attempt => {
-    const skill = attempt.skill_type || 'general';
+    const skill = attempt.skill_type || attempt.topic_id || 'general';
+    const topic = attempt.topic_name || attempt.topic_id || skill;
+    
     if (!skillStats[skill]) {
-      skillStats[skill] = { correct: 0, total: 0 };
+      skillStats[skill] = { 
+        correct: 0, 
+        total: 0, 
+        topics: {},
+        recentScores: []
+      };
     }
     skillStats[skill].total++;
     if (attempt.is_correct) skillStats[skill].correct++;
+    
+    // Track by specific topic
+    if (!skillStats[skill].topics[topic]) {
+      skillStats[skill].topics[topic] = { correct: 0, total: 0 };
+    }
+    skillStats[skill].topics[topic].total++;
+    if (attempt.is_correct) skillStats[skill].topics[topic].correct++;
+    
+    // Track recent scores
+    if (attempt.score_percent || attempt.score) {
+      skillStats[skill].recentScores.push(attempt.score_percent || attempt.score);
+    }
   });
   
   const weakAreas = [];
   Object.entries(skillStats).forEach(([skill, stats]) => {
-    const accuracy = stats.total > 0 ? (stats.correct / stats.total) * 100 : 0;
-    if (accuracy < 70 && stats.total >= 3) {
+    const skillScore = stats.total > 0 ? (stats.correct / stats.total) * 100 : 0;
+    
+    if (skillScore < threshold && stats.total >= 3) {
+      // Find weakest topics within this skill
+      const weakTopics = Object.entries(stats.topics)
+        .map(([topic, tStats]) => ({
+          topic,
+          score: tStats.total > 0 ? (tStats.correct / tStats.total) * 100 : 0,
+          attempts: tStats.total
+        }))
+        .filter(t => t.score < threshold)
+        .sort((a, b) => a.score - b.score);
+      
       weakAreas.push({
         skill,
-        accuracy: Math.round(accuracy),
+        skillScore: Math.round(skillScore),
         totalAttempts: stats.total,
-        priority: accuracy < 50 ? 'high' : 'medium'
+        priority: skillScore < 50 ? 'critical' : skillScore < 70 ? 'high' : 'medium',
+        weakTopics: weakTopics.slice(0, 3),
+        trend: calculateTrend(stats.recentScores)
       });
     }
   });
   
-  return weakAreas.sort((a, b) => a.accuracy - b.accuracy);
+  return weakAreas.sort((a, b) => a.skillScore - b.skillScore);
+};
+
+/**
+ * חישוב מגמה (עולה/יורדת/יציבה)
+ */
+const calculateTrend = (scores) => {
+  if (!scores || scores.length < 3) return 'stable';
+  const recent = scores.slice(-3);
+  const older = scores.slice(-6, -3);
+  if (older.length === 0) return 'stable';
+  
+  const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+  const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+  
+  if (recentAvg > olderAvg + 5) return 'improving';
+  if (recentAvg < olderAvg - 5) return 'declining';
+  return 'stable';
+};
+
+/**
+ * בדיקה אם להעלות רמת קושי
+ * כלל: 90% דיוק = נושא "חזק" = הפחתת תדירות
+ */
+export const shouldIncreaseDifficulty = (skillScore, threshold = 90) => {
+  return skillScore >= threshold;
 };
 
 /**
