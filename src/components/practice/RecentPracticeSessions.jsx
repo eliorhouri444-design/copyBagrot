@@ -333,18 +333,18 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
         <DialogContent dir="rtl" className="w-screen h-screen max-w-none max-h-none m-0 p-0 rounded-none">
           <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between flex-shrink-0">
+            <div className="bg-blue-500 px-5 py-4 from-blue-600 to-indigo-600 flex items-center justify-between flex-shrink-0">
               <div className="text-right flex-1">
                 <h1 className="text-[18px] font-bold text-white">כל התרגולים שלך</h1>
                 <p className="text-[12px] text-white/70">{practiceSessions.length} תרגולים</p>
               </div>
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="bg-blue-600 rounded-full w-10 h-10 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
             </div>
 
             {/* Content - scrollable with better spacing */}
-            <div className="flex-1 overflow-y-auto px-4 py-5">
+            <div className="bg-[#ffffff] px-4 py-5 flex-1 overflow-y-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-5xl mx-auto pb-4">
                 {practiceSessions.map((session, idx) => {
                   const passed = session.percentage >= 70;
@@ -365,11 +365,11 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           } else {
                             setShowAdDialog(session);
                           }
-                        }}
-                        className="w-full text-right hover:bg-white rounded-xl p-4 transition-all bg-white shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
+                        }} className="bg-slate-100 p-4 text-right rounded-xl w-full hover:bg-white transition-all shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
+
 
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                          <div className="bg-blue-100 rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0">
                             {passed ?
                             <CheckCircle className="w-6 h-6 text-green-600" /> :
 
@@ -392,7 +392,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           <div className="text-left">
                             {isPremium ?
                             <>
-                                <div className={`text-[20px] font-black ${passed ? 'text-green-600' : 'text-orange-600'}`}>
+                                <div className="text-[#000000] font-black">
                                   {Math.round(session.percentage)}%
                                 </div>
                                 <div className="text-[10px] text-gray-500">
@@ -412,8 +412,8 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                             setShowAllSessions(false);
                             sessionStorage.setItem('weakPracticeSource', session.id);
                             navigate(createPageUrl("CustomWeakPractice"));
-                          }}
-                          className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-[12px] font-bold flex items-center justify-center gap-2 rounded-xl">
+                          }} className="bg-blue-500 text-[12px] px-4 py-2 font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
+
 
                             <Target className="w-4 h-4" />
                             תרגול טעויות
