@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -452,6 +452,8 @@ export default function ExamModuleCPage() {
 
       await base44.entities.ExamAttempt.create({
         exam_id: exam.id,
+        exam_type: 'module_c',
+        module_id: 'C',
         subject: exam.subject,
         unit_level: exam.unit_level || exam.units || 3,
         started_at: new Date(Date.now() - (exam.duration_minutes * 60 - timeLeft) * 1000).toISOString(),
