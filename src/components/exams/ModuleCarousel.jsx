@@ -324,7 +324,7 @@ export default function ModuleCarousel({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="space-y-2 pt-2">
+                className="space-y-2">
 
                 {isLocked ?
                 <Button
