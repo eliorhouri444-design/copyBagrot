@@ -262,7 +262,8 @@ export default function HomePage() {
           examAttempts={examAttempts}
           isPremium={user?.is_premium}
           completedTasks={completedTasks}
-          onToggleTask={toggleTask} />
+          onToggleTask={toggleTask}
+          engineData={engineData} />
 
         {/* המשך מאיפה שהפסקת */}
         {lastActivity &&
