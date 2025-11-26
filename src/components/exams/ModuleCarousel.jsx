@@ -23,6 +23,8 @@ export default function ModuleCarousel({
   isPremium,
   onUpgrade,
   examAttempts: initialExamAttempts = [],
+  practiceAttempts = [],
+  topicStats = {},
   onShowAd
 }) {
   const navigate = useNavigate();
