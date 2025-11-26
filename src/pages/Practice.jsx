@@ -66,10 +66,10 @@ export default function PracticePage() {
         const units = parseInt(currentUser?.selected_units || cachedUnits);
 
         const [customTopics, allQuestions, recentSessions] = await Promise.all([
-          base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 50),
-          base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 500),
-          base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject, unit_level: units }, '-created_date', 5)
-        ]);
+        base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 50),
+        base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 500),
+        base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject, unit_level: units }, '-created_date', 5)]
+        );
 
         // Build topics with stats
         const topicsMap = {};
@@ -103,12 +103,12 @@ export default function PracticePage() {
           }
         });
 
-        const topicsArray = Object.values(topicsMap)
-          .filter(t => t.questionCount > 0 || customTopics.some(ct => ct.topic_id === t.topic_id))
-          .sort((a, b) => a.order - b.order);
+        const topicsArray = Object.values(topicsMap).
+        filter((t) => t.questionCount > 0 || customTopics.some((ct) => ct.topic_id === t.topic_id)).
+        sort((a, b) => a.order - b.order);
 
         // Process recent sessions
-        const sessionsWithTopics = recentSessions.map(session => {
+        const sessionsWithTopics = recentSessions.map((session) => {
           const topic = topicsMap[session.topic_id];
           return {
             ...session,
@@ -309,7 +309,7 @@ export default function PracticePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20 pt-0">
+    <div className="bg-[#ffffff] pt-0 pb-20 min-h-screen from-blue-50 via-purple-50 to-pink-50">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-600 to-indigo-600 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -323,7 +323,7 @@ export default function PracticePage() {
         </div>
       </div>
 
-      <div className="px-6 space-y-6 pb-6">
+      <div className="bg-[#ffffff] pb-6 px-6 space-y-6">
 
         <motion.div
           key={`${displaySubject}_${displayUnits}`}
@@ -361,8 +361,8 @@ export default function PracticePage() {
             subject={displaySubject}
             units={displayUnits}
             userEmail={user?.email}
-            isPremium={user?.is_premium}
-          />
+            isPremium={user?.is_premium} />
+
 
         </motion.div>
 
@@ -371,7 +371,7 @@ export default function PracticePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
 
-          <div className="bg-[#ffffff] p-4 rounded-2xl">
+          <div className="bg-blue-50 p-4 rounded-2xl">
             <div className="flex items-center gap-2 mb-3">
               <Crown className="w-5 h-5 text-[#3B82F6]" />
               <h3 className="text-base font-bold text-[#2B2B2B]">תרגול פרימיום מותאם אישית</h3>
