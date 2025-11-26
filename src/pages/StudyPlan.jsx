@@ -331,7 +331,7 @@ export default function StudyPlanPage() {
           </div>
         </motion.div>
 
-        {/* Daily Tasks */}
+        {/* Daily Tasks - Dynamic from Engine */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -341,77 +341,89 @@ export default function StudyPlanPage() {
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-green-600" />
             המשימות להיום
-            {!isPremium && <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full mr-auto">גרסת חינם</span>}
+            {dailyPlan && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full mr-auto">
+                {dailyPlan.estimatedMinutes} דקות
+              </span>
+            )}
           </h2>
           
           <div className="space-y-3">
-            <div className="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">לפתור שאלות</div>
-                  <div className="text-sm text-gray-600">
-                    {isPremium ? '70 שאלות' : `${freeUserLimits.questionsPerDay} שאלות`}
+            {dailyPlan?.tasks?.map((task, idx) => {
+              const iconMap = {
+                'mistakes': Repeat,
+                'topic': Target,
+                'questions': BookOpen,
+                'exam': FileCheck,
+                'vocabulary': BookOpen
+              };
+              const colorMap = {
+                'mistakes': { bg: 'bg-red-50', icon: 'bg-red-500', text: 'text-red-800' },
+                'topic': { bg: 'bg-orange-50', icon: 'bg-orange-500', text: 'text-orange-800' },
+                'questions': { bg: 'bg-blue-50', icon: 'bg-blue-500', text: 'text-blue-800' },
+                'exam': { bg: 'bg-green-50', icon: 'bg-green-500', text: 'text-green-800' },
+                'vocabulary': { bg: 'bg-purple-50', icon: 'bg-purple-500', text: 'text-purple-800' }
+              };
+              const Icon = iconMap[task.type] || BookOpen;
+              const colors = colorMap[task.type] || colorMap['questions'];
+              
+              return (
+                <div key={task.id || idx} className={`flex items-center justify-between ${colors.bg} p-4 rounded-xl`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 ${colors.icon} rounded-full flex items-center justify-center`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className={`font-semibold ${colors.text}`}>{task.title}</div>
+                      <div className="text-sm text-gray-600">{task.description}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-gray-700">{task.duration} דק'</div>
+                    {task.count && <div className="text-xs text-gray-500">{task.count} פריטים</div>}
                   </div>
                 </div>
-              </div>
-              {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-            </div>
-            
-            <div className="flex items-center justify-between bg-purple-50 p-4 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">ללמוד נושאים</div>
-                  <div className="text-sm text-gray-600">
-                    {isPremium ? '2 נושאים חדשים' : `${freeUserLimits.topicsPerDay} נושא`}
+              );
+            })}
+
+            {(!dailyPlan?.tasks || dailyPlan.tasks.length === 0) && (
+              <>
+                <div className="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">פתרון שאלות</div>
+                      <div className="text-sm text-gray-600">{isPremium ? '30 שאלות' : '10 שאלות'}</div>
+                    </div>
                   </div>
+                  {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
                 </div>
-              </div>
-              {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-            </div>
-            
-            <div className="flex items-center justify-between bg-orange-50 p-4 rounded-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                  <Repeat className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">לחזור על טעויות</div>
-                  <div className="text-sm text-gray-600">
-                    {isPremium ? '8 טעויות' : `${freeUserLimits.mistakesPerDay} טעויות`}
+                
+                <div className="flex items-center justify-between bg-orange-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                      <Repeat className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">תיקון טעויות</div>
+                      <div className="text-sm text-gray-600">{isPremium ? '8 טעויות' : '3 טעויות'}</div>
+                    </div>
                   </div>
+                  {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
                 </div>
-              </div>
-              {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-            </div>
-            
-            <div className={`flex items-center justify-between p-4 rounded-xl ${isPremium ? 'bg-green-50' : 'bg-gray-100'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPremium ? 'bg-green-500' : 'bg-gray-400'}`}>
-                  <FileCheck className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className={`font-semibold ${isPremium ? 'text-gray-900' : 'text-gray-500'}`}>לבצע סימולציה</div>
-                  <div className={`text-sm ${isPremium ? 'text-gray-600' : 'text-gray-400'}`}>
-                    {isPremium ? 'בגרות מלאה' : 'פרימיום בלבד'}
-                  </div>
-                </div>
-              </div>
-              {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-            </div>
+              </>
+            )}
           </div>
 
-          {!isPremium &&
-          <div className="mt-4 text-center text-sm text-gray-500">
-              זמן לימוד יומי: <span className="font-bold">30 דקות</span>
-              <span className="text-gray-400"> (פרימיום: 90 דקות)</span>
+          {dailyPlan?.expectedImprovement > 0 && (
+            <div className="mt-4 p-3 bg-green-50 rounded-xl text-center">
+              <span className="text-sm text-green-800">
+                שיפור צפוי: <strong>+{dailyPlan.expectedImprovement}%</strong> במוכנות
+              </span>
             </div>
-          }
+          )}
         </motion.div>
 
         {/* Premium Upsell for Free Users */}
