@@ -1212,7 +1212,7 @@ export default function ExamsPage() {
       </Dialog>
 
       <Dialog open={!!showAllExamsModule} onOpenChange={() => setShowAllExamsModule(null)}>
-        <DialogContent dir="rtl" className="sm:max-w-md max-h-[70vh] bg-gradient-to-br from-blue-50 to-blue-100">
+        <DialogContent dir="rtl" className="w-full h-full max-w-full max-h-full rounded-none bg-gradient-to-br from-blue-50 to-blue-100">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-blue-900">
               כל המבחנים ב{currentModules.find((m) => m.id === showAllExamsModule)?.title}
