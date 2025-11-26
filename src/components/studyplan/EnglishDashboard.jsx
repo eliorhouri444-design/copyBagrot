@@ -35,8 +35,9 @@ export default function EnglishDashboard({
   const stats = useMemo(() => {
     const targetScore = user?.target_score || 85;
     const examDate = user?.exam_date ? new Date(user.exam_date) : null;
-    const daysUntilExam = examDate ? differenceInDays(examDate, new Date()) : 60;
-    const moduleLevel = user?.selected_units === 5 ? 'E' : user?.selected_units === 4 ? 'C' : 'A';
+    const daysUntilExam = examDate ? Math.max(0, differenceInDays(examDate, new Date())) : 60;
+    const unitLevel = user?.selected_units || 5;
+    const moduleLevel = unitLevel === 5 ? 'E' : unitLevel === 4 ? 'C' : 'A';
     
     // חישוב ממוצע נע מ-5 תרגולים אחרונים
     const recentScores = examAttempts
@@ -45,17 +46,36 @@ export default function EnglishDashboard({
       .map(e => e.score_percent);
     const currentAverage = calculateMovingAverage(recentScores);
     
-    // זיהוי נקודות חלשות
+    // חישוב ממוצע שבועי
+    const weeklyAverage = calculateWeeklyAverage(examAttempts);
+    
+    // חישוב פער ביצועים
+    const performanceGap = calculatePerformanceGap(targetScore, weeklyAverage || currentAverage || 65);
+    
+    // זיהוי נקודות חלשות עם SkillScore
     const weakAreas = identifyWeakAreas(attempts);
+    
+    // בדיקת מצב - אינטנסיבי או סימולציה
+    const correction = weeklyCoursCorrection({
+      targetScore,
+      weeklyScores: examAttempts,
+      weakAreas,
+      currentPlan: null
+    });
     
     return {
       targetScore,
       currentAverage: currentAverage || 65,
+      weeklyAverage: weeklyAverage || currentAverage || 65,
+      performanceGap,
       gap: targetScore - (currentAverage || 65),
       daysUntilExam,
+      unitLevel,
       moduleLevel,
       weakAreas,
-      recentScores
+      recentScores,
+      mode: correction.newMode,
+      correction
     };
   }, [user, attempts, examAttempts]);
 
