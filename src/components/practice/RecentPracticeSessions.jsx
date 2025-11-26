@@ -136,7 +136,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                     } else {
                       setShowAdDialog(session);
                     }
-                  }} className="bg-slate-100 p-3 text-right rounded-lg w-full hover:bg-gray-50 transition-colors border border-gray-100 flex items-center justify-between">
+                  }} className="bg-zinc-50 p-3 text-right rounded-lg w-full hover:bg-gray-50 transition-colors border border-gray-100 flex items-center justify-between">
 
 
                   <div className="flex items-center gap-3 flex-1">
@@ -147,7 +147,8 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
                       {passed ?
                       <CheckCircle className="w-4 h-4 text-green-600" /> :
-                      <span className="text-orange-600"><TrendingUp className="w-4 h-4" /></span>
+
+                      <TrendingUp className="w-4 h-4 text-orange-600" />
                       }
                     </motion.div>
                     <div className="flex-1 text-right">
@@ -368,11 +369,12 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
 
                         <div className="flex items-center gap-3">
-                          <div className={`rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0 ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
-                          {passed ?
-                          <CheckCircle className="w-6 h-6 text-green-600" /> :
-                          <span className="text-orange-600"><TrendingUp className="w-6 h-6" /></span>
-                          }
+                          <div className="bg-indigo-700 rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0">
+                            {passed ?
+                            <CheckCircle className="w-6 h-6 text-green-600" /> :
+
+                            <TrendingUp className="text-[#000000] lucide lucide-trending-up w-6 h-6" />
+                            }
                           </div>
                           <div className="text-right flex-1 min-w-0">
                             <div className="text-[14px] font-bold text-gray-900 truncate">
