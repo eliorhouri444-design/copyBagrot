@@ -125,7 +125,93 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
   const currentTopic = topics[currentIndex];
   const totalPractices = (currentTopic.stats?.failedSets || 0) + (currentTopic.stats?.mediumSets || 0) + (currentTopic.stats?.excellentSets || 0);
-  const progress = currentTopic.stats?.progress || 0;
+  
+  // חישוב סטטיסטיקות מפורטות לנושא מתוך practiceAttempts
+  const topicDetailedStats = useMemo(() => {
+    if (!currentTopic || !practiceAttempts || practiceAttempts.length === 0) {
+      return null;
+    }
+
+    // סינון ניסיונות לפי נושא
+    const topicAttempts = practiceAttempts.filter(a => 
+      a.topic_id === currentTopic.topic_id
+    );
+
+    if (topicAttempts.length === 0) return null;
+
+    const totalQuestions = topicAttempts.length;
+    const correctAnswers = topicAttempts.filter(a => 
+      a.status === 'correct' || a.percentage >= 70
+    ).length;
+    const incorrectAnswers = totalQuestions - correctAnswers;
+
+    // חישוב לפי רמת קושי
+    let easyTotal = 0, easyCorrect = 0;
+    let mediumTotal = 0, mediumCorrect = 0;
+    let hardTotal = 0, hardCorrect = 0;
+
+    topicAttempts.forEach(a => {
+      const difficulty = a.difficulty_level || 'medium';
+      const isCorrect = a.status === 'correct' || a.percentage >= 70;
+      
+      if (difficulty === 'easy') {
+        easyTotal++;
+        if (isCorrect) easyCorrect++;
+      } else if (difficulty === 'hard' || difficulty === 'expert') {
+        hardTotal++;
+        if (isCorrect) hardCorrect++;
+      } else {
+        mediumTotal++;
+        if (isCorrect) mediumCorrect++;
+      }
+    });
+
+    // חישוב טעויות חוזרות (שאלות שנענו שגוי יותר מפעם אחת)
+    const questionErrors = {};
+    topicAttempts.forEach(a => {
+      if (a.status === 'incorrect' || a.percentage < 50) {
+        questionErrors[a.question_id] = (questionErrors[a.question_id] || 0) + 1;
+      }
+    });
+    const repeatedErrors = Object.values(questionErrors).filter(count => count > 1).length;
+
+    // חישוב זמן ממוצע
+    const timesArray = topicAttempts
+      .map(a => a.time_spent_seconds)
+      .filter(t => t && t > 0);
+    const avgTimePerQuestion = timesArray.length > 0 
+      ? timesArray.reduce((sum, t) => sum + t, 0) / timesArray.length 
+      : 0;
+
+    return {
+      totalQuestions,
+      correctAnswers,
+      incorrectAnswers,
+      easyTotal, easyCorrect,
+      mediumTotal, mediumCorrect,
+      hardTotal, hardCorrect,
+      repeatedErrors,
+      avgTimePerQuestion
+    };
+  }, [currentTopic, practiceAttempts]);
+
+  // חישוב מד מוכנות
+  const readinessData = useMemo(() => {
+    if (topicDetailedStats) {
+      return calculateTopicReadiness(topicDetailedStats);
+    }
+    // fallback לנתונים הקיימים
+    return {
+      readiness: currentTopic.stats?.progress || 0,
+      category: (currentTopic.stats?.progress || 0) >= 86 ? 'excellent' : (currentTopic.stats?.progress || 0) >= 56 ? 'medium' : 'weak',
+      accuracyScore: 0,
+      difficultyScore: 0,
+      errorReductionScore: 0,
+      speedScore: 0
+    };
+  }, [topicDetailedStats, currentTopic]);
+
+  const progress = readinessData.readiness;
 
   return (
     <div className="relative w-full py-4">
