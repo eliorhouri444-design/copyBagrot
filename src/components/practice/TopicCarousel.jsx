@@ -1,11 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic, isPremium }) {
+/**
+ * חישוב מד מוכנות לנושא (Topic Readiness)
+ * TopicReadiness = 0.60 * AccuracyScore + 0.20 * DifficultyScore + 0.10 * ErrorReductionScore + 0.10 * SpeedScore
+ */
+function calculateTopicReadiness(stats) {
+  if (!stats || stats.totalQuestions === 0) {
+    return { readiness: 0, category: 'weak', accuracyScore: 0, difficultyScore: 0, errorReductionScore: 0, speedScore: 0 };
+  }
+
+  // 1. AccuracyScore (60%) - רמת הצלחה
+  const accuracyScore = stats.totalQuestions > 0 
+    ? (stats.correctAnswers / stats.totalQuestions) * 100 
+    : 0;
+
+  // 2. DifficultyScore (20%) - התמודדות עם רמות קושי
+  // DifficultyScore = 0.5 * accuracy_easy + 0.3 * accuracy_medium + 0.2 * accuracy_hard
+  const easyAccuracy = stats.easyTotal > 0 ? (stats.easyCorrect / stats.easyTotal) * 100 : 100;
+  const mediumAccuracy = stats.mediumTotal > 0 ? (stats.mediumCorrect / stats.mediumTotal) * 100 : 100;
+  const hardAccuracy = stats.hardTotal > 0 ? (stats.hardCorrect / stats.hardTotal) * 100 : 100;
+  const difficultyScore = 0.5 * easyAccuracy + 0.3 * mediumAccuracy + 0.2 * hardAccuracy;
+
+  // 3. ErrorReductionScore (10%) - טעויות חוזרות
+  // if repeated_errors == 0 → 100, else → max(0, 100 - (repeated_errors * 8))
+  const repeatedErrors = stats.repeatedErrors || 0;
+  const errorReductionScore = repeatedErrors === 0 ? 100 : Math.max(0, 100 - (repeatedErrors * 8));
+
+  // 4. SpeedScore (10%) - מהירות (8 שניות = 100, 12 = 80, 20 = 50)
+  let speedScore = 0;
+  if (stats.avgTimePerQuestion && stats.avgTimePerQuestion > 0) {
+    const avgTime = stats.avgTimePerQuestion;
+    if (avgTime <= 8) speedScore = 100;
+    else if (avgTime <= 12) speedScore = 80;
+    else if (avgTime <= 20) speedScore = 50;
+    else speedScore = Math.max(0, 50 - (avgTime - 20) * 2);
+  }
+
+  // חישוב מד מוכנות סופי
+  const readiness = Math.round(
+    0.60 * accuracyScore +
+    0.20 * difficultyScore +
+    0.10 * errorReductionScore +
+    0.10 * speedScore
+  );
+
+  // קטגוריה: 0-55 = weak, 56-85 = medium, 86-100 = excellent
+  let category = 'weak';
+  if (readiness >= 86) category = 'excellent';
+  else if (readiness >= 56) category = 'medium';
+
+  return {
+    readiness: Math.min(100, Math.max(0, readiness)),
+    category,
+    accuracyScore: Math.round(accuracyScore),
+    difficultyScore: Math.round(difficultyScore),
+    errorReductionScore: Math.round(errorReductionScore),
+    speedScore: Math.round(speedScore)
+  };
+}
+
+export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic, isPremium, practiceAttempts = [] }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState(initialTopics);
