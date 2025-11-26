@@ -144,7 +144,13 @@ export default function EnglishDashboard({
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white relative overflow-hidden"
+        className={`rounded-2xl p-5 text-white relative overflow-hidden ${
+          stats.mode === 'intensive' 
+            ? 'bg-gradient-to-r from-red-600 to-orange-600' 
+            : stats.mode === 'simulation'
+              ? 'bg-gradient-to-r from-green-600 to-emerald-600'
+              : 'bg-gradient-to-r from-blue-600 to-indigo-600'
+        }`}
       >
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20" />
         
@@ -154,32 +160,70 @@ export default function EnglishDashboard({
           </button>
         )}
         
-        <div className="relative z-10">
+        {/* Mode Badge */}
+        {stats.mode !== 'normal' && (
+          <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold ${
+            stats.mode === 'intensive' ? 'bg-red-900/50' : 'bg-green-900/50'
+          }`}>
+            {stats.mode === 'intensive' ? '🔥 מצב אינטנסיבי' : '🎯 מצב סימולציה'}
+          </div>
+        )}
+        
+        <div className="relative z-10 mt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold">התוכנית שלך להיום</h2>
-              <p className="text-white/80 text-sm">שאלון {stats.moduleLevel} | {stats.daysUntilExam} ימים לבגרות</p>
+              <p className="text-white/80 text-sm">
+                שאלון {stats.moduleLevel} | {stats.unitLevel} יח"ל | {stats.daysUntilExam} ימים לבגרות
+              </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-black">{stats.currentAverage}</div>
-              <div className="text-xs text-white/80">ציון נוכחי</div>
+              <div className="text-3xl font-black">{stats.weeklyAverage}</div>
+              <div className="text-xs text-white/80">ממוצע שבועי</div>
             </div>
           </div>
           
           <div className="bg-white/20 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">היעד שלך: {stats.targetScore}</span>
+              <span className="text-sm">היעד: {stats.targetScore} | המצב הנוכחי: {stats.currentAverage}</span>
               <span className="text-sm font-bold">
-                {stats.gap > 0 ? `עוד ${stats.gap} נקודות` : '🎉 עברת את היעד!'}
+                {stats.performanceGap > 0 
+                  ? `פער: ${stats.performanceGap} נקודות` 
+                  : '🎉 עברת את היעד!'}
               </span>
             </div>
             <Progress 
-              value={(stats.currentAverage / stats.targetScore) * 100} 
+              value={Math.min(100, (stats.currentAverage / stats.targetScore) * 100)} 
               className="h-3 bg-white/30"
             />
           </div>
         </div>
       </motion.div>
+
+      {/* הודעת מצב */}
+      {stats.correction?.alert && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className={`rounded-xl p-4 border-2 ${
+            stats.correction.alert.type === 'success' 
+              ? 'bg-green-50 border-green-300'
+              : stats.correction.alert.type === 'critical'
+                ? 'bg-red-50 border-red-300'
+                : 'bg-amber-50 border-amber-300'
+          }`}
+        >
+          <p className={`font-medium text-sm ${
+            stats.correction.alert.type === 'success' 
+              ? 'text-green-800'
+              : stats.correction.alert.type === 'critical'
+                ? 'text-red-800'
+                : 'text-amber-800'
+          }`}>
+            {stats.correction.alert.message}
+          </p>
+        </motion.div>
+      )}
 
       {/* התראה אם לא עומדים בקצב */}
       {dailyPlan.alert && (
