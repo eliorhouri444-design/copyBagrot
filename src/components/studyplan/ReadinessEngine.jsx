@@ -27,7 +27,32 @@ export const CRITICAL_TOPICS = {
   }
 };
 
-// ===== משקולות לחישוב מוכנות =====
+// ===== משקולות לחישוב מוכנות כולל =====
+// FullExamReadiness = 0.50 * ExamsMastery + 0.40 * TopicsMastery + 0.10 * ErrorMastery
+export const FULL_READINESS_WEIGHTS = {
+  EXAMS_MASTERY: 0.50,
+  TOPICS_MASTERY: 0.40,
+  ERROR_MASTERY: 0.10
+};
+
+// משקולות לחישוב מוכנות שאלון (ExamReadiness per module)
+// ExamReadiness = 0.50 * TopicMastery + 0.30 * PracticePerformance + 0.20 * ExamPerformance
+export const EXAM_READINESS_WEIGHTS = {
+  TOPIC_MASTERY: 0.50,
+  PRACTICE_PERFORMANCE: 0.30,
+  EXAM_PERFORMANCE: 0.20
+};
+
+// משקולות לחישוב מוכנות נושא (TopicReadiness per topic)
+// TopicReadiness = 0.60 * Accuracy + 0.20 * DifficultyScore + 0.10 * ErrorReduction + 0.10 * SpeedScore
+export const TOPIC_READINESS_WEIGHTS = {
+  ACCURACY: 0.60,
+  DIFFICULTY: 0.20,
+  ERROR_REDUCTION: 0.10,
+  SPEED: 0.10
+};
+
+// Legacy weights (kept for backward compatibility)
 export const READINESS_WEIGHTS = {
   CONTENT_MASTERY: 0.35,
   PRACTICE_SCORE: 0.30,
