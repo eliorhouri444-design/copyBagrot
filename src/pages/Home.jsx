@@ -201,12 +201,21 @@ export default function HomePage() {
 
   const readinessData = useReadinessCalculator(user, topics, practiceAttempts, examAttempts);
 
-  // חישוב overallMastery מ-stats (כבר מחושב ב-useHomeData)
-  const overallMastery = useMemo(() => ({
-    topicMastery: stats.practiceAccuracy || 0,
-    examMastery: stats.examAverage || 0,
-    readinessScore: stats.overallMastery || 0
-  }), [stats]);
+  // חישוב overallMastery מ-stats או מה-engine
+  const overallMastery = useMemo(() => {
+    if (engineData?.readiness) {
+      return {
+        topicMastery: engineData.readiness.contentScore || 0,
+        examMastery: engineData.readiness.examScore || 0,
+        readinessScore: engineData.readiness.readinessScore || 0
+      };
+    }
+    return {
+      topicMastery: stats?.practiceAccuracy || 0,
+      examMastery: stats?.examAverage || 0,
+      readinessScore: stats?.overallMastery || 0
+    };
+  }, [stats, engineData]);
 
   const daysUntilExam = user?.exam_date ?
   Math.max(0, Math.ceil((new Date(user.exam_date) - new Date()) / (1000 * 60 * 60 * 24))) :
