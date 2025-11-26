@@ -665,7 +665,30 @@ export default function SettingsPage() {
           
           {settings.app_notifications && (
             <button
-              onClick={sendTestNotification}
+              type="button"
+              onClick={() => {
+                if (!('Notification' in window)) {
+                  alert('הדפדפן שלך לא תומך בהתראות');
+                  return;
+                }
+                if (Notification.permission === 'granted') {
+                  new Notification('בגרות פלוס 📚', {
+                    body: 'זוהי התראת בדיקה! ההתראות עובדות בהצלחה.',
+                  });
+                } else if (Notification.permission === 'denied') {
+                  alert('התראות חסומות בדפדפן. יש לאפשר אותן בהגדרות הדפדפן.');
+                } else {
+                  Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                      new Notification('בגרות פלוס 📚', {
+                        body: 'זוהי התראת בדיקה! ההתראות עובדות בהצלחה.',
+                      });
+                    } else {
+                      alert('לא ניתן לשלוח התראות - יש לאשר את ההרשאה');
+                    }
+                  });
+                }
+              }}
               className="w-full bg-[#F59E0B]/10 text-[#F59E0B] rounded-xl p-3 text-[13px] font-semibold hover:bg-[#F59E0B]/20 transition-colors"
             >
               🔔 שלח התראת בדיקה
