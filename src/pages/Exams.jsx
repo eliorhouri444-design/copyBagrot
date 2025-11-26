@@ -657,7 +657,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="bg-[#ffffff] pb-4 min-h-screen from-blue-50 via-indigo-50 to-blue-100">
+    <div className="bg-gray-50 pb-4 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}

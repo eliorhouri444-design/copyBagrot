@@ -309,7 +309,7 @@ export default function PracticePage() {
   }
 
   return (
-    <div className="bg-[#ffffff] pt-0 pb-20 min-h-screen from-blue-50 via-purple-50 to-pink-50">
+    <div className="bg-gray-50 pt-0 pb-20 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-600 to-indigo-600 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -323,7 +323,7 @@ export default function PracticePage() {
         </div>
       </div>
 
-      <div className="bg-[#ffffff] pb-6 px-6 space-y-6">
+      <div className="bg-gray-50 pb-6 px-6 space-y-6">
 
         <motion.div
           key={`${displaySubject}_${displayUnits}`}
