@@ -65,10 +65,11 @@ export default function PracticePage() {
         const subject = currentUser?.selected_subject || cachedSubject;
         const units = parseInt(currentUser?.selected_units || cachedUnits);
 
-        const [customTopics, allQuestions, recentSessions] = await Promise.all([
+        const [customTopics, allQuestions, recentSessions, allPracticeAttempts] = await Promise.all([
         base44.entities.TopicNew.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 50),
         base44.entities.QuestionBank.filter({ subject_id: subject, unit_level: units, is_active: true }, null, 500),
-        base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject, unit_level: units }, '-created_date', 5)]
+        base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject, unit_level: units }, '-created_date', 5),
+        base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 500)]
         );
 
         // Build topics with stats
