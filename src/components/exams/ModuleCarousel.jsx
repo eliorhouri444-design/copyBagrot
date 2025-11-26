@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle, AlertTriangle, Lock, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, TrendingDown, Shuffle, AlertTriangle, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-[#ffffff] p-4 rounded-2xl">
+          <div className="bg-indigo-50 p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -296,27 +296,30 @@ export default function ModuleCarousel({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <Target className="w-4 h-4 text-white" />
+              <div className="bg-[#ffffff] p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
-              </div>
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <TrendingUp className="w-4 h-4 text-white" />
+                <div className="bg-white rounded-xl p-3 text-center">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <TrendingUp className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
-              </div>
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <AlertTriangle className="w-4 h-4 text-white" />
+                <div className="bg-white rounded-xl p-3 text-center">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <TrendingDown className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
-              </div>
             </div>
 
               {/* Action buttons */}
