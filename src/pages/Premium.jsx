@@ -337,7 +337,17 @@ export default function PremiumPage() {
               </div>
               
               <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-                {plans.map((plan, idx) =>
+                {plans.filter(plan => {
+                  // אם המשתמש כבר מנוי, הצג רק את האפשרות השנייה
+                  if (user?.is_premium) {
+                    if (user?.subscription_type === 'monthly') {
+                      return plan.id === 'yearly'; // מנוי חודשי רואה רק שנתי
+                    } else if (user?.subscription_type === 'yearly') {
+                      return plan.id === 'monthly'; // מנוי שנתי רואה רק חודשי
+                    }
+                  }
+                  return true; // לא מנוי - רואה הכל
+                }).map((plan, idx) =>
               <motion.div
                 key={plan.id}
                 initial={{ opacity: 0, scale: 0.9 }}
