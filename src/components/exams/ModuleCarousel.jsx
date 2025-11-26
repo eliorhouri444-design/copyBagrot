@@ -176,15 +176,25 @@ export default function ModuleCarousel({
         passedAttempts: 0,
         avgScore: 0,
         progress: 0,
-        maxExams: isPremium === true ? 100 : 5
+        maxExams: isPremium === true ? 100 : 5,
+        excellentAttempts: 0,
+        mediumAttempts: 0,
+        failedAttempts: 0
       };
     }
 
+    // סינון לפי מודול - בדיקה גם לפי exam_type וגם לפי module_id
     const moduleAttempts = examAttempts.filter((attemptItem) => {
-      if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
-      if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
-      if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
-      if (currentModule.entity === 'GenericExam' && attemptItem.module_id === currentModule.id) return true;
+      // בדיקה לפי exam_type אם קיים
+      if (attemptItem.exam_type) {
+        if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
+        if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
+        if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
+        if (currentModule.entity === 'GenericExam' && attemptItem.exam_type === 'generic' && attemptItem.module_id === currentModule.id) return true;
+      }
+      // בדיקה לפי module_id אם קיים
+      if (attemptItem.module_id === currentModule.id) return true;
+      if (attemptItem.module_id === currentModule.module_id) return true;
       return false;
     });
 
