@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, TrendingDown, Shuffle, AlertTriangle, Lock, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, Edit2, Play, Crown, Target, TrendingUp, Shuffle, AlertTriangle, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";
@@ -176,25 +176,15 @@ export default function ModuleCarousel({
         passedAttempts: 0,
         avgScore: 0,
         progress: 0,
-        maxExams: isPremium === true ? 100 : 5,
-        excellentAttempts: 0,
-        mediumAttempts: 0,
-        failedAttempts: 0
+        maxExams: isPremium === true ? 100 : 5
       };
     }
 
-    // סינון לפי מודול - בדיקה גם לפי exam_type וגם לפי module_id
     const moduleAttempts = examAttempts.filter((attemptItem) => {
-      // בדיקה לפי exam_type אם קיים
-      if (attemptItem.exam_type) {
-        if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
-        if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
-        if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
-        if (currentModule.entity === 'GenericExam' && attemptItem.exam_type === 'generic' && attemptItem.module_id === currentModule.id) return true;
-      }
-      // בדיקה לפי module_id אם קיים
-      if (attemptItem.module_id === currentModule.id) return true;
-      if (attemptItem.module_id === currentModule.module_id) return true;
+      if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
+      if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
+      if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
+      if (currentModule.entity === 'GenericExam' && attemptItem.module_id === currentModule.id) return true;
       return false;
     });
 
@@ -312,7 +302,6 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
@@ -320,15 +309,13 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <TrendingDown className="w-4 h-4 text-white" />
+                  <AlertTriangle className="w-4 h-4 text-white" />
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
               </div>
             </div>
 
