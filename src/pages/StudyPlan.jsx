@@ -516,7 +516,7 @@ export default function StudyPlanPage() {
         </motion.div>
 
         {/* Smart Alert */}
-        {stats.weakTopics > 0 &&
+        {performanceData?.weakTopics?.length > 0 &&
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -525,7 +525,7 @@ export default function StudyPlanPage() {
 
             <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
-              <div className="font-bold text-yellow-900">יש לך {stats.weakTopics} נושאים חלשים</div>
+              <div className="font-bold text-yellow-900">יש לך {performanceData.weakTopics.length} נושאים חלשים</div>
               <div className="text-sm text-yellow-800">מומלץ לחזור עליהם היום כדי לשפר את המוכנות</div>
             </div>
           </motion.div>
