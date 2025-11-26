@@ -65,7 +65,7 @@ export default function PremiumPage() {
             const yearlyPlan = plans.find(p => p.id === 'yearly');
             if (yearlyPlan) {
               setSelectedPlan(yearlyPlan);
-              setShowPaymentDialog(true);
+              setShowPlanDialog(true);
             }
           }
           return;
