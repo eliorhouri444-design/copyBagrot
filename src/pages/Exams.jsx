@@ -525,6 +525,30 @@ export default function ExamsPage() {
       return;
     }
 
+    // For free users, cycle through exams in order (1->2->3->4->5->1...)
+    if (!isPremium) {
+      // Get attempts for this specific module
+      const moduleAttemptCount = examAttempts.filter((a) => {
+        if (a.module_id === moduleId) return true;
+        // Also check by exam_type for Module A/B/C
+        if (moduleId === 'A' && a.exam_type === 'module_a') return true;
+        if (moduleId === 'B' && a.exam_type === 'module_b') return true;
+        if (moduleId === 'C' && a.exam_type === 'module_c') return true;
+        return false;
+      }).length;
+      
+      // Calculate which exam to show (cycle through the 5 available)
+      const examIndex = moduleAttemptCount % moduleExams.length;
+      const examToStart = moduleExams[examIndex];
+      
+      if (examToStart) {
+        console.log('✅ Starting exam (free user cycle):', examToStart.id, 'Module:', moduleId, 'Index:', examIndex);
+        handleExamClick(examToStart);
+        return;
+      }
+    }
+
+    // For premium users, prefer unattempted exams
     const attemptedExamIds = examAttempts.map((a) => a.exam_id);
     const unattemptedExams = moduleExams.filter((e) => !attemptedExamIds.includes(e.id));
 
