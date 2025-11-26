@@ -140,15 +140,15 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
 
                   <div className="flex items-center gap-3 flex-1">
-                    <motion.div className="bg-indigo-50 p-2 rounded-lg"
-
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}>
+                    <motion.div
+                      className={`p-2 rounded-lg ${passed ? 'bg-green-100' : 'bg-red-100'}`}
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}>
 
                       {passed ?
                       <CheckCircle className="w-4 h-4 text-green-600" /> :
 
-                      <TrendingUp className="text-[#000000] lucide lucide-trending-up w-4 h-4" />
+                      <TrendingUp className="w-4 h-4 text-red-600" />
                       }
                     </motion.div>
                     <div className="flex-1 text-right">
