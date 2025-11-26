@@ -369,12 +369,11 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
 
                         <div className="flex items-center gap-3">
-                          <div className="bg-blue-100 rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0">
-                            {passed ?
-                            <CheckCircle className="w-6 h-6 text-green-600" /> :
-
-                            <TrendingUp className="w-6 h-6 text-orange-600" />
-                            }
+                          <div className={`rounded-xl w-12 h-12 flex items-center justify-center flex-shrink-0 ${passed ? 'bg-green-100' : 'bg-orange-100'}`}>
+                          {passed ?
+                          <CheckCircle className="w-6 h-6 text-green-600" /> :
+                          <span className="text-orange-600"><TrendingUp className="w-6 h-6" /></span>
+                          }
                           </div>
                           <div className="text-right flex-1 min-w-0">
                             <div className="text-[14px] font-bold text-gray-900 truncate">
