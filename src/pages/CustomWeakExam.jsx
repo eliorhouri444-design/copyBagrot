@@ -463,17 +463,20 @@ Return JSON:`,
 
             {/* הצגת הנושא החלש */}
             {question._metadata && (
-              <div className="bg-white rounded-xl p-3 mb-3 border border-blue-200">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-blue-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <BookOpen className="w-4 h-4 text-blue-600" />
-                  <div className="text-xs font-bold text-blue-900">נושא חלש:</div>
+                  <Target className="w-4 h-4 text-blue-600" />
+                  <div className="text-xs font-bold text-blue-900">למה השאלה הזו?</div>
                 </div>
-                <div className="flex items-center gap-2 text-xs flex-wrap">
+                <p className="text-xs text-gray-700 mb-2">
+                  בנושא <span className="font-bold text-blue-700">{question._metadata.topic}</span> יש לך {Math.round(question._metadata.topicErrorRate)}% שגיאות - יותר משאר הנושאים בשאלון הזה. לכן אני מתמקד איתך בתרגול נושא זה.
+                </p>
+                <div className="flex items-center gap-2 text-xs">
                   <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg font-bold">
                     {question._metadata.topic}
                   </span>
                   <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg">
-                    {Math.round(question._metadata.topicErrorRate)}% שגיאות בנושא זה
+                    {question._metadata.failures} טעויות
                   </span>
                 </div>
               </div>
