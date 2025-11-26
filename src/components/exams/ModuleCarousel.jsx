@@ -302,6 +302,7 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
+                <div className="text-[9px] text-[#6E6E6E]">ציון: 86–100</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
@@ -309,6 +310,7 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
+                <div className="text-[9px] text-[#6E6E6E]">ציון: 56–85</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
@@ -316,6 +318,7 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
+                <div className="text-[9px] text-[#6E6E6E]">ציון: 0–55</div>
               </div>
             </div>
 
