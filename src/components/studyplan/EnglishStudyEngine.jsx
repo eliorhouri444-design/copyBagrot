@@ -198,143 +198,291 @@ export const shouldIncreaseDifficulty = (skillScore, threshold = 90) => {
 };
 
 /**
- * בניית תוכנית יומית
- * @param {Object} params - פרמטרים לבניית התוכנית
+ * בניית תוכנית יומית חכמה
+ * לוגיקה: 60% תיקון פערים, 20% חזרה, 20% סימולציה
  */
 export const buildDailyPlan = ({
   dayOfWeek,
   targetScore,
   currentAverage,
+  weeklyAverage,
   daysUntilExam,
   moduleLevel,
+  unitLevel = 5,
   weakAreas = [],
   vocabularyWords = [],
-  completedToday = []
+  completedToday = [],
+  weeklyScores = [],
+  isSimulationMode = false
 }) => {
+  const performanceGap = calculatePerformanceGap(targetScore, weeklyAverage || currentAverage);
+  const needsIntensiveMode = performanceGap > 10;
+  
+  // חישוב זמן יומי - מוסיפים 10 דקות אם יש פער גדול
+  let baseDailyMinutes = 60;
+  if (needsIntensiveMode) baseDailyMinutes += 10;
+  if (daysUntilExam < 14) baseDailyMinutes += 15; // שבועיים אחרונים
+  
   const plan = {
     date: new Date(),
     targetScore,
     currentAverage,
+    weeklyAverage: weeklyAverage || currentAverage,
+    performanceGap,
     gap: targetScore - currentAverage,
     tasks: [],
-    estimatedMinutes: 0
+    estimatedMinutes: 0,
+    mode: isSimulationMode ? 'simulation' : needsIntensiveMode ? 'intensive' : 'normal',
+    unitLevel
   };
+
+  // === PRIORITY 1: אוצר מילים - חובה יומית (30% מהזמן) ===
+  const vocabMinutes = Math.round(baseDailyMinutes * TIME_ALLOCATION[SKILL_TYPES.VOCABULARY]);
+  const wordsToReview = vocabularyWords.filter(w => !w.isMastered && 
+    (!w.nextReviewDate || new Date(w.nextReviewDate) <= new Date()));
   
-  // תמיד מתחילים באוצר מילים - 15 דקות
   plan.tasks.push({
-    id: 'vocab',
+    id: 'vocab-daily',
     type: SKILL_TYPES.VOCABULARY,
-    title: 'שינון אוצר מילים',
-    description: 'חזרה על מילים חדשות ומילים לחיזוק',
-    duration: 15,
-    priority: 'high',
-    wordsCount: Math.min(20, vocabularyWords.filter(w => !w.isMastered).length)
+    title: 'אוצר מילים יומי',
+    description: unitLevel === 5 
+      ? 'Academic Word List + Collocations'
+      : unitLevel === 4 
+        ? 'מילים מתקדמות + ביטויים'
+        : 'מילים בסיסיות + ביטויי זמן',
+    duration: vocabMinutes,
+    priority: 'critical',
+    wordsCount: Math.min(10, wordsToReview.length),
+    usesSpacedRepetition: true
   });
-  plan.estimatedMinutes += 15;
+  plan.estimatedMinutes += vocabMinutes;
+
+  // === מצב סימולציה - אם הממוצע >= יעד ===
+  if (isSimulationMode || (weeklyAverage >= targetScore && daysUntilExam < 21)) {
+    plan.tasks.push({
+      id: 'full-simulation',
+      type: 'simulation',
+      title: `סימולציה מלאה - שאלון ${moduleLevel}`,
+      description: 'מבחן בגרות מלא בתנאים אמיתיים עם סטופר',
+      duration: 90,
+      priority: 'critical',
+      isFullSimulation: true,
+      moduleLevel,
+      timeLimit: 90
+    });
+    plan.estimatedMinutes += 90;
+    plan.mode = 'simulation';
+    return plan;
+  }
+
+  // === מצב אינטנסיבי - אם הפער > 10 נקודות ===
+  if (needsIntensiveMode) {
+    // 100% מהזמן על Priority 1 - תיקון נושאים חלשים
+    const gapFixingMinutes = baseDailyMinutes - vocabMinutes;
+    
+    if (weakAreas.length > 0) {
+      // מחלקים את הזמן בין 2-3 הנושאים החלשים ביותר
+      const topWeakAreas = weakAreas.slice(0, 3);
+      const minutesPerArea = Math.floor(gapFixingMinutes / topWeakAreas.length);
+      
+      topWeakAreas.forEach((weak, idx) => {
+        plan.tasks.push({
+          id: `intensive-${weak.skill}-${idx}`,
+          type: weak.skill,
+          title: `תיקון פער: ${getSkillName(weak.skill)}`,
+          description: `ציון נוכחי: ${weak.skillScore}% - נדרש חיזוק אינטנסיבי`,
+          duration: minutesPerArea,
+          priority: 'critical',
+          isGapFixing: true,
+          skillScore: weak.skillScore,
+          weakTopics: weak.weakTopics,
+          questionsCount: Math.ceil(minutesPerArea / 2) // ~2 דקות לשאלה
+        });
+        plan.estimatedMinutes += minutesPerArea;
+      });
+    }
+    
+    plan.alert = {
+      type: 'intensive',
+      message: `פער של ${performanceGap} נקודות מהיעד! מצב אינטנסיבי מופעל - מתמקדים בחולשות בלבד`,
+      shouldPauseProgress: true,
+      addedMinutes: 10
+    };
+    
+    return plan;
+  }
+
+  // === מצב רגיל - חלוקה לפי עדיפויות ===
+  const remainingMinutes = baseDailyMinutes - vocabMinutes;
   
+  // Priority 1: תיקון פערים (60%)
+  const gapFixingMinutes = Math.round(remainingMinutes * TASK_PRIORITY.GAP_FIXING);
+  
+  // Priority 2: חזרה - Reinforcement (20%)
+  const reinforcementMinutes = Math.round(remainingMinutes * TASK_PRIORITY.REINFORCEMENT);
+  
+  // Priority 3: סימולציה (20%)
+  const simulationMinutes = Math.round(remainingMinutes * TASK_PRIORITY.SIMULATION);
+
   // לפי יום בשבוע
-  const isInputDay = [0, 2, 4].includes(dayOfWeek); // א', ג', ה'
-  const isOutputDay = [1, 3].includes(dayOfWeek); // ב', ד'
+  const isInputDay = [0, 2, 4].includes(dayOfWeek); // א', ג', ה' - Input
+  const isOutputDay = [1, 3].includes(dayOfWeek); // ב', ד' - Output
   const isSimulationDay = [5, 6].includes(dayOfWeek); // סופ"ש
-  
+
   if (isInputDay) {
-    // דגש על קריאה ושמיעה
+    // === Reading עם טיימר נוקשה (40% מהזמן) ===
     const readingTime = calculateAllowedTime(35, Math.max(0, 60 - daysUntilExam), 60);
     
     plan.tasks.push({
-      id: 'reading',
+      id: 'reading-timed',
       type: SKILL_TYPES.READING,
-      title: `תרגול Unseen - ${moduleLevel}`,
-      description: `קריאת טקסט ומענה על שאלות (${readingTime} דקות)`,
+      title: `Unseen - מודול ${moduleLevel}`,
+      description: `קריאה תחת לחץ זמן: ${readingTime} דקות`,
       duration: readingTime,
       priority: 'high',
       timeLimit: readingTime,
-      moduleLevel
+      moduleLevel,
+      hasStrictTimer: true
     });
     plan.estimatedMinutes += readingTime;
     
-    if (moduleLevel === 'A' || moduleLevel === 'B') {
+    // Listening פעם ביומיים
+    if (dayOfWeek === 0 || dayOfWeek === 4) {
       plan.tasks.push({
         id: 'listening',
         type: SKILL_TYPES.LISTENING,
         title: 'תרגול האזנה',
-        description: 'שמיעה והבנה',
-        duration: 20,
+        description: 'שמיעה והבנה - מודול A/B',
+        duration: 15,
         priority: 'medium'
       });
-      plan.estimatedMinutes += 20;
+      plan.estimatedMinutes += 15;
     }
   }
   
   if (isOutputDay) {
-    // דגש על כתיבה ודקדוק
+    // === Grammar (20%) - דגש על נושאים חלשים ===
+    const grammarWeak = weakAreas.find(w => w.skill === SKILL_TYPES.GRAMMAR);
     plan.tasks.push({
       id: 'grammar',
       type: SKILL_TYPES.GRAMMAR,
-      title: 'תרגול דקדוק',
-      description: 'זמנים, מבנה משפט, מילות קישור',
-      duration: 20,
-      priority: 'high'
+      title: grammarWeak 
+        ? `דקדוק: ${grammarWeak.weakTopics?.[0]?.topic || 'נושאים לחיזוק'}`
+        : 'תרגול דקדוק',
+      description: grammarWeak 
+        ? `ציון נוכחי: ${grammarWeak.skillScore}% - צריך חיזוק`
+        : 'זמנים, מבנה משפט, Conditionals',
+      duration: gapFixingMinutes,
+      priority: grammarWeak ? 'critical' : 'high',
+      isGapFixing: !!grammarWeak
     });
-    plan.estimatedMinutes += 20;
+    plan.estimatedMinutes += gapFixingMinutes;
     
-    // כתיבה מדורגת לפי יום בשבוע
-    const writingPhase = dayOfWeek === 1 ? 'connectors' : 'paragraph';
-    plan.tasks.push({
-      id: 'writing',
-      type: SKILL_TYPES.WRITING,
-      title: writingPhase === 'connectors' ? 'מילות קישור' : 'כתיבת פסקה',
-      description: writingPhase === 'connectors' 
-        ? 'תרגול שימוש נכון במילות קישור'
-        : 'כתיבת פסקת פתיחה או סיום',
-      duration: 25,
-      priority: 'medium',
-      writingPhase
-    });
-    plan.estimatedMinutes += 25;
+    // Writing פעם ב-3 ימים
+    if (dayOfWeek === 3) {
+      const writingPhase = getWritingPhase(daysUntilExam);
+      plan.tasks.push({
+        id: 'writing',
+        type: SKILL_TYPES.WRITING,
+        title: writingPhase.title,
+        description: writingPhase.description,
+        duration: 25,
+        priority: 'medium',
+        writingPhase: writingPhase.phase
+      });
+      plan.estimatedMinutes += 25;
+    }
   }
   
   if (isSimulationDay) {
-    // סימולציה מלאה
+    // === סימולציה מלאה בסופ"ש ===
     plan.tasks.push({
-      id: 'simulation',
+      id: 'weekly-simulation',
       type: 'simulation',
-      title: `סימולציה מלאה - שאלון ${moduleLevel}`,
+      title: `סימולציה שבועית - שאלון ${moduleLevel}`,
       description: 'מבחן מלא בתנאי בגרות עם סטופר',
       duration: 90,
       priority: 'critical',
       isFullSimulation: true,
-      moduleLevel
+      moduleLevel,
+      timeLimit: 90
     });
     plan.estimatedMinutes += 90;
   }
-  
-  // הוספת תרגול על נושאים חלשים
-  if (weakAreas.length > 0 && !isSimulationDay) {
-    const topWeak = weakAreas[0];
-    plan.tasks.push({
-      id: 'weak-review',
-      type: topWeak.skill,
-      title: `חיזוק: ${getSkillName(topWeak.skill)}`,
-      description: `המערכת זיהתה שאתה בציון ${topWeak.accuracy}% - צריך לחזק`,
-      duration: 15,
-      priority: 'high',
-      isReview: true,
-      weakArea: topWeak
-    });
-    plan.estimatedMinutes += 15;
+
+  // === הוספת משימות Priority 2 - חזרה על נושאים חזקים ===
+  if (!isSimulationDay && reinforcementMinutes > 0) {
+    const strongAreas = weakAreas.length > 0 
+      ? [] // אם יש חולשות - לא מתרגלים חזקים
+      : [{ skill: SKILL_TYPES.READING, topic: 'חזרה כללית' }];
+    
+    if (strongAreas.length > 0) {
+      plan.tasks.push({
+        id: 'reinforcement',
+        type: strongAreas[0].skill,
+        title: 'חיזוק והעמקה',
+        description: 'חזרה על נושאים שנלמדו לפני שבוע',
+        duration: reinforcementMinutes,
+        priority: 'low',
+        isReinforcement: true
+      });
+      plan.estimatedMinutes += reinforcementMinutes;
+    }
   }
-  
-  // הוספת התראה אם לא עומדים בקצב
-  if (currentAverage < targetScore - 10) {
+
+  // === הוספת נושאים חלשים (אם יש) ===
+  if (weakAreas.length > 0 && !isSimulationDay && !needsIntensiveMode) {
+    const topWeak = weakAreas[0];
+    if (!plan.tasks.find(t => t.type === topWeak.skill)) {
+      plan.tasks.push({
+        id: 'weak-priority',
+        type: topWeak.skill,
+        title: `תיקון: ${getSkillName(topWeak.skill)}`,
+        description: `ציון ${topWeak.skillScore}% - ${topWeak.weakTopics?.[0]?.topic || 'נושאים לחיזוק'}`,
+        duration: 15,
+        priority: 'high',
+        isGapFixing: true,
+        skillScore: topWeak.skillScore
+      });
+      plan.estimatedMinutes += 15;
+    }
+  }
+
+  // === התראה על מצב ===
+  if (performanceGap > 5) {
     plan.alert = {
       type: 'warning',
-      message: `כדי להגיע ליעד ${targetScore}, עלינו לחזק את ${weakAreas[0]?.skill || 'הנושאים החלשים'} לפני שמתקדמים`,
-      shouldPauseProgress: true
+      message: `עדיין ${performanceGap} נקודות מהיעד. המשך לתרגל את ${weakAreas[0]?.skill ? getSkillName(weakAreas[0].skill) : 'הנושאים החלשים'}`,
+      shouldPauseProgress: performanceGap > 10
     };
   }
   
   return plan;
+};
+
+/**
+ * קביעת שלב כתיבה לפי זמן עד בגרות
+ */
+const getWritingPhase = (daysUntilExam) => {
+  if (daysUntilExam > 30) {
+    return {
+      phase: 'connectors',
+      title: 'מילות קישור',
+      description: 'תרגול שימוש נכון ב-However, Therefore, Moreover...'
+    };
+  } else if (daysUntilExam > 14) {
+    return {
+      phase: 'paragraph',
+      title: 'כתיבת פסקאות',
+      description: 'כתיבת פסקת פתיחה/סיום איכותית'
+    };
+  } else {
+    return {
+      phase: 'full',
+      title: 'חיבור מלא',
+      description: 'כתיבת חיבור שלם בתנאי בגרות'
+    };
+  }
 };
 
 /**
