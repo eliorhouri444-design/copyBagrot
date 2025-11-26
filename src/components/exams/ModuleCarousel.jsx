@@ -375,12 +375,12 @@ export default function ModuleCarousel({
                     <Button
                       onClick={() => handleModuleClick(currentModule)}
                       variant="outline"
-                      className="w-full h-10 text-[12px] font-semibold border hover:bg-gray-50 rounded-[14px]">
+                      className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                    <div className="bg-white rounded-lg p-2.5 border border-[#E9F0FF]">
+                    <div className="bg-[#F5F8FF] rounded-lg p-2.5 border border-[#E9F0FF]">
                             <div className="text-center mb-2">
                               <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
                               <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
