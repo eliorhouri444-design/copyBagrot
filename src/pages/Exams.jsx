@@ -1029,9 +1029,13 @@ export default function ExamsPage() {
       <Dialog open={!!showAdDialog} onOpenChange={() => {setShowAdDialog(null);}}>
         <DialogContent dir="rtl" className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">צפייה בציון המבחן</DialogTitle>
+            <DialogTitle className="text-xl font-bold">
+              {showAdDialog?.isExamStart ? 'התחלת מבחן' : 'צפייה בציון המבחן'}
+            </DialogTitle>
             <DialogDescription>
-              בחר אופציה לצפייה בפרטי המבחן והציון
+              {showAdDialog?.isExamStart 
+                ? 'צפה בפרסומת קצרה כדי להתחיל את המבחן'
+                : 'בחר אופציה לצפייה בפרטי המבחן והציון'}
             </DialogDescription>
           </DialogHeader>
 
@@ -1040,15 +1044,25 @@ export default function ExamsPage() {
               <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
               <p className="text-sm text-gray-600 mb-4">
-                צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב
+                {showAdDialog?.isExamStart 
+                  ? 'צפה בפרסומת קצרה כדי להתחיל את המבחן'
+                  : 'צפה בפרסומת קצרה כדי לפתוח את הציון והמשוב'}
               </p>
               <Button
                 onClick={async () => {
                   alert("🎬 הפרסומת מתחילה...\n(סימולציה - בייצור יופיע וידאו אמיתי)");
                   await new Promise((resolve) => setTimeout(resolve, 2000));
-                  setUnlockedAttempts((prev) => new Set([...prev, showAdDialog.id]));
-                  setShowAttemptDetails(showAdDialog);
-                  setShowAdDialog(null);
+                  
+                  if (showAdDialog?.isExamStart) {
+                    // Start the exam after watching ad
+                    const examToStart = showAdDialog;
+                    setShowAdDialog(null);
+                    handleExamClick(examToStart);
+                  } else {
+                    setUnlockedAttempts((prev) => new Set([...prev, showAdDialog.id]));
+                    setShowAttemptDetails(showAdDialog);
+                    setShowAdDialog(null);
+                  }
                 }}
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white h-12 font-bold">
 
