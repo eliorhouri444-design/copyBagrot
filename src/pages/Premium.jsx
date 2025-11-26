@@ -511,7 +511,17 @@ export default function PremiumPage() {
             <DialogTitle className="text-2xl font-bold text-center mb-4">בחר תוכנית פרימיום</DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
-            {plans.map((plan) =>
+            {plans.filter(plan => {
+              // אם המשתמש כבר מנוי, הצג רק את האפשרות השנייה
+              if (user?.is_premium) {
+                if (user?.subscription_type === 'monthly') {
+                  return plan.id === 'yearly'; // מנוי חודשי רואה רק שנתי
+                } else if (user?.subscription_type === 'yearly') {
+                  return plan.id === 'monthly'; // מנוי שנתי רואה רק חודשי
+                }
+              }
+              return true; // לא מנוי - רואה הכל
+            }).map((plan) =>
             <div
               key={plan.id}
               className={`relative bg-white rounded-xl shadow-md p-5 border-2 ${selectedPlan?.id === plan.id ? 'border-amber-500' : 'border-gray-200'} cursor-pointer hover:border-amber-500 transition-all`}
