@@ -278,10 +278,10 @@ export default function ModuleCarousel({
             </div>
 
             {/* Content */}
-            <div className="bg-white rounded-xl p-3 space-y-2.5 border border-[#E9F0FF]">
+            <div className="space-y-2.5">
               <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
               
-              <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
+              <div className="bg-white rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
                 <div className="flex justify-center items-center mb-1.5">
                   <span className="text-[17px] font-bold text-[#3B82F6]">{moduleStats.progress}%</span>
                 </div>
