@@ -414,49 +414,52 @@ Return JSON:`,
           animate={{ opacity: 1, x: 0 }}
           className="bg-white rounded-3xl shadow-2xl w-full max-w-lg"
         >
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-t-3xl border-b-2 border-orange-100">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-t-3xl border-b-2 border-blue-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
                 <div className="text-sm text-gray-600 font-medium">
-                  {sourceExam ? `שאלה ${question.question_number} מהמבחן המקורי` : 'שאלה מבגרות קודמות'}
+                  {sourceExam ? `שאלה מ${sourceExam.title}` : 'שאלה מבגרות קודמות'}
                 </div>
-                <div className="text-xs text-orange-600">⚡ שאלה שטעית בה במבחן</div>
+                <div className="text-xs text-blue-600">⚡ נושא חלש שדורש חיזוק</div>
               </div>
             </div>
 
-            {sourceExam && (
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-purple-200">
+            {/* Weak Topics Summary */}
+            {weakTopics.length > 0 && (
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-blue-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="text-lg">📋</div>
-                  <div className="text-xs font-bold text-purple-900">{sourceExam.title}</div>
+                  <BookOpen className="w-4 h-4 text-blue-600" />
+                  <div className="text-xs font-bold text-blue-900">
+                    {sourceExam ? sourceExam.title : 'נושאים חלשים'}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs flex-wrap">
-                  {sourceAttempt && (
-                    <>
-                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
-                        ציון מקורי: {Math.round(sourceAttempt.score_percent)}
-                      </span>
-                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
-                        {sourceAttempt.earned_points}/{sourceAttempt.total_points} נקודות
-                      </span>
-                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
-                        {questions.length} טעויות במבחן זה
-                      </span>
-                    </>
-                  )}
+                <div className="flex flex-wrap gap-1.5">
+                  {weakTopics.slice(0, 3).map((topic, idx) => (
+                    <span 
+                      key={idx}
+                      className={`text-[10px] px-2 py-1 rounded-lg font-medium ${
+                        topic.topic === question._metadata?.topic 
+                          ? 'bg-blue-200 text-blue-800 border border-blue-300' 
+                          : 'bg-white text-gray-700'
+                      }`}
+                    >
+                      {topic.topic} ({Math.round(topic.errorRate)}% שגיאות)
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
 
-            {!sourceExam && question._metadata && (
+            {/* Current question topic info */}
+            {question._metadata && (
               <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-xs text-gray-600 font-semibold mb-2">📊 למה השאלה הזו:</div>
+                <div className="text-xs text-gray-600 font-semibold mb-2">📊 נושא חלש:</div>
                 <div className="flex items-center gap-2 text-xs text-gray-700 flex-wrap">
-                  <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
-                    {question._metadata.failures} טעויות
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg font-bold">
+                    {question._metadata.topic || 'כללי'} - {Math.round(question._metadata.topicErrorRate || 0)}% שגיאות
                   </span>
                   {question.exam_title && (
                     <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg">
