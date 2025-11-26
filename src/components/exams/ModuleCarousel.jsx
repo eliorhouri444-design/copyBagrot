@@ -12,8 +12,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  DialogDescription } from
+"@/components/ui/dialog";
 
 export default function ModuleCarousel({
   modules,
@@ -43,7 +43,7 @@ export default function ModuleCarousel({
     try {
       const user = await base44.auth.me();
       const allAttempts = await base44.entities.ExamAttempt.list("-created_date", 500);
-      const userAttempts = allAttempts.filter(a => a.created_by === user.email);
+      const userAttempts = allAttempts.filter((a) => a.created_by === user.email);
       setExamAttempts(userAttempts);
       console.log('🔄 ModuleCarousel: Refreshed exam attempts', userAttempts.length);
     } catch (error) {
@@ -141,7 +141,7 @@ export default function ModuleCarousel({
       callback();
       return;
     }
-    
+
     // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה בגרות היום)
     if (todayExamCount >= FREE_DAILY_EXAM) {
       // הצג דיאלוג קטן במקום פרסומת
@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-[#E9F0FF] p-4 rounded-2xl">
+          <div className="bg-blue-100 p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -268,11 +268,11 @@ export default function ModuleCarousel({
                 <div className="relative w-16 h-16 flex-shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                    <circle 
-                      cx="18" cy="18" r="14" fill="none" 
+                    <circle
+                      cx="18" cy="18" r="14" fill="none"
                       stroke="white" strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${moduleStats.progress}, 100`}
-                    />
+                      strokeDasharray={`${moduleStats.progress}, 100`} />
+
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <FileText className="w-5 h-5 text-white" />
@@ -296,13 +296,12 @@ export default function ModuleCarousel({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-white rounded-xl p-3 text-center">
+              <div className="bg-[#ffffff] p-3 text-center rounded-xl">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                   <Target className="w-4 h-4 text-white" />
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">86-100</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
@@ -310,117 +309,115 @@ export default function ModuleCarousel({
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">56-85</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                   <AlertTriangle className="w-4 h-4 text-white" />
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">מתחת ל-56</div>
               </div>
             </div>
 
               {/* Action buttons */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="space-y-2">
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="space-y-2">
 
                 {isLocked ?
-                <Button
-                  onClick={onUpgrade}
-                  className="w-full h-11 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[13px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+              <Button
+                onClick={onUpgrade}
+                className="w-full h-11 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[13px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
                     <Crown className="w-4 h-4" />
                     שדרג לפרימיום
                   </Button> :
 
-                <>
+              <>
                     {/* מבחן אקראי - למעלה - לכולם */}
                     {currentModule.entity !== 'practice' && onRandomExam &&
-                  <div className="space-y-2">
+                <div className="space-y-2">
                         <Button
-                          onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
-                          className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800"
-                        >
+                    onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
+                    className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800">
+
                           <Play className="w-4 h-4 ml-2" />
                           התחל בגרות
                         </Button>
 
-                        {isPremium === true ? (
-                          <Button
-                            onClick={() => {
-                              sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
-                              navigate(createPageUrl("CustomWeakExam"));
-                            }}
-                            className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
-                          >
+                        {isPremium === true ?
+                  <Button
+                    onClick={() => {
+                      sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
+                      navigate(createPageUrl("CustomWeakExam"));
+                    }}
+                    className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
+
                             <Target className="w-4 h-4 ml-2" />
                             בוחן טעויות מהשאלון
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() => navigate(createPageUrl("Premium"))}
-                            className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800"
-                          >
+                          </Button> :
+
+                  <Button
+                    onClick={() => navigate(createPageUrl("Premium"))}
+                    className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800">
+
                             <Lock className="w-4 h-4 ml-2" />
                             בוחן טעויות
                           </Button>
-                        )}
-                      </div>
                   }
+                      </div>
+                }
 
                     {/* בחר מבחן ספציפי - למטה - רק לפרימיום */}
                     {currentModule.entity !== 'practice' &&
-                  <>
+                <>
                         {isPremium === true ?
-                    <Button
-                      onClick={() => handleModuleClick(currentModule)}
-                      variant="outline"
-                      className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
+                  <Button
+                    onClick={() => handleModuleClick(currentModule)}
+                    variant="outline"
+                    className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                    <div className="bg-[#F5F8FF] rounded-lg p-2.5 border border-[#E9F0FF]">
+                  <div className="bg-[#F5F8FF] rounded-lg p-2.5 border border-[#E9F0FF]">
                             <div className="text-center mb-2">
                               <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
                               <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
                             </div>
                             <Button
-                        onClick={() => handleModuleClick(currentModule)}
-                        variant="outline"
-                        className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
+                      onClick={() => handleModuleClick(currentModule)}
+                      variant="outline"
+                      className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
 
                               בחר מבחן (מוגבל ל-5)
                             </Button>
                             <Button
-                        onClick={onUpgrade}
-                        className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
+                      onClick={onUpgrade}
+                      className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
 
                               <Crown className="w-3.5 h-3.5" />
                               לגישה מלאה 100+ בגרויות
                             </Button>
                           </div>
-                    }
-                      </>
                   }
+                      </>
+                }
 
                     {/* אם זה תרגול */}
                     {currentModule.entity === 'practice' &&
-                  <Button
-                    onClick={() => handleModuleClick(currentModule)}
-                    className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-11 text-[13px] font-bold transition-all flex items-center justify-center gap-2 rounded-[14px]`}>
+                <Button
+                  onClick={() => handleModuleClick(currentModule)}
+                  className={`w-full bg-gradient-to-r ${currentModule.color || 'from-blue-500 to-indigo-600'} text-white h-11 text-[13px] font-bold transition-all flex items-center justify-center gap-2 rounded-[14px]`}>
 
                         התחל תרגול
                         <Play className="w-4 h-4" />
                       </Button>
-                  }
-                  </>
                 }
+                  </>
+              }
               </motion.div>
             </div>
         </motion.div>
@@ -497,8 +494,8 @@ export default function ModuleCarousel({
           <div className="flex flex-col gap-2">
             <Button
               onClick={handleWatchAdAndContinue}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
-            >
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
+
               📺 צפה בפרסומת והמשך
             </Button>
             <Button
@@ -506,16 +503,16 @@ export default function ModuleCarousel({
                 setShowAdDialog(false);
                 navigate(createPageUrl("Premium"));
               }}
-              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl"
-            >
+              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl">
+
               <Crown className="w-5 h-5 ml-2" />
               שדרג לפרימיום
             </Button>
             <Button
               variant="ghost"
               onClick={() => setShowAdDialog(false)}
-              className="w-full text-gray-500"
-            >
+              className="w-full text-gray-500">
+
               ביטול
             </Button>
           </div>
