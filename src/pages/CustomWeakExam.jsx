@@ -266,21 +266,49 @@ Return JSON:`,
     }
   }, [currentIndex]);
 
-  if (!user || questions.length === 0) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">בונה בגרות על נושאים חלשים...</h3>
           <p className="text-gray-600 font-semibold">
-            {sourceExam ? `מנתח טעויות מ: ${sourceExam.title}` : 'מחפש טעויות מבגרויות קודמות'}
+            {sourceExam ? `מנתח נושאים חלשים מ: ${sourceExam.title}` : 'מחפש נושאים חלשים מבגרויות'}
           </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!user || questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md"
+        >
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="w-10 h-10 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">אין נושאים חלשים</h3>
+          <p className="text-gray-600 mb-6">
+            {sourceExam 
+              ? `לא נמצאו טעויות ב${sourceExam.title}. נסה לעשות עוד בגרויות.`
+              : 'לא נמצאו טעויות בבגרויות קודמות. המשך לתרגל!'}
+          </p>
+          <Button 
+            onClick={() => navigate(createPageUrl("Exams"))}
+            className="w-full h-12 bg-blue-500 hover:bg-blue-600"
+          >
+            חזרה לבגרויות
+          </Button>
         </motion.div>
       </div>
     );
