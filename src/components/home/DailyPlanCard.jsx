@@ -14,7 +14,8 @@ export default function DailyPlanCard({
   examAttempts = [],
   isPremium = false,
   completedTasks = [],
-  onToggleTask
+  onToggleTask,
+  engineData = null
 }) {
   const navigate = useNavigate();
 
@@ -162,9 +163,9 @@ export default function DailyPlanCard({
     };
   }, [readinessData, todayProgress]);
 
-  // חישוב נושאים מומלצים לתרגול + אחוז בקיאות כולל
-  const { recommendedTopics, overallTopicMastery } = useMemo(() => {
-    if (!topics || topics.length === 0) return { recommendedTopics: [], overallTopicMastery: 0 };
+  // חישוב סטטיסטיקות כוללות לנושאים
+  const topicOverallStats = useMemo(() => {
+    if (!topics || topics.length === 0) return { mastery: 0, total: 0, mastered: 0 };
 
     const topicStats = {};
     practiceAttempts.forEach((attempt) => {
@@ -175,26 +176,48 @@ export default function DailyPlanCard({
       if (attempt.status === "correct") topicStats[topicId].correct++;
     });
 
-    const allTopicsWithStats = topics.map((topic) => {
+    let totalMastery = 0;
+    let masteredCount = 0;
+    
+    topics.forEach((topic) => {
       const stats = topicStats[topic.topic_id];
-      let status = "not_started";
-      let accuracy = 0;
-      if (stats) {
-        accuracy = stats.total > 0 ? (stats.correct / stats.total) * 100 : 0;
-        if (accuracy < 50) status = "weak";
-        else if (stats.total < 10) status = "in_progress";
-        else status = "mastered";
+      if (stats && stats.total > 0) {
+        const accuracy = (stats.correct / stats.total) * 100;
+        totalMastery += accuracy;
+        if (accuracy >= 70) masteredCount++;
       }
-      return { ...topic, status, stats, accuracy };
     });
 
-    // חישוב אחוז בקיאות כולל בנושאים
-    const topicsWithAttempts = allTopicsWithStats.filter(t => t.stats && t.stats.total > 0);
-    const totalMastery = topicsWithAttempts.length > 0
-      ? Math.round(topicsWithAttempts.reduce((sum, t) => sum + t.accuracy, 0) / topicsWithAttempts.length)
-      : 0;
+    const avgMastery = topics.length > 0 ? Math.round(totalMastery / topics.length) : 0;
+    
+    return { mastery: avgMastery, total: topics.length, mastered: masteredCount };
+  }, [topics, practiceAttempts]);
 
-    const recommended = allTopicsWithStats
+  // חישוב נושאים מומלצים לתרגול
+  const recommendedTopics = useMemo(() => {
+    if (!topics || topics.length === 0) return [];
+
+    const topicStats = {};
+    practiceAttempts.forEach((attempt) => {
+      const topicId = attempt.topic_id;
+      if (!topicId) return;
+      if (!topicStats[topicId]) topicStats[topicId] = { total: 0, correct: 0 };
+      topicStats[topicId].total++;
+      if (attempt.status === "correct") topicStats[topicId].correct++;
+    });
+
+    return topics
+      .map((topic) => {
+        const stats = topicStats[topic.topic_id];
+        let status = "not_started";
+        if (stats) {
+          const accuracy = stats.total > 0 ? (stats.correct / stats.total) * 100 : 0;
+          if (accuracy < 50) status = "weak";
+          else if (stats.total < 10) status = "in_progress";
+          else status = "mastered";
+        }
+        return { ...topic, status, stats };
+      })
       .filter((t) => t.status !== "mastered")
       .sort((a, b) => {
         if (a.status === "weak" && b.status !== "weak") return -1;
@@ -203,13 +226,43 @@ export default function DailyPlanCard({
         return 0;
       })
       .slice(0, 3);
-
-    return { recommendedTopics: recommended, overallTopicMastery: totalMastery };
   }, [topics, practiceAttempts]);
 
-  // חישוב שאלונים מומלצים + אחוז בקיאות כולל בשאלונים
-  const { recommendedExams, overallExamMastery } = useMemo(() => {
-    if (!modules || modules.length === 0) return { recommendedExams: [], overallExamMastery: 0 };
+  // חישוב סטטיסטיקות כוללות לשאלונים
+  const examOverallStats = useMemo(() => {
+    if (!modules || modules.length === 0) return { mastery: 0, total: 0, passed: 0 };
+
+    const moduleAttempts = {};
+    examAttempts.forEach((attempt) => {
+      const moduleId = attempt.module_id;
+      if (!moduleId) return;
+      if (!moduleAttempts[moduleId]) moduleAttempts[moduleId] = { total: 0, scores: [] };
+      moduleAttempts[moduleId].total++;
+      moduleAttempts[moduleId].scores.push(attempt.score_percent || 0);
+    });
+
+    let totalMastery = 0;
+    let passedCount = 0;
+    let modulesWithAttempts = 0;
+
+    modules.forEach((module) => {
+      const stats = moduleAttempts[module.id];
+      if (stats && stats.scores.length > 0) {
+        const avgScore = stats.scores.reduce((sum, s) => sum + s, 0) / stats.scores.length;
+        totalMastery += avgScore;
+        modulesWithAttempts++;
+        if (avgScore >= 56) passedCount++;
+      }
+    });
+
+    const avgMastery = modulesWithAttempts > 0 ? Math.round(totalMastery / modulesWithAttempts) : 0;
+    
+    return { mastery: avgMastery, total: modules.length, passed: passedCount };
+  }, [modules, examAttempts]);
+
+  // חישוב שאלונים מומלצים
+  const recommendedExams = useMemo(() => {
+    if (!modules || modules.length === 0) return [];
 
     const moduleAttempts = {};
     examAttempts.forEach((attempt) => {
@@ -227,24 +280,17 @@ export default function DailyPlanCard({
         : 0;
     });
 
-    const allModulesWithStats = modules.map((module) => {
-      const stats = moduleAttempts[module.id];
-      let status = "not_started";
-      if (stats) {
-        if (stats.avgScore < 56) status = "required";
-        else if (stats.total < 3) status = "started";
-        else status = "passed";
-      }
-      return { ...module, status, stats };
-    });
-
-    // חישוב אחוז בקיאות כולל בשאלונים
-    const modulesWithAttempts = allModulesWithStats.filter(m => m.stats && m.stats.total > 0);
-    const totalExamMastery = modulesWithAttempts.length > 0
-      ? Math.round(modulesWithAttempts.reduce((sum, m) => sum + m.stats.avgScore, 0) / modulesWithAttempts.length)
-      : 0;
-
-    const recommended = allModulesWithStats
+    return modules
+      .map((module) => {
+        const stats = moduleAttempts[module.id];
+        let status = "not_started";
+        if (stats) {
+          if (stats.avgScore < 56) status = "required";
+          else if (stats.total < 3) status = "started";
+          else status = "passed";
+        }
+        return { ...module, status, stats };
+      })
       .filter((m) => m.status !== "passed")
       .sort((a, b) => {
         if (a.status === "required" && b.status !== "required") return -1;
@@ -252,8 +298,6 @@ export default function DailyPlanCard({
         return 0;
       })
       .slice(0, 3);
-
-    return { recommendedExams: recommended, overallExamMastery: totalExamMastery };
   }, [modules, examAttempts]);
 
   // חישוב התקדמות אוטומטית מהמשימות
@@ -408,8 +452,8 @@ export default function DailyPlanCard({
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">נושאים לתרגול</h3>
             </div>
             <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF]">
-              <span className="text-[13px] font-bold text-[#3B82F6]">{overallTopicMastery}%</span>
-              <span className="text-[11px] text-[#6E6E6E] mr-1">בקיאות</span>
+              <span className="text-[13px] font-bold text-[#3B82F6]">{topicOverallStats.mastery}%</span>
+              <span className="text-[10px] text-[#6E6E6E] mr-1">בקיאות</span>
             </div>
           </div>
           
@@ -451,8 +495,8 @@ export default function DailyPlanCard({
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">שאלונים לבגרות</h3>
             </div>
             <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF]">
-              <span className="text-[13px] font-bold text-[#3B82F6]">{overallExamMastery}%</span>
-              <span className="text-[11px] text-[#6E6E6E] mr-1">בקיאות</span>
+              <span className="text-[13px] font-bold text-[#3B82F6]">{examOverallStats.mastery}%</span>
+              <span className="text-[10px] text-[#6E6E6E] mr-1">בקיאות</span>
             </div>
           </div>
           
