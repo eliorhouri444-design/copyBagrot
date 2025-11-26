@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { CheckCircle, Target, BookOpen, RotateCcw, FileCheck, Play } from "lucide-react";
+import { CheckCircle, Target, BookOpen, RotateCcw, FileCheck, Play, Repeat, AlertTriangle } from "lucide-react";
 import { CardSimple, CardTitle } from "@/components/ui/card-simple";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
