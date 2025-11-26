@@ -95,21 +95,32 @@ export default function StudyPlanPage() {
     loadData();
   }, []);
 
+  const displaySubject = user?.selected_subject || 'אנגלית';
+  const displayUnits = user?.selected_units || 5;
+  const targetScore = user?.target_score || 85;
+  const examDate = user?.exam_date ? new Date(user.exam_date) : null;
+  const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : null;
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
       </div>);
-
   }
 
-  const displaySubject = user?.selected_subject || 'אנגלית';
-  const displayUnits = user?.selected_units || 3;
+  const readinessScore = readiness?.readinessScore || 0;
+  const gap = requirements?.gap || 0;
 
   return (
     <div className="bg-gray-50 pb-24 min-h-screen">
       {/* Header */}
-      <div className="bg-blue-500 mb-6 p-6 rounded-b-[2rem] from-[#3B82F6] to-[#8B5CF6] shadow-xl">
+      <div className={`mb-6 p-6 rounded-b-[2rem] shadow-xl ${
+        dailyPlan?.mode === 'intensive' 
+          ? 'bg-gradient-to-r from-red-500 to-orange-500' 
+          : dailyPlan?.mode === 'simulation'
+            ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+            : 'bg-gradient-to-r from-blue-500 to-indigo-600'
+      }`}>
         <div className="flex items-center justify-between text-white mb-4">
           <Button
             variant="ghost"
@@ -125,6 +136,17 @@ export default function StudyPlanPage() {
           <div className="w-10" />
         </div>
 
+        {/* Mode Badge */}
+        {dailyPlan?.mode && dailyPlan.mode !== 'normal' && (
+          <div className={`text-center mb-3`}>
+            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
+              dailyPlan.mode === 'intensive' ? 'bg-red-900/50' : 'bg-green-900/50'
+            } text-white`}>
+              {dailyPlan.mode === 'intensive' ? '🔥 מצב אינטנסיבי' : '🎯 מצב סימולציה'}
+            </span>
+          </div>
+        )}
+
         {/* Readiness Gauge */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -137,30 +159,38 @@ export default function StudyPlanPage() {
               <circle
                 cx="18" cy="18" r="15.9" fill="none"
                 stroke="white" strokeWidth="3" strokeLinecap="round"
-                strokeDasharray={`${overallReadiness}, 100`} />
-
+                strokeDasharray={`${readinessScore}, 100`} />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold text-white">{overallReadiness}%</span>
+              <span className="text-4xl font-bold text-white">{readinessScore}%</span>
             </div>
           </div>
           <p className="text-white font-semibold text-lg">מוכנות לבגרות</p>
-          <p className="text-white/80 text-sm mt-1">מבוסס על תרגול, שאלונים ותוכנית אישית</p>
+          <p className="text-white/80 text-sm mt-1">
+            יעד: {targetScore} | {gap > 0 ? `חסרות ${gap} נקודות` : '🎉 הגעת ליעד!'}
+          </p>
           
-          <div className="flex justify-around mt-4 text-white/90 text-sm">
-            <div className="text-center">
-              <div className="font-bold text-lg">{practiceProgress}%</div>
-              <div className="text-xs opacity-80">תרגול</div>
+          {/* Breakdown */}
+          {readiness?.breakdown && (
+            <div className="grid grid-cols-4 gap-2 mt-4 text-white/90 text-xs">
+              <div className="text-center">
+                <div className="font-bold text-sm">{readiness.breakdown.content.score}%</div>
+                <div className="opacity-80">שליטה</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-sm">{readiness.breakdown.practice.score}%</div>
+                <div className="opacity-80">תרגול</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-sm">{readiness.breakdown.exam.score}%</div>
+                <div className="opacity-80">בגרויות</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-sm">{readiness.breakdown.speed.score}%</div>
+                <div className="opacity-80">מהירות</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="font-bold text-lg">{examProgress}%</div>
-              <div className="text-xs opacity-80">שאלונים</div>
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-lg">{Math.max(0, 100 - stats.weakTopics * 10)}%</div>
-              <div className="text-xs opacity-80">שליטה</div>
-            </div>
-          </div>
+          )}
         </motion.div>
       </div>
 
