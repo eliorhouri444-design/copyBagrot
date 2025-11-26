@@ -284,7 +284,7 @@ Return JSON:`,
     }
   }, [currentIndex]);
 
-  if (!user || questions.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
         <motion.div
@@ -297,8 +297,36 @@ Return JSON:`,
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
           <p className="text-gray-600 font-semibold">
-            {sourceExam ? `מנתח טעויות מ: ${sourceExam.title}` : 'מחפש טעויות מבגרויות קודמות'}
+            {sourceExam ? `מנתח נושאים חלשים מ: ${sourceExam.title}` : 'מחפש נושאים חלשים מבגרויות'}
           </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!user || questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md"
+        >
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="w-10 h-10 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">אין נושאים חלשים</h3>
+          <p className="text-gray-600 mb-6">
+            {sourceExam 
+              ? `לא נמצאו טעויות בשאלון ${sourceExam.title}. נסה לעשות עוד בגרויות.`
+              : 'לא נמצאו טעויות בבגרויות קודמות. המשך לתרגל!'}
+          </p>
+          <Button 
+            onClick={() => navigate(createPageUrl("Exams"))}
+            className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600"
+          >
+            חזרה לבגרויות
+          </Button>
         </motion.div>
       </div>
     );
