@@ -484,7 +484,8 @@ export default function ProfilePage() {
             </div>
 
             {user?.subscription_type === 'monthly' &&
-            <Button onClick={() => navigate(createPageUrl("Premium"))} className="w-full bg-[#F59E0B] rounded-[14px]">
+            <Button onClick={() => navigate(createPageUrl("Premium") + "?plan=yearly")} className="w-full bg-[#F59E0B] hover:bg-amber-600 text-white font-bold rounded-[14px]">
+                <Crown className="w-4 h-4 ml-2" />
                 שדרג למנוי שנתי וחסוך 50%
               </Button>
             }
