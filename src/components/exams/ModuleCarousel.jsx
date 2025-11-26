@@ -12,8 +12,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription } from
-"@/components/ui/dialog";
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function ModuleCarousel({
   modules,
@@ -43,7 +43,7 @@ export default function ModuleCarousel({
     try {
       const user = await base44.auth.me();
       const allAttempts = await base44.entities.ExamAttempt.list("-created_date", 500);
-      const userAttempts = allAttempts.filter((a) => a.created_by === user.email);
+      const userAttempts = allAttempts.filter(a => a.created_by === user.email);
       setExamAttempts(userAttempts);
       console.log('🔄 ModuleCarousel: Refreshed exam attempts', userAttempts.length);
     } catch (error) {
@@ -141,7 +141,7 @@ export default function ModuleCarousel({
       callback();
       return;
     }
-
+    
     // בדוק אם צריך לראות פרסומת (משתמש לא פרימיום וכבר עשה בגרות היום)
     if (todayExamCount >= FREE_DAILY_EXAM) {
       // הצג דיאלוג קטן במקום פרסומת
@@ -247,7 +247,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-blue-100 p-4 rounded-2xl">
+          <div className="bg-[#E9F0FF] p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -263,66 +263,68 @@ export default function ModuleCarousel({
                 </Button>
               }
               
-              <div className="text-center">
-                <div className="text-3xl mb-1.5">📝</div>
-                <h2 className="text-[#ffffff] mb-0.5 font-bold">{currentModule.title}</h2>
-                <p className="text-[#ffffff] opacity-90">{moduleStats.totalAttempts} בגרויות בוצעו</p>
-                
-                {isLocked &&
-                <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
-                    <Crown className="w-3 h-3" />
-                    פרימיום
+              <div className="flex items-center gap-4">
+                {/* Progress Circle */}
+                <div className="relative w-16 h-16 flex-shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                    <circle 
+                      cx="18" cy="18" r="14" fill="none" 
+                      stroke="white" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${moduleStats.progress}, 100`}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
                   </div>
-                }
+                </div>
+                
+                <div className="flex-1 text-right">
+                  <h2 className="text-white text-lg font-bold mb-0.5">{currentModule.title}</h2>
+                  <div className="text-3xl font-black text-white">{moduleStats.progress}%</div>
+                  <p className="text-white/80 text-sm">{moduleStats.totalAttempts} בגרויות בוצעו</p>
+                </div>
               </div>
+              
+              {isLocked &&
+              <div className="inline-flex items-center gap-1 bg-amber-500 px-2 py-1 rounded-full text-xs font-bold mt-2">
+                  <Crown className="w-3 h-3" />
+                  פרימיום
+                </div>
+              }
             </div>
 
-            {/* Content */}
-            <div className="bg-white rounded-xl p-3 space-y-2.5 border border-[#E9F0FF]">
-              <div className="text-[13px] font-bold text-center text-[#2B2B2B] mb-2">📊 הסטטיסטיקה שלך</div>
-              
-              <div className="bg-[#F5F8FF] rounded-xl p-2.5 mb-2.5 border border-[#E9F0FF]">
-                <div className="flex justify-center items-center mb-1.5">
-                  <span className="text-[17px] font-bold text-[#3B82F6]">{moduleStats.progress}%</span>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <Target className="w-4 h-4 text-white" />
                 </div>
-                <div className="text-[11px] font-semibold text-center text-[#2B2B2B] mb-1.5">התקדמות</div>
-                <div className="h-2 bg-white rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${moduleStats.progress}%` }}
-                    transition={{ duration: 0.5 }}
-                    className="h-full bg-[#3B82F6] rounded-full" />
-
-                </div>
-                <p className="text-[10px] text-[#6E6E6E] text-center mt-1">
-                  {moduleStats.totalAttempts} / {moduleStats.maxExams} מבחנים הושלמו
-                </p>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.excellentAttempts || 0}</div>
               </div>
-
-              <div className="grid grid-cols-3 gap-1.5">
-                <div className="bg-green-50 rounded-lg p-1.5 text-center border border-green-200">
-                  <div className="text-[16px] font-bold text-green-600">{moduleStats.excellentAttempts || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">מצוין</div>
-                  <div className="text-[8px] text-green-500">86%–100%</div>
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <TrendingUp className="w-4 h-4 text-white" />
                 </div>
-                <div className="bg-orange-50 rounded-lg p-1.5 text-center border border-orange-200">
-                  <div className="text-[16px] font-bold text-orange-600">{moduleStats.mediumAttempts || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">בינוני</div>
-                  <div className="text-[8px] text-orange-500">56%–85%</div>
-                </div>
-                <div className="bg-red-50 rounded-lg p-1.5 text-center border border-red-200">
-                  <div className="text-[16px] font-bold text-red-600">{moduleStats.failedAttempts || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E] font-semibold">נמוך</div>
-                  <div className="text-[8px] text-red-500">מתחת ל־56%</div>
-                </div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.mediumAttempts || 0}</div>
               </div>
+              <div className="bg-white rounded-xl p-3 text-center">
+                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <AlertTriangle className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לשיפור</div>
+                <div className="text-lg font-bold text-[#2B2B2B]">{moduleStats.failedAttempts || 0}</div>
+              </div>
+            </div>
 
               {/* Action buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
-                className="space-y-2 pt-2">
+                className="space-y-2">
 
                 {isLocked ?
                 <Button
@@ -338,33 +340,33 @@ export default function ModuleCarousel({
                     {currentModule.entity !== 'practice' && onRandomExam &&
                   <div className="space-y-2">
                         <Button
-                      onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
-                      className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800">
-
+                          onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
+                          className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-blue-700 active:bg-blue-800"
+                        >
                           <Play className="w-4 h-4 ml-2" />
                           התחל בגרות
                         </Button>
 
-                        {isPremium === true ?
-                    <Button
-                      onClick={() => {
-                        sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
-                        navigate(createPageUrl("CustomWeakExam"));
-                      }}
-                      className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white">
-
+                        {isPremium === true ? (
+                          <Button
+                            onClick={() => {
+                              sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
+                              navigate(createPageUrl("CustomWeakExam"));
+                            }}
+                            className="w-full h-10 text-[12px] font-bold bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 rounded-[14px] text-white"
+                          >
                             <Target className="w-4 h-4 ml-2" />
                             בוחן טעויות מהשאלון
-                          </Button> :
-
-                    <Button
-                      onClick={() => navigate(createPageUrl("Premium"))}
-                      className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800">
-
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => navigate(createPageUrl("Premium"))}
+                            className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-blue-700 active:bg-blue-800"
+                          >
                             <Lock className="w-4 h-4 ml-2" />
                             בוחן טעויות
                           </Button>
-                    }
+                        )}
                       </div>
                   }
 
@@ -375,12 +377,12 @@ export default function ModuleCarousel({
                     <Button
                       onClick={() => handleModuleClick(currentModule)}
                       variant="outline"
-                      className="w-full h-10 text-[12px] font-semibold border hover:bg-gray-50 rounded-[14px]">
+                      className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                    <div className="bg-white rounded-lg p-2.5 border border-[#E9F0FF]">
+                    <div className="bg-[#F5F8FF] rounded-lg p-2.5 border border-[#E9F0FF]">
                             <div className="text-center mb-2">
                               <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
                               <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
@@ -418,7 +420,6 @@ export default function ModuleCarousel({
                 }
               </motion.div>
             </div>
-          </div>
         </motion.div>
       </AnimatePresence>
 
@@ -428,18 +429,18 @@ export default function ModuleCarousel({
           variant="outline"
           size="icon"
           onClick={handlePrevious}
-          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto -translate-x-2 border border-[#E9F0FF]">
+          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto -translate-x-3 border-0">
 
-          <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
+          <ChevronRight className="w-5 h-5 text-[#3B82F6]" />
         </Button>
 
         <Button
           variant="outline"
           size="icon"
           onClick={handleNext}
-          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto translate-x-2 border border-[#E9F0FF]">
+          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto translate-x-3 border-0">
 
-          <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
+          <ChevronLeft className="w-5 h-5 text-[#3B82F6]" />
         </Button>
       </div>
 
@@ -493,8 +494,8 @@ export default function ModuleCarousel({
           <div className="flex flex-col gap-2">
             <Button
               onClick={handleWatchAdAndContinue}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
-
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+            >
               📺 צפה בפרסומת והמשך
             </Button>
             <Button
@@ -502,16 +503,16 @@ export default function ModuleCarousel({
                 setShowAdDialog(false);
                 navigate(createPageUrl("Premium"));
               }}
-              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl">
-
+              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl"
+            >
               <Crown className="w-5 h-5 ml-2" />
               שדרג לפרימיום
             </Button>
             <Button
               variant="ghost"
               onClick={() => setShowAdDialog(false)}
-              className="w-full text-gray-500">
-
+              className="w-full text-gray-500"
+            >
               ביטול
             </Button>
           </div>
