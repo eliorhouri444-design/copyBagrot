@@ -298,17 +298,17 @@ export default function ModuleCarousel({
             <div className="grid grid-cols-3 gap-2 mb-3">
               <div className="bg-green-50 rounded-xl p-3 text-center border border-green-200">
                 <div className="text-lg font-bold text-green-600">{moduleStats.excellentAttempts || 0}</div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium">מצוין</div>
                 <div className="text-[9px] text-green-500">100%-86%</div>
               </div>
               <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-200">
                 <div className="text-lg font-bold text-orange-500">{moduleStats.mediumAttempts || 0}</div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium">בינוני</div>
                 <div className="text-[9px] text-orange-400">85%-56%</div>
               </div>
               <div className="bg-red-50 rounded-xl p-3 text-center border border-red-200">
                 <div className="text-lg font-bold text-red-500">{moduleStats.failedAttempts || 0}</div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                <div className="text-[11px] text-[#6E6E6E] font-medium">נמוך</div>
                 <div className="text-[9px] text-red-400">מתחת ל-56%</div>
               </div>
             </div>
