@@ -1251,8 +1251,14 @@ export default function ExamsPage() {
             <button
               key={exam.id}
               onClick={() => {
-                setShowAllExamsModule(null);
-                handleExamClick(exam);
+                if (!isPremium) {
+                  // Show ad dialog before starting exam for free users
+                  setShowAllExamsModule(null);
+                  setShowAdDialog({ ...exam, isExamStart: true });
+                } else {
+                  setShowAllExamsModule(null);
+                  handleExamClick(exam);
+                }
               }}
               className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-200 hover:border-blue-400 flex items-center justify-between group shadow-sm hover:shadow-md">
 
