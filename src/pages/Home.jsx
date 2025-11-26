@@ -205,14 +205,14 @@ export default function HomePage() {
   const overallMastery = useMemo(() => {
     if (engineData?.readiness) {
       return {
-        topicMastery: engineData.readiness.contentScore || 0,
-        examMastery: engineData.readiness.examScore || 0,
+        totalTopicMastery: engineData.readiness.contentScore || 0,
+        examsMastery: engineData.readiness.examScore || 0,
         readinessScore: engineData.readiness.readinessScore || 0
       };
     }
     return {
-      topicMastery: stats?.practiceAccuracy || 0,
-      examMastery: stats?.examAverage || 0,
+      totalTopicMastery: stats?.practiceAccuracy || 0,
+      examsMastery: stats?.examAverage || 0,
       readinessScore: stats?.overallMastery || 0
     };
   }, [stats, engineData]);
