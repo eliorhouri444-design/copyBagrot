@@ -28,6 +28,8 @@ export default function CustomWeakExamPage() {
 
   const [sourceExam, setSourceExam] = useState(null);
   const [sourceAttempt, setSourceAttempt] = useState(null);
+  const [weakTopics, setWeakTopics] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadUserAndQuestions = async () => {
     try {
