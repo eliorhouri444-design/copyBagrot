@@ -419,7 +419,6 @@ export default function ModuleCarousel({
                   </>
                 }
               </motion.div>
-            </div>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -430,18 +429,18 @@ export default function ModuleCarousel({
           variant="outline"
           size="icon"
           onClick={handlePrevious}
-          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto -translate-x-2 border border-[#E9F0FF]">
+          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto -translate-x-3 border-0">
 
-          <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
+          <ChevronRight className="w-5 h-5 text-[#3B82F6]" />
         </Button>
 
         <Button
           variant="outline"
           size="icon"
           onClick={handleNext}
-          className="rounded-full shadow-md bg-white hover:bg-gray-50 w-8 h-8 pointer-events-auto translate-x-2 border border-[#E9F0FF]">
+          className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto translate-x-3 border-0">
 
-          <ChevronLeft className="w-4 h-4 text-[#3B82F6]" />
+          <ChevronLeft className="w-5 h-5 text-[#3B82F6]" />
         </Button>
       </div>
 
