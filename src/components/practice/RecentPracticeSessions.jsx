@@ -136,8 +136,8 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                     } else {
                       setShowAdDialog(session);
                     }
-                  }}
-                  className="w-full text-right hover:bg-gray-50 rounded-lg p-3 transition-colors border border-gray-100 flex items-center justify-between">
+                  }} className="bg-slate-100 p-3 text-right rounded-lg w-full hover:bg-gray-50 transition-colors border border-gray-100 flex items-center justify-between">
+
 
                   <div className="flex items-center gap-3 flex-1">
                     <motion.div
