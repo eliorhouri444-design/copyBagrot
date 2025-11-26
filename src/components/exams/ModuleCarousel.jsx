@@ -411,8 +411,10 @@ export default function ModuleCarousel({
                         {isPremium === true ?
                   <Button
                     onClick={() => {
-                      sessionStorage.setItem('weakExamModule', currentModule.module_id || currentModule.id);
-                      sessionStorage.setItem('weakExamModuleEntity', currentModule.entity || 'GenericExam');
+                      // שומר את פרטי המודול כדי לבנות בגרות על נושאים חלשים במודול הזה
+                      sessionStorage.setItem('weakTopicsModule', currentModule.module_id || currentModule.id);
+                      sessionStorage.setItem('weakTopicsModuleEntity', currentModule.entity || 'GenericExam');
+                      sessionStorage.setItem('weakTopicsModuleTitle', currentModule.title || '');
                       navigate(createPageUrl("CustomWeakExam"));
                     }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
                             <Target className="w-4 h-4 ml-2" />
