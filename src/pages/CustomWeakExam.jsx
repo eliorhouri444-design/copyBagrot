@@ -409,13 +409,13 @@ Return JSON:`,
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-lg font-bold">
-                {sourceExam ? `מבחן מותאם: ${sourceExam.title}` : 'מבחן מותאם מבגרויות'}
+                {sourceExam ? `בגרות נושאים חלשים: ${sourceExam.title}` : 'בגרות על נושאים חלשים'}
               </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
             <p className="text-sm opacity-90">
               שאלה {currentIndex + 1} / {questions.length}
-              {sourceAttempt && ` • ציון מקורי: ${Math.round(sourceAttempt.score_percent)}`}
+              {weakTopics.length > 0 && ` • ${weakTopics.length} נושאים חלשים`}
             </p>
           </div>
 
