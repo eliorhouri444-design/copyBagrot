@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Target, Zap, Brain, CheckCircle, XCircle, ChevronLeft, Trophy, Crown, BookOpen } from "lucide-react";
+import { ArrowLeft, Target, Zap, Brain, CheckCircle, XCircle, ChevronLeft, Trophy, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,11 +28,8 @@ export default function CustomWeakExamPage() {
 
   const [sourceExam, setSourceExam] = useState(null);
   const [sourceAttempt, setSourceAttempt] = useState(null);
-  const [weakTopics, setWeakTopics] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const loadUserAndQuestions = async () => {
-    setIsLoading(true);
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
@@ -40,87 +37,52 @@ export default function CustomWeakExamPage() {
       // Check if there's a specific exam ID to filter by
       const specificExamId = sessionStorage.getItem('weakExamSource');
       if (specificExamId) {
-        sessionStorage.removeItem('weakExamSource');
+        sessionStorage.removeItem('weakExamSource'); // Clean up
       }
 
-      // Check if there's a specific module to filter by (from ModuleCarousel)
-      const specificModuleId = sessionStorage.getItem('weakExamModule');
-      const specificModuleEntity = sessionStorage.getItem('weakExamModuleEntity');
-      if (specificModuleId) {
-        sessionStorage.removeItem('weakExamModule');
-        sessionStorage.removeItem('weakExamModuleEntity');
-      }
-
-      // Get all exam attempts
-      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 200);
-      
-      // Filter by user, subject, units
-      let userExamAttempts = examAttempts.filter(a => 
+      // Get all exam attempts (not practice attempts)
+      const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
+      const userExamAttempts = examAttempts.filter(a => 
         a.created_by === currentUser.email && 
         a.subject === currentUser.selected_subject &&
         parseInt(a.unit_level) === parseInt(currentUser.selected_units) &&
         (!specificExamId || a.exam_id === specificExamId)
       );
 
-      // If filtering by module, further filter by module_id or exam_type
-      if (specificModuleId && !specificExamId) {
-        userExamAttempts = userExamAttempts.filter(a => {
-          if (a.module_id === specificModuleId) return true;
-          if (specificModuleId === 'A' && a.exam_type === 'module_a') return true;
-          if (specificModuleId === 'B' && a.exam_type === 'module_b') return true;
-          if (specificModuleId === 'C' && a.exam_type === 'module_c') return true;
-          if (specificModuleEntity === 'ModuleAExam' && a.exam_type === 'module_a') return true;
-          if (specificModuleEntity === 'ModuleBExam' && a.exam_type === 'module_b') return true;
-          if (specificModuleEntity === 'ModuleCExam' && a.exam_type === 'module_c') return true;
-          return false;
-        });
+      // Store source attempt info if filtering by specific exam
+      if (specificExamId && userExamAttempts.length > 0) {
+        const sourceAttemptData = userExamAttempts[0];
+        setSourceAttempt(sourceAttemptData);
       }
 
-      // === NEW LOGIC: Analyze weak TOPICS from all exams in this module ===
-      // Count errors per topic across ALL exam attempts in this module
-      const topicErrorStats = {};
-      
+      // Collect all wrong answers from all exam attempts
+      const wrongQuestionIds = new Set();
+      const questionErrorDetails = {};
+
       userExamAttempts.forEach(attempt => {
         if (attempt.answers && Array.isArray(attempt.answers)) {
           attempt.answers.forEach((answer, idx) => {
-            const topicKey = answer.topic || answer.topic_key || `question_${idx}`;
-            
-            if (!topicErrorStats[topicKey]) {
-              topicErrorStats[topicKey] = {
-                topic: topicKey,
-                totalQuestions: 0,
-                wrongAnswers: 0,
-                questions: []
-              };
-            }
-            
-            topicErrorStats[topicKey].totalQuestions++;
-            
             if (!answer.is_correct) {
-              topicErrorStats[topicKey].wrongAnswers++;
-              topicErrorStats[topicKey].questions.push({
-                exam_id: attempt.exam_id,
-                question_index: idx,
-                answer: answer
-              });
+              const questionKey = `${attempt.exam_id}_${idx}`;
+              wrongQuestionIds.add(questionKey);
+              
+              if (!questionErrorDetails[questionKey]) {
+                questionErrorDetails[questionKey] = {
+                  exam_id: attempt.exam_id,
+                  question_index: idx,
+                  errors: 0,
+                  last_attempt: attempt.created_date
+                };
+              }
+              questionErrorDetails[questionKey].errors++;
             }
           });
         }
       });
 
-      // Calculate weakness percentage for each topic and sort
-      const sortedWeakTopics = Object.values(topicErrorStats)
-        .map(t => ({
-          ...t,
-          errorRate: t.totalQuestions > 0 ? (t.wrongAnswers / t.totalQuestions) * 100 : 0
-        }))
-        .filter(t => t.wrongAnswers > 0) // Only topics with errors
-        .sort((a, b) => b.errorRate - a.errorRate); // Most errors first
+      console.log('Found wrong answers:', wrongQuestionIds.size);
 
-      console.log('📊 Weak topics found:', sortedWeakTopics.map(t => `${t.topic}: ${Math.round(t.errorRate)}%`));
-      setWeakTopics(sortedWeakTopics.slice(0, 5)); // Top 5 weak topics
-
-      // Fetch all exams to get actual questions
+      // Now fetch the actual exam questions
       const [genericExams, moduleAExams, moduleBExams, moduleCExams] = await Promise.all([
         base44.entities.GenericExam.list(),
         base44.entities.ModuleAExam.list(),
@@ -130,63 +92,47 @@ export default function CustomWeakExamPage() {
 
       const allExams = [...genericExams, ...moduleAExams, ...moduleBExams, ...moduleCExams];
       
-      // Set source info for display
+      // Find and store the source exam if we're filtering by specific exam
       if (specificExamId) {
         const sourceExamData = allExams.find(e => e.id === specificExamId);
         if (sourceExamData) {
           setSourceExam(sourceExamData);
         }
-      } else if (specificModuleId) {
-        setSourceExam({ 
-          title: `שאלון ${specificModuleId}`,
-          module_id: specificModuleId
-        });
       }
-
-      // === Build questions from WEAK TOPICS ===
-      // Prioritize questions from the weakest topics
+      
+      // Extract questions from wrong answers
       const weakQuestions = [];
-      const usedQuestionKeys = new Set();
+      wrongQuestionIds.forEach(questionKey => {
+        const details = questionErrorDetails[questionKey];
+        const exam = allExams.find(e => e.id === details.exam_id);
 
-      // Go through weak topics and collect questions
-      sortedWeakTopics.forEach(topicInfo => {
-        topicInfo.questions.forEach(qInfo => {
-          const questionKey = `${qInfo.exam_id}_${qInfo.question_index}`;
-          if (usedQuestionKeys.has(questionKey)) return;
-          
-          const exam = allExams.find(e => e.id === qInfo.exam_id);
-          if (exam && exam.questions && exam.questions[qInfo.question_index]) {
-            const question = exam.questions[qInfo.question_index];
-            weakQuestions.push({
-              ...question,
-              reading_text: question.reading_text || exam.reading_text,
-              exam_id: qInfo.exam_id,
-              exam_title: exam.title || 'מבחן בגרות',
-              question_number: qInfo.question_index + 1,
-              weak_topic: topicInfo.topic,
-              _metadata: {
-                topic: topicInfo.topic,
-                topicErrorRate: topicInfo.errorRate,
-                failures: topicInfo.wrongAnswers,
-                from_exam: true
-              }
-            });
-            usedQuestionKeys.add(questionKey);
-          }
-        });
+        if (exam && exam.questions && exam.questions[details.question_index]) {
+          const question = exam.questions[details.question_index];
+          weakQuestions.push({
+            ...question,
+            reading_text: question.reading_text || exam.reading_text,
+            exam_id: details.exam_id,
+            exam_title: exam.title || 'מבחן בגרות',
+            question_number: details.question_index + 1,
+            _metadata: {
+              failures: details.errors,
+              attempts: details.errors,
+              lastScore: 0,
+              from_exam: true
+            }
+          });
+        }
       });
 
-      // Sort by topic error rate (weakest topics first)
-      const sortedQuestions = weakQuestions
-        .sort((a, b) => (b._metadata?.topicErrorRate || 0) - (a._metadata?.topicErrorRate || 0))
-        .slice(0, 20);
+      // Sort by number of errors
+      const sortedQuestions = weakQuestions.sort((a, b) => 
+        (b._metadata?.failures || 0) - (a._metadata?.failures || 0)
+      ).slice(0, 20);
 
-      console.log('📝 Loaded weak topic questions:', sortedQuestions.length);
+      console.log('Loaded weak questions from exams:', sortedQuestions.length);
       setQuestions(sortedQuestions);
     } catch (error) {
       console.error("Error loading questions:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -284,7 +230,7 @@ Return JSON:`,
     }
   }, [currentIndex]);
 
-  if (isLoading) {
+  if (!user || questions.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
         <motion.div
@@ -297,36 +243,8 @@ Return JSON:`,
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">בונה מבחן מותאם אישית...</h3>
           <p className="text-gray-600 font-semibold">
-            {sourceExam ? `מנתח נושאים חלשים מ: ${sourceExam.title}` : 'מחפש נושאים חלשים מבגרויות'}
+            {sourceExam ? `מנתח טעויות מ: ${sourceExam.title}` : 'מחפש טעויות מבגרויות קודמות'}
           </p>
-        </motion.div>
-      </div>
-    );
-  }
-
-  if (!user || questions.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md"
-        >
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Target className="w-10 h-10 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">אין נושאים חלשים</h3>
-          <p className="text-gray-600 mb-6">
-            {sourceExam 
-              ? `לא נמצאו טעויות בשאלון ${sourceExam.title}. נסה לעשות עוד בגרויות.`
-              : 'לא נמצאו טעויות בבגרויות קודמות. המשך לתרגל!'}
-          </p>
-          <Button 
-            onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-12 bg-gradient-to-r from-orange-600 to-red-600"
-          >
-            חזרה לבגרויות
-          </Button>
         </motion.div>
       </div>
     );
@@ -409,13 +327,13 @@ Return JSON:`,
           <div className="text-center flex-1">
             <div className="flex items-center justify-center gap-2">
               <h1 className="text-lg font-bold">
-                {sourceExam ? `בגרות נושאים חלשים: ${sourceExam.title}` : 'בגרות על נושאים חלשים'}
+                {sourceExam ? `מבחן מותאם: ${sourceExam.title}` : 'מבחן מותאם מבגרויות'}
               </h1>
               <Crown className="w-5 h-5 text-yellow-300" />
             </div>
             <p className="text-sm opacity-90">
               שאלה {currentIndex + 1} / {questions.length}
-              {weakTopics.length > 0 && ` • ${weakTopics.length} נושאים חלשים`}
+              {sourceAttempt && ` • ציון מקורי: ${Math.round(sourceAttempt.score_percent)}`}
             </p>
           </div>
 
@@ -445,39 +363,36 @@ Return JSON:`,
               </div>
             </div>
 
-            {/* Weak Topics Summary */}
-            {weakTopics.length > 0 && (
+            {sourceExam && (
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-purple-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <BookOpen className="w-4 h-4 text-purple-600" />
-                  <div className="text-xs font-bold text-purple-900">
-                    {sourceExam ? sourceExam.title : 'נושאים חלשים'}
-                  </div>
+                  <div className="text-lg">📋</div>
+                  <div className="text-xs font-bold text-purple-900">{sourceExam.title}</div>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {weakTopics.slice(0, 3).map((topic, idx) => (
-                    <span 
-                      key={idx}
-                      className={`text-[10px] px-2 py-1 rounded-lg font-medium ${
-                        topic.topic === question._metadata?.topic 
-                          ? 'bg-red-200 text-red-800 border border-red-300' 
-                          : 'bg-white text-gray-700'
-                      }`}
-                    >
-                      {topic.topic} ({Math.round(topic.errorRate)}% שגיאות)
-                    </span>
-                  ))}
+                <div className="flex items-center gap-2 text-xs flex-wrap">
+                  {sourceAttempt && (
+                    <>
+                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                        ציון מקורי: {Math.round(sourceAttempt.score_percent)}
+                      </span>
+                      <span className="bg-white text-gray-700 px-2 py-1 rounded-lg">
+                        {sourceAttempt.earned_points}/{sourceAttempt.total_points} נקודות
+                      </span>
+                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
+                        {questions.length} טעויות במבחן זה
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Current question topic info */}
-            {question._metadata && (
+            {!sourceExam && question._metadata && (
               <div className="bg-white rounded-xl p-3 mb-3">
-                <div className="text-xs text-gray-600 font-semibold mb-2">📊 נושא חלש:</div>
+                <div className="text-xs text-gray-600 font-semibold mb-2">📊 למה השאלה הזו:</div>
                 <div className="flex items-center gap-2 text-xs text-gray-700 flex-wrap">
                   <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">
-                    {question._metadata.topic || 'כללי'} - {Math.round(question._metadata.topicErrorRate || 0)}% שגיאות
+                    {question._metadata.failures} טעויות
                   </span>
                   {question.exam_title && (
                     <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg">
