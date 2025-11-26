@@ -316,7 +316,7 @@ export default function ModuleCarousel({
           }}>
 
           <div className="bg-[#ffffff] p-4 rounded-2xl">
-            {/* Header with gradient */}
+            {/* Header with gradient and Readiness */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
               <Button
@@ -332,25 +332,38 @@ export default function ModuleCarousel({
               }
               
               <div className="flex items-center gap-4">
-                {/* Progress Circle */}
-                <div className="relative w-16 h-16 flex-shrink-0">
+                {/* Readiness Circle - מד מוכנות */}
+                <div className="relative w-20 h-20 flex-shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
                     <circle
-                      cx="18" cy="18" r="14" fill="none"
-                      stroke="white" strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${moduleStats.progress}, 100`} />
-
+                      cx="18" cy="18" r="15" fill="none"
+                      stroke={moduleStats.readiness >= 70 ? '#22C55E' : moduleStats.readiness >= 40 ? '#FACC15' : '#EF4444'}
+                      strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${moduleStats.readiness}, 100`} />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-white" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xl font-black text-white">{moduleStats.readiness}%</span>
+                    <span className="text-[8px] text-white/70">מוכנות</span>
                   </div>
                 </div>
                 
                 <div className="flex-1 text-right">
-                  <h2 className="text-white text-lg font-bold mb-0.5">{currentModule.title}</h2>
-                  <div className="text-3xl font-black text-white">{moduleStats.progress}%</div>
-                  <p className="text-white/80 text-sm">{moduleStats.totalAttempts} בגרויות בוצעו</p>
+                  <h2 className="text-white text-lg font-bold mb-1">{currentModule.title}</h2>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-white/90">{moduleStats.topicMastery}%</span>
+                      <span className="text-white/70">שליטה בנושאים</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-white/90">{moduleStats.practicePerformance}%</span>
+                      <span className="text-white/70">ביצועי תרגול</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-white/90">{moduleStats.examPerformance}%</span>
+                      <span className="text-white/70">ביצועי בגרויות</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               
