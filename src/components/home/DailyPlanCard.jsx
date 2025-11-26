@@ -338,27 +338,43 @@ export default function DailyPlanCard({
 
   const handleTaskClick = (task) => {
     // ניווט לפי סוג המשימה
-    if (task.type === "practice") {
-      if (recommendedTopics.length > 0) {
+    if (task.type === "practice" || task.type === "questions") {
+      // אם יש topic_id במשימה, נווט אליו ישירות
+      if (task.topic_id) {
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1`);
+      } else if (recommendedTopics.length > 0) {
         navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
       } else {
         navigate(createPageUrl("Practice"));
       }
-    } else if (task.type === "learn") {
-      if (recommendedTopics.length > 0) {
+    } else if (task.type === "learn" || task.type === "topic") {
+      if (task.topic_id) {
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1`);
+      } else if (recommendedTopics.length > 0) {
         navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
       } else {
         navigate(createPageUrl("Practice"));
       }
-    } else if (task.type === "review") {
+    } else if (task.type === "review" || task.type === "mistakes") {
       navigate(createPageUrl("CustomWeakPractice"));
     } else if (task.type === "exam") {
-      if (recommendedExams.length > 0) {
+      if (task.exam_id) {
+        navigate(`${createPageUrl("ExamGeneric")}?examId=${task.exam_id}`);
+      } else if (recommendedExams.length > 0) {
         sessionStorage.setItem('selectedModuleId', recommendedExams[0].id);
         navigate(createPageUrl("Exams"));
       } else {
         navigate(createPageUrl("Exams"));
       }
+    } else if (task.type === "vocabulary") {
+      if (task.topic_id) {
+        navigate(`${createPageUrl("VocabularyPractice")}?topicid=${encodeURIComponent(task.topic_id)}`);
+      } else {
+        navigate(createPageUrl("Vocabulary"));
+      }
+    } else {
+      // ברירת מחדל - נווט לדף תרגול
+      navigate(createPageUrl("Practice"));
     }
   };
 
