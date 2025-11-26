@@ -335,6 +335,7 @@ export default function PracticePage() {
 
           <TopicCarousel
             topics={practiceData?.topics || []}
+            practiceAttempts={practiceData?.practiceAttempts || []}
             isPremium={user?.is_premium}
             onEditTopic={user?.role === 'admin' ? handleEditTopic : null}
             onAddTopic={user?.role === 'admin' ? () => {
