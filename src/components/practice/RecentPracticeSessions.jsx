@@ -147,8 +147,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
                       {passed ?
                       <CheckCircle className="w-4 h-4 text-green-600" /> :
-
-                      <TrendingUp className="w-4 h-4 text-orange-600" />
+                      <span className="text-orange-600"><TrendingUp className="w-4 h-4" /></span>
                       }
                     </motion.div>
                     <div className="flex-1 text-right">
