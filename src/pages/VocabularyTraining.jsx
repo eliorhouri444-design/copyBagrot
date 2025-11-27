@@ -25,12 +25,10 @@ const PRACTICE_MODES = {
 
 export default function VocabularyTrainingPage() {
   const navigate = useNavigate();
-  const urlParams = new URLSearchParams(window.location.search);
-  const startQuickPractice = urlParams.get('startQuickPractice') === 'true';
   
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [mode, setMode] = useState(startQuickPractice ? PRACTICE_MODES.QUICK_PRACTICE : PRACTICE_MODES.DASHBOARD);
+  const [mode, setMode] = useState(PRACTICE_MODES.FLASHCARDS);
   const [words, setWords] = useState([]);
   const [filteredWords, setFilteredWords] = useState([]);
   const [progress, setProgress] = useState({});

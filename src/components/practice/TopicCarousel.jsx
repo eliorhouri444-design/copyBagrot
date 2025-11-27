@@ -192,7 +192,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               onClick={() => {
                 const topic = topics[currentIndex];
                 if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-                  navigate(createPageUrl(`VocabularyTraining`) + '?startQuickPractice=true');
+                  navigate(createPageUrl(`VocabularyTraining`));
                 } else {
                   handleStartPractice();
                 }
