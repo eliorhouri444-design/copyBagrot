@@ -1420,7 +1420,7 @@ export default function ExamsPage() {
             </Button>
             <Button
               onClick={handleDeleteAllAttempts}
-              variant="destructive" className="bg-blue-500 text-destructive-foreground px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm h-9 w-full sm:w-auto hover:bg-red-600 flex items-center justify-center gap-2">
+              variant="destructive" className="bg-blue-500 text-destructive-foreground px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm h-9 w-full sm:w-auto hover:bg-blue-700 flex items-center justify-center gap-2">
 
 
               <Trash2 className="w-4 h-4 mr-2" />
