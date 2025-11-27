@@ -754,14 +754,14 @@ export default function ExamsPage() {
                             setShowAdDialog(attempt);
                           }
                         }}
-                        className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-blue-500 flex items-center justify-between">
+                        className="bg-zinc-50 p-3 text-right opacity-100 rounded-xl w-full hover:bg-white transition-colors border border-[#E9F0FF] flex items-center justify-between">
 
                           <div className="flex items-center gap-3 flex-1">
                             <motion.div
                             className={`p-1.5 rounded-lg ${
                             passed ?
-                            'bg-green-50 border border-blue-500' :
-                            'bg-red-50 border border-blue-500'}`
+                            'bg-green-50 border border-green-200' :
+                            'bg-red-50 border border-red-200'}`
                             }
                             whileHover={{ rotate: 360 }}
                             transition={{ duration: 0.5 }}>
@@ -814,7 +814,7 @@ export default function ExamsPage() {
                         {hasMistakes && isPremium && (() => {
                         const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                         return (
-                          <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-5000">
+                          <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                               <div className="flex items-center gap-2 mb-2">
                                 <Target className="text-blue-500 lucide lucide-target w-4 h-4" />
                                 <h4 className="bg-transparent text-[#000000] font-bold">תרגול טעויות מבחינה זו
@@ -848,7 +848,7 @@ export default function ExamsPage() {
                     <Button
                   onClick={() => setShowAllExams(true)}
                   variant="outline"
-                  className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-blue-500 hover:bg-[#F5F8FF]">
+                  className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
@@ -1018,7 +1018,7 @@ export default function ExamsPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-500 text-center">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border-2 border-blue-200 text-center">
               <Play className="w-12 h-12 text-blue-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">צפה בפרסומת</h3>
               <p className="text-sm text-gray-600 mb-4">
@@ -1058,7 +1058,7 @@ export default function ExamsPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-blue-500 text-center">
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 text-center">
               <Crown className="w-12 h-12 text-amber-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-2">שדרג לפרימיום</h3>
               <p className="text-sm text-gray-600 mb-4">
@@ -1099,7 +1099,7 @@ export default function ExamsPage() {
 
           {showAttemptDetails &&
           <div className="space-y-4">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4">
+              <div className="bg-blue-50 p-4 rounded-xl from-blue-50 to-purple-50">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
@@ -1134,12 +1134,12 @@ export default function ExamsPage() {
                 <div className="space-y-3">
                   {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) =>
                 <div
-                  key={idx}
-                  className={`rounded-xl p-4 border-2 ${
-                  answer.is_correct ?
-                  'bg-green-50 border-blue-500' :
-                  'bg-red-50 border-blue-500'}`
-                  }>
+                  key={idx} className="bg-blue-50 p-4 rounded-xl border-2 border-blue-500">
+
+
+
+
+
 
                       <div className="font-semibold text-gray-900 mb-2">שאלה {idx + 1}</div>
                       <div className="flex gap-2 text-sm mb-2">
@@ -1186,7 +1186,7 @@ export default function ExamsPage() {
               slice(0, 3);
 
               return sortedWeakTopics.length > 0 &&
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border-2 border-blue-5000">
+              <div className="bg-blue-50 p-4 rounded-xl from-orange-50 to-red-50 border-2 border-blue-5000">
                     <div className="flex items-center gap-2 mb-3">
                       <Crown className="w-5 h-5 text-orange-600" />
                       <h4 className="font-bold text-gray-900">מבחן מותאם לטעויות שלך</h4>
@@ -1195,7 +1195,7 @@ export default function ExamsPage() {
                       {sortedWeakTopics.map(([topic, count]) =>
                   <div key={topic} className="flex items-center justify-between bg-white rounded-lg p-2">
                           <span className="text-sm font-semibold text-gray-900">{topic}</span>
-                          <span className="text-xs text-orange-600 font-bold">{count} טעויות</span>
+                          <span className="text-[#ff2e2e] text-xs font-bold">{count} טעויות</span>
                         </div>
                   )}
                     </div>
@@ -1252,7 +1252,7 @@ export default function ExamsPage() {
                   handleExamClick(exam);
                 }
               }}
-              className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-500 hover:border-blue-600 flex items-center justify-between group shadow-sm hover:shadow-md">
+              className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-200 hover:border-blue-400 flex items-center justify-between group shadow-sm hover:shadow-md">
 
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 break-words">
@@ -1267,7 +1267,7 @@ export default function ExamsPage() {
             )}
 
             {!isPremium && showAllExamsModule &&
-            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-blue-500 mt-3">
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 mt-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Crown className="w-5 h-5 text-amber-600" />
                   <h4 className="font-bold text-gray-900 text-sm">מוגבל ל-5 מבחנים</h4>
@@ -1373,7 +1373,7 @@ export default function ExamsPage() {
                   {hasMistakes && (() => {
                     const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                     return (
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-blue-5000 mr-2">
+                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-blue-500 mr-2">
                         <div className="flex items-center gap-2 mb-2">
                           <Target className="w-4 h-4 text-orange-600" />
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
@@ -1657,7 +1657,7 @@ export default function ExamsPage() {
 
               </div>
 
-              <div className="bg-blue-50 border-2 border-blue-500 rounded-xl p-4">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                 <div className="text-sm text-gray-700">
                   <strong>💡 טיפ:</strong> לאחר שתוסיף שאלון חדש, תוכל להוסיף אליו מבחנים דרך "ניהול מבחנים"
                 </div>
@@ -1769,7 +1769,7 @@ export default function ExamsPage() {
 
               </div>
 
-              <div className="bg-blue-50 border-2 border-blue-500 rounded-xl p-4">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                 <div className="flex items-start gap-2">
                   <FileCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-gray-700">
