@@ -16,6 +16,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState(initialTopics);
+  const [showVocabSetSelector, setShowVocabSetSelector] = useState(false);
+  const [vocabularySets, setVocabularySets] = useState([]);
 
   useEffect(() => {
     setTopics(initialTopics);
