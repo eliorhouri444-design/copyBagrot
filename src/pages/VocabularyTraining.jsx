@@ -1117,6 +1117,130 @@ export default function VocabularyTrainingPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk JSON Import Dialog - NEW */}
+      <Dialog open={showBulkJsonDialog} onOpenChange={setShowBulkJsonDialog}>
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Upload className="w-5 h-5 text-orange-600" />
+              ייבוא סטים מ-JSON
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-orange-50 rounded-xl p-3 border border-orange-200">
+              <div className="text-sm font-bold text-orange-900 mb-2">📋 פורמט JSON:</div>
+              <pre className="text-xs text-orange-800 bg-white rounded p-2 overflow-x-auto" dir="ltr">{`{
+  "vocabularySets": [
+    {
+      "setNumber": 1,
+      "words": [
+        {
+          "english": "run",
+          "hebrew": "לרוץ",
+          "difficulty": "easy",
+          "questions": [
+            { "type": "translate", "q": "מה פירוש run?", "a": "לרוץ" },
+            { "type": "fill", "q": "I like to ___ every morning.", "a": "run" },
+            { "type": "choose", "q": "Choose meaning of 'run'", "options": ["לרוץ","לישון","לשבת"], "a": "לרוץ" }
+          ]
+        }
+      ]
+    }
+  ]
+}`}</pre>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                הדבק JSON כאן
+              </label>
+              <Textarea
+                value={bulkJsonText}
+                onChange={(e) => setBulkJsonText(e.target.value)}
+                placeholder='{"vocabularySets": [...]}'
+                className="h-64 font-mono text-sm"
+                dir="ltr"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkJsonDialog(false)}>
+              ביטול
+            </Button>
+            <Button
+              onClick={handleBulkJsonImport}
+              disabled={isSaving}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
+              ייבא סטים
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Set Selector Dialog */}
+      <SetSelectorDialog 
+        open={showSetSelector} 
+        onOpenChange={setShowSetSelector}
+        sets={vocabularySets}
+        currentSetNumber={currentSetNumber}
+        onSelectSet={(setNum) => {
+          setShowSetSelector(false);
+          const set = vocabularySets.find(s => s.set_number === setNum);
+          if (set) startSetPractice(set);
+        }}
+      />
     </div>
+  );
+}
+
+// Set Selector Dialog Component
+function SetSelectorDialog({ open, onOpenChange, sets, currentSetNumber, onSelectSet }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
+        <DialogHeader>
+          <DialogTitle className="text-center text-lg font-bold">בחר סט</DialogTitle>
+        </DialogHeader>
+        <div className="overflow-y-auto max-h-[60vh] py-2">
+          <div className="space-y-3">
+            {sets.map(set => (
+              <button
+                key={set.id}
+                onClick={() => onSelectSet(set.set_number)}
+                className={`w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all ${
+                  set.set_number === currentSetNumber 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-100 hover:border-blue-300 bg-white'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold ${
+                    set.set_number === currentSetNumber ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {set.set_number}
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">סט {set.set_number}</div>
+                    <div className="text-sm text-blue-600">{set.words?.length || 0} מילים</div>
+                  </div>
+                </div>
+                {set.set_number === currentSetNumber && (
+                  <Check className="w-5 h-5 text-blue-600" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
