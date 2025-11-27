@@ -364,7 +364,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           } else {
                             setShowAdDialog(session);
                           }
-                        }} className="bg-gray-100 p-4 text-right rounded-xl w-full hover:bg-blue-50 transition-all shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
+                        }} className="bg-zinc-50 p-4 text-right rounded-xl w-full hover:bg-blue-50 transition-all shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
 
 
                         <div className="flex items-center gap-3">
