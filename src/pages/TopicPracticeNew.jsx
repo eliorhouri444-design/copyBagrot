@@ -870,6 +870,55 @@ export default function TopicPracticeNewPage() {
         max_score: totalQuestions,
         percentage: percentage
       });
+
+      // עדכון משימה יומית אם הגענו מתוך DailyPlanCard
+      const taskId = urlParams.get("taskId") || sessionStorage.getItem('currentTaskId');
+      const taskTarget = parseInt(sessionStorage.getItem('currentTaskTarget') || '10');
+      
+      if (taskId && user?.email) {
+        try {
+          const today = new Date().toISOString().split('T')[0];
+          const dailyRecords = await base44.entities.DailyPractice.filter({
+            user_email: user.email,
+            date: today
+          });
+          
+          if (dailyRecords && dailyRecords.length > 0) {
+            const record = dailyRecords[0];
+            const updatedTasks = (record.tasks || []).map(task => {
+              if (task.task_id === taskId) {
+                const newCompleted = (task.completed_questions || 0) + totalQuestions;
+                const isFullyDone = newCompleted >= (task.question_count || taskTarget);
+                return {
+                  ...task,
+                  status: isFullyDone ? 'done' : 'in_progress',
+                  completed_questions: newCompleted,
+                  completed_at: isFullyDone ? new Date().toISOString() : null
+                };
+              }
+              return task;
+            });
+            
+            const allDone = updatedTasks.every(t => t.status === 'done');
+            const totalCompleted = updatedTasks.reduce((sum, t) => sum + (t.completed_questions || 0), 0);
+            
+            await base44.entities.DailyPractice.update(record.id, {
+              tasks: updatedTasks,
+              completed_questions: totalCompleted,
+              is_completed: allDone,
+              completion_time: allDone ? new Date().toISOString() : null
+            });
+          }
+          
+          // נקה את ה-session storage
+          sessionStorage.removeItem('currentTaskId');
+          sessionStorage.removeItem('currentTaskType');
+          sessionStorage.removeItem('currentTaskTarget');
+          sessionStorage.removeItem('currentTaskCurrent');
+        } catch (error) {
+          console.error("Error updating daily task:", error);
+        }
+      }
     }
 
     // Trigger global update for carousels
