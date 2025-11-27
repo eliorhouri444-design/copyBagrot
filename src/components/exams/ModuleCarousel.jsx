@@ -408,8 +408,8 @@ export default function ModuleCarousel({
                     onClick={() => handleStartExam(() => onRandomExam(currentModule.id))}
                     className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
-                          <Play className="w-4 h-4 ml-2" />
                           התחל בגרות
+                          <Play className="w-4 h-4 mr-2" />
                         </Button>
 
                         {isPremium === true ?
@@ -424,8 +424,8 @@ export default function ModuleCarousel({
                       navigate(createPageUrl("CustomWeakExam"));
                     }}
                     className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
-                      <Target className="w-4 h-4 ml-2" />
                       בגרות על נושאים חלשים
+                      <Target className="w-4 h-4 mr-2" />
                     </Button> :
                   <div className="bg-gray-100 rounded-xl p-3 text-center border border-blue-500">
                       <div className="flex items-center justify-center gap-2 mb-1">
