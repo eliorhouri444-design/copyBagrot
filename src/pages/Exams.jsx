@@ -1393,7 +1393,7 @@ export default function ExamsPage() {
                               navigate(createPageUrl("Premium"));
                             }
                           }}
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
                           {isPremium ?
                           <>
                               <Target className="w-3 h-3" />
