@@ -819,7 +819,7 @@ export default function ExamsPage() {
                                 <h4 className="bg-transparent text-[#000000] text-sm font-bold">תקן טעויות מבגרות זו</h4>
                               </div>
                               <p className="text-[#000000] mb-2 text-sm">
-                                {wrongCount} שאלות שטעית בהן במבחן הזה
+                                {wrongCount} שאלות שטעית בהן
                               </p>
                               <Button
                               onClick={(e) => {
@@ -1388,7 +1388,7 @@ export default function ExamsPage() {
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">
-                          {wrongCount} שאלות שטעית בהן במבחן הזה
+                          {wrongCount} שאלות שטעית בהן
                         </p>
                         <Button
                           onClick={(e) => {
