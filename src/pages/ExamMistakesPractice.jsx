@@ -223,7 +223,7 @@ Return JSON:`,
           </p>
           <Button
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-600">
+            className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
 
             חזרה לבגרויות
           </Button>
@@ -280,7 +280,7 @@ Return JSON:`,
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg">
+              className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-lg font-bold shadow-lg">
 
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
@@ -395,7 +395,7 @@ Return JSON:`,
                   <Button
                   onClick={checkAnswer}
                   disabled={!userAnswer.trim() || isChecking}
-                  className="flex-1 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg disabled:opacity-50">
+                  className="flex-1 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-lg font-bold shadow-lg disabled:opacity-50">
 
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />

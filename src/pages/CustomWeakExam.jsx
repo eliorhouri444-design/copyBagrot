@@ -350,7 +350,7 @@ Return JSON:`,
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-500">
             <div className="text-center">
               <div className="text-6xl font-black text-blue-600 mb-2">
                 {correctCount} / {totalAnswered}
@@ -463,7 +463,7 @@ Return JSON:`,
 
             {/* הצגת הנושא החלש */}
             {question._metadata &&
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-blue-200">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 border-2 border-blue-500">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="w-4 h-4 text-blue-600" />
                   <div className="text-xs font-bold text-blue-900">למה השאלה הזו?</div>
@@ -483,7 +483,7 @@ Return JSON:`,
             }
 
             {question.reading_text &&
-            <div className="bg-blue-50 rounded-xl p-4 mb-4 border-2 border-blue-200">
+            <div className="bg-blue-50 rounded-xl p-4 mb-4 border-2 border-blue-500">
                 <div className="text-xs font-bold text-blue-900 mb-2">📖 טקסט הקריאה:</div>
                 <div className="text-sm text-gray-800 leading-relaxed max-h-48 overflow-y-auto">
                   {question.reading_text}
@@ -498,7 +498,7 @@ Return JSON:`,
             </div>
 
             {hasAudio &&
-            <div className="mt-4 bg-white rounded-xl p-4 border-2 border-blue-200">
+            <div className="mt-4 bg-white rounded-xl p-4 border-2 border-blue-500">
                 <div className="flex items-center gap-3">
                   <div className="text-4xl">🎧</div>
                   <div className="flex-1">
@@ -533,7 +533,7 @@ Return JSON:`,
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder={canAnswer ? "הקלד את תשובתך..." : "האזן לקטע תחילה..."}
-                className="w-full h-32 p-4 text-base border-2 border-blue-200 focus:border-blue-500 rounded-2xl resize-none"
+                className="w-full h-32 p-4 text-base border-2 border-blue-500 focus:border-blue-500 rounded-2xl resize-none"
                 autoFocus={canAnswer}
                 disabled={isChecking || !canAnswer} />
 
