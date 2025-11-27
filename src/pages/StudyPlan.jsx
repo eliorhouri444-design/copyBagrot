@@ -234,12 +234,12 @@ export default function StudyPlanPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`rounded-xl p-4 border-2 ${
+            className={`bg-white rounded-2xl shadow-lg p-4 border-r-4 ${
               dailyPlan.alert.type === 'success' 
-                ? 'bg-green-50 border-green-300'
+                ? 'border-r-green-500'
                 : dailyPlan.alert.type === 'critical'
-                  ? 'bg-red-50 border-red-300'
-                  : 'bg-amber-50 border-amber-300'
+                  ? 'border-r-red-500'
+                  : 'border-r-amber-500'
             }`}>
             <p className={`font-medium text-sm ${
               dailyPlan.alert.type === 'success' 
