@@ -319,7 +319,7 @@ export default function ModuleCarousel({
             }
           }}>
 
-          <div className="bg-[#ffffff] p-4 rounded-2xl">
+          <div className="bg-[#ffffff] text-black p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
               {onEditModule &&
@@ -358,7 +358,7 @@ export default function ModuleCarousel({
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-blue-50 p-3 text-center rounded-xl">
+              <div className="bg-blue-100 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
