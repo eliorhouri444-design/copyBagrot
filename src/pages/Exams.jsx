@@ -1381,10 +1381,11 @@ export default function ExamsPage() {
                     </div>
                   </button>
 
-                  {hasMistakes && (() => {
-                    const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
-                    return (
-                      <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
+                  {(() => {
+                                            const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
+                                            if (wrongCount === 0) return null;
+                                            return (
+                                              <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                         <div className="flex items-center gap-2 mb-2">
                           <Target className="w-4 h-4 text-orange-600" />
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
