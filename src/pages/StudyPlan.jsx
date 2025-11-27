@@ -112,86 +112,18 @@ export default function StudyPlanPage() {
   const gap = requirements?.gap || 0;
 
   return (
-    <div className="bg-gray-50 pb-24 min-h-screen">
-      {/* Header */}
-      <div className={`mb-6 p-6 rounded-b-[2rem] shadow-xl ${
-        dailyPlan?.mode === 'intensive' 
-          ? 'bg-gradient-to-r from-red-500 to-orange-500' 
-          : dailyPlan?.mode === 'simulation'
-            ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-            : 'bg-gradient-to-r from-blue-500 to-indigo-600'
-      }`}>
-        <div className="flex items-center justify-between text-white mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Home"))}
-            className="text-white hover:bg-white/20">
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-          <div className="text-center flex-1">
-            <h1 className="text-xl font-bold">התוכנית האישית לבגרות</h1>
-            <p className="text-sm opacity-90">{displaySubject} • {displayUnits} יחידות</p>
-          </div>
-          <div className="w-10" />
+    <div className="bg-blue-50 pb-24 min-h-screen">
+      {/* Header - סגנון אחיד עם שאר הדפים */}
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+        <button
+          onClick={() => navigate(createPageUrl("SubjectSelection"))}
+          className="text-right flex-1 hover:opacity-90 transition-opacity">
+          <h1 className="text-[16px] font-bold text-white">התוכנית שלי</h1>
+          <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
+        </button>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <TrendingUp className="w-5 h-5 text-white" />
         </div>
-
-        {/* Mode Badge */}
-        {dailyPlan?.mode && dailyPlan.mode !== 'normal' && (
-          <div className={`text-center mb-3`}>
-            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-              dailyPlan.mode === 'intensive' ? 'bg-red-900/50' : 'bg-green-900/50'
-            } text-white`}>
-              {dailyPlan.mode === 'intensive' ? '🔥 מצב אינטנסיבי' : '🎯 מצב סימולציה'}
-            </span>
-          </div>
-        )}
-
-        {/* Readiness Gauge */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
-
-          <div className="relative w-32 h-32 mx-auto mb-3">
-            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-              <circle
-                cx="18" cy="18" r="15.9" fill="none"
-                stroke="white" strokeWidth="3" strokeLinecap="round"
-                strokeDasharray={`${readinessScore}, 100`} />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold text-white">{readinessScore}%</span>
-            </div>
-          </div>
-          <p className="text-white font-semibold text-lg">מוכנות לבגרות</p>
-          <p className="text-white/80 text-sm mt-1">
-            יעד: {targetScore} | {gap > 0 ? `חסרות ${gap} נקודות` : '🎉 הגעת ליעד!'}
-          </p>
-          
-          {/* Breakdown */}
-          {readiness?.breakdown && (
-            <div className="grid grid-cols-4 gap-2 mt-4 text-white/90 text-xs">
-              <div className="text-center">
-                <div className="font-bold text-sm">{readiness.breakdown.content.score}%</div>
-                <div className="opacity-80">שליטה</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm">{readiness.breakdown.practice.score}%</div>
-                <div className="opacity-80">תרגול</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm">{readiness.breakdown.exam.score}%</div>
-                <div className="opacity-80">בגרויות</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm">{readiness.breakdown.speed.score}%</div>
-                <div className="opacity-80">מהירות</div>
-              </div>
-            </div>
-          )}
-        </motion.div>
       </div>
 
       <div className="px-4 space-y-4">
