@@ -286,7 +286,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
 
           {selectedSession &&
           <div className="space-y-4">
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
+              <div className="bg-blue-50 p-4 rounded-xl from-green-50 to-emerald-50">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
@@ -322,7 +322,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
           }
 
           <DialogFooter>
-            <Button onClick={() => setSelectedSession(null)} className="w-full">
+            <Button onClick={() => setSelectedSession(null)} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 h-9 w-full">
               סגור
             </Button>
           </DialogFooter>
