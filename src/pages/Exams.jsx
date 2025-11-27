@@ -1404,13 +1404,13 @@ export default function ExamsPage() {
                           className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
                           {isPremium ?
                           <>
-                              <Target className="w-3 h-3" />
                               <span>תקן {wrongCount} טעויות</span>
+                              <Target className="w-3 h-3" />
                             </> :
 
                           <>
-                              <Lock className="w-3 h-3" />
                               <span>שדרג לפרימיום</span>
+                              <Lock className="w-3 h-3" />
                             </>
                           }
                         </Button>
