@@ -781,7 +781,7 @@ export default function VocabularyTrainingPage() {
             <div 
               className="relative cursor-pointer"
               onClick={() => setIsFlipped(!isFlipped)}
-              style={{ perspective: '1000px', height: '340px' }}
+              style={{ perspective: '1000px', height: '260px' }}
             >
               <motion.div
                 className="w-full h-full relative"
@@ -842,45 +842,38 @@ export default function VocabularyTrainingPage() {
               </motion.div>
             </div>
 
-            {/* Action buttons - only show when flipped */}
-            <AnimatePresence>
-              {isFlipped && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="flex gap-3 mt-8"
-                  style={{ direction: 'rtl' }}
-                >
-                  <button 
-                    onClick={() => handleSetFlashcardAnswer(true)} 
-                    className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ 
-                      width: '48%',
-                      backgroundColor: '#E7F0FF',
-                      color: '#1C6EF2',
-                      borderRadius: '16px'
-                    }}
-                  >
-                    <Check className="w-5 h-5" />
-                    <span>ידעתי</span>
-                  </button>
-                  <button 
-                    onClick={() => handleSetFlashcardAnswer(false)} 
-                    className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ 
-                      width: '48%',
-                      backgroundColor: '#FFECEC',
-                      color: '#D93A3A',
-                      borderRadius: '16px'
-                    }}
-                  >
-                    <X className="w-5 h-5" />
-                    <span>לא ידעתי</span>
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Action buttons - always visible */}
+            <div 
+              className="flex gap-3 mt-6"
+              style={{ direction: 'rtl' }}
+            >
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleSetFlashcardAnswer(true); }} 
+                className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ 
+                  width: '48%',
+                  backgroundColor: '#E7F0FF',
+                  color: '#1C6EF2',
+                  borderRadius: '16px'
+                }}
+              >
+                <Check className="w-5 h-5" />
+                <span>ידעתי</span>
+              </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleSetFlashcardAnswer(false); }} 
+                className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ 
+                  width: '48%',
+                  backgroundColor: '#FFECEC',
+                  color: '#D93A3A',
+                  borderRadius: '16px'
+                }}
+              >
+                <X className="w-5 h-5" />
+                <span>לא ידעתי</span>
+              </button>
+            </div>
           </motion.div>
         </div>
 
