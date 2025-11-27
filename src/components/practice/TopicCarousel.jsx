@@ -42,8 +42,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
-    if (topic.isVocabulary) {
-      navigate(createPageUrl(`VocabularyPractice?topicId=${topicIdParam}`));
+    if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+      navigate(createPageUrl(`VocabularyTraining?topicId=${topicIdParam}`));
       return;
     }
 

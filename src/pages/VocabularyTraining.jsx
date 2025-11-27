@@ -45,6 +45,8 @@ export default function VocabularyTrainingPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
+  const [bulkText, setBulkText] = useState('');
   const [newWord, setNewWord] = useState({
     hebrew_word: '',
     english_answer: '',
@@ -222,6 +224,53 @@ export default function VocabularyTrainingPage() {
     }
   };
 
+  const handleBulkAdd = async () => {
+    if (!bulkText.trim()) {
+      alert('יש להזין מילים');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const lines = bulkText.trim().split('\n').filter(line => line.trim());
+      const wordsToAdd = [];
+
+      for (const line of lines) {
+        // פורמט: מילה בעברית | תרגום באנגלית | קטגוריה (אופציונלי)
+        const parts = line.split('|').map(p => p.trim());
+        if (parts.length >= 2) {
+          wordsToAdd.push({
+            subject_id: displaySubject,
+            unit_level: displayUnits,
+            hebrew_word: parts[0],
+            english_answer: parts[1],
+            category: parts[2] || 'כללי',
+            difficulty: 'medium',
+            is_active: true
+          });
+        }
+      }
+
+      if (wordsToAdd.length === 0) {
+        alert('לא נמצאו מילים בפורמט הנכון.\nפורמט: מילה בעברית | תרגום באנגלית | קטגוריה');
+        setIsSaving(false);
+        return;
+      }
+
+      await base44.entities.VocabularyQuestion.bulkCreate(wordsToAdd);
+
+      setShowBulkAddDialog(false);
+      setBulkText('');
+      loadData();
+      alert(`${wordsToAdd.length} מילים נוספו בהצלחה! ✅`);
+    } catch (error) {
+      console.error("Error bulk adding words:", error);
+      alert('שגיאה בהוספת המילים');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSessionComplete = async (results) => {
     setSessionResults(results);
     setMode(PRACTICE_MODES.SUMMARY);
@@ -300,15 +349,24 @@ export default function VocabularyTrainingPage() {
           <div className="space-y-4">
             <VocabularyDashboard stats={stats} />
 
-            {/* Admin Add Button */}
+            {/* Admin Add Buttons */}
             {user?.role === 'admin' && (
-              <Button
-                onClick={() => setShowAddDialog(true)}
-                className="w-full bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                הוסף מילה חדשה
-              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  onClick={() => setShowAddDialog(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  הוסף מילה
+                </Button>
+                <Button
+                  onClick={() => setShowBulkAddDialog(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  הוסף הרבה
+                </Button>
+              </div>
             )}
 
             {/* Category Filter */}
@@ -444,6 +502,62 @@ export default function VocabularyTrainingPage() {
           />
         )}
       </div>
+
+      {/* Bulk Add Dialog */}
+      <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
+        <DialogContent dir="rtl" className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Plus className="w-5 h-5 text-purple-600" />
+              הוסף מילים רבות
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+              <div className="text-sm font-bold text-purple-900 mb-1">📋 פורמט:</div>
+              <div className="text-xs text-purple-700">מילה בעברית | תרגום באנגלית | קטגוריה</div>
+              <div className="text-xs text-purple-600 mt-1">לדוגמה:</div>
+              <div className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1">
+                לרוץ | run | פעלים{'\n'}
+                בית | house | שמות עצם{'\n'}
+                מהר | fast | תארים
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                הזן מילים (כל שורה = מילה אחת)
+              </label>
+              <Textarea
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+                placeholder="מילה בעברית | תרגום באנגלית | קטגוריה"
+                className="h-48 font-mono text-sm"
+                dir="rtl"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkAddDialog(false)}>
+              ביטול
+            </Button>
+            <Button
+              onClick={handleBulkAdd}
+              disabled={isSaving}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              הוסף הכל
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Word Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
