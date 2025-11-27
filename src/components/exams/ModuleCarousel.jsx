@@ -409,25 +409,36 @@ export default function ModuleCarousel({
                         </Button>
 
                         {isPremium === true ?
-                  <Button
-                    onClick={() => {
-                      // שומר את פרטי המודול כדי לבנות בגרות על נושאים חלשים במודול הזה
-                      sessionStorage.setItem('weakTopicsModule', currentModule.module_id || currentModule.id);
-                      sessionStorage.setItem('weakTopicsModuleEntity', currentModule.entity || 'GenericExam');
-                      sessionStorage.setItem('weakTopicsModuleTitle', currentModule.title || '');
-                      navigate(createPageUrl("CustomWeakExam"));
-                    }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
-                            <Target className="w-4 h-4 ml-2" />
-                            בגרות על נושאים חלשים
-                          </Button> :
-
+                  // צריך מינימום 3 ניסיונות במודול כדי לזהות נושאים חלשים
+                  moduleStats.totalAttempts >= 3 ?
+                    <Button
+                      onClick={() => {
+                        // שומר את פרטי המודול כדי לבנות בגרות על נושאים חלשים במודול הזה
+                        sessionStorage.setItem('weakTopicsModule', currentModule.module_id || currentModule.id);
+                        sessionStorage.setItem('weakTopicsModuleEntity', currentModule.entity || 'GenericExam');
+                        sessionStorage.setItem('weakTopicsModuleTitle', currentModule.title || '');
+                        navigate(createPageUrl("CustomWeakExam"));
+                      }} 
+                      className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
+                      <Target className="w-4 h-4 ml-2" />
+                      בגרות על נושאים חלשים
+                    </Button> :
+                    <div className="bg-gray-100 rounded-xl p-3 text-center border border-gray-200">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <AlertTriangle className="w-4 h-4 text-gray-500" />
+                        <span className="text-[12px] font-bold text-gray-700">בגרות על נושאים חלשים</span>
+                      </div>
+                      <p className="text-[11px] text-gray-500">
+                        פתור עוד {3 - moduleStats.totalAttempts} בגרויות כדי שנזהה את הנושאים החלשים שלך
+                      </p>
+                    </div>
+                  :
                   <Button
                     onClick={() => navigate(createPageUrl("Premium"))}
                     className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
-
-                            <Lock className="w-4 h-4 ml-2" />
-                            בגרות על נושאים חלשים
-                          </Button>
+                    <Lock className="w-4 h-4 ml-2" />
+                    בגרות על נושאים חלשים
+                  </Button>
                   }
                       </div>
                 }
