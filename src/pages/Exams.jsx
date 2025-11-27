@@ -1132,10 +1132,18 @@ export default function ExamsPage() {
                 </h3>
 
                 <div className="space-y-3">
-                  {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) =>
+                  {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) => {
+                    const attemptExamData = allExamsMap.get(showAttemptDetails.exam_id);
+                    const questionData = attemptExamData?.questions?.[idx];
+                    return (
                 <div
                   key={idx} className="bg-blue-50 p-4 rounded-xl border-2 border-blue-500">
-
+                      {questionData?.question_text && (
+                        <div className="text-sm text-gray-700 mb-3 p-3 bg-white rounded-lg border border-blue-200">
+                          <div className="text-xs text-blue-600 font-bold mb-1">השאלה:</div>
+                          <div className="whitespace-pre-wrap">{questionData.question_text}</div>
+                        </div>
+                      )}
 
 
 
