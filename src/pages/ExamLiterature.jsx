@@ -179,24 +179,24 @@ export default function ExamLiteraturePage() {
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl p-4 text-center border-2 border-pink-200">
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl p-4 text-center border-2 border-blue-500">
                 <Clock className="w-6 h-6 text-pink-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{exam.duration_minutes}</div>
                 <div className="text-xs">דקות</div>
               </div>
-              <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl p-4 text-center border-2 border-rose-200">
+              <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl p-4 text-center border-2 border-blue-500">
                 <Award className="w-6 h-6 text-rose-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{exam.total_points}</div>
                 <div className="text-xs">נקודות</div>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 text-center border-2 border-purple-200">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 text-center border-2 border-blue-500">
                 <Type className="w-6 h-6 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{exam.questions.length}</div>
                 <div className="text-xs">שאלות</div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4 border-2 border-pink-200 mb-6">
+            <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4 border-2 border-blue-500 mb-6">
               <div className="text-sm text-gray-700">
                 <strong className="text-pink-900">מבחן ספרות:</strong>
                 <ul className="mt-2 space-y-1">
@@ -255,7 +255,7 @@ export default function ExamLiteraturePage() {
                   </div>
 
                   {result.explanation && (
-                    <div className="bg-white p-4 rounded-xl border-2 border-pink-200">
+                    <div className="bg-white p-4 rounded-xl border-2 border-blue-500">
                       <div className="text-sm font-semibold mb-2 text-pink-900">💡 הסבר ודוגמה:</div>
                       <div className="text-sm text-gray-700 whitespace-pre-wrap">{result.explanation}</div>
                     </div>
@@ -312,11 +312,11 @@ export default function ExamLiteraturePage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-6 border-2 border-pink-200">
+            <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-6 border-2 border-blue-500">
               <div className="text-lg text-gray-900 whitespace-pre-wrap leading-relaxed">{question.question_text}</div>
             </div>
 
-            <div className="bg-white rounded-xl p-4 border-2 border-pink-200">
+            <div className="bg-white rounded-xl p-4 border-2 border-blue-500">
               <div className="text-sm font-semibold mb-3 flex justify-between">
                 <span>כתוב תשובה מפורטת:</span>
                 <span className={`${currentWordCount < 50 ? 'text-red-600' : currentWordCount < 100 ? 'text-yellow-600' : 'text-green-600'}`}>

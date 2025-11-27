@@ -679,8 +679,8 @@ export default function ExamMathPage() {
                       result.is_correct
                         ? 'bg-emerald-50/50 border-2 border-emerald-200/50'
                         : result.partial_credit
-                        ? 'bg-amber-50/50 border-2 border-amber-200/50'
-                        : 'bg-rose-50/50 border-2 border-rose-200/50'
+                        ? 'bg-amber-50/50 border-2 border-blue-500/50'
+                        : 'bg-rose-50/50 border-2 border-blue-500/50'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-4">
@@ -774,9 +774,9 @@ export default function ExamMathPage() {
 
                     {/* Display saved draft if available for review */}
                     {draftPapers[question.question_number] && (
-                        <div className="mt-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div className="mt-4 bg-slate-50 p-4 rounded-xl border border-blue-500">
                             <h4 className="text-sm font-semibold mb-2 text-slate-900">הטיוטה שלך:</h4>
-                            <img src={draftPapers[question.question_number]} alt="Draft" className="w-full h-auto rounded-lg border border-slate-300" />
+                            <img src={draftPapers[question.question_number]} alt="Draft" className="w-full h-auto rounded-lg border border-blue-500" />
                         </div>
                     )}
                   </motion.div>
@@ -937,7 +937,7 @@ export default function ExamMathPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-blue-500 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -981,7 +981,7 @@ export default function ExamMathPage() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-slate-200 bg-slate-50"
+              className="border-t border-blue-500 bg-slate-50"
             >
               <div className="max-w-4xl mx-auto px-4 py-4">
                 <div className="flex flex-wrap gap-2 justify-center">
@@ -999,7 +999,7 @@ export default function ExamMathPage() {
                         } ${
                           status === 'answered' ? 'bg-emerald-500 text-white' :
                           status === 'marked' ? 'bg-amber-500 text-white' :
-                          'bg-white text-slate-700 border border-slate-300'
+                          'bg-white text-slate-700 border border-blue-500'
                         }`}
                       >
                         {idx + 1}
@@ -1093,14 +1093,14 @@ export default function ExamMathPage() {
                       className={`w-full text-right p-4 rounded-xl border-2 transition-all ${
                         userAnswers[question.question_number] === optionValue
                           ? 'bg-blue-50 border-blue-500 shadow-md'
-                          : 'bg-white border-slate-200 hover:border-blue-300'
+                          : 'bg-white border-blue-500 hover:border-blue-300'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                           userAnswers[question.question_number] === optionValue
                             ? 'border-blue-500 bg-blue-500'
-                            : 'border-slate-300'
+                            : 'border-blue-500'
                         }`}>
                           {userAnswers[question.question_number] === optionValue && (
                             <div className="w-2.5 h-2.5 bg-white rounded-full" />
@@ -1131,7 +1131,7 @@ export default function ExamMathPage() {
               <Button
                 onClick={() => toggleDraftForQuestion(question.question_number)}
                 variant="outline"
-                className="w-full border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                className="w-full border-2 border-dashed border-blue-500 hover:border-blue-500 hover:bg-blue-50 transition-all"
               >
                 <Pencil className="w-4 h-4 ml-2" />
                 {showDraftForQuestion[question.question_number] ? 'הסתר לוח טיוטה' : 'פתח לוח טיוטה לחישובים'}
@@ -1174,7 +1174,7 @@ export default function ExamMathPage() {
       </div>
 
       {/* Fixed Bottom Bar with Calculator */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-blue-500 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2">
             <Button
@@ -1276,7 +1276,7 @@ export default function ExamMathPage() {
           <div className="space-y-4">
             {formulas.map((category, categoryIndex) => (
               <div key={categoryIndex}>
-                <h3 className="text-lg font-bold text-slate-900 mb-3 border-b border-blue-200 pb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-3 border-b border-blue-500 pb-2">
                   {category.category}
                 </h3>
                 <div className="space-y-2">
@@ -1317,7 +1317,7 @@ export default function ExamMathPage() {
               className="w-full h-32 p-3 border-2 border-gray-200 rounded-xl resize-none focus:border-blue-500 focus:outline-none"
             />
 
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-3">
+            <div className="bg-blue-50 border-2 border-blue-500 rounded-xl p-3">
               <p className="text-xs text-blue-700">
                 💡 הדיווח שלך יישלח למנהלי המערכת ויטופל בהקדם
               </p>

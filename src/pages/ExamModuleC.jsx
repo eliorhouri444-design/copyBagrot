@@ -743,7 +743,7 @@ export default function ExamModuleCPage() {
             <h4 className="font-bold text-gray-900 mb-3">שאלות ({exam.questions?.length || 0}):</h4>
             <div className="space-y-3">
               {exam.questions?.map((questionItem, questionIndex) => (
-                <div key={questionIndex} className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div key={questionIndex} className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-blue-900">שאלה {questionItem.question_number}</span>
                     <span className="text-sm bg-blue-600 text-white px-2 py-1 rounded">{questionItem.points} נק'</span>
@@ -762,7 +762,7 @@ export default function ExamModuleCPage() {
           {/* Writing Section Preview */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">חלק ב' - כתיבה</h3>
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+            <div className="bg-purple-50 border-2 border-blue-500 rounded-lg p-4">
               <h4 className="font-bold text-purple-900 mb-2">נושא הכתיבה:</h4>
               <p className="text-gray-700" dir="ltr">{exam.writing_prompt || 'לא הוגדר נושא'}</p>
               <div className="text-sm text-gray-600 mt-3">
@@ -786,7 +786,7 @@ export default function ExamModuleCPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+          <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-500">
             <div className="text-sm text-gray-700 space-y-1">
               <p><strong>התקדמות:</strong> {savedProgress.current_section === 'reading' ? 'הבנת נקרא' : 'כתיבה'}</p>
               {savedProgress.exam_mode !== 'practice' && (
@@ -941,7 +941,7 @@ export default function ExamModuleCPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-3 mb-3">
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-500 rounded-xl p-3 mb-3">
             <div className="font-bold text-gray-900 mb-2 text-sm flex items-center gap-2">
               <Info className="w-4 h-4 text-blue-600" />
               מבנה המבחן
@@ -1085,7 +1085,7 @@ export default function ExamModuleCPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-4">סקירת תשובות</h3>
                 <div className="space-y-4">
                   {results.readingResults.map((resultItem, resultIndex) => (
-                    <div key={resultIndex} className="mb-6 pb-4 border-b last:border-b-0 border-gray-200">
+                    <div key={resultIndex} className="mb-6 pb-4 border-b last:border-b-0 border-blue-500">
                       <p className="font-semibold text-lg text-gray-900 mb-2">שאלה {resultItem.question_number}:</p>
                       <p className="text-gray-700 mb-2 text-left" dir="ltr">{exam.questions.find(questionItem => questionItem.question_number === resultItem.question_number)?.question_text}</p>
                       <p className="text-gray-700 mb-1">
@@ -1101,7 +1101,7 @@ export default function ExamModuleCPage() {
                         )}
                       </p>
                       {resultItem.ai_explanation && (
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 border border-gray-200">
+                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 border border-blue-500">
                           <p className="font-medium text-gray-800">הסבר:</p>
                           <div dir="rtl" className="whitespace-pre-wrap">{resultItem.ai_explanation}</div>
                         </div>
@@ -1117,7 +1117,7 @@ export default function ExamModuleCPage() {
 
                   {/* The detailed score breakdown and specific errors sections were removed as the AI prompt for writing was simplified for speed */}
                   {results.writingFeedback.feedback_hebrew && (
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border-2 border-blue-200">
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border-2 border-blue-500">
                       <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">📝</span>
                         משוב כללי
@@ -1341,7 +1341,7 @@ export default function ExamModuleCPage() {
                               className={`w-full p-3 sm:p-4 rounded-xl border-2 text-left transition-all ${
                                 readingAnswers[question.question_number] === optionValue
                                   ? 'bg-blue-100 border-blue-500'
-                                  : 'bg-white border-gray-200 hover:border-blue-300'
+                                  : 'bg-white border-blue-500 hover:border-blue-500'
                               }`}
                               dir="ltr"
                             >
@@ -1441,7 +1441,7 @@ export default function ExamModuleCPage() {
                                 className={`w-full p-3 sm:p-4 rounded-xl border-2 text-left transition-all ${
                                   readingAnswers[questionItem.question_number] === optionValue
                                     ? 'bg-blue-100 border-blue-500'
-                                    : 'bg-white border-gray-200 hover:border-blue-300'
+                                    : 'bg-white border-blue-500 hover:border-blue-500'
                                 }`}
                                 dir="ltr"
                               >
@@ -1482,7 +1482,7 @@ export default function ExamModuleCPage() {
             <div className="bg-white rounded-2xl shadow-md p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">חלק ב' - כתיבה</h3>
 
-              <div className="bg-purple-50 rounded-xl p-6 mb-6 border-2 border-purple-200">
+              <div className="bg-purple-50 rounded-xl p-6 mb-6 border-2 border-blue-500">
                 <div className="font-semibold text-gray-900 mb-2" dir="ltr">
                   {exam.writing_prompt}
                 </div>

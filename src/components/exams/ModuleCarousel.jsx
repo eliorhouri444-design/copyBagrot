@@ -423,7 +423,7 @@ export default function ModuleCarousel({
                       <Target className="w-4 h-4 ml-2" />
                       בגרות על נושאים חלשים
                     </Button> :
-                    <div className="bg-gray-100 rounded-xl p-3 text-center border border-gray-200">
+                    <div className="bg-gray-100 rounded-xl p-3 text-center border border-blue-500">
                       <div className="flex items-center justify-center gap-2 mb-1">
                         <AlertTriangle className="w-4 h-4 text-gray-500" />
                         <span className="text-[12px] font-bold text-gray-700">בגרות על נושאים חלשים</span>
@@ -450,12 +450,12 @@ export default function ModuleCarousel({
                   <Button
                     onClick={() => handleModuleClick(currentModule)}
                     variant="outline"
-                    className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
+                    className="w-full h-10 text-[12px] font-semibold border-2 border-blue-500 hover:bg-[#F5F8FF] rounded-[14px]">
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
 
-                  <div className="bg-slate-100 p-2.5 rounded-lg border border-[#E9F0FF]">
+                  <div className="bg-slate-100 p-2.5 rounded-lg border border-blue-500">
                             <div className="text-center mb-2">
                               <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-5 בגרויות</h4>
                               <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-5 הבגרויות הראשונות</p>
@@ -463,7 +463,7 @@ export default function ModuleCarousel({
                             <Button
                       onClick={() => handleModuleClick(currentModule)}
                       variant="outline"
-                      className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
+                      className="w-full h-9 text-[11px] font-semibold border border-blue-500 text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
 
                               בחר מבחן (מוגבל ל-5)
                             </Button>
@@ -553,7 +553,7 @@ export default function ModuleCarousel({
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 text-center border border-amber-200">
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 text-center border border-blue-500">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Crown className="w-5 h-5 text-amber-600" />
                 <span className="font-bold text-amber-900">או שדרג לפרימיום</span>

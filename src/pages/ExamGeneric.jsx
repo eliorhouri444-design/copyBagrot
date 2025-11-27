@@ -644,7 +644,7 @@ export default function ExamGenericPage() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleStartExam('normal')}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg">
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-500 hover:border-blue-500 transition-all text-right shadow-lg">
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
@@ -671,7 +671,7 @@ export default function ExamGenericPage() {
             <motion.button
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-300 hover:border-purple-500 transition-all shadow-lg">
+              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-500 hover:border-purple-500 transition-all shadow-lg">
 
 
               <div className="flex items-center gap-3 mb-4">
@@ -731,7 +731,7 @@ export default function ExamGenericPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-5 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-500 rounded-xl p-5 mb-6">
               <div className="font-bold text-gray-900 mb-3 text-lg flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-600" />
                 מבנה המבחן והוראות
@@ -1015,7 +1015,7 @@ export default function ExamGenericPage() {
                             className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                             userAnswers[question.question_number] === optionValue ?
                             'bg-blue-100 border-blue-500 shadow-md' :
-                            'bg-white border-gray-200 hover:border-blue-300'}`
+                            'bg-white border-blue-500 hover:border-blue-500'}`
                             }
                             dir="ltr">
 
@@ -1042,7 +1042,7 @@ export default function ExamGenericPage() {
                     className={`w-full p-3 rounded-lg border-2 text-base transition-all ${
                     userAnswers[question.question_number] === optionValue ?
                     'bg-blue-100 border-blue-500 shadow-md' :
-                    'bg-white border-gray-200 hover:border-blue-300'}`
+                    'bg-white border-blue-500 hover:border-blue-500'}`
                     }
                     dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
 
@@ -1178,7 +1178,7 @@ export default function ExamGenericPage() {
                           className={`w-full p-2.5 rounded-lg border-2 text-left text-base transition-all ${
                           userAnswers[questionItem.question_number] === optionValue ?
                           'bg-blue-100 border-blue-500 shadow-md' :
-                          'bg-white border-gray-200 hover:border-blue-300'}`
+                          'bg-white border-blue-500 hover:border-blue-500'}`
                           }
                           dir="ltr">
 
@@ -1206,7 +1206,7 @@ export default function ExamGenericPage() {
                   className={`w-full p-2.5 rounded-lg border-2 text-base transition-all ${
                   userAnswers[questionItem.question_number] === optionValue ?
                   'bg-blue-100 border-blue-500 shadow-md' :
-                  'bg-white border-gray-200 hover:border-blue-300'}`
+                  'bg-white border-blue-500 hover:border-blue-500'}`
                   }
                   dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
 

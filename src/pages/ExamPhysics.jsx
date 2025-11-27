@@ -312,7 +312,7 @@ export default function ExamPhysicsPage() {
 
                   return (
                     <div key={questionIndex} className={`p-4 rounded-lg border-2 ${
-                      isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'
+                      isCorrect ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-blue-500'
                     }`}>
                       <div className="flex items-start gap-2 mb-2">
                         <span className="font-bold text-gray-900">שאלה {questionIndex + 1}:</span>
@@ -337,7 +337,7 @@ export default function ExamPhysicsPage() {
                           </div>
                         )}
                         {questionItem.explanation && (
-                          <div className="mt-2 pt-2 border-t border-gray-300">
+                          <div className="mt-2 pt-2 border-t border-blue-500">
                             <span className="text-gray-600 font-semibold">הסבר:</span>
                             <p className="text-gray-700 mt-1">{questionItem.explanation}</p>
                           </div>
@@ -440,7 +440,7 @@ export default function ExamPhysicsPage() {
                     <img 
                       src={question.question_image} 
                       alt="Question" 
-                      className="max-w-full h-auto rounded-xl border-2 border-gray-200"
+                      className="max-w-full h-auto rounded-xl border-2 border-blue-500"
                     />
                   </div>
                 )}
@@ -456,14 +456,14 @@ export default function ExamPhysicsPage() {
                         className={`w-full text-right p-4 rounded-xl border-2 transition-all ${
                           answers[currentQuestion] === optionValue
                             ? 'bg-blue-50 border-blue-500 text-blue-900'
-                            : 'bg-white border-gray-200 hover:border-blue-300 text-gray-700'
+                            : 'bg-white border-blue-500 hover:border-blue-500 text-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                             answers[currentQuestion] === optionValue
                               ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300'
+                              : 'border-blue-500'
                           }`}>
                             {answers[currentQuestion] === optionValue && (
                               <CheckCircle className="w-4 h-4 text-white" />
@@ -568,7 +568,7 @@ export default function ExamPhysicsPage() {
       </div>
 
       {showCalculator && (
-        <div className="fixed bottom-24 left-4 bg-white rounded-2xl shadow-2xl p-4 border-2 border-gray-200 z-20">
+        <div className="fixed bottom-24 left-4 bg-white rounded-2xl shadow-2xl p-4 border-2 border-blue-500 z-20">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-gray-900">מחשבון</h3>
             <button
@@ -612,7 +612,7 @@ export default function ExamPhysicsPage() {
       )}
 
       {showFormulas && (
-        <div className="fixed bottom-24 right-4 bg-white rounded-2xl shadow-2xl p-6 border-2 border-gray-200 z-20 max-w-md max-h-96 overflow-y-auto">
+        <div className="fixed bottom-24 right-4 bg-white rounded-2xl shadow-2xl p-6 border-2 border-blue-500 z-20 max-w-md max-h-96 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-gray-900 text-lg">נוסחאות פיזיקה</h3>
             <button

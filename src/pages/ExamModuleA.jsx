@@ -838,7 +838,7 @@ export default function ExamModuleAPage() {
               <div className="space-y-4">
                 {results.readingResults.map((resultItem, resultIndex) => (
                   <div key={resultIndex} className={`rounded-xl p-4 border-2 ${
-                    resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    resultItem.is_correct ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-blue-500'
                   }`}>
                     <div className="font-semibold mb-2">שאלה {resultItem.question_number}</div>
                     <div className="text-sm space-y-1">
@@ -852,7 +852,7 @@ export default function ExamModuleAPage() {
 
                 {results.listeningResults.map((resultItem, resultIndex) => (
                   <div key={resultIndex} className={`rounded-xl p-4 border-2 ${
-                    resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    resultItem.is_correct ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-blue-500'
                   }`}>
                     <div className="font-semibold mb-2">שאלת האזנה {resultItem.question_number}</div>
                     <div className="text-sm space-y-1">
@@ -943,7 +943,7 @@ export default function ExamModuleAPage() {
                 value={reportText}
                 onChange={(e) => setReportText(e.target.value)}
                 placeholder="לדוגמה: התשובה צריכה להיות..."
-                className="w-full h-32 p-3 border-2 border-gray-200 rounded-xl resize-none focus:border-blue-500 focus:outline-none"
+                className="w-full h-32 p-3 border-2 border-blue-500 rounded-xl resize-none focus:border-blue-500 focus:outline-none"
               />
             </div>
 
@@ -1025,7 +1025,7 @@ export default function ExamModuleAPage() {
                             className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
                               readingAnswers[questionItem.question_number] === optionValue
                                 ? 'bg-purple-50 border-purple-500 shadow-md'
-                                : 'bg-gray-50 border-gray-200 hover:border-purple-300'
+                                : 'bg-gray-50 border-blue-500 hover:border-blue-500'
                             }`}
                             dir="ltr"
                           >

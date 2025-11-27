@@ -961,8 +961,8 @@ export default function TopicPracticeNewPage() {
                 return (
                   <div key={idx} className={`rounded-xl p-4 border-2 ${
                   q.question_type === "writing" ?
-                  'bg-blue-50 border-blue-300' :
-                  result?.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`
+                  'bg-blue-50 border-blue-500' :
+                  result?.isCorrect ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-blue-500'}`
                   }>
                     <div className="flex items-start gap-3">
                       {q.question_type === "writing" ?
@@ -979,7 +979,7 @@ export default function TopicPracticeNewPage() {
                         <div className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{q.question_text}</div>
 
                         {/* תמיד הצג את התשובה של המשתמש */}
-                        <div className="bg-white rounded-lg p-3 border border-gray-200 mb-2">
+                        <div className="bg-white rounded-lg p-3 border border-blue-500 mb-2">
                           <div className="text-xs text-gray-600 mb-1">התשובה שלך:</div>
                           <div className={`text-sm font-semibold ${result?.isCorrect ? 'text-green-700' : 'text-red-700'}`} dir="ltr">
                             {result?.userAnswer || "לא נענה"}
@@ -988,7 +988,7 @@ export default function TopicPracticeNewPage() {
 
                         {q.question_type === "writing" && result?.writingEvaluation ?
                         <div className="space-y-2">
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-300">
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-500">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
                                 פירוט הציון
@@ -1165,7 +1165,7 @@ export default function TopicPracticeNewPage() {
                   <span className="text-purple-600 font-bold text-lg flex-shrink-0">2</span>
                   <span className="font-medium">אחרי פעמיים, עבור לענות על <strong>{currentSetQuestions.length} שאלות</strong></span>
                 </li>
-                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3 border-2 border-red-300">
+                <li className="flex items-start gap-3 bg-red-50 rounded-lg p-3 border-2 border-blue-500">
                   <span className="text-red-600 font-bold text-lg flex-shrink-0">⚠️</span>
                   <span className="font-medium"><strong>חשוב מאוד:</strong> אחרי שתתחיל לענות, לא תוכל לשמוע את הקטע שוב!</span>
                 </li>
@@ -1237,7 +1237,7 @@ export default function TopicPracticeNewPage() {
             </div>
 
             <div className="p-4 sm:p-6">
-              <div className="bg-white rounded-lg border-2 border-gray-200">
+              <div className="bg-white rounded-lg border-2 border-blue-500">
                 <div
                   className="text-base sm:text-lg leading-[1.8] text-gray-900 p-4 sm:p-6 whitespace-pre-wrap text-left"
                   style={{
@@ -1388,7 +1388,7 @@ export default function TopicPracticeNewPage() {
                 <img
                   src={currentQuestion.question_image_url}
                   alt="Question"
-                  className="mt-4 rounded-xl max-w-full shadow-md border-2 border-gray-200" />
+                  className="mt-4 rounded-xl max-w-full shadow-md border-2 border-blue-500" />
 
                 }
           </div>
@@ -1419,7 +1419,7 @@ export default function TopicPracticeNewPage() {
                       className={`w-full p-4 rounded-xl border-2 transition-all shadow-sm ${
                       isSelected ?
                       'border-blue-600 bg-blue-50 shadow-md' :
-                      'border-gray-300 hover:border-blue-400 hover:bg-gray-50'} cursor-pointer`
+                      'border-blue-500 hover:border-blue-500 hover:bg-gray-50'} cursor-pointer`
                       }
                       dir="ltr">
 
@@ -1446,7 +1446,7 @@ export default function TopicPracticeNewPage() {
 
           {/* Answer input area - fixed at bottom */}
           {currentQuestion.question_type !== "writing" &&
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl p-4 z-20">
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-2xl p-4 z-20">
               <div className="space-y-3 max-w-2xl mx-auto">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ?
               <div></div> :
@@ -1455,7 +1455,7 @@ export default function TopicPracticeNewPage() {
                 value={answers[currentQuestion.question_id] || ""}
                 onChange={(e) => setAnswers((prev) => ({ ...prev, [currentQuestion.question_id]: e.target.value }))}
                 placeholder="הקלד את תשובתך כאן..."
-                className="w-full h-24 text-base resize-none border-2 border-gray-300 focus:border-blue-500 rounded-lg"
+                className="w-full h-24 text-base resize-none border-2 border-blue-500 focus:border-blue-600 rounded-lg"
                 dir="ltr" />
 
               }
@@ -1664,7 +1664,7 @@ export default function TopicPracticeNewPage() {
               </div>
 
               {/* Score Breakdown */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-300">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-500">
                 <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                   <span className="text-xl">📊</span>
                   פירוט הציון
@@ -1709,7 +1709,7 @@ export default function TopicPracticeNewPage() {
               {showRewriteOptions &&
             <div className="space-y-3">
                   {writingFeedbackData.evaluation.rewritten_version_90_plus &&
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-300">
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
                         <Crown className="w-5 h-5" />
                         גרסה משודרגת (90+)
@@ -1721,7 +1721,7 @@ export default function TopicPracticeNewPage() {
               }
 
                   {writingFeedbackData.evaluation.rewritten_with_connectors &&
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         גרסה עם מילות קישור
@@ -1733,7 +1733,7 @@ export default function TopicPracticeNewPage() {
               }
 
                   {writingFeedbackData.evaluation.rewritten_advanced_vocabulary &&
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         גרסה עם אוצר מילים מתקדם
@@ -1748,7 +1748,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Sentence Analysis */}
               {showSentenceAnalysis && writingFeedbackData.evaluation.sentence_by_sentence_analysis?.length > 0 &&
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-500">
                   <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">🔍</span>
                     ניתוח משפט אחר משפט
@@ -1780,7 +1780,7 @@ export default function TopicPracticeNewPage() {
               {showVocabularyHelp &&
             <div className="space-y-3">
                   {writingFeedbackData.evaluation.connectors_to_use?.length > 0 &&
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-300">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-purple-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">🔗</span>
                         מילות קישור לשימוש
@@ -1798,7 +1798,7 @@ export default function TopicPracticeNewPage() {
               }
 
                   {writingFeedbackData.evaluation.advanced_vocabulary?.length > 0 &&
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-300">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-green-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">📚</span>
                         מילים מתקדמות לשדרוג
@@ -1816,7 +1816,7 @@ export default function TopicPracticeNewPage() {
               }
 
                   {writingFeedbackData.evaluation.useful_phrases?.length > 0 &&
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-300">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-500">
                       <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                         <span className="text-xl">💬</span>
                         ביטויים שימושיים לבגרות
@@ -1835,7 +1835,7 @@ export default function TopicPracticeNewPage() {
 
               {/* Recurring Mistakes */}
               {writingFeedbackData.evaluation.recurring_mistakes?.length > 0 &&
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-300">
+            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-blue-500">
                   <div className="text-sm font-bold text-red-900 mb-3 flex items-center gap-2">
                     <span className="text-xl">⚠️</span>
                     טעויות שחוזרות על עצמן
@@ -1917,14 +1917,14 @@ export default function TopicPracticeNewPage() {
 
               {/* Spelling Errors */}
               {writingFeedbackData.evaluation.spelling_errors?.length > 0 &&
-            <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200">
+            <div className="bg-pink-50 rounded-xl p-4 border-2 border-blue-500">
                   <div className="text-sm font-bold text-pink-900 mb-2 flex items-center gap-2">
                     <span className="text-xl">✏️</span>
                     שגיאות כתיב שזוהו
                   </div>
                   <div className="grid grid-cols-1 gap-2">
                     {writingFeedbackData.evaluation.spelling_errors.map((err, i) =>
-                <div key={i} className="bg-white rounded-lg p-3 border border-pink-200">
+                <div key={i} className="bg-white rounded-lg p-3 border border-blue-500">
                         <div className="flex items-center gap-2 text-sm mb-1">
                           <span className="text-red-600 line-through font-semibold">{err.word || err}</span>
                           <span className="text-gray-400">→</span>

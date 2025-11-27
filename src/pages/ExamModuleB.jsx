@@ -713,7 +713,7 @@ export default function ExamModuleBPage() {
             <h4 className="font-bold text-gray-900 mb-3">שאלות ({exam.grammar_questions?.length || 0}):</h4>
             <div className="space-y-3">
               {exam.grammar_questions?.map((questionItem, questionIndex) => (
-                <div key={questionIndex} className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                <div key={questionIndex} className="bg-green-50 border-2 border-blue-500 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-green-900">שאלה {questionItem.question_number}</span>
                     <div className="flex items-center gap-2">
@@ -853,7 +853,7 @@ export default function ExamModuleBPage() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleModeSelect('exam')}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
+              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-500 hover:border-blue-500 transition-all text-right shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
@@ -890,7 +890,7 @@ export default function ExamModuleBPage() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleModeSelect('interactive')}
-              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-300 hover:border-purple-500 transition-all text-right shadow-lg"
+              className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-blue-500 hover:border-purple-500 transition-all text-right shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center">
@@ -1033,7 +1033,7 @@ export default function ExamModuleBPage() {
               <div className="space-y-4">
                 {results.grammarResults.map((resultItem, resultIndex) => (
                   <div key={resultIndex} className={`rounded-xl p-4 border-2 ${
-                    resultItem.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    resultItem.is_correct ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-red-200'
                   }`}>
                     <div className="font-semibold text-gray-900 mb-2">
                       שאלה {resultItem.question_number}: {resultItem.question_text}
@@ -1290,7 +1290,7 @@ At the end of the summer, the city mayor invited the group to city hall and than
                                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                                   grammarAnswers[question.question_number] === option
                                     ? 'border-green-500 bg-green-50 shadow-md'
-                                    : 'border-gray-200 hover:border-green-300'
+                                    : 'border-blue-500 hover:border-blue-500'
                                 }`}
                                 dir="ltr"
                               >
@@ -1381,7 +1381,7 @@ At the end of the summer, the city mayor invited the group to city hall and than
                               className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                                 grammarAnswers[questionItem.question_number] === optionValue
                                   ? 'border-green-500 bg-green-50 shadow-md'
-                                  : 'border-gray-200 hover:border-green-300'
+                                  : 'border-blue-500 hover:border-blue-500'
                               }`}
                               dir="ltr"
                             >
