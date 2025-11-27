@@ -497,25 +497,22 @@ export default function StudyPlanPage() {
           className="grid grid-cols-2 gap-3">
 
           <Button
-            onClick={() => navigate(createPageUrl("CustomWeakPractice"))} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 h-14 flex flex-col items-center justify-center gap-1">
-
-
+            onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
+            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1">
             <Repeat className="w-5 h-5" />
             תרגל טעויות
           </Button>
           
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1">
-
+            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1">
             <Play className="w-5 h-5" />
             המשך לתרגל
           </Button>
           
           <Button
-            onClick={() => navigate(createPageUrl("WeakAreaSelection"))} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 h-14 col-span-2 flex items-center justify-center gap-2">
-
-
+            onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
+            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] col-span-2 flex items-center justify-center gap-2">
             <Zap className="w-5 h-5" />
             תרגל נושאים חלשים
           </Button>
@@ -528,12 +525,10 @@ export default function StudyPlanPage() {
                 navigate(createPageUrl("Premium"));
               }
             }}
-            className={`h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 ${
+            className={`h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1 ${
             isPremium ?
-            'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600' :
-            'bg-gray-400 hover:bg-gray-500'}`
-            }>
-
+            'bg-[#3B82F6] hover:bg-blue-700' :
+            'bg-gray-400 hover:bg-gray-500'} text-white`}>
             <FileCheck className="w-5 h-5" />
             בגרות מלאה
             {!isPremium && <Lock className="w-3 h-3" />}
@@ -541,8 +536,7 @@ export default function StudyPlanPage() {
           
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 h-14 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1">
-
+            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1">
             <Target className="w-5 h-5" />
             משימה יומית
           </Button>
