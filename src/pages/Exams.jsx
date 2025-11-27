@@ -681,7 +681,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="bg-blue-100 pb-4 min-h-screen">
+    <div className="bg-indigo-50 pb-4 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -695,7 +695,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      <div className="bg-blue-100 pb-6 px-6 space-y-6">
+      <div className="bg-indigo-50 pb-6 px-6 space-y-6">
 
 
         <motion.div
@@ -1204,17 +1204,17 @@ export default function ExamsPage() {
                   )}
                     </div>
                     <Button
-                    onClick={() => {
-                      setShowAttemptDetails(null);
-                      if (isPremium) {
-                        sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
-                        sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
-                        navigate(createPageUrl("ExamMistakesPractice"));
-                      } else {
-                        navigate(createPageUrl("Premium"));
-                      }
-                    }}
-                    className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+                  onClick={() => {
+                    setShowAttemptDetails(null);
+                    if (isPremium) {
+                      sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
+                      sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
+                      navigate(createPageUrl("ExamMistakesPractice"));
+                    } else {
+                      navigate(createPageUrl("Premium"));
+                    }
+                  }}
+                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                         {isPremium ? 'תרגל טעויות בבגרות זו' : '🔒 שדרג לפרימיום'}
                     </Button>
