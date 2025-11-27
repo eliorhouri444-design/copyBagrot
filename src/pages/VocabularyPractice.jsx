@@ -16,8 +16,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const WORDS_PER_SET = 10;
-
 export default function VocabularyPracticePage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
@@ -26,10 +24,9 @@ export default function VocabularyPracticePage() {
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [allWords, setAllWords] = useState([]);
-  const [currentSetWords, setCurrentSetWords] = useState([]);
+  const [vocabularySets, setVocabularySets] = useState([]);
+  const [currentSet, setCurrentSet] = useState(null);
   const [currentSetId, setCurrentSetId] = useState(1);
-  const [totalSets, setTotalSets] = useState(0);
   
   // Flashcards phase
   const [phase, setPhase] = useState('flashcards'); // 'flashcards' | 'quiz' | 'summary'
@@ -62,15 +59,14 @@ export default function VocabularyPracticePage() {
       const subject = currentUser?.selected_subject || 'אנגלית';
       const units = currentUser?.selected_units || 3;
 
-      const words = await base44.entities.VocabularyQuestion.filter({
+      // Load vocabulary sets
+      const sets = await base44.entities.VocabularySet.filter({
         subject_id: subject,
         unit_level: units,
         is_active: true
-      }, 'order', 500);
+      }, 'set_number', 100);
 
-      setAllWords(words);
-      const numSets = Math.ceil(words.length / WORDS_PER_SET);
-      setTotalSets(numSets);
+      setVocabularySets(sets);
 
       // Determine which set to start with
       let startSet = 1;
@@ -78,7 +74,10 @@ export default function VocabularyPracticePage() {
         startSet = parseInt(requestedSetId);
       }
       
-      loadSet(startSet, words);
+      const selectedSet = sets.find(s => s.set_number === startSet) || sets[0];
+      if (selectedSet) {
+        loadSet(selectedSet);
+      }
       
       // Show set selector if requested
       if (showSelectorOnLoad) {
@@ -92,13 +91,9 @@ export default function VocabularyPracticePage() {
     }
   };
 
-  const loadSet = (setId, words = allWords) => {
-    const startIdx = (setId - 1) * WORDS_PER_SET;
-    const endIdx = startIdx + WORDS_PER_SET;
-    const setWords = words.slice(startIdx, endIdx);
-    
-    setCurrentSetId(setId);
-    setCurrentSetWords(setWords);
+  const loadSet = (set) => {
+    setCurrentSet(set);
+    setCurrentSetId(set.set_number);
     setPhase('flashcards');
     setFlashcardIndex(0);
     setFlashcardResults({ known: 0, unknown: 0 });
@@ -111,9 +106,16 @@ export default function VocabularyPracticePage() {
     setShowResult(false);
   };
 
+  const selectSetById = (setNumber) => {
+    const selectedSet = vocabularySets.find(s => s.set_number === setNumber);
+    if (selectedSet) {
+      loadSet(selectedSet);
+    }
+  };
+
   // Flashcard handlers
   const handleFlashcardAnswer = async (isKnown) => {
-    const currentWord = currentSetWords[flashcardIndex];
+    const currentWord = currentSet.words[flashcardIndex];
     
     setAnsweredFlashcards(prev => [...prev, { ...currentWord, isKnown }]);
     setFlashcardResults(prev => ({
@@ -123,9 +125,10 @@ export default function VocabularyPracticePage() {
 
     // Save progress
     try {
+      const wordId = `${currentSet.id}_${flashcardIndex}`;
       const existingProgress = await base44.entities.VocabularyProgress.filter({
         user_email: user.email,
-        word_id: currentWord.id
+        word_id: wordId
       });
 
       if (existingProgress.length > 0) {
@@ -141,12 +144,12 @@ export default function VocabularyPracticePage() {
         });
       } else {
         await base44.entities.VocabularyProgress.create({
-          word_id: currentWord.id,
+          word_id: wordId,
           user_email: user.email,
           subject_id: user.selected_subject || 'אנגלית',
           unit_level: user.selected_units || 3,
-          hebrew_word: currentWord.hebrew_word,
-          english_word: currentWord.english_answer,
+          hebrew_word: currentWord.hebrew,
+          english_word: currentWord.english,
           times_seen: 1,
           times_correct: isKnown ? 1 : 0,
           times_incorrect: isKnown ? 0 : 1,
@@ -161,86 +164,52 @@ export default function VocabularyPracticePage() {
     }
 
     // Move to next or transition to quiz
-    if (flashcardIndex < currentSetWords.length - 1) {
+    if (flashcardIndex < currentSet.words.length - 1) {
       setTimeout(() => setFlashcardIndex(prev => prev + 1), 200);
     } else {
-      // Generate quiz questions and move to quiz phase
-      const generatedQuestions = generateQuestions(currentSetWords);
+      // Generate quiz questions from the set's predefined questions
+      const generatedQuestions = generateQuestionsFromSet(currentSet);
       setQuestions(generatedQuestions);
       setTimeout(() => setPhase('quiz'), 500);
     }
   };
 
-  const generateQuestions = (words) => {
-    const questionTypes = ['multiple_choice', 'fill_blank', 'write', 'translate'];
+  const generateQuestionsFromSet = (set) => {
     const questions = [];
-
-    words.forEach((word, idx) => {
-      const type = questionTypes[idx % questionTypes.length];
-      
-      if (type === 'multiple_choice') {
-        const otherWords = allWords.filter(w => w.id !== word.id);
-        const shuffled = otherWords.sort(() => Math.random() - 0.5).slice(0, 3);
-        const options = [
-          word.english_answer,
-          ...shuffled.map(w => w.english_answer)
-        ].sort(() => Math.random() - 0.5);
-
-        questions.push({
-          type: 'multiple_choice',
-          word: word,
-          question: `מה התרגום של "${word.hebrew_word}"?`,
-          options: options,
-          correctAnswer: word.english_answer
-        });
-      } else if (type === 'fill_blank') {
-        const hint = word.english_answer.charAt(0) + '_'.repeat(word.english_answer.length - 1);
-        questions.push({
-          type: 'fill_blank',
-          word: word,
-          question: `השלם: "${word.hebrew_word}"`,
-          hint: hint,
-          correctAnswer: word.english_answer
-        });
-      } else if (type === 'translate') {
-        const otherWords = allWords.filter(w => w.id !== word.id);
-        const shuffled = otherWords.sort(() => Math.random() - 0.5).slice(0, 3);
-        const options = [
-          word.hebrew_word,
-          ...shuffled.map(w => w.hebrew_word)
-        ].sort(() => Math.random() - 0.5);
-
-        questions.push({
-          type: 'translate',
-          word: word,
-          question: `מה המילה בעברית?`,
-          englishWord: word.english_answer,
-          options: options,
-          correctAnswer: word.hebrew_word
+    
+    set.words.forEach((word, wordIdx) => {
+      if (word.questions && word.questions.length > 0) {
+        // Use predefined questions from the set
+        word.questions.forEach((q, qIdx) => {
+          questions.push({
+            id: `${wordIdx}_${qIdx}`,
+            type: q.type,
+            word: word,
+            question: q.q,
+            correctAnswer: q.a,
+            options: q.options || null,
+            hint: q.type === 'fill' ? q.a.charAt(0) + '_'.repeat(q.a.length - 1) : null
+          });
         });
       } else {
+        // Generate default questions if none provided
         questions.push({
-          type: 'write',
+          id: `${wordIdx}_default`,
+          type: 'translate',
           word: word,
-          question: `תרגם לאנגלית: "${word.hebrew_word}"`,
-          correctAnswer: word.english_answer
+          question: `מה פירוש ${word.english}?`,
+          correctAnswer: word.hebrew,
+          options: null
         });
       }
     });
 
-    return questions.sort(() => Math.random() - 0.5);
+    return questions.sort(() => Math.random() - 0.5).slice(0, 10); // Max 10 questions
   };
 
   const checkAnswer = (answer) => {
     const question = questions[quizIndex];
-    const correct = answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-    
-    const acceptableAnswers = question.word.acceptable_answers || [];
-    const isAcceptable = acceptableAnswers.some(a => 
-      a.toLowerCase().trim() === answer.toLowerCase().trim()
-    );
-
-    return correct || isAcceptable;
+    return answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
   };
 
   const handleQuizSubmit = async (selectedAnswer = null) => {
@@ -258,9 +227,10 @@ export default function VocabularyPracticePage() {
 
     // Update progress
     try {
+      const wordId = `${currentSet.id}_${currentSet.words.indexOf(question.word)}`;
       const existingProgress = await base44.entities.VocabularyProgress.filter({
         user_email: user.email,
-        word_id: question.word.id
+        word_id: wordId
       });
 
       if (existingProgress.length > 0) {
@@ -290,8 +260,9 @@ export default function VocabularyPracticePage() {
   };
 
   const goToNextSet = () => {
-    if (currentSetId < totalSets) {
-      loadSet(currentSetId + 1);
+    const nextSet = vocabularySets.find(s => s.set_number === currentSetId + 1);
+    if (nextSet) {
+      loadSet(nextSet);
     }
   };
 
@@ -303,7 +274,7 @@ export default function VocabularyPracticePage() {
     );
   }
 
-  if (currentSetWords.length === 0) {
+  if (!currentSet || currentSet.words.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
@@ -321,7 +292,7 @@ export default function VocabularyPracticePage() {
     const accuracy = questions.length > 0 ? Math.round((quizResults.correct / questions.length) * 100) : 0;
     const wrongQuestions = answeredQuestions.filter(q => !q.isCorrect);
     const correctQuestions = answeredQuestions.filter(q => q.isCorrect);
-    const hasNextSet = currentSetId < totalSets;
+    const hasNextSet = vocabularySets.some(s => s.set_number === currentSetId + 1);
     
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -356,7 +327,7 @@ export default function VocabularyPracticePage() {
               <div className="flex flex-wrap gap-1">
                 {correctQuestions.slice(0, 6).map((q, idx) => (
                   <span key={idx} className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">
-                    {q.word.english_answer}
+                    {q.word.english}
                   </span>
                 ))}
               </div>
@@ -369,7 +340,7 @@ export default function VocabularyPracticePage() {
               <div className="flex flex-wrap gap-1">
                 {wrongQuestions.map((q, idx) => (
                   <span key={idx} className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs">
-                    {q.word.english_answer}
+                    {q.word.english}
                   </span>
                 ))}
               </div>
@@ -403,7 +374,7 @@ export default function VocabularyPracticePage() {
             )}
 
             <Button
-              onClick={() => loadSet(currentSetId)}
+              onClick={() => loadSet(currentSet)}
               variant="ghost"
               className="w-full h-10 text-sm"
             >
@@ -465,16 +436,10 @@ export default function VocabularyPracticePage() {
             >
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-4">
                 <div className="text-xs text-gray-400 mb-3 uppercase tracking-wide">
-                  {question.type === 'multiple_choice' ? 'בחירה' : 
-                   question.type === 'fill_blank' ? 'השלמה' : 
+                  {question.type === 'choose' ? 'בחירה' : 
+                   question.type === 'fill' ? 'השלמה' : 
                    question.type === 'translate' ? 'תרגום' : 'כתיבה'}
                 </div>
-                
-                {question.type === 'translate' && (
-                  <div className="text-2xl font-bold text-gray-900 mb-3" dir="ltr">
-                    {question.englishWord}
-                  </div>
-                )}
                 
                 <h2 className="text-lg font-semibold text-gray-900">{question.question}</h2>
                 
@@ -485,14 +450,13 @@ export default function VocabularyPracticePage() {
 
               {!showResult ? (
                 <div className="space-y-3">
-                  {(question.type === 'multiple_choice' || question.type === 'translate') ? (
+                  {question.options ? (
                     <div className="space-y-2">
                       {question.options.map((option, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleQuizSubmit(option)}
                           className="w-full bg-white rounded-xl p-4 text-right border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all"
-                          dir={question.type === 'translate' ? 'rtl' : 'ltr'}
                         >
                           <span className="text-base font-medium text-gray-900">{option}</span>
                         </button>
@@ -505,7 +469,7 @@ export default function VocabularyPracticePage() {
                         onChange={(e) => setUserAnswer(e.target.value)}
                         placeholder="הקלד את התשובה..."
                         className="h-12 text-base"
-                        dir="ltr"
+                        dir="auto"
                         autoFocus
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && userAnswer.trim()) {
@@ -543,7 +507,7 @@ export default function VocabularyPracticePage() {
                     {!isCorrect && (
                       <div className="bg-white rounded-lg p-3 mt-2">
                         <div className="text-xs text-gray-500 mb-1">התשובה הנכונה:</div>
-                        <div className="font-semibold text-gray-900" dir="ltr">
+                        <div className="font-semibold text-gray-900">
                           {question.correctAnswer}
                         </div>
                       </div>
@@ -565,11 +529,11 @@ export default function VocabularyPracticePage() {
         <SetSelectorDialog 
           open={showSetSelector} 
           onOpenChange={setShowSetSelector}
-          totalSets={totalSets}
+          sets={vocabularySets}
           currentSetId={currentSetId}
-          onSelectSet={(setId) => {
+          onSelectSet={(setNumber) => {
             setShowSetSelector(false);
-            loadSet(setId);
+            selectSetById(setNumber);
           }}
         />
       </div>
@@ -577,8 +541,8 @@ export default function VocabularyPracticePage() {
   }
 
   // FLASHCARDS PHASE
-  const currentWord = currentSetWords[flashcardIndex];
-  const flashcardProgress = ((flashcardIndex + 1) / currentSetWords.length) * 100;
+  const currentWord = currentSet.words[flashcardIndex];
+  const flashcardProgress = ((flashcardIndex + 1) / currentSet.words.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -591,7 +555,7 @@ export default function VocabularyPracticePage() {
         </button>
         <div className="text-center">
           <span className="text-sm font-medium text-gray-900">סט {currentSetId}</span>
-          <span className="text-xs text-gray-500 block">{flashcardIndex + 1} / {currentSetWords.length}</span>
+          <span className="text-xs text-gray-500 block">{flashcardIndex + 1} / {currentSet.words.length}</span>
         </div>
         <div className="w-9" />
       </div>
@@ -607,7 +571,7 @@ export default function VocabularyPracticePage() {
         >
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
             <div className="text-3xl font-bold text-gray-900 mb-4" dir="ltr">
-              {currentWord.english_answer}
+              {currentWord.english}
             </div>
             
             {currentWord.example_sentence && (
@@ -617,7 +581,7 @@ export default function VocabularyPracticePage() {
             )}
 
             <div className="text-lg text-gray-600 pt-4 border-t border-gray-100">
-              {currentWord.hebrew_word}
+              {currentWord.hebrew}
             </div>
           </div>
 
@@ -644,20 +608,18 @@ export default function VocabularyPracticePage() {
       <SetSelectorDialog 
         open={showSetSelector} 
         onOpenChange={setShowSetSelector}
-        totalSets={totalSets}
+        sets={vocabularySets}
         currentSetId={currentSetId}
-        onSelectSet={(setId) => {
+        onSelectSet={(setNumber) => {
           setShowSetSelector(false);
-          loadSet(setId);
+          selectSetById(setNumber);
         }}
       />
     </div>
   );
 }
 
-function SetSelectorDialog({ open, onOpenChange, totalSets, currentSetId, onSelectSet }) {
-  const sets = Array.from({ length: totalSets }, (_, i) => i + 1);
-  
+function SetSelectorDialog({ open, onOpenChange, sets, currentSetId, onSelectSet }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
@@ -666,28 +628,28 @@ function SetSelectorDialog({ open, onOpenChange, totalSets, currentSetId, onSele
         </DialogHeader>
         <div className="overflow-y-auto max-h-[60vh] py-2">
           <div className="space-y-3">
-            {sets.map(setId => (
+            {sets.map(set => (
               <button
-                key={setId}
-                onClick={() => onSelectSet(setId)}
+                key={set.id}
+                onClick={() => onSelectSet(set.set_number)}
                 className={`w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all ${
-                  setId === currentSetId 
+                  set.set_number === currentSetId 
                     ? 'border-blue-500 bg-blue-50' 
                     : 'border-gray-100 hover:border-blue-300 bg-white'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold ${
-                    setId === currentSetId ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
+                    set.set_number === currentSetId ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
                   }`}>
-                    {setId}
+                    {set.set_number}
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-gray-900">סט {setId}</div>
-                    <div className="text-sm text-blue-600">מילים {(setId - 1) * 10 + 1} - {setId * 10}</div>
+                    <div className="font-bold text-gray-900">סט {set.set_number}</div>
+                    <div className="text-sm text-blue-600">מילים {(set.set_number - 1) * 10 + 1} - {set.set_number * 10}</div>
                   </div>
                 </div>
-                {setId === currentSetId && (
+                {set.set_number === currentSetId && (
                   <Check className="w-5 h-5 text-blue-600" />
                 )}
               </button>
