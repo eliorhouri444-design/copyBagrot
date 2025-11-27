@@ -196,6 +196,8 @@ export default function VocabularyTrainingPage() {
       known: prev.known + (isKnown ? 1 : 0),
       unknown: prev.unknown + (isKnown ? 0 : 1)
     }));
+    
+    setIsFlipped(false); // Reset flip for next card
 
     // Save progress
     try {
