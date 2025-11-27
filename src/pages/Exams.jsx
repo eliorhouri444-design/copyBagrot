@@ -815,23 +815,9 @@ export default function ExamsPage() {
                         const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                         return (
                           <div className="bg-gray-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="bg-transparent text-[#000000] text-sm font-bold">טעויות בבגרות </h4>
-                              </div>
-                              <p className="text-[#000000] mb-2 text-sm">
-                                {wrongCount} שאלות שטעית בהן במבחן הזה
+                              <p className="text-[#000000] text-sm font-bold">
+                                תקן טעויות
                               </p>
-                              <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
-                                sessionStorage.setItem('mistakesExamId', attempt.exam_id);
-                                navigate(createPageUrl("ExamMistakesPractice"));
-                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-600 from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
-
-                                <Target className="text-white" />
-                                תרגל {wrongCount} טעויות
-                              </Button>
                             </div>);
 
                       })()}
