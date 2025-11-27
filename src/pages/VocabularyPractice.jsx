@@ -22,6 +22,7 @@ export default function VocabularyPracticePage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const requestedSetId = urlParams.get('set');
+  const showSelectorOnLoad = urlParams.get('selectSet') === 'true';
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,6 +79,11 @@ export default function VocabularyPracticePage() {
       }
       
       loadSet(startSet, words);
+      
+      // Show set selector if requested
+      if (showSelectorOnLoad) {
+        setShowSetSelector(true);
+      }
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
