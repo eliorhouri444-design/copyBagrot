@@ -62,7 +62,6 @@ import LearningPlan from './pages/LearningPlan';
 import Readiness from './pages/Readiness';
 import Home from './pages/Home';
 import Settings from './pages/Settings';
-import StudyPlan from './pages/StudyPlan';
 import ExamMistakesPractice from './pages/ExamMistakesPractice';
 import __Layout from './Layout.jsx';
 
@@ -132,7 +131,6 @@ export const PAGES = {
     "Readiness": Readiness,
     "Home": Home,
     "Settings": Settings,
-    "StudyPlan": StudyPlan,
     "ExamMistakesPractice": ExamMistakesPractice,
 }
 
