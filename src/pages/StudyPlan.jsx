@@ -259,11 +259,17 @@ export default function StudyPlanPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg p-5">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-orange-600" />
-              מה צריך כדי להגיע ל-{targetScore}
-            </h2>
+            className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-[#3B82F6] p-4">
+              <div className="flex items-center gap-3 text-white">
+                <div className="flex-1 text-right">
+                  <h3 className="text-base font-bold">מה צריך כדי להגיע ל-{targetScore}</h3>
+                  <p className="text-xs opacity-90">התוכנית שלך להצלחה</p>
+                </div>
+                <Target className="w-7 h-7" />
+              </div>
+            </div>
+            <div className="p-5">
             
             <div className="space-y-3">
               <div className="flex items-center justify-between">
