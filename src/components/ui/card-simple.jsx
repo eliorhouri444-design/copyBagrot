@@ -6,7 +6,7 @@ export function CardSimple({ children, className = "", delay = 0 }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }} className="bg-indigo-50 p-4 rounded-xl">
+      transition={{ delay }} className="bg-blue-100 p-4 rounded-xl">
 
 
       {children}
