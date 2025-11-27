@@ -213,11 +213,11 @@ export default function StudyPlanPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`rounded-2xl p-4 flex items-center gap-3 ${
-              paceStatus.status === 'ahead' ? 'bg-green-100 border-2 border-green-300' :
-              paceStatus.status === 'on_track' ? 'bg-blue-100 border-2 border-blue-300' :
-              paceStatus.status === 'behind' ? 'bg-yellow-100 border-2 border-yellow-300' :
-              'bg-red-100 border-2 border-red-300'
+            className={`bg-white rounded-2xl shadow-lg p-4 flex items-center gap-3 border-r-4 ${
+              paceStatus.status === 'ahead' ? 'border-r-green-500' :
+              paceStatus.status === 'on_track' ? 'border-r-blue-500' :
+              paceStatus.status === 'behind' ? 'border-r-yellow-500' :
+              'border-r-red-500'
             }`}>
             <span className="text-3xl">{paceStatus.icon}</span>
             <div className="flex-1">
