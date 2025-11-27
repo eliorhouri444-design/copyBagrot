@@ -322,14 +322,32 @@ export default function VocabularyTrainingPage() {
     setIsSaving(true);
     try {
       const data = JSON.parse(bulkJsonText);
-      const setsToAdd = data.vocabularySets || data;
+      
+      // Support multiple formats:
+      // 1. { vocabularySets: [...] }
+      // 2. [ { setNumber: 1, words: [...] }, ... ]
+      // 3. { setNumber: 1, words: [...] } (single set)
+      let setsToAdd;
+      if (data.vocabularySets) {
+        setsToAdd = data.vocabularySets;
+      } else if (Array.isArray(data)) {
+        setsToAdd = data;
+      } else if (data.setNumber || data.set_number || data.words) {
+        // Single set object
+        setsToAdd = [data];
+      } else {
+        throw new Error('פורמט לא מזוהה');
+      }
 
+      let addedCount = 0;
       for (const setData of setsToAdd) {
+        const setNumber = setData.setNumber || setData.set_number || (addedCount + 1);
+        
         await base44.entities.VocabularySet.create({
-          set_number: setData.setNumber || setData.set_number,
+          set_number: setNumber,
           subject_id: displaySubject,
           unit_level: displayUnits,
-          title: setData.title || `סט ${setData.setNumber || setData.set_number}`,
+          title: setData.title || `סט ${setNumber}`,
           words: setData.words.map(w => ({
             english: w.english,
             hebrew: w.hebrew,
@@ -337,17 +355,18 @@ export default function VocabularyTrainingPage() {
             questions: w.questions || []
           })),
           is_active: true,
-          order: setData.setNumber || setData.set_number
+          order: setNumber
         });
+        addedCount++;
       }
 
       setShowBulkJsonDialog(false);
       setBulkJsonText('');
       loadData();
-      alert(`${setsToAdd.length} סטים נוספו בהצלחה! ✅`);
+      alert(`${addedCount} סטים נוספו בהצלחה! ✅`);
     } catch (error) {
       console.error("Error importing JSON:", error);
-      alert('שגיאה בייבוא - ודא שה-JSON תקין');
+      alert('שגיאה בייבוא - ודא שה-JSON תקין\n' + error.message);
     } finally {
       setIsSaving(false);
     }
