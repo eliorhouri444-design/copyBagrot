@@ -780,7 +780,7 @@ export default function VocabularyTrainingPage() {
             {/* Flashcard with flip animation */}
             <div 
               className="relative cursor-pointer"
-              onClick={() => !isFlipped && setIsFlipped(true)}
+              onClick={() => setIsFlipped(!isFlipped)}
               style={{ perspective: '1000px', height: '280px' }}
             >
               <motion.div
