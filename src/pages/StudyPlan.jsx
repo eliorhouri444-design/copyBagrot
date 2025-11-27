@@ -706,10 +706,28 @@ export default function StudyPlanPage() {
                         פרימיום בלבד
                       </div>
                     )}
+                    {task.improvement && isPremium && (
+                      <div className="mt-2 text-xs text-green-600 font-medium">
+                        📈 +{task.improvement}% במוכנות
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
+            
+            {dailyPlan?.expectedImprovement > 0 && (
+              <div className="mt-4 p-3 bg-green-50 rounded-xl border-2 border-green-200">
+                <div className="text-center">
+                  <div className="text-sm text-green-800 font-medium">
+                    אם תסיים את כל המשימות היום:
+                  </div>
+                  <div className="text-lg font-bold text-green-700 mt-1">
+                    +{dailyPlan.expectedImprovement}% במוכנות
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
