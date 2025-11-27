@@ -76,6 +76,7 @@ export default function VocabularyTrainingPage() {
   const [setPhase, setSetPhase] = useState('flashcards'); // 'flashcards' | 'quiz' | 'summary'
   const [flashcardIndex, setFlashcardIndex] = useState(0);
   const [flashcardResults, setFlashcardResults] = useState({ known: 0, unknown: 0 });
+  const [isFlipped, setIsFlipped] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState('');
