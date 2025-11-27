@@ -454,6 +454,7 @@ export default function StudyPlanPage() {
               </span>
             </div>
           )}
+          </div>
         </motion.div>
 
         {/* Premium Upsell for Free Users */}
