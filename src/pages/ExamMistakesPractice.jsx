@@ -386,7 +386,7 @@ Return JSON:`,
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder="נסה שוב - הקלד את תשובתך..."
-                className="w-full h-32 p-4 text-base border-2 border-blue-500 focus:border-blue-500 rounded-2xl resize-none"
+                className="w-full h-32 p-4 text-base border-2 border-blue-500 focus:border-blue-600 rounded-2xl resize-none"
                 autoFocus
                 disabled={isChecking} />
 
