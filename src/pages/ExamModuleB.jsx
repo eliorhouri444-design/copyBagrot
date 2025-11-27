@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, FileText, AlertTriangle, BookOpen, Info, Zap, Loader2, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
@@ -1225,7 +1225,7 @@ export default function ExamModuleBPage() {
           </div>
           <Progress
             value={progress}
-            className="h-2"
+            className="h-2 [&>div]:bg-white"
           />
         </div>
 

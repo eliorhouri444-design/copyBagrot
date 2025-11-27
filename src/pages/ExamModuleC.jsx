@@ -1277,7 +1277,7 @@ export default function ExamModuleCPage() {
         <h1 className="text-xl font-bold text-white text-center mb-2">{exam.title}</h1>
         {currentSection === 'reading' && (
           <>
-            <Progress value={progress} className="h-2 bg-white/20" />
+            <Progress value={progress} className="h-2 bg-white/20 [&>div]:bg-white" />
             <div className="flex justify-between text-white text-xs mt-2">
               <span>שאלה {currentQuestion + 1} מתוך {exam.questions.length}</span>
             </div>

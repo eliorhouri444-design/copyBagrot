@@ -956,7 +956,7 @@ export default function ExamGenericPage() {
         </div>
 
         <h1 className="text-base font-bold text-white text-center mb-2">{exam.title}</h1>
-        <Progress value={progress} className="h-1.5 bg-white/20" />
+        <Progress value={progress} className="h-1.5 bg-white/20 [&>div]:bg-white" />
         <div className="flex justify-between text-white text-xs mt-1">
           <span>שאלה {currentQuestion + 1} מתוך {exam.questions.length}</span>
         </div>

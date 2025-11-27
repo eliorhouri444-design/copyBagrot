@@ -1,12 +1,11 @@
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   ArrowLeft, Clock, Calculator, ChevronRight, ChevronLeft,
   CheckCircle, X, AlertCircle, Loader2, Flag, Lightbulb,
-  Grid3x3, BookOpen, Pencil
+  Grid3x3, BookOpen, Pencil, Eraser
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -967,7 +966,7 @@ export default function ExamMathPage() {
 
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <Progress value={progress} className="h-1.5 bg-slate-200" />
+              <Progress value={progress} className="h-1.5 bg-slate-200 [&>div]:bg-white" />
             </div>
             <span className="text-sm font-semibold text-slate-600 min-w-[60px] text-center">
               {currentQuestion + 1} / {exam.questions.length}

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -296,7 +295,7 @@ export default function ExamLiteraturePage() {
             </div>
             <div className="text-sm">שאלה <span className="font-bold text-lg text-pink-600">{currentQuestion+1}</span> / {exam.questions.length}</div>
           </div>
-          <Progress value={progress} className="h-2 mt-3" />
+          <Progress value={progress} className="h-2 mt-3 [&>div]:bg-white" />
         </div>
 
         <AnimatePresence mode="wait">
