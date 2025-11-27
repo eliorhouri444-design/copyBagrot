@@ -327,7 +327,7 @@ Return JSON:`,
           <div className="w-10" />
         </div>
 
-        <Progress value={progress} className="h-2 bg-white/20" />
+        <Progress value={progress} className="h-2 bg-white/20 [&>div]:bg-white" />
       </div>
 
       <div className="bg-gray-100 p-4 flex-1 flex items-center justify-center">
