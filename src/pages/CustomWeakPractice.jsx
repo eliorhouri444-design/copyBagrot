@@ -322,17 +322,19 @@ Return JSON:`,
     }
   };
 
+  // עדכון המשימה היומית כשמגיעים לסיכום
+  useEffect(() => {
+    if (showSummary) {
+      updateDailyTask();
+    }
+  }, [showSummary]);
+
   if (showSummary) {
     const correctCount = Object.values(answers).filter(a => a.correct).length;
     const totalAnswered = Object.keys(answers).length;
     const avgScore = totalAnswered > 0 
       ? Object.values(answers).reduce((sum, a) => sum + (a.score || 0), 0) / totalAnswered 
       : 0;
-
-    // עדכון המשימה היומית
-    useEffect(() => {
-      updateDailyTask();
-    }, []);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
