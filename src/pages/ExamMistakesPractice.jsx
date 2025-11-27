@@ -372,7 +372,8 @@ Return JSON:`,
               </div>
             }
 
-            <div className="bg-zinc-50 p-4 rounded-xl">
+            <div className="bg-zinc-50 p-4 rounded-xl border-2 border-blue-500">
+              <div className="text-sm font-bold text-blue-600 mb-2">📝 השאלה:</div>
               <p className="text-[#030202] text-base leading-relaxed whitespace-pre-wrap">
                 {question.question_text}
               </p>
