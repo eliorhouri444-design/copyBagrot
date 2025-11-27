@@ -545,6 +545,7 @@ export default function StudyPlanPage() {
                   <div className="font-bold text-blue-600 text-lg">
                     {requirements.questionsSolved} מתוך {requirements.questionsTarget}
                   </div>
+                  <div className="text-xs text-gray-500">{requirements.questionsPerDay} ליום</div>
                 </div>
                 <Progress value={(requirements.questionsSolved / requirements.questionsTarget) * 100} className="w-24 h-2" />
               </div>
@@ -555,6 +556,7 @@ export default function StudyPlanPage() {
                   <div className="font-bold text-purple-600 text-lg">
                     {requirements.examsDone} מתוך {requirements.examsTarget}
                   </div>
+                  <div className="text-xs text-gray-500">{requirements.examsPerWeek} לשבוע</div>
                 </div>
                 <Progress value={(requirements.examsDone / requirements.examsTarget) * 100} className="w-24 h-2" />
               </div>
@@ -563,7 +565,7 @@ export default function StudyPlanPage() {
                 <div className="flex-1">
                   <div className="text-sm text-gray-700 mb-1">נושאים לשליטה:</div>
                   <div className="font-bold text-orange-600 text-lg">
-                    {requirements.topicsToMaster} שאינם ברמת שליטה
+                    {requirements.topicsToMaster} שאינם ברמת שליטה (85%+)
                   </div>
                 </div>
               </div>
@@ -574,6 +576,7 @@ export default function StudyPlanPage() {
                   <div className="font-bold text-red-600 text-lg">
                     {requirements.mistakesToFix} טעויות פעילות
                   </div>
+                  <div className="text-xs text-gray-500">{requirements.mistakesPerDay} ליום</div>
                 </div>
               </div>
 
@@ -584,6 +587,11 @@ export default function StudyPlanPage() {
                     זמן משוער להגעה ליעד: <strong>{requirements.estimatedDays} ימים</strong>
                   </span>
                 </div>
+                {requirements.daysUntilExam && requirements.estimatedDays > requirements.daysUntilExam && (
+                  <div className="text-xs text-red-600 mt-1 font-medium">
+                    ⚠️ נדרש מאמץ מוגבר - הבגרות בעוד {requirements.daysUntilExam} ימים!
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
