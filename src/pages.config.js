@@ -65,6 +65,7 @@ import Settings from './pages/Settings';
 import ExamMistakesPractice from './pages/ExamMistakesPractice';
 import StudyPlan from './pages/StudyPlan';
 import CustomPracticeSession from './pages/CustomPracticeSession';
+import VocabularyTraining from './pages/VocabularyTraining';
 import __Layout from './Layout.jsx';
 
 
@@ -136,6 +137,7 @@ export const PAGES = {
     "ExamMistakesPractice": ExamMistakesPractice,
     "StudyPlan": StudyPlan,
     "CustomPracticeSession": CustomPracticeSession,
+    "VocabularyTraining": VocabularyTraining,
 }
 
 export const pagesConfig = {
