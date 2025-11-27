@@ -36,7 +36,7 @@ export default function ExamMistakesPracticePage() {
       // קבל את פרטי הניסיון מ-sessionStorage
       const attemptId = sessionStorage.getItem('mistakesExamAttemptId');
       const examId = sessionStorage.getItem('mistakesExamId');
-      
+
       // נקה את ה-sessionStorage
       sessionStorage.removeItem('mistakesExamAttemptId');
       sessionStorage.removeItem('mistakesExamId');
@@ -49,8 +49,8 @@ export default function ExamMistakesPracticePage() {
 
       // טען את הניסיון המקורי
       const attempts = await base44.entities.ExamAttempt.list("-created_date", 500);
-      const attempt = attempts.find(a => a.id === attemptId);
-      
+      const attempt = attempts.find((a) => a.id === attemptId);
+
       if (!attempt) {
         console.log('Attempt not found, redirecting to Exams');
         navigate(createPageUrl("Exams"));
@@ -61,14 +61,14 @@ export default function ExamMistakesPracticePage() {
 
       // טען את המבחן המקורי כדי לקבל את השאלות המלאות
       const [genericExams, moduleAExams, moduleBExams, moduleCExams] = await Promise.all([
-        base44.entities.GenericExam.list(),
-        base44.entities.ModuleAExam.list(),
-        base44.entities.ModuleBExam.list(),
-        base44.entities.ModuleCExam.list()
-      ]);
+      base44.entities.GenericExam.list(),
+      base44.entities.ModuleAExam.list(),
+      base44.entities.ModuleBExam.list(),
+      base44.entities.ModuleCExam.list()]
+      );
 
       const allExams = [...genericExams, ...moduleAExams, ...moduleBExams, ...moduleCExams];
-      const exam = allExams.find(e => e.id === examId);
+      const exam = allExams.find((e) => e.id === examId);
 
       if (!exam) {
         console.log('Exam not found, redirecting to Exams');
@@ -84,14 +84,14 @@ export default function ExamMistakesPracticePage() {
       });
 
       // מצא את השאלות שהמשתמש טעה בהן
-      const wrongAnswers = attempt.answers?.filter(a => !a.is_correct) || [];
-      
+      const wrongAnswers = attempt.answers?.filter((a) => !a.is_correct) || [];
+
       // בנה את רשימת השאלות מהטעויות
       const mistakeQuestions = wrongAnswers.map((wrongAnswer, idx) => {
         // מצא את השאלה המקורית מהמבחן
         const questionIndex = wrongAnswer.question_index ?? wrongAnswer.item_id ?? idx;
         const originalQuestion = exam.questions?.[questionIndex] || {};
-        
+
         return {
           ...originalQuestion,
           question_text: wrongAnswer.question_text || originalQuestion.question_text || `שאלה ${questionIndex + 1}`,
@@ -119,7 +119,7 @@ export default function ExamMistakesPracticePage() {
 
   const checkAnswer = async () => {
     if (!userAnswer.trim() || isChecking) return;
-    
+
     setIsChecking(true);
     const question = questions[currentIndex];
 
@@ -148,8 +148,8 @@ Return JSON:`,
       setIsCorrect(aiResponse.is_correct);
       setFeedback(aiResponse.feedback_hebrew);
       setShowResult(true);
-      
-      setAnswers(prev => ({
+
+      setAnswers((prev) => ({
         ...prev,
         [currentIndex]: {
           correct: aiResponse.is_correct,
@@ -168,7 +168,7 @@ Return JSON:`,
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
       setUserAnswer("");
       setShowResult(false);
       setIsCorrect(false);
@@ -179,7 +179,7 @@ Return JSON:`,
   };
 
   const handleSkip = () => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
       [currentIndex]: { correct: false, score: 0, userAnswer: "" }
     }));
@@ -193,16 +193,16 @@ Return JSON:`,
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
+          className="text-center">
+
           <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">טוען את הטעויות שלך...</h3>
           <p className="text-gray-600 font-semibold">מכין תרגול ממוקד</p>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   // אין שאלות
@@ -212,8 +212,8 @@ Return JSON:`,
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md"
-        >
+          className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md">
+
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-10 h-10 text-green-500" />
           </div>
@@ -221,24 +221,24 @@ Return JSON:`,
           <p className="text-gray-600 mb-6">
             כל הכבוד! לא נמצאו טעויות במבחן הזה.
           </p>
-          <Button 
+          <Button
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-          >
+            className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+
             חזרה לבגרויות
           </Button>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   // מסך סיכום
   if (showSummary) {
-    const correctCount = Object.values(answers).filter(a => a.correct).length;
+    const correctCount = Object.values(answers).filter((a) => a.correct).length;
     const totalAnswered = Object.keys(answers).length;
-    const avgScore = totalAnswered > 0 
-      ? Object.values(answers).reduce((sum, a) => sum + (a.score || 0), 0) / totalAnswered 
-      : 0;
+    const avgScore = totalAnswered > 0 ?
+    Object.values(answers).reduce((sum, a) => sum + (a.score || 0), 0) / totalAnswered :
+    0;
     const improvement = correctCount > 0;
 
     return (
@@ -246,8 +246,8 @@ Return JSON:`,
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full"
-        >
+          className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+
           <div className="text-center mb-6">
             <div className={`w-24 h-24 ${improvement ? 'bg-gradient-to-br from-green-400 to-emerald-500' : 'bg-gradient-to-br from-orange-400 to-red-500'} rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}>
               <Trophy className="w-12 h-12 text-white" />
@@ -267,50 +267,50 @@ Return JSON:`,
               </div>
               <div className="text-sm text-gray-600 mb-4">תשובות נכונות הפעם</div>
               
-              {improvement && (
-                <div className="bg-white rounded-xl p-3 border border-green-200">
+              {improvement &&
+              <div className="bg-white rounded-xl p-3 border border-green-200">
                   <div className="text-sm text-green-700 font-bold">
                     🎉 שיפרת {correctCount} תשובות מהמבחן המקורי!
                   </div>
                 </div>
-              )}
+              }
             </div>
           </div>
 
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg"
-            >
+              className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg">
+
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
             </Button>
             <Button
               onClick={() => navigate(createPageUrl("Exams"))}
               variant="outline"
-              className="w-full h-14 text-lg font-bold border-2"
-            >
+              className="w-full h-14 text-lg font-bold border-2">
+
               חזרה לבגרויות
             </Button>
           </div>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   const question = questions[currentIndex];
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const progress = (currentIndex + 1) / questions.length * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex flex-col">
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 p-4 shadow-xl flex-shrink-0">
+      <div className="bg-blue-500 p-4 from-orange-500 to-red-500 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="text-white hover:bg-white/20"
-          >
+            className="text-white hover:bg-white/20">
+
             <ArrowLeft className="w-6 h-6" />
           </Button>
 
@@ -330,104 +330,104 @@ Return JSON:`,
         <Progress value={progress} className="h-2 bg-white/20" />
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-4">
+      <div className="bg-gray-100 p-4 flex-1 flex items-center justify-center">
         <motion.div
           key={currentIndex}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-lg"
-        >
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-t-3xl border-b-2 border-orange-100">
+          className="bg-white rounded-3xl shadow-2xl w-full max-w-lg">
+
+          <div className="bg-[#ffffff] p-6 rounded-t-3xl from-orange-50 to-red-50 border-b-2 border-orange-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="bg-blue-500 rounded-xl w-12 h-12 from-orange-500 to-red-500 flex items-center justify-center shadow-lg">
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-[#000000] text-sm font-medium">
                   שאלה {question.question_number} - טעית בה במבחן
                 </div>
-                <div className="text-xs text-orange-600 font-bold">
+                <div className="text-[#000000] text-xs font-bold">
                   הזדמנות לתקן!
                 </div>
               </div>
             </div>
 
             {/* הצגת התשובה המקורית השגויה */}
-            {question.original_user_answer && (
-              <div className="bg-red-50 rounded-xl p-3 mb-3 border-2 border-red-200">
+            {question.original_user_answer &&
+            <div className="bg-red-50 rounded-xl p-3 mb-3 border-2 border-red-200">
                 <div className="flex items-center gap-2 mb-1">
                   <XCircle className="w-4 h-4 text-red-500" />
                   <div className="text-xs font-bold text-red-800">התשובה שלך במבחן:</div>
                 </div>
                 <p className="text-sm text-red-700">{question.original_user_answer}</p>
               </div>
-            )}
+            }
 
-            {question.reading_text && (
-              <div className="bg-white rounded-xl p-4 mb-4 border-2 border-orange-200">
-                <div className="text-xs font-bold text-orange-900 mb-2">📖 טקסט הקריאה:</div>
+            {question.reading_text &&
+            <div className="bg-white rounded-xl p-4 mb-4 border-2 border-orange-200">
+                <div className="text-[#000000] mb-2 text-xs font-bold">📖 טקסט הקריאה:</div>
                 <div className="text-sm text-gray-800 leading-relaxed max-h-48 overflow-y-auto">
                   {question.reading_text}
                 </div>
               </div>
-            )}
+            }
 
             <div className="bg-white rounded-xl p-4">
-              <p className="text-base text-gray-900 leading-relaxed whitespace-pre-wrap">
+              <p className="text-[#000000] text-base leading-relaxed whitespace-pre-wrap">
                 {question.question_text}
               </p>
             </div>
           </div>
 
-          <div className="p-6 pt-0">
-            {!showResult ? (
-              <div className="space-y-4">
+          <div className="bg-[#ffffff] p-6">
+            {!showResult ?
+            <div className="space-y-4">
                 <textarea
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="נסה שוב - הקלד את תשובתך..."
-                  className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
-                  autoFocus
-                  disabled={isChecking}
-                />
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                placeholder="נסה שוב - הקלד את תשובתך..."
+                className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
+                autoFocus
+                disabled={isChecking} />
+
 
                 <div className="flex gap-3">
                   <Button
-                    onClick={checkAnswer}
-                    disabled={!userAnswer.trim() || isChecking}
-                    className="flex-1 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg disabled:opacity-50"
-                  >
+                  onClick={checkAnswer}
+                  disabled={!userAnswer.trim() || isChecking}
+                  className="flex-1 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg disabled:opacity-50">
+
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />
                   </Button>
                   <Button
-                    onClick={handleSkip}
-                    variant="outline"
-                    className="px-6 h-14 text-lg font-semibold border-2"
-                  >
+                  onClick={handleSkip}
+                  variant="outline"
+                  className="px-6 h-14 text-lg font-semibold border-2">
+
                     דלג
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
-              >
+              </div> :
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4">
+
                 <div className={`rounded-2xl p-6 border-2 ${
-                  isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'
-                }`}>
+              isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`
+              }>
                   <div className="flex items-center gap-3 mb-3">
-                    {isCorrect ? (
-                      <CheckCircle className="w-10 h-10 text-green-600" />
-                    ) : (
-                      <XCircle className="w-10 h-10 text-red-600" />
-                    )}
+                    {isCorrect ?
+                  <CheckCircle className="w-10 h-10 text-green-600" /> :
+
+                  <XCircle className="w-10 h-10 text-red-600" />
+                  }
                     <div className="flex-1">
                       <div className={`text-xl font-bold ${
-                        isCorrect ? 'text-green-800' : 'text-red-800'
-                      }`}>
+                    isCorrect ? 'text-green-800' : 'text-red-800'}`
+                    }>
                         {isCorrect ? '🎉 מצוין! תיקנת את הטעות!' : 'עדיין לא נכון'}
                       </div>
                     </div>
@@ -439,17 +439,17 @@ Return JSON:`,
                 </div>
 
                 <Button
-                  onClick={handleNext}
-                  className="w-full h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xl font-bold shadow-lg"
-                >
+                onClick={handleNext}
+                className="w-full h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xl font-bold shadow-lg">
+
                   {currentIndex < questions.length - 1 ? 'השאלה הבאה' : 'סיים'}
                   <ChevronLeft className="w-6 h-6 mr-2" />
                 </Button>
               </motion.div>
-            )}
+            }
           </div>
         </motion.div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
