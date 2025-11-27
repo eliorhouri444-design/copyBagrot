@@ -409,7 +409,7 @@ export default function DailyPlanCard({
       .slice(0, 3);
   }, [modules, examAttempts]);
 
-  // שימוש במשימות מה-Engine אם קיימות
+  // שימוש במשימות מה-Engine אם קיימות, עם שילוב סטטוס מ-DailyPractice
   const engineTasks = useMemo(() => {
     if (!engineData?.dailyPlan?.tasks) return null;
     
@@ -422,22 +422,32 @@ export default function DailyPlanCard({
         'vocabulary': BookOpen
       };
       
+      // בדיקת סטטוס מהרשומה השמורה
+      const savedStatus = taskStatuses[task.id];
+      const currentProgress = savedStatus?.completed || 0;
+      const targetCount = task.count || 1;
+      const isCompleted = savedStatus?.status === 'done' || currentProgress >= targetCount;
+      
       return {
         id: task.id,
         type: task.type,
-        title: task.title,
-        description: task.description,
-        target: task.count || 1,
-        current: 0,
-        remaining: task.count || 1,
-        isCompleted: false,
+        title: isCompleted ? `✓ ${task.title}` : task.title,
+        description: isCompleted 
+          ? "הושלם!" 
+          : currentProgress > 0 
+            ? `${currentProgress}/${targetCount} הושלמו`
+            : task.description,
+        target: targetCount,
+        current: currentProgress,
+        remaining: Math.max(0, targetCount - currentProgress),
+        isCompleted,
         icon: iconMap[task.type] || Target,
         duration: task.duration,
         topic_id: task.topic_id,
         exam_id: task.exam_id
       };
     });
-  }, [engineData]);
+  }, [engineData, taskStatuses]);
 
   // בחירה בין המשימות מה-Engine או החישוב הישן
   const finalTasks = engineTasks || dailyTasks.tasks;
