@@ -812,9 +812,9 @@ export default function ExamsPage() {
                         </motion.button>
 
                         {hasMistakes && isPremium && (() => {
-                          const wrongCount = attempt.answers?.filter(a => !a.is_correct).length || 0;
-                          return (
-                            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
+                        const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
+                        return (
+                          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                               <div className="flex items-center gap-2 mb-2">
                                 <Target className="w-4 h-4 text-orange-600" />
                                 <h4 className="font-bold text-gray-900 text-[12px]">
@@ -825,19 +825,19 @@ export default function ExamsPage() {
                                 {wrongCount} שאלות שטעית בהן במבחן הזה
                               </p>
                               <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
-                                  sessionStorage.setItem('mistakesExamId', attempt.exam_id);
-                                  navigate(createPageUrl("ExamMistakesPractice"));
-                                }} 
-                                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-[11px] px-4 py-2 font-bold rounded-[14px] w-full h-9 flex items-center justify-center gap-2">
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
+                                sessionStorage.setItem('mistakesExamId', attempt.exam_id);
+                                navigate(createPageUrl("ExamMistakesPractice"));
+                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
+
                                 <Target className="w-3.5 h-3.5" />
                                 תרגל {wrongCount} טעויות
                               </Button>
-                            </div>
-                          );
-                        })()}
+                            </div>);
+
+                      })()}
                       </div>);
 
                 })}
@@ -1371,7 +1371,7 @@ export default function ExamsPage() {
                   </button>
 
                   {hasMistakes && (() => {
-                    const wrongCount = attempt.answers?.filter(a => !a.is_correct).length || 0;
+                    const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                     return (
                       <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-orange-200 mr-2">
                         <div className="flex items-center gap-2 mb-2">
@@ -1394,20 +1394,20 @@ export default function ExamsPage() {
                             }
                           }}
                           className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
-                          {isPremium ? (
-                            <>
+                          {isPremium ?
+                          <>
                               <Target className="w-3 h-3" />
                               <span>תרגל {wrongCount} טעויות</span>
-                            </>
-                          ) : (
-                            <>
+                            </> :
+
+                          <>
                               <Lock className="w-3 h-3" />
                               <span>שדרג לפרימיום</span>
                             </>
-                          )}
+                          }
                         </Button>
-                      </div>
-                    );
+                      </div>);
+
                   })()}
                 </div>);
 
