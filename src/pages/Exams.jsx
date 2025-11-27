@@ -847,7 +847,7 @@ export default function ExamsPage() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                   onClick={() => setShowAllExams(true)}
-                  variant="outline" className="bg-[#ffffff] text-blue-500 mt-2 px-4 py-2 text-sm font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
+                  variant="outline" className="bg-[#ffffff] text-blue-500 mt-2 px-4 py-2 text-sm font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-blue-500 w-full h-10 border-2 border-blue-500 hover:bg-[#F5F8FF]">
 
 
                       צפה בכל הבגרויות ({examAttempts.length})
