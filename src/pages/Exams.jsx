@@ -681,7 +681,7 @@ export default function ExamsPage() {
   }
 
   return (
-    <div className="bg-gray-100 pb-4 min-h-screen">
+    <div className="bg-blue-50 pb-4 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -695,7 +695,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      <div className="bg-gray-100 pb-6 px-6 space-y-6">
+      <div className="bg-blue-50 pb-6 px-6 space-y-6">
 
 
         <motion.div
