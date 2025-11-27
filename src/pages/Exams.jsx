@@ -1149,7 +1149,7 @@ export default function ExamsPage() {
 
 
 
-                      <div className="font-semibold text-gray-900 mb-2">שאלה {idx + 1}</div>
+
                       <div className="flex gap-2 text-sm mb-2">
                         <span className={answer.is_correct ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
                           תשובתך: {answer.user_answer || 'לא נענה'}
