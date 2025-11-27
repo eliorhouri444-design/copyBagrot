@@ -355,6 +355,7 @@ export default function StudyPlanPage() {
               <div className="text-xs text-red-600">לתרגול חוזר</div>
             </div>
           </div>
+          </div>
         </motion.div>
 
         {/* Daily Tasks - Dynamic from Engine */}
