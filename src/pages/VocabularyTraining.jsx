@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
   BookOpen, ChevronLeft, Layers, Target, AlertTriangle, 
-  RotateCcw, Loader2, Filter, Plus, Save, X, Trash2 
+  RotateCcw, Loader2, Filter, Plus, Save, X, Trash2, List, Upload, Check, ArrowLeft
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 import VocabularyDashboard from "@/components/vocabulary/VocabularyDashboard";
 import Flashcards from "@/components/vocabulary/Flashcards";
