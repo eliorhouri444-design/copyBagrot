@@ -1218,7 +1218,7 @@ export default function ExamsPage() {
                   className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                         <Target className="w-4 h-4" />
-                        {isPremium ? 'תרגול טעויות מהבגרות הזו' : '🔒 שדרג לפרימיום'}
+                        {isPremium ? 'תרגול טעויות מהמבחן הזה' : '🔒 שדרג לפרימיום'}
                     </Button>
                   </div>;
 
@@ -1381,7 +1381,7 @@ export default function ExamsPage() {
                     const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                     if (wrongCount === 0) return null;
                     return (
-                      <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
+                      <div className="bg-slate-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                         <div className="flex items-center gap-2 mb-2">
                           
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
@@ -1404,13 +1404,13 @@ export default function ExamsPage() {
                           className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
                           {isPremium ?
                           <>
-                              <span>תקן {wrongCount} טעויות</span>
                               <Target className="w-3 h-3" />
+                              <span>תקן {wrongCount} טעויות</span>
                             </> :
 
                           <>
-                              <span>שדרג לפרימיום</span>
                               <Lock className="w-3 h-3" />
+                              <span>שדרג לפרימיום</span>
                             </>
                           }
                         </Button>
