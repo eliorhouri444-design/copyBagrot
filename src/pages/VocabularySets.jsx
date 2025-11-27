@@ -126,7 +126,7 @@ export default function VocabularySetsPage() {
     sessionStorage.setItem('selectedVocabSets', JSON.stringify(selectedSets));
     sessionStorage.setItem('vocabSetsData', JSON.stringify(selectedSetObjects));
     
-    navigate(createPageUrl(`VocabularySetMode?multiSet=true&sets=${selectedSets.join(',')}`));
+    navigate(createPageUrl(`VocabularyFlashcards?multiSet=true&sets=${selectedSets.join(',')}`));
   };
 
   const handleBulkAdd = async () => {
@@ -327,7 +327,7 @@ export default function VocabularySetsPage() {
                     } else if (isLocked) {
                       navigate(createPageUrl("Premium"));
                     } else {
-                      navigate(createPageUrl(`VocabularySetMode?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`));
+                      navigate(createPageUrl(`VocabularyFlashcards?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`));
                     }
                   }}
                   className={`w-full bg-white rounded-2xl p-4 flex items-center gap-4 border-2 transition-all ${

@@ -128,15 +128,20 @@ export default function VocabularyFlashcardsPage() {
     return { text: "צריך לתרגל עוד, אל תוותר!", color: "text-red-600" };
   };
 
-  // Store words for quiz
-  const goToQuiz = () => {
-    sessionStorage.setItem('flashcardResults', JSON.stringify(answeredWords));
-    if (isMultiSet) {
-      navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
-    } else {
-      navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+  // Auto-continue to quiz
+  useEffect(() => {
+    if (showSummary) {
+      sessionStorage.setItem('flashcardResults', JSON.stringify(answeredWords));
+      const timer = setTimeout(() => {
+        if (isMultiSet) {
+          navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
+        } else {
+          navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [showSummary]);
 
   if (isLoading) {
     return (
@@ -148,64 +153,23 @@ export default function VocabularyFlashcardsPage() {
 
   if (showSummary) {
     const evaluation = getEvaluation();
-    const unknownWords = answeredWords.filter(w => !w.isKnown);
     
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full"
+          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full text-center"
         >
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">סיימת את הכרטיסיות</h2>
+          <div className="mb-4">
+            <div className="text-4xl font-bold text-gray-900">{results.known}/{words.length}</div>
+            <p className={`text-sm mt-2 ${evaluation.color}`}>{evaluation.text}</p>
           </div>
-
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">ידעת</span>
-              <span className="font-bold text-green-600">{results.known} מילים</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">לא ידעת</span>
-              <span className="font-bold text-red-600">{results.unknown} מילים</span>
-            </div>
-            <div className="pt-2">
-              <p className={`text-center font-semibold ${evaluation.color}`}>
-                {evaluation.text}
-              </p>
-            </div>
-          </div>
-
-          {unknownWords.length > 0 && (
-            <div className="bg-gray-50 rounded-xl p-4 mb-6">
-              <div className="text-sm text-gray-500 mb-2">מילים לחזרה:</div>
-              <div className="flex flex-wrap gap-2">
-                {unknownWords.slice(0, 5).map((word, idx) => (
-                  <span key={idx} className="bg-white px-2 py-1 rounded text-sm text-gray-700 border">
-                    {word.hebrew_word}
-                  </span>
-                ))}
-                {unknownWords.length > 5 && (
-                  <span className="text-sm text-gray-400">+{unknownWords.length - 5} עוד</span>
-                )}
-              </div>
-            </div>
-          )}
-
-          <Button
-            onClick={goToQuiz}
-            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-bold"
-          >
-            עבור לבוחן
-          </Button>
           
-          <button
-            onClick={() => navigate(createPageUrl("VocabularySets"))}
-            className="w-full mt-3 text-gray-500 text-sm hover:text-gray-700"
-          >
-            חזרה לנושאים
-          </button>
+          <div className="flex items-center justify-center gap-2 text-gray-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">עובר לבוחן...</span>
+          </div>
         </motion.div>
       </div>
     );
