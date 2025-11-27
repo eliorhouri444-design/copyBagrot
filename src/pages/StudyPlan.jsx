@@ -317,12 +317,18 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl shadow-lg p-5">
+          className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-blue-600" />
-            הביצועים שלך
-          </h2>
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">הביצועים שלך</h3>
+                <p className="text-xs opacity-90">סטטיסטיקות למידה</p>
+              </div>
+              <BarChart3 className="w-7 h-7" />
+            </div>
+          </div>
+          <div className="p-5">
           
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 p-4 rounded-xl">
