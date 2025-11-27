@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function CustomWeakPracticePage() {
   const navigate = useNavigate();
+  const urlParams = new URLSearchParams(window.location.search);
+  const taskIdFromUrl = urlParams.get("taskId");
+  
   const [user, setUser] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
