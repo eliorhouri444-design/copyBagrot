@@ -54,34 +54,36 @@ export default function CustomWeakPracticePage() {
       }
 
       // Get all WRONG practice attempts
-      const attempts = await base44.entities.AttemptNew.list("-created_date", 500);
+      const attempts = await base44.entities.AttemptNew.filter({ 
+        created_by: currentUser.email 
+      }, "-created_date", 1000);
+      
       console.log('📊 Total attempts found:', attempts.length);
       console.log('📊 User email:', currentUser.email);
       console.log('📊 Selected subject:', currentUser.selected_subject);
       console.log('📊 Selected units:', currentUser.selected_units);
       
-      // More flexible filtering - don't require exact subject/unit match for finding mistakes
+      // Filter wrong attempts
       let wrongAttempts = attempts.filter(a => 
-        a.created_by === currentUser.email && 
         (a.status === "incorrect" || a.status === "unanswered" || (a.percentage !== undefined && a.percentage < 50)) &&
-        (!specificSessionId || a.session_id === specificSessionId)
+        (!specificSessionId || a.session_id === specificSessionId) &&
+        (!specificTopicId || a.topic_id === specificTopicId)
       );
       
-      console.log('❌ All wrong attempts before subject filter:', wrongAttempts.length);
+      console.log('❌ Wrong attempts after basic filter:', wrongAttempts.length);
 
-      if (specificTopicId) {
-        wrongAttempts = wrongAttempts.filter(a => a.topic_id === specificTopicId);
-      }
-      
-      // If we have selected subject, filter by it, but keep all if no subject set
-      if (currentUser.selected_subject) {
-        wrongAttempts = wrongAttempts.filter(a => 
+      // Filter by subject and unit if user has selection
+      if (currentUser.selected_subject && currentUser.selected_units) {
+        const subjectMatches = wrongAttempts.filter(a => 
           a.subject_id === currentUser.selected_subject &&
-          parseInt(a.unit_level || 0) === parseInt(currentUser.selected_units || 3)
+          parseInt(a.unit_level || 0) === parseInt(currentUser.selected_units)
         );
+        
+        // Use subject matches if available, otherwise use all wrong attempts
+        wrongAttempts = subjectMatches.length > 0 ? subjectMatches : wrongAttempts;
       }
       
-      console.log('❌ Wrong practice attempts after filters:', wrongAttempts.length);
+      console.log('❌ Wrong practice attempts final:', wrongAttempts.length);
 
       // ALSO get wrong answers from EXAMS
       const examAttempts = await base44.entities.ExamAttempt.list("-created_date", 100);
@@ -259,12 +261,29 @@ Return JSON:`,
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
-          <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 mb-2">אין שאלות זמינות</h3>
-          <p className="text-gray-600 mb-6">נראה שלא טעית בשאלות עדיין, או שאתה מעולה! 🌟</p>
-          <Button onClick={() => navigate(createPageUrl("Practice"))} className="w-full">
-            חזרה לתרגול
-          </Button>
+          <Target className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-gray-900 mb-2">כל הכבוד! 🎉</h3>
+          <p className="text-gray-600 mb-2">לא נמצאו טעויות לתיקון</p>
+          <p className="text-sm text-gray-500 mb-6">
+            {user?.selected_subject && user?.selected_units 
+              ? `עבור ${user.selected_subject} ${user.selected_units} יחידות` 
+              : 'בנושא זה'}
+          </p>
+          <div className="space-y-2">
+            <Button 
+              onClick={() => navigate(createPageUrl("Practice"))} 
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              המשך לתרגול חדש
+            </Button>
+            <Button 
+              onClick={() => navigate(createPageUrl("Home"))} 
+              variant="outline"
+              className="w-full"
+            >
+              חזור לדף הבית
+            </Button>
+          </div>
         </div>
       </div>
     );
