@@ -814,14 +814,14 @@ export default function ExamsPage() {
                         {hasMistakes && isPremium && (() => {
                         const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                         return (
-                          <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
+                          <div className="bg-gray-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                               <div className="flex items-center gap-2 mb-2">
                                 <Target className="text-blue-500 lucide lucide-target w-4 h-4" />
-                                <h4 className="bg-transparent text-[#000000] font-bold">תרגול טעויות מבחינה זו
+                                <h4 className="bg-transparent text-[#000000] text-sm font-bold">תרגול טעויות מבחינה זו
 
                               </h4>
                               </div>
-                              <p className="text-[#000000] mb-2">
+                              <p className="text-[#000000] mb-2 text-sm">
                                 {wrongCount} שאלות שטעית בהן במבחן הזה
                               </p>
                               <Button
@@ -1201,20 +1201,17 @@ export default function ExamsPage() {
                     </div>
                     <Button
                   onClick={() => {
+                    setShowAttemptDetails(null);
                     if (isPremium) {
-                      sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
-                      sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
-                      setShowAttemptDetails(null);
-                      navigate(createPageUrl("ExamMistakesPractice"));
+                      navigate(createPageUrl("WeakExamSelection"));
                     } else {
-                      setShowAttemptDetails(null);
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                       <Target className="w-4 h-4" />
-                      {isPremium ? 'תרגל טעויות מבגרות זו' : '🔒 שדרג לפרימיום'}
+                      {isPremium ? 'מבחן טעויות מבגרויות' : '🔒 שדרג לפרימיום'}
                     </Button>
                   </div>;
 
