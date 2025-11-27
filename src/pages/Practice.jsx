@@ -412,7 +412,7 @@ export default function PracticePage() {
 
 
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center flex-shrink-0">
+                    <div className="bg-blue-600 rounded-lg flex-shrink-0 w-10 h-10 from-orange-600 to-red-600 flex items-center justify-center">
                       <Target className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
@@ -445,7 +445,7 @@ export default function PracticePage() {
 
 
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <div className="bg-blue-600 rounded-lg w-10 h-10 from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
                       <Settings className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
