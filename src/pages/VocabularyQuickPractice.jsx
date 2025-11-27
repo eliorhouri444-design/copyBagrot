@@ -47,11 +47,11 @@ export default function VocabularyQuickPracticePage() {
         is_active: true
       }, 'order', 500);
 
-      const setWords = allWords.slice(startIndex, endIndex);
-      setWords(setWords);
+      const wordsForSet = allWords.slice(startIndex, endIndex);
+      setWords(wordsForSet);
 
       // Generate questions
-      const generatedQuestions = generateQuestions(setWords, allWords);
+      const generatedQuestions = generateQuestions(wordsForSet, allWords);
       setQuestions(generatedQuestions);
 
     } catch (error) {
@@ -253,7 +253,20 @@ export default function VocabularyQuickPracticePage() {
   }
 
   const question = questions[currentIndex];
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+
+  if (!question) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 text-center">
+          <p className="text-gray-600 mb-4">אין שאלות זמינות</p>
+          <Button onClick={() => navigate(createPageUrl("VocabularySets"))}>
+            חזור לסטים
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex flex-col">
