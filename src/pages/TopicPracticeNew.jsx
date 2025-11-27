@@ -31,6 +31,7 @@ export default function TopicPracticeNewPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const topicId = urlParams.get("topicid");
   const setNumber = parseInt(urlParams.get("set") || "1");
+  const taskIdFromUrl = urlParams.get("taskId");
 
   const [user, setUser] = useState(null);
   const [allQuestions, setAllQuestions] = useState([]);
