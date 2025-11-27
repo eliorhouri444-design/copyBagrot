@@ -1197,8 +1197,8 @@ export default function ExamsPage() {
               return sortedWeakTopics.length > 0 &&
               <div className="bg-blue-50 p-4 rounded-xl from-orange-50 to-red-50 border-2 border-blue-5000">
                     <div className="flex items-center gap-2 mb-3">
-                      <Crown className="w-5 h-5 text-orange-600" />
                       <h4 className="font-bold text-gray-900">מבחן מותאם לטעויות שלך</h4>
+                      <Crown className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="space-y-2">
                       {sortedWeakTopics.map(([topic, count]) =>
