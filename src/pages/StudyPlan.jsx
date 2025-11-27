@@ -548,12 +548,12 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl p-4 flex items-start gap-3">
+          className="bg-white rounded-2xl shadow-lg p-4 flex items-start gap-3 border-r-4 border-r-yellow-500">
 
             <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div>
-              <div className="font-bold text-yellow-900">יש לך {performanceData.weakTopics.length} נושאים חלשים</div>
-              <div className="text-sm text-yellow-800">מומלץ לחזור עליהם היום כדי לשפר את המוכנות</div>
+              <div className="font-bold text-gray-900">יש לך {performanceData.weakTopics.length} נושאים חלשים</div>
+              <div className="text-sm text-gray-600">מומלץ לחזור עליהם היום כדי לשפר את המוכנות</div>
             </div>
           </motion.div>
         }
