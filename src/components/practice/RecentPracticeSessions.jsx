@@ -412,7 +412,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                             setShowAllSessions(false);
                             sessionStorage.setItem('weakPracticeSource', session.id);
                             navigate(createPageUrl("CustomWeakPractice"));
-                          }} className="bg-blue-500 text-[12px] px-4 py-2 font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 w-full from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-9 flex items-center justify-center gap-2">
+                          }} className="bg-blue-500 text-[12px] px-4 py-2 font-bold rounded-xl whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-700 w-full h-9 flex items-center justify-center gap-2">
 
 
                             <Target className="w-4 h-4" />
