@@ -363,17 +363,20 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-5">
+          className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-green-600" />
-            המשימות להיום
-            {dailyPlan && (
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full mr-auto">
-                {dailyPlan.estimatedMinutes} דקות
-              </span>
-            )}
-          </h2>
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">המשימות להיום</h3>
+                <p className="text-xs opacity-90">
+                  {dailyPlan ? `${dailyPlan.estimatedMinutes} דקות` : 'התוכנית היומית שלך'}
+                </p>
+              </div>
+              <CheckCircle className="w-7 h-7" />
+            </div>
+          </div>
+          <div className="p-5">
           
           <div className="space-y-3">
             {dailyPlan?.tasks?.map((task, idx) => {
