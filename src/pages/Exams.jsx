@@ -1133,17 +1133,17 @@ export default function ExamsPage() {
 
                 <div className="space-y-3">
                   {showAttemptDetails.answers && showAttemptDetails.answers.map((answer, idx) => {
-                    const attemptExamData = allExamsMap.get(showAttemptDetails.exam_id);
-                    const questionData = attemptExamData?.questions?.[idx];
-                    return (
-                <div
-                  key={idx} className="bg-blue-50 p-4 rounded-xl border-2 border-blue-500">
-                      {questionData?.question_text && (
-                        <div className="text-sm text-gray-700 mb-3 p-3 bg-white rounded-lg border border-blue-200">
+                  const attemptExamData = allExamsMap.get(showAttemptDetails.exam_id);
+                  const questionData = attemptExamData?.questions?.[idx];
+                  return (
+                    <div
+                      key={idx} className="bg-blue-50 p-4 rounded-xl border-2 border-blue-500">
+                      {questionData?.question_text &&
+                      <div className="text-sm text-gray-700 mb-3 p-3 bg-white rounded-lg border border-blue-200">
                           <div className="text-xs text-blue-600 font-bold mb-1">השאלה:</div>
                           <div className="whitespace-pre-wrap">{questionData.question_text}</div>
                         </div>
-                      )}
+                      }
 
 
 
@@ -1156,19 +1156,19 @@ export default function ExamsPage() {
                         </span>
                       </div>
                       {!answer.is_correct && answer.correct_answer &&
-                  <div className="text-sm text-green-700 font-semibold mt-1">
+                      <div className="text-sm text-green-700 font-semibold mt-1">
                           תשובה נכונה: {answer.correct_answer}
                         </div>
-                  }
+                      }
                       {answer.explanation &&
-                  <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
+                      <div className="mt-2 p-3 bg-white rounded-lg text-sm text-gray-700">
                           <div className="font-semibold text-blue-600 mb-1">הסבר:</div>
                           {answer.explanation}
                         </div>
-                  }
-                    </div>
-                    );
-                  })}
+                      }
+                    </div>);
+
+                })}
 
                   {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) &&
                 <div className="text-center text-gray-500 text-sm py-4">
@@ -1209,17 +1209,17 @@ export default function ExamsPage() {
                   )}
                     </div>
                     <Button
-                      onClick={() => {
-                        setShowAttemptDetails(null);
-                        if (isPremium) {
-                          sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
-                          sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
-                          navigate(createPageUrl("ExamMistakesPractice"));
-                        } else {
-                          navigate(createPageUrl("Premium"));
-                        }
-                      }}
-                      className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+                  onClick={() => {
+                    setShowAttemptDetails(null);
+                    if (isPremium) {
+                      sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
+                      sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
+                      navigate(createPageUrl("ExamMistakesPractice"));
+                    } else {
+                      navigate(createPageUrl("Premium"));
+                    }
+                  }}
+                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                         <Target className="w-4 h-4" />
                         {isPremium ? 'תרגול טעויות מהמבחן הזה' : '🔒 שדרג לפרימיום'}
@@ -1231,7 +1231,7 @@ export default function ExamsPage() {
           }
 
           <DialogFooter>
-            <Button onClick={() => setShowAttemptDetails(null)} className="w-full">
+            <Button onClick={() => setShowAttemptDetails(null)} className="bg-blue-500 text-[#ffffff] px-4 py-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 h-9 w-full">
               סגור
             </Button>
           </DialogFooter>
@@ -1382,10 +1382,10 @@ export default function ExamsPage() {
                   </button>
 
                   {(() => {
-                                            const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
-                                            if (wrongCount === 0) return null;
-                                            return (
-                                              <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
+                    const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
+                    if (wrongCount === 0) return null;
+                    return (
+                      <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                         <div className="flex items-center gap-2 mb-2">
                           <Target className="w-4 h-4 text-orange-600" />
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
