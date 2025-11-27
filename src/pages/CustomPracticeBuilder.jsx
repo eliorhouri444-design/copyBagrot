@@ -95,18 +95,23 @@ export default function CustomPracticeBuilderPage() {
       // Shuffle and limit
       const shuffled = filteredQuestions.sort(() => Math.random() - 0.5).slice(0, questionCount);
       
-      // Create custom practice session
+      // Create custom practice session with question IDs stored
       const session = await base44.entities.PracticeSessionNew.create({
         session_type: "custom",
         subject_id: user.selected_subject,
         unit_level: user.selected_units,
+        topic_id: `custom_${Date.now()}`,
         questions: shuffled.map(q => q.question_id),
         started_at: new Date().toISOString(),
         is_completed: false
       });
 
-      // Navigate to practice with session ID
-      navigate(createPageUrl(`TopicPracticeNew?sessionId=${session.id}`));
+      // Store custom questions in sessionStorage for the practice page to pick up
+      sessionStorage.setItem('customPracticeQuestions', JSON.stringify(shuffled));
+      sessionStorage.setItem('customPracticeSessionId', session.id);
+
+      // Navigate to custom practice page
+      navigate(createPageUrl(`CustomPractice?sessionId=${session.id}`));
     } catch (error) {
       console.error("Error starting practice:", error);
       alert("שגיאה ביצירת התרגול");
