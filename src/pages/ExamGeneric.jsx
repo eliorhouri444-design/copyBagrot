@@ -671,7 +671,7 @@ export default function ExamGenericPage() {
             <motion.button
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-500 hover:border-blue-600 transition-all shadow-lg">
+              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-500 hover:border-purple-500 transition-all shadow-lg">
 
 
               <div className="flex items-center gap-3 mb-4">
@@ -703,7 +703,7 @@ export default function ExamGenericPage() {
 
   if (!examStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
+      <div className="bg-gray-100 p-6 min-h-screen from-blue-50 to-purple-50">
         <div className="max-w-3xl mx-auto">
           <Button variant="ghost" size="icon" onClick={() => navigate(createPageUrl("Exams"))} className="mb-4">
             <ArrowLeft className="w-6 h-6" />
