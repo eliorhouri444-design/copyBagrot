@@ -305,14 +305,15 @@ export default function PracticePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
-      </div>);
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
-    <div className="bg-slate-100 pt-0 pb-20 min-h-screen">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-600 to-indigo-600 flex items-center justify-between">
+    <div className="bg-blue-50 pt-0 pb-20 min-h-screen">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity">
@@ -325,7 +326,7 @@ export default function PracticePage() {
         </div>
       </div>
 
-      <div className="bg-gray-100 pb-6 px-6 space-y-6">
+      <div className="pb-6 px-6 space-y-6">
 
         <motion.div
           key={`${displaySubject}_${displayUnits}`}
@@ -374,15 +375,20 @@ export default function PracticePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
 
-          <div className="bg-[#ffffff] p-4 rounded-2xl">
-            <div className="flex items-center gap-2 mb-3">
-              <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">תרגול פרימיום מותאם אישית</h3>
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-[#3B82F6] p-4">
+              <div className="flex items-center gap-3 text-white">
+                <div className="flex-1 text-right">
+                  <h3 className="text-base font-bold">תרגול פרימיום מותאם אישית</h3>
+                  <p className="text-xs opacity-90">תכונות ייחודיות למנויי פרימיום</p>
+                </div>
+                <Crown className="w-7 h-7" />
+              </div>
             </div>
-
-            <div>
-              <p className="text-[#6E6E6E] text-[13px] mb-3 text-center">
-                תכונות ייחודיות למנויי פרימיום - תרגול חכם ומותאם במיוחד בשבילך
+            
+            <div className="p-5">
+              <p className="text-gray-600 text-[13px] mb-4 text-center">
+                תרגול חכם ומותאם במיוחד בשבילך
               </p>
               
               <div className="space-y-2">
@@ -396,7 +402,9 @@ export default function PracticePage() {
                     } else {
                       navigate(createPageUrl("Premium"));
                     }
-                  }} className="bg-white p-3 text-right opacity-100 rounded-xl w-full border transition-all border-[#E9F0FF] cursor-not-allowed">
+                  }}
+                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer"
+                >
 
 
 
@@ -408,8 +416,8 @@ export default function PracticePage() {
                       <Target className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-[#2B2B2B] text-[13px] mb-0.5">תרגול טעויות ונושאים חלשים</div>
-                      <div className="text-[11px] text-[#6E6E6E]">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
+                      <div className="font-bold text-gray-900 text-[13px] mb-0.5">תרגול טעויות ונושאים חלשים</div>
+                      <div className="text-[11px] text-gray-600">תרגול ממוקד בנושאים שטעית בהם בעבר</div>
                     </div>
                     {!user?.is_premium &&
                     <Crown className="w-4 h-4 text-amber-500" />
@@ -427,7 +435,9 @@ export default function PracticePage() {
                     } else {
                       navigate(createPageUrl("Premium"));
                     }
-                  }} className="bg-white p-3 text-right opacity-100 rounded-xl w-full border transition-all border-[#E9F0FF] cursor-not-allowed">
+                  }}
+                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer"
+                >
 
 
 
@@ -439,8 +449,8 @@ export default function PracticePage() {
                       <Settings className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-[#2B2B2B] text-[13px] mb-0.5">בניה עצמאית של תרגול</div>
-                      <div className="text-[11px] text-[#6E6E6E]">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
+                      <div className="font-bold text-gray-900 text-[13px] mb-0.5">בניה עצמאית של תרגול</div>
+                      <div className="text-[11px] text-gray-600">בחר נושאים, כמות שאלות ורמת קושי בעצמך</div>
                     </div>
                     {!user?.is_premium &&
                     <Crown className="w-4 h-4 text-amber-500" />
@@ -449,17 +459,17 @@ export default function PracticePage() {
                 </motion.button>
               </div>
 
-              {!user?.is_premium &&
-              <div className="mt-3 text-center">
+              {!user?.is_premium && (
+                <div className="mt-4 text-center">
                   <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8">
-
+                    onClick={() => navigate(createPageUrl("Premium"))}
+                    className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8"
+                  >
                     <Crown className="w-4 h-4 ml-2" />
                     שדרג לפרימיום
                   </Button>
                 </div>
-              }
+              )}
             </div>
           </div>
         </motion.div>
@@ -471,11 +481,11 @@ export default function PracticePage() {
           transition={{ delay: 0.25 }}
           className="grid grid-cols-2 gap-3">
 
-            <div className="bg-indigo-50 rounded-xl p-3">
+            <div className="bg-white rounded-xl p-3 shadow-md border-2 border-blue-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">ניהול שאלות</h3>
-                  <p className="text-[11px] text-[#6E6E6E]">הוסף ועדכן</p>
+                  <h3 className="text-[13px] font-bold text-gray-900 mb-0.5">ניהול שאלות</h3>
+                  <p className="text-[11px] text-gray-600">הוסף ועדכן</p>
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
@@ -487,11 +497,11 @@ export default function PracticePage() {
               </div>
             </div>
 
-            <div className="bg-indigo-50 rounded-xl p-3">
+            <div className="bg-white rounded-xl p-3 shadow-md border-2 border-blue-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-[13px] font-bold text-[#2B2B2B] mb-0.5">ניהול נושאים</h3>
-                  <p className="text-[11px] text-[#6E6E6E]">הוסף, ערוך, סדר</p>
+                  <h3 className="text-[13px] font-bold text-gray-900 mb-0.5">ניהול נושאים</h3>
+                  <p className="text-[11px] text-gray-600">הוסף, ערוך, סדר</p>
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminTopics"))}

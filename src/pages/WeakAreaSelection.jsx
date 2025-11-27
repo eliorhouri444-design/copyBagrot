@@ -57,75 +57,61 @@ export default function WeakAreaSelectionPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-b-[2rem] p-6 shadow-2xl mb-6"
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          
-          <div className="flex-1 text-center">
-            <div className="flex items-center justify-center gap-2">
-              <h1 className="text-2xl font-bold text-white">תרגול מותאם אישית</h1>
-              <Crown className="w-6 h-6 text-yellow-300" />
-            </div>
-            <p className="text-sm text-white/90 mt-1">בחר את סוג התרגול המתאים לך</p>
-          </div>
+    <div className="min-h-screen bg-blue-50 pb-20">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+        <button
+          onClick={() => navigate(createPageUrl("Practice"))}
+          className="text-right flex-1 hover:opacity-90 transition-opacity"
+        >
+          <h1 className="text-[16px] font-bold text-white">תרגול מותאם אישית</h1>
+          <p className="text-[11px] text-white/90">בחר את סוג התרגול המתאים לך</p>
+        </button>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Crown className="w-5 h-5 text-white" />
         </div>
-      </motion.div>
+      </div>
 
       <div className="px-6 space-y-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-3xl shadow-2xl overflow-hidden"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-gradient-to-br from-red-500 to-orange-500 p-6">
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/40 shadow-xl">
-                <Target className="w-8 h-8" />
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">🟥 מבחן טעויות</h3>
+                <p className="text-xs opacity-90">תרגל שאלות שטעית בהן בעבר</p>
               </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-1">🟥 מבחן טעויות</h2>
-                <p className="text-sm text-white/90">תרגל שאלות שטעית בהן בעבר</p>
-              </div>
+              <Target className="w-7 h-7" />
             </div>
           </div>
 
-          <div className="p-6 space-y-4">
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-4 border-2 border-red-200">
+          <div className="p-5 space-y-4">
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
               <div className="flex items-center gap-3 mb-3">
-                <Zap className="w-6 h-6 text-red-600" />
+                <Zap className="w-6 h-6 text-blue-600" />
                 <h3 className="font-bold text-gray-900">איך זה עובד?</h3>
               </div>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 font-bold mt-0.5">•</span>
+                  <span className="text-blue-600 font-bold mt-0.5">•</span>
                   <span>שאלות שטעית בהן בתרגולים קודמים</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 font-bold mt-0.5">•</span>
+                  <span className="text-blue-600 font-bold mt-0.5">•</span>
                   <span>ממוקד בדיוק במה שקשה לך</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 font-bold mt-0.5">•</span>
+                  <span className="text-blue-600 font-bold mt-0.5">•</span>
                   <span>מסודר לפי מספר הטעויות - מהרבה למעט</span>
                 </li>
               </ul>
@@ -151,9 +137,9 @@ export default function WeakAreaSelectionPage() {
             <Button
               onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
               disabled={stats.mistakes === 0}
-              className="w-full h-16 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-lg font-bold shadow-lg disabled:opacity-50"
+              className="w-full h-14 bg-[#3B82F6] hover:bg-blue-700 text-white text-base font-bold rounded-[14px] disabled:opacity-50"
             >
-              <Target className="w-6 h-6 ml-2" />
+              <Target className="w-5 h-5 ml-2" />
               התחל תרגול טעויות
             </Button>
           </div>
@@ -163,22 +149,20 @@ export default function WeakAreaSelectionPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl shadow-2xl overflow-hidden"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6">
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border-2 border-white/40 shadow-xl">
-                <TrendingDown className="w-8 h-8" />
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">🟦 מבחן לפי חולשות</h3>
+                <p className="text-xs opacity-90">תרגל נושאים שאתה חלש בהם</p>
               </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-1">🟦 מבחן לפי חולשות</h2>
-                <p className="text-sm text-white/90">תרגל נושאים שאתה חלש בהם</p>
-              </div>
+              <TrendingDown className="w-7 h-7" />
             </div>
           </div>
 
-          <div className="p-6 space-y-4">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border-2 border-blue-200">
+          <div className="p-5 space-y-4">
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
               <div className="flex items-center gap-3 mb-3">
                 <Zap className="w-6 h-6 text-blue-600" />
                 <h3 className="font-bold text-gray-900">איך זה עובד?</h3>
@@ -219,9 +203,9 @@ export default function WeakAreaSelectionPage() {
             <Button
               onClick={() => navigate(createPageUrl("WeakTopics"))}
               disabled={stats.weakTopics === 0}
-              className="w-full h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg font-bold shadow-lg disabled:opacity-50"
+              className="w-full h-14 bg-[#3B82F6] hover:bg-blue-700 text-white text-base font-bold rounded-[14px] disabled:opacity-50"
             >
-              <TrendingDown className="w-6 h-6 ml-2" />
+              <TrendingDown className="w-5 h-5 ml-2" />
               התחל תרגול נושאים חלשים
             </Button>
           </div>
@@ -231,13 +215,15 @@ export default function WeakAreaSelectionPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5 border-2 border-purple-200"
+          className="bg-white rounded-2xl shadow-lg p-5 border-r-4 border-r-blue-500"
         >
           <div className="flex items-center gap-3">
-            <Crown className="w-8 h-8 text-purple-600" />
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <Crown className="w-5 h-5 text-white" />
+            </div>
             <div className="flex-1">
               <h3 className="font-bold text-gray-900">💡 טיפ</h3>
-              <p className="text-sm text-gray-700 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 מומלץ להתחיל ב"מבחן טעויות" כדי לתקן את מה שכבר טעית בו, ואז לעבור ל"מבחן לפי חולשות" לחיזוק כללי
               </p>
             </div>

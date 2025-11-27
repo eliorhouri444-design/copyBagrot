@@ -231,21 +231,23 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
-      </div>);
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      </div>
+    );
   }
   
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <p className="text-red-500">Error loading data.</p>
-      </div>);
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
+    <div className="min-h-screen bg-blue-50 pb-20">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
           <p className="text-[11px] text-white/90">{user?.selected_subject} • {user?.selected_units} יחידות</p>
@@ -275,30 +277,44 @@ export default function HomePage() {
           engineData={engineData} />
 
         {/* המשך מאיפה שהפסקת */}
-        {lastActivity &&
-        <CardSimple delay={0.3}>
-            <CardTitle icon={PlayCircle}>המשך מאיפה שהפסקת</CardTitle>
-            <div className="mb-3">
-              <div className="text-[15px] font-bold text-[#2B2B2B]">{lastActivity.topic}</div>
-              <div className="text-[13px] text-[#6E6E6E]">{lastActivity.type === 'practice' ? 'תרגול נושא' : 'בגרות'}</div>
+        {lastActivity && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+          >
+            <div className="bg-[#3B82F6] p-4">
+              <div className="flex items-center gap-3 text-white">
+                <div className="flex-1 text-right">
+                  <h3 className="text-base font-bold">המשך מאיפה שהפסקת</h3>
+                </div>
+                <PlayCircle className="w-7 h-7" />
+              </div>
             </div>
+            <div className="p-5">
+              <div className="mb-4">
+                <div className="text-[15px] font-bold text-gray-900">{lastActivity.topic}</div>
+                <div className="text-[13px] text-gray-600">{lastActivity.type === 'practice' ? 'תרגול נושא' : 'בגרות'}</div>
+              </div>
 
-            <Button
-            onClick={() => {
-              if (lastActivity.type === 'practice') {
-                navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
-              } else {
-                sessionStorage.setItem('currentExamId', lastActivity.examId);
-                navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
-              }
-            }}
-            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
-
-              <PlayCircle className="w-5 h-5 ml-2" />
-              המשך
-            </Button>
-          </CardSimple>
-        }
+              <Button
+                onClick={() => {
+                  if (lastActivity.type === 'practice') {
+                    navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${lastActivity.topicId}&setNumber=1`);
+                  } else {
+                    sessionStorage.setItem('currentExamId', lastActivity.examId);
+                    navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
+                  }
+                }}
+                className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+              >
+                <PlayCircle className="w-5 h-5 ml-2" />
+                המשך
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
       </div>
 

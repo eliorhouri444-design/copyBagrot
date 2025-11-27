@@ -261,15 +261,15 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1E4BA1]" />
-      </div>);
-
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
+    <div className="min-h-screen bg-blue-50 pb-20">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
@@ -279,138 +279,183 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      <div className="px-5 space-y-6">
+      <div className="px-5 space-y-4">
         {/* המנוי שלי */}
-        {user?.is_premium ?
-        <CardSimple delay={0.05}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Crown className="w-5 h-5 text-[#3B82F6]" />
-                <h3 className="text-base font-bold text-[#2B2B2B]">המנוי שלי</h3>
-              </div>
-              <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setShowSubscriptionDialog(true)}
-              className="h-8 text-[12px] text-[#3B82F6] hover:bg-[#E9F0FF]">
-
-                נהל
-              </Button>
-            </div>
-            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-              <div className="text-[13px] text-[#6E6E6E] mb-1">סוג מנוי</div>
-              <div className="text-[15px] font-bold text-[#2B2B2B]">
-                {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-3 border border-[#E9F0FF] mt-2 flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-[#3B82F6]" />
-              </div>
-              <div>
-                <div className="font-bold text-[15px] text-[#2B2B2B]">מנוי פעיל</div>
-                <div className="text-[13px] text-[#6E6E6E]">גישה מלאה לכל התכונות</div>
+        {user?.is_premium ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+          >
+            <div className="bg-[#3B82F6] p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-white">
+                  <Crown className="w-5 h-5" />
+                  <h3 className="text-base font-bold">המנוי שלי</h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowSubscriptionDialog(true)}
+                  className="h-8 text-[12px] text-white hover:bg-white/20"
+                >
+                  נהל
+                </Button>
               </div>
             </div>
-          </CardSimple> :
-
-        <CardSimple delay={0.05}>
+            <div className="p-5 space-y-3">
+              <div className="bg-blue-50 rounded-xl p-3">
+                <div className="text-[13px] text-gray-600 mb-1">סוג מנוי</div>
+                <div className="text-[15px] font-bold text-gray-900">
+                  {user?.subscription_type === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-3 flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-[15px] text-gray-900">מנוי פעיל</div>
+                  <div className="text-[13px] text-gray-600">גישה מלאה לכל התכונות</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-white rounded-2xl shadow-lg p-5"
+          >
             <div className="flex items-center gap-2 mb-3">
-              <Crown className="w-5 h-5 text-[#3B82F6]" />
-              <h3 className="text-base font-bold text-[#2B2B2B]">שדרג לפרימיום</h3>
+              <Crown className="w-5 h-5 text-amber-500" />
+              <h3 className="text-base font-bold text-gray-900">שדרג לפרימיום</h3>
             </div>
-            <p className="text-[13px] text-[#6E6E6E] mb-3">גישה בלתי מוגבלת לכל התכונות</p>
+            <p className="text-[13px] text-gray-600 mb-3">גישה בלתי מוגבלת לכל התכונות</p>
             <Button
-            onClick={() => navigate(createPageUrl("Premium"))}
-            className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]">
-
+              onClick={() => navigate(createPageUrl("Premium"))}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+            >
               <Crown className="w-4 h-4 ml-2" />
               שדרג עכשיו
             </Button>
-          </CardSimple>
-        }
+          </motion.div>
+        )}
 
         {/* הדרך שלך לבגרות */}
-        {readinessData &&
-        <CardSimple delay={0.05}>
-            <CardTitle>הדרך שלך לבגרות</CardTitle>
-            
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              <StatCard value={`${readinessData.scores.mastery}%`} label="שליטה בחומר" color="#3B82F6" />
-              <StatCard value={`${readinessData.scores.practice}%`} label="תרגול" color="#3B82F6" />
-              <StatCard value={`${readinessData.scores.exams}%`} label="בגרויות" color="#3B82F6" />
+        {readinessData && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+          >
+            <div className="bg-[#3B82F6] p-4">
+              <div className="flex items-center gap-3 text-white">
+                <div className="flex-1 text-right">
+                  <h3 className="text-base font-bold">הדרך שלך לבגרות</h3>
+                </div>
+                <Target className="w-7 h-7" />
+              </div>
             </div>
-
-            <Button
-            onClick={() => setShowDetailsView(!showDetailsView)}
-            variant="outline"
-            className="w-full h-10 text-[13px] rounded-[14px] border-2 border-[#E9F0FF] text-[#3B82F6]">
-
-              {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
-              <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-180' : ''}`} />
-            </Button>
-
-            {showDetailsView &&
-          <div className="space-y-2 mt-3">
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[15px] font-semibold text-[#2B2B2B]">שליטה בחומר</span>
-                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.mastery}%</span>
-                  </div>
-                  <Progress value={readinessData.scores.mastery} className="h-2 mt-2" />
+            <div className="p-5">
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="bg-blue-50 p-3 rounded-xl text-center">
+                  <div className="text-xl font-bold text-blue-900">{readinessData.scores.mastery}%</div>
+                  <div className="text-[10px] text-gray-600">שליטה בחומר</div>
                 </div>
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[15px] font-semibold text-[#2B2B2B]">תרגול</span>
-                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.practice}%</span>
-                  </div>
-                  <Progress value={readinessData.scores.practice} className="h-2 mt-2" />
+                <div className="bg-blue-50 p-3 rounded-xl text-center">
+                  <div className="text-xl font-bold text-blue-900">{readinessData.scores.practice}%</div>
+                  <div className="text-[10px] text-gray-600">תרגול</div>
                 </div>
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[15px] font-semibold text-[#2B2B2B]">בגרויות</span>
-                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.exams}%</span>
-                  </div>
-                  <Progress value={readinessData.scores.exams} className="h-2 mt-2" />
-                </div>
-                <div className="bg-white rounded-lg p-3 border border-[#E9F0FF]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[15px] font-semibold text-[#2B2B2B]">מהירות</span>
-                    <span className="text-2xl font-black text-[#3B82F6]">{readinessData.scores.speed}%</span>
-                  </div>
-                  <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
+                <div className="bg-blue-50 p-3 rounded-xl text-center">
+                  <div className="text-xl font-bold text-blue-900">{readinessData.scores.exams}%</div>
+                  <div className="text-[10px] text-gray-600">בגרויות</div>
                 </div>
               </div>
-          }
-          </CardSimple>
-        }
+
+              <Button
+                onClick={() => setShowDetailsView(!showDetailsView)}
+                variant="outline"
+                className="w-full h-10 text-[13px] rounded-[14px] border-2 border-blue-200 text-[#3B82F6] hover:bg-blue-50"
+              >
+                {showDetailsView ? 'הסתר פירוט' : 'ראה פירוט'}
+                <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetailsView ? 'rotate-180' : ''}`} />
+              </Button>
+
+              {showDetailsView && (
+                <div className="space-y-2 mt-3">
+                  <div className="bg-blue-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[15px] font-semibold text-gray-900">שליטה בחומר</span>
+                      <span className="text-2xl font-black text-blue-600">{readinessData.scores.mastery}%</span>
+                    </div>
+                    <Progress value={readinessData.scores.mastery} className="h-2 mt-2" />
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[15px] font-semibold text-gray-900">תרגול</span>
+                      <span className="text-2xl font-black text-blue-600">{readinessData.scores.practice}%</span>
+                    </div>
+                    <Progress value={readinessData.scores.practice} className="h-2 mt-2" />
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[15px] font-semibold text-gray-900">בגרויות</span>
+                      <span className="text-2xl font-black text-blue-600">{readinessData.scores.exams}%</span>
+                    </div>
+                    <Progress value={readinessData.scores.exams} className="h-2 mt-2" />
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[15px] font-semibold text-gray-900">מהירות</span>
+                      <span className="text-2xl font-black text-blue-600">{readinessData.scores.speed}%</span>
+                    </div>
+                    <Progress value={readinessData.scores.speed} className="h-2 mt-2" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {/* הגדרות */}
-        <CardSimple delay={0.4}>
-          <CardTitle icon={Settings}>הגדרות חשבון</CardTitle>
-
-          <div className="space-y-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">הגדרות חשבון</h3>
+              </div>
+              <Settings className="w-7 h-7" />
+            </div>
+          </div>
+          <div className="p-5 space-y-2">
             <Button
-              variant="outline" className="bg-background text-[15px] text-[#3B82F6] px-4 py-2 font-medium rounded-[14px] inline-flex items-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:bg-accent hover:text-accent-foreground w-full justify-start h-12 border-2 border-[#E9F0FF]"
-
-              onClick={() => navigate(createPageUrl("Settings"))}>
-
+              variant="outline"
+              className="w-full justify-start h-12 border-2 border-blue-200 text-[#3B82F6] hover:bg-blue-50 rounded-[14px]"
+              onClick={() => navigate(createPageUrl("Settings"))}
+            >
               <Settings className="w-5 h-5 ml-3" />
               כל ההגדרות
             </Button>
 
-
-
             <Button
-              variant="outline" className="bg-background text-[15px] text-[#3B82F6] px-4 py-2 font-medium rounded-[14px] inline-flex items-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:bg-accent hover:text-accent-foreground w-full justify-start h-12 border-2 border-[#E9F0FF]"
-
-              onClick={handleLogout}>
-
+              variant="outline"
+              className="w-full justify-start h-12 border-2 border-blue-200 text-[#3B82F6] hover:bg-blue-50 rounded-[14px]"
+              onClick={handleLogout}
+            >
               <LogOut className="w-5 h-5 ml-3" />
               התנתק
             </Button>
           </div>
-        </CardSimple>
+        </motion.div>
       </div>
 
       {/* Dialogs */}
