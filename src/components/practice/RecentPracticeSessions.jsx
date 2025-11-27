@@ -322,7 +322,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
           }
 
           <DialogFooter>
-            <Button onClick={() => setSelectedSession(null)} className="bg-blue-500 text-white px-4 py-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-700 h-9 w-full">
+            <Button onClick={() => setSelectedSession(null)} className="bg-blue-500 text-primary-foreground px-4 py-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-primary/90 h-9 w-full">
               סגור
             </Button>
           </DialogFooter>
@@ -365,7 +365,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           } else {
                             setShowAdDialog(session);
                           }
-                        }} className="bg-slate-100 p-4 text-right rounded-xl w-full hover:bg-blue-50 transition-all shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
+                        }} className="bg-gray-100 p-4 text-right rounded-xl w-full hover:bg-blue-50 transition-all shadow-md border border-gray-100 hover:border-blue-400 flex flex-col gap-3">
 
 
                         <div className="flex items-center gap-3">
@@ -380,7 +380,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                             <div className="text-[14px] font-bold text-gray-900 truncate">
                               {getTopicName(session.topic_id)}
                             </div>
-                            <div className="text-[11px] text-gray-500">
+                            <div className="text-[#000000]">
                               {new Date(session.created_date).toLocaleDateString('he-IL', {
                                 day: 'numeric',
                                 month: 'short',
@@ -392,7 +392,7 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
                           <div className="text-left">
                             {isPremium ?
                             <>
-                                <div className="text-[#1E3A8A] font-black">
+                                <div className="text-[#000000] font-black">
                                   {Math.round(session.percentage)}%
                                 </div>
                                 <div className="text-[10px] text-gray-500">
