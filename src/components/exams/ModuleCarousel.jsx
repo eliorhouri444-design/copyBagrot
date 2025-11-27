@@ -193,10 +193,14 @@ export default function ModuleCarousel({
 
     // סינון מבחנים לפי מודול
     const moduleAttempts = (examAttempts || []).filter((attemptItem) => {
+      // Match primarily by module_id if it exists
+      if (attemptItem.module_id) {
+        return attemptItem.module_id === currentModule.id;
+      }
+      // Fallback for older attempts that might only have exam_type
       if (currentModule.entity === 'ModuleAExam' && attemptItem.exam_type === 'module_a') return true;
       if (currentModule.entity === 'ModuleBExam' && attemptItem.exam_type === 'module_b') return true;
       if (currentModule.entity === 'ModuleCExam' && attemptItem.exam_type === 'module_c') return true;
-      if (currentModule.entity === 'GenericExam' && attemptItem.module_id === currentModule.id) return true;
       return false;
     });
 
