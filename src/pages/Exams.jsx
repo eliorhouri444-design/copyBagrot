@@ -1217,7 +1217,6 @@ export default function ExamsPage() {
                     className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                         {isPremium ? 'תרגל טעויות בבגרות זו' : '🔒 שדרג לפרימיום'}
-                        <Target className="w-4 h-4" />
                     </Button>
                   </div>;
 
