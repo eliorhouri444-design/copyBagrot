@@ -115,55 +115,45 @@ export default function CustomPracticeBuilderPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 pb-20">
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-b-[2rem] p-6 shadow-2xl mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          
-          <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-2xl px-5 py-2.5 shadow-lg">
-            <Sliders className="w-6 h-6 text-white" />
-            <span className="text-xl font-bold text-white">תרגול מותאם אישית</span>
-          </div>
-
-          <div className="w-10" />
-        </div>
-
-        <div className="text-center text-white">
-          <h2 className="text-lg font-bold mb-1">בנה את התרגול המושלם</h2>
-          <p className="text-sm opacity-90">התאם את התרגול לצרכים שלך</p>
+    <div className="min-h-screen bg-blue-50 pb-20">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+        <button
+          onClick={() => navigate(createPageUrl("Practice"))}
+          className="text-right flex-1 hover:opacity-90 transition-opacity"
+        >
+          <h1 className="text-[16px] font-bold text-white">תרגול מותאם אישית</h1>
+          <p className="text-[11px] text-white/90">התאם את התרגול לצרכים שלך</p>
+        </button>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Sliders className="w-5 h-5 text-white" />
         </div>
       </div>
 
-      <div className="px-4 space-y-4">
+      <div className="px-6 space-y-4">
         {/* Topics Selection */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">בחר נושאים לתרגול</h3>
-          <div className="space-y-2">
+          <div className="bg-[#3B82F6] p-4">
+            <h3 className="text-base font-bold text-white">בחר נושאים לתרגול</h3>
+          </div>
+          <div className="p-4 space-y-2">
             {allTopics.map((topic) => (
               <label
                 key={topic.id}
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                   selectedTopics.includes(topic.topic_id)
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-purple-300'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
                 }`}
               >
                 <Checkbox
@@ -182,9 +172,12 @@ export default function CustomPracticeBuilderPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-5"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">הגדרות תרגול</h3>
+          <div className="bg-[#3B82F6] p-4">
+            <h3 className="text-base font-bold text-white">הגדרות תרגול</h3>
+          </div>
+          <div className="p-4">
           
           <div className="space-y-4">
             <div>
@@ -249,6 +242,7 @@ export default function CustomPracticeBuilderPage() {
               </Select>
             </div>
           </div>
+          </div>
         </motion.div>
 
         {/* Summary */}
@@ -256,24 +250,28 @@ export default function CustomPracticeBuilderPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg p-5 text-white"
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <h3 className="text-lg font-bold mb-3">סיכום התרגול</h3>
-          <div className="space-y-2 text-sm">
-            <div>✓ {selectedTopics.length} נושאים נבחרו</div>
-            <div>✓ {questionCount} שאלות</div>
-            <div>✓ רמת קושי: {difficulty === "all" ? "כל הרמות" : difficulty}</div>
-            <div>✓ התמקדות: {focusOn === "all" ? "כל השאלות" : focusOn === "weak" ? "שאלות חלשות" : "שאלות חדשות"}</div>
+          <div className="bg-[#3B82F6] p-4">
+            <h3 className="text-base font-bold text-white">סיכום התרגול</h3>
           </div>
+          <div className="p-4">
+            <div className="space-y-2 text-sm text-gray-700 mb-4">
+              <div>✓ {selectedTopics.length} נושאים נבחרו</div>
+              <div>✓ {questionCount} שאלות</div>
+              <div>✓ רמת קושי: {difficulty === "all" ? "כל הרמות" : difficulty}</div>
+              <div>✓ התמקדות: {focusOn === "all" ? "כל השאלות" : focusOn === "weak" ? "שאלות חלשות" : "שאלות חדשות"}</div>
+            </div>
 
-          <Button
-            onClick={handleStartPractice}
-            disabled={selectedTopics.length === 0}
-            className="w-full h-14 bg-white text-purple-700 hover:bg-gray-100 font-bold text-lg mt-4 shadow-lg"
-          >
-            <Play className="w-5 h-5 ml-2" />
-            התחל תרגול
-          </Button>
+            <Button
+              onClick={handleStartPractice}
+              disabled={selectedTopics.length === 0}
+              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold text-[15px] rounded-[14px]"
+            >
+              <Play className="w-5 h-5 ml-2" />
+              התחל תרגול
+            </Button>
+          </div>
         </motion.div>
       </div>
     </div>
