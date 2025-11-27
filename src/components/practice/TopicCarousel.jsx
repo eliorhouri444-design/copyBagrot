@@ -199,8 +199,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     sessionStorage.setItem('selectedTopicForPractice', currentTopic.topic_id);
                     navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
                   }}
-                  variant="outline"
-                  className="w-full h-10 text-[12px] font-semibold border-2 border-[#E9F0FF] hover:bg-[#F5F8FF] rounded-[14px]">
+                  className="bg-[#3B82F6] text-white text-[13px] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
                     בחר תרגול ספציפי (מעל 500 שאלות)
                   </Button>
                 </> :
