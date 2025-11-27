@@ -52,7 +52,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
     if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-      navigate(createPageUrl(`VocabularyPractice`));
+      navigate(createPageUrl(`VocabularyTraining`));
       return;
     }
 
@@ -317,7 +317,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   key={set.id}
                   onClick={() => {
                     setShowVocabSetSelector(false);
-                    navigate(createPageUrl(`VocabularyPractice?set=${set.set_number}`));
+                    navigate(createPageUrl(`VocabularyTraining?set=${set.set_number}`));
                   }}
                   className="w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all border-gray-100 hover:border-blue-300 bg-white"
                 >
