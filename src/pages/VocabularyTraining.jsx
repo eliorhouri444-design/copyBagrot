@@ -654,7 +654,7 @@ export default function VocabularyTrainingPage() {
 
                 {!showQuizResult ? (
                   <div className="space-y-3">
-                    {question.options ? (
+                    {question.options && question.options.length > 0 ? (
                       <div className="space-y-2">
                         {question.options.map((option, idx) => (
                           <button key={idx} onClick={() => handleQuizSubmit(option)} className="w-full bg-white rounded-xl p-4 text-right border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all">
@@ -664,8 +664,27 @@ export default function VocabularyTrainingPage() {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <Input value={quizAnswer} onChange={(e) => setQuizAnswer(e.target.value)} placeholder="הקלד את התשובה..." className="h-12 text-base" dir="auto" autoFocus onKeyDown={(e) => { if (e.key === 'Enter' && quizAnswer.trim()) handleQuizSubmit(); }} />
-                        <Button onClick={() => handleQuizSubmit()} disabled={!quizAnswer.trim()} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-semibold">בדוק</Button>
+                        <Input 
+                          value={quizAnswer} 
+                          onChange={(e) => setQuizAnswer(e.target.value)} 
+                          placeholder="הקלד את התשובה..." 
+                          className="h-12 text-base" 
+                          dir="auto" 
+                          autoFocus 
+                          onKeyDown={(e) => { 
+                            if (e.key === 'Enter' && quizAnswer.trim()) {
+                              e.preventDefault();
+                              handleQuizSubmit(quizAnswer); 
+                            }
+                          }} 
+                        />
+                        <Button 
+                          onClick={() => handleQuizSubmit(quizAnswer)} 
+                          disabled={!quizAnswer.trim()} 
+                          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-semibold"
+                        >
+                          בדוק
+                        </Button>
                       </div>
                     )}
                   </div>
