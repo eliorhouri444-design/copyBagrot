@@ -1209,18 +1209,20 @@ export default function ExamsPage() {
                   )}
                     </div>
                     <Button
-                  onClick={() => {
-                    setShowAttemptDetails(null);
-                    if (isPremium) {
-                      navigate(createPageUrl("WeakExamSelection"));
-                    } else {
-                      navigate(createPageUrl("Premium"));
-                    }
-                  }}
-                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+                      onClick={() => {
+                        setShowAttemptDetails(null);
+                        if (isPremium) {
+                          sessionStorage.setItem('mistakesExamAttemptId', showAttemptDetails.id);
+                          sessionStorage.setItem('mistakesExamId', showAttemptDetails.exam_id);
+                          navigate(createPageUrl("ExamMistakesPractice"));
+                        } else {
+                          navigate(createPageUrl("Premium"));
+                        }
+                      }}
+                      className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
-                      <Target className="w-4 h-4" />
-                      {isPremium ? 'מבחן טעויות מבגרויות' : '🔒 שדרג לפרימיום'}
+                        <Target className="w-4 h-4" />
+                        {isPremium ? 'תרגול טעויות מהמבחן הזה' : '🔒 שדרג לפרימיום'}
                     </Button>
                   </div>;
 
