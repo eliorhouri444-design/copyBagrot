@@ -466,41 +466,24 @@ export default function DailyPlanCard({
     
     // ניווט לפי סוג המשימה
     if (task.type === "practice" || task.type === "questions") {
-      // אם יש topic_id במשימה, נווט אליו ישירות
-      if (task.topic_id) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1&taskId=${task.id}`);
-      } else if (recommendedTopics.length > 0) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1&taskId=${task.id}`);
-      } else {
-        navigate(createPageUrl("Practice"));
-      }
+      // תמיד נווט לדף Practice - שם יש את כל הנושאים
+      navigate(createPageUrl("Practice"));
     } else if (task.type === "learn" || task.type === "topic") {
-      if (task.topic_id) {
+      // אם יש topic_id במשימה, נווט אליו ישירות
+      if (task.topic_id && topics.some(t => t.topic_id === task.topic_id)) {
         navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1&taskId=${task.id}`);
-      } else if (recommendedTopics.length > 0) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1&taskId=${task.id}`);
       } else {
+        // אחרת נווט לדף Practice לבחירת נושא
         navigate(createPageUrl("Practice"));
       }
     } else if (task.type === "review" || task.type === "mistakes") {
       navigate(`${createPageUrl("CustomWeakPractice")}?taskId=${task.id}`);
     } else if (task.type === "exam") {
-      if (task.exam_id) {
-        navigate(`${createPageUrl("ExamGeneric")}?examId=${task.exam_id}&taskId=${task.id}`);
-      } else if (recommendedExams.length > 0) {
-        sessionStorage.setItem('selectedModuleId', recommendedExams[0].id);
-        sessionStorage.setItem('examTaskId', task.id);
-        navigate(createPageUrl("Exams"));
-      } else {
-        sessionStorage.setItem('examTaskId', task.id);
-        navigate(createPageUrl("Exams"));
-      }
+      // תמיד נווט לדף בגרויות - שם יש את כל השאלונים
+      sessionStorage.setItem('examTaskId', task.id);
+      navigate(createPageUrl("Exams"));
     } else if (task.type === "vocabulary") {
-      if (task.topic_id) {
-        navigate(`${createPageUrl("VocabularyPractice")}?topicid=${encodeURIComponent(task.topic_id)}&taskId=${task.id}`);
-      } else {
-        navigate(`${createPageUrl("Vocabulary")}?taskId=${task.id}`);
-      }
+      navigate(createPageUrl("VocabularyTraining"));
     } else {
       // ברירת מחדל - נווט לדף תרגול
       navigate(createPageUrl("Practice"));
@@ -668,9 +651,9 @@ export default function DailyPlanCard({
               <BookOpen className="w-4 h-4 text-[#3B82F6]" />
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">נושאים לתרגול</h3>
             </div>
-            <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF]">
+            <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF] flex items-center gap-1">
               <span className="text-[13px] font-bold text-[#3B82F6]">{topicOverallStats.mastery}%</span>
-              <span className="text-[10px] text-[#6E6E6E] mr-1">בקיאות</span>
+              <span className="text-[10px] text-[#6E6E6E]">בקיאות</span>
             </div>
           </div>
           
@@ -711,9 +694,9 @@ export default function DailyPlanCard({
               <FileCheck className="w-4 h-4 text-[#3B82F6]" />
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">שאלונים לבגרות</h3>
             </div>
-            <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF]">
+            <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF] flex items-center gap-1">
               <span className="text-[13px] font-bold text-[#3B82F6]">{examOverallStats.mastery}%</span>
-              <span className="text-[10px] text-[#6E6E6E] mr-1">בקיאות</span>
+              <span className="text-[10px] text-[#6E6E6E]">בקיאות</span>
             </div>
           </div>
           
