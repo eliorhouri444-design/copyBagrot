@@ -463,23 +463,25 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-5 text-center">
-
-            <Crown className="w-12 h-12 text-white mx-auto mb-3" />
-            <h3 className="text-xl font-bold text-white mb-2">שדרג לפרימיום</h3>
-            <p className="text-white/90 text-sm mb-4">
-              פתח את כל התכונות: ללא פרסומות, ללא מגבלות, תוכנית AI מלאה
-            </p>
-            <ul className="text-white/90 text-sm space-y-1 mb-4 text-right">
-              <li>✓ שאלות ללא הגבלה</li>
-              <li>✓ כל הנושאים פתוחים</li>
-              <li>✓ סימולציות מלאות</li>
-              <li>✓ תרגול טעויות ללא הגבלה</li>
-              <li>✓ ללא פרסומות</li>
+          className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
+                <Crown className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900">שדרג לפרימיום</h3>
+                <p className="text-sm text-gray-600">פתח את כל התכונות</p>
+              </div>
+            </div>
+            <ul className="text-gray-700 text-sm space-y-2 mb-4">
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> שאלות ללא הגבלה</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> כל הנושאים פתוחים</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> סימולציות מלאות</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> ללא פרסומות</li>
             </ul>
             <Button
             onClick={() => navigate(createPageUrl("Premium"))}
-            className="w-full bg-white text-amber-600 hover:bg-gray-100 font-bold h-12 rounded-xl">
+            className="w-full bg-[#3B82F6] hover:bg-blue-700 text-white font-bold h-12 rounded-[14px]">
 
               <Crown className="w-5 h-5 ml-2" />
               שדרג עכשיו
