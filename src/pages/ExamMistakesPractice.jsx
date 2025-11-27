@@ -343,10 +343,10 @@ Return JSON:`,
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-[#000000] text-sm font-medium">
+                <div className="text-white text-sm font-medium">
                   שאלה {question.question_number} - טעית בה במבחן
                 </div>
-                <div className="text-[#000000] text-xs font-bold">
+                <div className="text-white text-xs font-bold">
                   הזדמנות לתקן!
                 </div>
               </div>
@@ -365,7 +365,7 @@ Return JSON:`,
 
             {question.reading_text &&
             <div className="bg-white rounded-xl p-4 mb-4 border-2 border-blue-500">
-                <div className="text-[#000000] mb-2 text-xs font-bold">📖 טקסט הקריאה:</div>
+                <div className="text-white mb-2 text-xs font-bold">📖 טקסט הקריאה:</div>
                 <div className="text-sm text-gray-800 leading-relaxed max-h-48 overflow-y-auto">
                   {question.reading_text}
                 </div>
@@ -373,7 +373,7 @@ Return JSON:`,
             }
 
             <div className="bg-white rounded-xl p-4">
-              <p className="text-[#000000] text-base leading-relaxed whitespace-pre-wrap">
+              <p className="text-white text-base leading-relaxed whitespace-pre-wrap">
                 {question.question_text}
               </p>
             </div>
