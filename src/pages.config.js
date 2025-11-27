@@ -66,6 +66,10 @@ import ExamMistakesPractice from './pages/ExamMistakesPractice';
 import StudyPlan from './pages/StudyPlan';
 import CustomPracticeSession from './pages/CustomPracticeSession';
 import VocabularyTraining from './pages/VocabularyTraining';
+import VocabularySets from './pages/VocabularySets';
+import VocabularySetMode from './pages/VocabularySetMode';
+import VocabularyFlashcards from './pages/VocabularyFlashcards';
+import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
 import __Layout from './Layout.jsx';
 
 
@@ -138,6 +142,10 @@ export const PAGES = {
     "StudyPlan": StudyPlan,
     "CustomPracticeSession": CustomPracticeSession,
     "VocabularyTraining": VocabularyTraining,
+    "VocabularySets": VocabularySets,
+    "VocabularySetMode": VocabularySetMode,
+    "VocabularyFlashcards": VocabularyFlashcards,
+    "VocabularyQuickPractice": VocabularyQuickPractice,
 }
 
 export const pagesConfig = {
