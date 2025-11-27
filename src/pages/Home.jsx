@@ -275,7 +275,10 @@ export default function HomePage() {
           isPremium={user?.is_premium}
           completedTasks={completedTasks}
           onToggleTask={toggleTask}
-          engineData={engineData} />
+          engineData={engineData}
+          subject={user?.selected_subject || ''}
+          unitLevel={user?.selected_units || 0}
+          userEmail={user?.email || ''} />
 
         {/* המשך מאיפה שהפסקת */}
         {lastActivity && (
