@@ -660,31 +660,31 @@ function SetSelectorDialog({ open, onOpenChange, totalSets, currentSetId, onSele
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm max-h-[80vh]">
+      <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-center">בחר סט</DialogTitle>
+          <DialogTitle className="text-center text-lg font-bold">בחר סט</DialogTitle>
         </DialogHeader>
         <div className="overflow-y-auto max-h-[60vh] py-2">
-          <div className="space-y-2">
+          <div className="space-y-3">
             {sets.map(setId => (
               <button
                 key={setId}
                 onClick={() => onSelectSet(setId)}
-                className={`w-full p-4 rounded-xl border-2 flex items-center justify-between transition-all ${
+                className={`w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all ${
                   setId === currentSetId 
                     ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-blue-300'
+                    : 'border-gray-100 hover:border-blue-300 bg-white'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold ${
-                    setId === currentSetId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold ${
+                    setId === currentSetId ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
                   }`}>
                     {setId}
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900">סט {setId}</div>
-                    <div className="text-xs text-gray-500">מילים {(setId - 1) * 10 + 1} - {setId * 10}</div>
+                    <div className="font-bold text-gray-900">סט {setId}</div>
+                    <div className="text-sm text-blue-600">מילים {(setId - 1) * 10 + 1} - {setId * 10}</div>
                   </div>
                 </div>
                 {setId === currentSetId && (
