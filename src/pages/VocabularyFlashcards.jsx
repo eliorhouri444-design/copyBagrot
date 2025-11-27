@@ -25,6 +25,7 @@ export default function VocabularyFlashcardsPage() {
   const [results, setResults] = useState({ known: 0, unknown: 0 });
   const [answeredWords, setAnsweredWords] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -177,7 +178,6 @@ export default function VocabularyFlashcardsPage() {
 
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
-  const [isFlipped, setIsFlipped] = useState(false);
 
   const handleFlip = () => setIsFlipped(!isFlipped);
 
