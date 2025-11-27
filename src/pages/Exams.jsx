@@ -816,10 +816,10 @@ export default function ExamsPage() {
                         return (
                           <div className="bg-gray-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                               <div className="flex items-center gap-2 mb-2">
-                                <h4 className="bg-transparent text-[#000000] text-sm font-bold">תקן טעויות מבגרות זו</h4>
+                                <h4 className="bg-transparent text-[#000000] text-sm font-bold">טעויות בבגרות </h4>
                               </div>
                               <p className="text-[#000000] mb-2 text-sm">
-                                {wrongCount} שאלות שטעית בהן
+                                {wrongCount} שאלות שטעית בהן במבחן הזה
                               </p>
                               <Button
                               onClick={(e) => {
@@ -1388,7 +1388,7 @@ export default function ExamsPage() {
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">
-                          {wrongCount} שאלות שטעית בהן
+                          {wrongCount} שאלות שטעית בהן במבחן הזה
                         </p>
                         <Button
                           onClick={(e) => {
