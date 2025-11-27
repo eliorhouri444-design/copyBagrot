@@ -99,7 +99,15 @@ export default function VocabularyTrainingPage() {
       const subject = currentUser?.selected_subject || 'אנגלית';
       const units = currentUser?.selected_units || 3;
 
-      // Load vocabulary words
+      // Load vocabulary sets (NEW)
+      const sets = await base44.entities.VocabularySet.filter({
+        subject_id: subject,
+        unit_level: units,
+        is_active: true
+      }, 'set_number', 100);
+      setVocabularySets(sets);
+
+      // Load vocabulary words (old system - for backwards compatibility)
       const allWords = await base44.entities.VocabularyQuestion.filter({
         subject_id: subject,
         unit_level: units,
@@ -124,7 +132,8 @@ export default function VocabularyTrainingPage() {
       });
       setProgress(progressMap);
 
-      // Calculate stats
+      // Calculate stats - include both old words and new sets
+      const totalSetWords = sets.reduce((sum, s) => sum + (s.words?.length || 0), 0);
       const learnedWords = userProgress.filter(p => p.is_known).length;
       const weakWords = userProgress.filter(p => p.is_weak).length;
       const totalCorrect = userProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
@@ -132,13 +141,13 @@ export default function VocabularyTrainingPage() {
       const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
       const activeErrors = userProgress.filter(p => p.times_incorrect > p.times_correct).length;
 
-      // Calculate readiness score
-      const totalWords = allWords.length;
+      const totalWords = Math.max(allWords.length, totalSetWords);
       const masterySum = userProgress.reduce((sum, p) => sum + (p.mastery_level || 0), 0);
       const readiness = totalWords > 0 ? Math.round((masterySum / (totalWords * 100)) * 100) : 0;
 
       setStats({
         totalWords,
+        totalSets: sets.length,
         learnedWords,
         weakWords,
         accuracy,
@@ -146,10 +155,201 @@ export default function VocabularyTrainingPage() {
         readiness: Math.min(100, Math.max(0, readiness))
       });
 
+      // If requested specific set, load it
+      if (requestedSetNumber) {
+        const set = sets.find(s => s.set_number === parseInt(requestedSetNumber));
+        if (set) {
+          startSetPractice(set);
+        }
+      } else if (showSelectorOnLoad) {
+        setShowSetSelector(true);
+      }
+
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // NEW: Start practice with a specific set
+  const startSetPractice = (set) => {
+    setCurrentSet(set);
+    setCurrentSetNumber(set.set_number);
+    setMode(PRACTICE_MODES.SET_PRACTICE);
+    setSetPhase('flashcards');
+    setFlashcardIndex(0);
+    setFlashcardResults({ known: 0, unknown: 0 });
+    setQuizQuestions([]);
+    setQuizIndex(0);
+    setQuizResults({ correct: 0, incorrect: 0 });
+    setQuizAnswer('');
+    setShowQuizResult(false);
+  };
+
+  // NEW: Handle flashcard answer
+  const handleSetFlashcardAnswer = async (isKnown) => {
+    const currentWord = currentSet.words[flashcardIndex];
+    
+    setFlashcardResults(prev => ({
+      known: prev.known + (isKnown ? 1 : 0),
+      unknown: prev.unknown + (isKnown ? 0 : 1)
+    }));
+
+    // Save progress
+    try {
+      const wordId = `set_${currentSet.id}_${flashcardIndex}`;
+      const existingProgress = await base44.entities.VocabularyProgress.filter({
+        user_email: user.email,
+        word_id: wordId
+      });
+
+      if (existingProgress.length > 0) {
+        const p = existingProgress[0];
+        await base44.entities.VocabularyProgress.update(p.id, {
+          times_seen: (p.times_seen || 0) + 1,
+          times_correct: (p.times_correct || 0) + (isKnown ? 1 : 0),
+          times_incorrect: (p.times_incorrect || 0) + (isKnown ? 0 : 1),
+          is_known: isKnown ? true : p.is_known,
+          is_weak: !isKnown,
+          last_practiced: new Date().toISOString(),
+          mastery_level: Math.min(100, Math.max(0, (p.mastery_level || 0) + (isKnown ? 10 : -15)))
+        });
+      } else {
+        await base44.entities.VocabularyProgress.create({
+          word_id: wordId,
+          user_email: user.email,
+          subject_id: displaySubject,
+          unit_level: displayUnits,
+          hebrew_word: currentWord.hebrew,
+          english_word: currentWord.english,
+          times_seen: 1,
+          times_correct: isKnown ? 1 : 0,
+          times_incorrect: isKnown ? 0 : 1,
+          is_known: isKnown,
+          is_weak: !isKnown,
+          last_practiced: new Date().toISOString(),
+          mastery_level: isKnown ? 20 : 0
+        });
+      }
+    } catch (error) {
+      console.error("Error saving progress:", error);
+    }
+
+    // Move to next or transition to quiz
+    if (flashcardIndex < currentSet.words.length - 1) {
+      setTimeout(() => setFlashcardIndex(prev => prev + 1), 200);
+    } else {
+      // Generate quiz questions from set
+      const questions = generateQuizFromSet(currentSet);
+      setQuizQuestions(questions);
+      setTimeout(() => setSetPhase('quiz'), 500);
+    }
+  };
+
+  // NEW: Generate quiz questions from set's predefined questions
+  const generateQuizFromSet = (set) => {
+    const questions = [];
+    
+    set.words.forEach((word, wordIdx) => {
+      if (word.questions && word.questions.length > 0) {
+        word.questions.forEach((q, qIdx) => {
+          questions.push({
+            id: `${wordIdx}_${qIdx}`,
+            type: q.type,
+            word: word,
+            question: q.q,
+            correctAnswer: q.a,
+            options: q.options || null
+          });
+        });
+      } else {
+        // Default question if none provided
+        questions.push({
+          id: `${wordIdx}_default`,
+          type: 'translate',
+          word: word,
+          question: `מה פירוש ${word.english}?`,
+          correctAnswer: word.hebrew,
+          options: null
+        });
+      }
+    });
+
+    return questions.sort(() => Math.random() - 0.5).slice(0, 10);
+  };
+
+  // NEW: Check quiz answer
+  const handleQuizSubmit = (selectedAnswer = null) => {
+    const answer = selectedAnswer || quizAnswer;
+    const question = quizQuestions[quizIndex];
+    const correct = answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
+    
+    setIsQuizCorrect(correct);
+    setShowQuizResult(true);
+    setQuizResults(prev => ({
+      correct: prev.correct + (correct ? 1 : 0),
+      incorrect: prev.incorrect + (correct ? 0 : 1)
+    }));
+  };
+
+  // NEW: Go to next quiz question
+  const handleQuizNext = () => {
+    if (quizIndex < quizQuestions.length - 1) {
+      setQuizIndex(prev => prev + 1);
+      setQuizAnswer('');
+      setShowQuizResult(false);
+    } else {
+      setSetPhase('summary');
+    }
+  };
+
+  // NEW: Go to next set
+  const goToNextSet = () => {
+    const nextSet = vocabularySets.find(s => s.set_number === currentSetNumber + 1);
+    if (nextSet) {
+      startSetPractice(nextSet);
+    }
+  };
+
+  // NEW: Bulk import JSON
+  const handleBulkJsonImport = async () => {
+    if (!bulkJsonText.trim()) {
+      alert('יש להזין JSON');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const data = JSON.parse(bulkJsonText);
+      const setsToAdd = data.vocabularySets || data;
+
+      for (const setData of setsToAdd) {
+        await base44.entities.VocabularySet.create({
+          set_number: setData.setNumber || setData.set_number,
+          subject_id: displaySubject,
+          unit_level: displayUnits,
+          title: setData.title || `סט ${setData.setNumber || setData.set_number}`,
+          words: setData.words.map(w => ({
+            english: w.english,
+            hebrew: w.hebrew,
+            difficulty: w.difficulty || 'medium',
+            questions: w.questions || []
+          })),
+          is_active: true,
+          order: setData.setNumber || setData.set_number
+        });
+      }
+
+      setShowBulkJsonDialog(false);
+      setBulkJsonText('');
+      loadData();
+      alert(`${setsToAdd.length} סטים נוספו בהצלחה! ✅`);
+    } catch (error) {
+      console.error("Error importing JSON:", error);
+      alert('שגיאה בייבוא - ודא שה-JSON תקין');
+    } finally {
+      setIsSaving(false);
     }
   };
 
