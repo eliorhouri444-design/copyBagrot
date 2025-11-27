@@ -195,7 +195,7 @@ Return JSON:`,
           animate={{ opacity: 1, scale: 1 }}
           className="text-center">
 
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-2">טוען את הטעויות שלך...</h3>
@@ -223,7 +223,7 @@ Return JSON:`,
           </p>
           <Button
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+            className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
 
             חזרה לבגרויות
           </Button>
@@ -260,7 +260,7 @@ Return JSON:`,
             </p>
           </div>
 
-          <div className={`${improvement ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' : 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200'} rounded-2xl p-6 mb-6 border-2`}>
+          <div className={`${improvement ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' : 'bg-gradient-to-br from-orange-50 to-red-50 border-blue-500'} rounded-2xl p-6 mb-6 border-2`}>
             <div className="text-center">
               <div className={`text-6xl font-black ${improvement ? 'text-green-600' : 'text-orange-600'} mb-2`}>
                 {correctCount} / {totalAnswered}
@@ -280,7 +280,7 @@ Return JSON:`,
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg">
+              className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-lg font-bold shadow-lg">
 
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
@@ -303,7 +303,7 @@ Return JSON:`,
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex flex-col">
-      <div className="bg-blue-500 p-4 from-orange-500 to-red-500 shadow-xl flex-shrink-0">
+      <div className="bg-blue-500 p-4 from-blue-500 to-blue-600 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <Button
             variant="ghost"
@@ -327,7 +327,7 @@ Return JSON:`,
           <div className="w-10" />
         </div>
 
-        <Progress value={progress} className="h-2 bg-white/20" />
+        <Progress value={progress} className="h-2 bg-white/20 [&>div]:bg-white" />
       </div>
 
       <div className="bg-gray-100 p-4 flex-1 flex items-center justify-center">
@@ -337,9 +337,9 @@ Return JSON:`,
           animate={{ opacity: 1, x: 0 }}
           className="bg-white rounded-3xl shadow-2xl w-full max-w-lg">
 
-          <div className="bg-[#ffffff] p-6 rounded-t-3xl from-orange-50 to-red-50 border-b-2 border-orange-100">
+          <div className="bg-[#ffffff] p-6 rounded-t-3xl from-orange-50 to-red-50 border-b-2 border-blue-500">
             <div className="flex items-center gap-3 mb-4">
-              <div className="bg-blue-500 rounded-xl w-12 h-12 from-orange-500 to-red-500 flex items-center justify-center shadow-lg">
+              <div className="bg-blue-500 rounded-xl w-12 h-12 from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
@@ -364,7 +364,7 @@ Return JSON:`,
             }
 
             {question.reading_text &&
-            <div className="bg-white rounded-xl p-4 mb-4 border-2 border-orange-200">
+            <div className="bg-white rounded-xl p-4 mb-4 border-2 border-blue-500">
                 <div className="bg-transparent text-[#000000] mb-2 text-xs font-bold">📖 טקסט הקריאה:</div>
                 <div className="text-sm text-gray-800 leading-relaxed max-h-48 overflow-y-auto">
                   {question.reading_text}
@@ -386,7 +386,7 @@ Return JSON:`,
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder="נסה שוב - הקלד את תשובתך..."
-                className="w-full h-32 p-4 text-base border-2 border-orange-200 focus:border-orange-500 rounded-2xl resize-none"
+                className="w-full h-32 p-4 text-base border-2 border-blue-500 focus:border-blue-500 rounded-2xl resize-none"
                 autoFocus
                 disabled={isChecking} />
 
@@ -395,7 +395,7 @@ Return JSON:`,
                   <Button
                   onClick={checkAnswer}
                   disabled={!userAnswer.trim() || isChecking}
-                  className="flex-1 h-14 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg disabled:opacity-50">
+                  className="flex-1 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-lg font-bold shadow-lg disabled:opacity-50">
 
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />
