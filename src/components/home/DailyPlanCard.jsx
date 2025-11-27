@@ -448,40 +448,48 @@ export default function DailyPlanCard({
   const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
   const handleTaskClick = (task) => {
+    // שמירת פרטי המשימה ב-sessionStorage כדי לעקוב אחרי ההשלמה
+    sessionStorage.setItem('currentTaskId', task.id);
+    sessionStorage.setItem('currentTaskType', task.type);
+    sessionStorage.setItem('currentTaskTarget', task.target?.toString() || '1');
+    sessionStorage.setItem('currentTaskCurrent', task.current?.toString() || '0');
+    
     // ניווט לפי סוג המשימה
     if (task.type === "practice" || task.type === "questions") {
       // אם יש topic_id במשימה, נווט אליו ישירות
       if (task.topic_id) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1`);
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1&taskId=${task.id}`);
       } else if (recommendedTopics.length > 0) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1&taskId=${task.id}`);
       } else {
         navigate(createPageUrl("Practice"));
       }
     } else if (task.type === "learn" || task.type === "topic") {
       if (task.topic_id) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1`);
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(task.topic_id)}&set=1&taskId=${task.id}`);
       } else if (recommendedTopics.length > 0) {
-        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1`);
+        navigate(`${createPageUrl("TopicPracticeNew")}?topicid=${encodeURIComponent(recommendedTopics[0].topic_id)}&set=1&taskId=${task.id}`);
       } else {
         navigate(createPageUrl("Practice"));
       }
     } else if (task.type === "review" || task.type === "mistakes") {
-      navigate(createPageUrl("CustomWeakPractice"));
+      navigate(`${createPageUrl("CustomWeakPractice")}?taskId=${task.id}`);
     } else if (task.type === "exam") {
       if (task.exam_id) {
-        navigate(`${createPageUrl("ExamGeneric")}?examId=${task.exam_id}`);
+        navigate(`${createPageUrl("ExamGeneric")}?examId=${task.exam_id}&taskId=${task.id}`);
       } else if (recommendedExams.length > 0) {
         sessionStorage.setItem('selectedModuleId', recommendedExams[0].id);
+        sessionStorage.setItem('examTaskId', task.id);
         navigate(createPageUrl("Exams"));
       } else {
+        sessionStorage.setItem('examTaskId', task.id);
         navigate(createPageUrl("Exams"));
       }
     } else if (task.type === "vocabulary") {
       if (task.topic_id) {
-        navigate(`${createPageUrl("VocabularyPractice")}?topicid=${encodeURIComponent(task.topic_id)}`);
+        navigate(`${createPageUrl("VocabularyPractice")}?topicid=${encodeURIComponent(task.topic_id)}&taskId=${task.id}`);
       } else {
-        navigate(createPageUrl("Vocabulary"));
+        navigate(`${createPageUrl("Vocabulary")}?taskId=${task.id}`);
       }
     } else {
       // ברירת מחדל - נווט לדף תרגול
