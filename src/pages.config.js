@@ -63,6 +63,7 @@ import Readiness from './pages/Readiness';
 import Home from './pages/Home';
 import Settings from './pages/Settings';
 import ExamMistakesPractice from './pages/ExamMistakesPractice';
+import StudyPlan from './pages/StudyPlan';
 import __Layout from './Layout.jsx';
 
 
@@ -132,6 +133,7 @@ export const PAGES = {
     "Home": Home,
     "Settings": Settings,
     "ExamMistakesPractice": ExamMistakesPractice,
+    "StudyPlan": StudyPlan,
 }
 
 export const pagesConfig = {
