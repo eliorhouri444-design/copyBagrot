@@ -464,17 +464,17 @@ export default function ProfilePage() {
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent dir="rtl" className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[18px]">ערוך פרטים אישיים</DialogTitle>
+            <DialogTitle className="text-xl font-bold">ערוך פרטים אישיים</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">שם מלא</label>
+              <label className="text-sm font-semibold mb-2 block text-gray-900">שם מלא</label>
               <Input value={editData.full_name} onChange={(e) => setEditData({ ...editData, full_name: e.target.value })} />
             </div>
 
             <div>
-              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">מקצוע ראשי</label>
+              <label className="text-sm font-semibold mb-2 block text-gray-900">מקצוע ראשי</label>
               <Select value={editData.selected_subject} onValueChange={(value) => setEditData({ ...editData, selected_subject: value })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent dir="rtl">
@@ -484,7 +484,7 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">רמת יחידות</label>
+              <label className="text-sm font-semibold mb-2 block text-gray-900">רמת יחידות</label>
               <Select value={editData.selected_units?.toString()} onValueChange={(value) => setEditData({ ...editData, selected_units: parseInt(value) })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent dir="rtl">
@@ -496,19 +496,19 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">ציון מטרה</label>
+              <label className="text-sm font-semibold mb-2 block text-gray-900">ציון מטרה</label>
               <Input type="number" value={editData.target_score} onChange={(e) => setEditData({ ...editData, target_score: parseInt(e.target.value) })} min="55" max="100" />
             </div>
 
             <div>
-              <label className="text-[13px] font-semibold mb-2 block text-[#2B2B2B]">תאריך בגרות</label>
+              <label className="text-sm font-semibold mb-2 block text-gray-900">תאריך בגרות</label>
               <Input type="date" value={editData.exam_date} onChange={(e) => setEditData({ ...editData, exam_date: e.target.value })} />
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditing(false)}>ביטול</Button>
-            <Button onClick={handleSaveProfile} className="bg-[#3B82F6]">שמור</Button>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row-reverse">
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="w-full sm:w-auto rounded-[14px]">ביטול</Button>
+            <Button onClick={handleSaveProfile} className="bg-[#3B82F6] hover:bg-blue-700 w-full sm:w-auto rounded-[14px]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -516,28 +516,35 @@ export default function ProfilePage() {
       <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
         <DialogContent dir="rtl" className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-[18px]">
-              <CreditCard className="w-5 h-5 text-[#F59E0B]" />
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+              <CreditCard className="w-6 h-6 text-amber-500" />
               ניהול מנוי
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="bg-[#F5F8FF] rounded-lg p-4 border border-[#E9F0FF]">
-              <div className="font-bold text-[#2B2B2B] mb-2 text-[15px]">המנוי הנוכחי שלך</div>
-              <div className="text-[13px] text-[#6E6E6E]">
+            <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+              <div className="font-bold text-gray-900 mb-2 text-base">המנוי הנוכחי שלך</div>
+              <div className="text-sm text-gray-700">
                 {user?.subscription_type === 'yearly' ? 'מנוי שנתי - 299.94 ₪' : 'מנוי חודשי - 49.99 ₪'}
               </div>
             </div>
 
-            {user?.subscription_type === 'monthly' &&
-            <Button onClick={() => navigate(createPageUrl("Premium") + "?plan=yearly")} className="w-full bg-[#F59E0B] hover:bg-amber-600 text-white font-bold rounded-[14px]">
+            {user?.subscription_type === 'monthly' && (
+              <Button 
+                onClick={() => navigate(createPageUrl("Premium") + "?plan=yearly")} 
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-[14px] h-12"
+              >
                 <Crown className="w-4 h-4 ml-2" />
                 שדרג למנוי שנתי וחסוך 50%
               </Button>
-            }
+            )}
 
-            <Button variant="outline" className="w-full text-red-600 hover:bg-red-50 rounded-[14px]" onClick={() => {setShowSubscriptionDialog(false);setShowCancelDialog(true);}}>
+            <Button 
+              variant="outline" 
+              className="w-full text-red-600 hover:bg-red-50 rounded-[14px] border-2 border-red-200 h-12" 
+              onClick={() => {setShowSubscriptionDialog(false);setShowCancelDialog(true);}}
+            >
               ביטול מנוי
             </Button>
           </div>
@@ -547,11 +554,11 @@ export default function ProfilePage() {
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <DialogContent dir="rtl" className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[18px]">ביטול מנוי</DialogTitle>
+            <DialogTitle className="text-xl font-bold">ביטול מנוי</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="text-[15px] text-[#2B2B2B]">אנחנו מצטערים לראות אותך הולך. למה אתה מבטל?</div>
+            <div className="text-base text-gray-900">אנחנו מצטערים לראות אותך הולך. למה אתה מבטל?</div>
 
             <Select value={cancelReason} onValueChange={setCancelReason}>
               <SelectTrigger><SelectValue placeholder="בחר סיבה..." /></SelectTrigger>
@@ -560,14 +567,14 @@ export default function ProfilePage() {
               </SelectContent>
             </Select>
 
-            <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-              <div className="text-[13px] text-red-900"><strong>שים לב:</strong> לאחר הביטול תאבד גישה לכל תכונות הפרימיום</div>
+            <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+              <div className="text-sm text-red-800"><strong>⚠️ שים לב:</strong> לאחר הביטול תאבד גישה לכל תכונות הפרימיום</div>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>אל תבטל</Button>
-            <Button onClick={handleCancelSubscription} className="bg-red-600 hover:bg-red-700" disabled={!cancelReason}>בטל מנוי</Button>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row-reverse">
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="w-full sm:w-auto rounded-[14px]">אל תבטל</Button>
+            <Button onClick={handleCancelSubscription} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto rounded-[14px]" disabled={!cancelReason}>בטל מנוי</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
