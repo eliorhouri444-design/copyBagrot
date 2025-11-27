@@ -20,14 +20,12 @@ import {
   MessageSquare,
   CheckCircle,
   AlertTriangle,
-  ChevronDown,
-  Loader2 } from
+  ChevronDown } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle, StatCard } from "@/components/ui/card-simple";
-import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
