@@ -721,7 +721,7 @@ export default function VocabularyTrainingPage() {
     const currentWord = currentSet?.words?.[flashcardIndex];
     if (!currentWord) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F7F9FC' }}>
           <div className="text-center">
             <p className="text-gray-600 mb-4">אין מילים בסט זה</p>
             <Button onClick={() => setMode(PRACTICE_MODES.DASHBOARD)}>חזרה</Button>
@@ -732,50 +732,112 @@ export default function VocabularyTrainingPage() {
     const flashcardProgress = ((flashcardIndex + 1) / currentSet.words.length) * 100;
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
-          <button onClick={() => setShowSetSelector(true)} className="p-2 -ml-2 text-gray-500">
-            <List className="w-5 h-5" />
-          </button>
-          <div className="text-center">
-            <span className="text-sm font-medium text-gray-900">סט {currentSetNumber}</span>
-            <span className="text-xs text-gray-500 block">{flashcardIndex + 1} / {currentSet.words.length}</span>
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F7F9FC' }}>
+        {/* Header */}
+        <div className="px-5 py-4 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={() => setShowSetSelector(true)} className="p-2 -mr-2 text-gray-400 hover:text-gray-600">
+              <List className="w-5 h-5" />
+            </button>
+            <div className="text-center">
+              <span className="text-lg font-bold" style={{ color: '#0A2540' }}>סט {currentSetNumber}</span>
+            </div>
+            <button onClick={() => setMode(PRACTICE_MODES.DASHBOARD)} className="p-2 -ml-2 text-gray-400 hover:text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <div className="w-9" />
+          
+          {/* Progress info */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium" style={{ color: '#1C6EF2' }}>
+              שאלה {flashcardIndex + 1} מתוך {currentSet.words.length}
+            </span>
+            <span className="text-sm text-gray-500">
+              {Math.round(flashcardProgress)}%
+            </span>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full rounded-full"
+              style={{ backgroundColor: '#1C6EF2' }}
+              initial={{ width: 0 }}
+              animate={{ width: `${flashcardProgress}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
         </div>
-        
-        <Progress value={flashcardProgress} className="h-1 rounded-none" />
 
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
-          <motion.div key={flashcardIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm">
+        {/* Flashcard Area */}
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8">
+          <motion.div 
+            key={flashcardIndex} 
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            className="w-full max-w-md"
+          >
             {/* Flashcard with flip animation */}
             <div 
-              className="relative h-56 cursor-pointer perspective-1000"
+              className="relative cursor-pointer"
               onClick={() => !isFlipped && setIsFlipped(true)}
-              style={{ perspective: '1000px' }}
+              style={{ perspective: '1000px', height: '280px' }}
             >
               <motion.div
                 className="w-full h-full relative"
                 style={{ transformStyle: 'preserve-3d' }}
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               >
                 {/* Front side - English word */}
                 <div 
-                  className="absolute inset-0 bg-white rounded-2xl shadow-lg border-2 border-blue-200 p-8 flex flex-col items-center justify-center backface-hidden"
-                  style={{ backfaceVisibility: 'hidden' }}
+                  className="absolute inset-0 bg-white shadow-xl flex flex-col items-center justify-center"
+                  style={{ 
+                    backfaceVisibility: 'hidden',
+                    borderRadius: '22px',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                  }}
                 >
-                  <div className="text-3xl font-bold text-gray-900" dir="ltr">{currentWord.english}</div>
-                  <div className="mt-6 text-sm text-blue-500 font-medium">לחץ להפוך ←</div>
+                  <div 
+                    className="font-bold mb-8" 
+                    dir="ltr"
+                    style={{ color: '#0A2540', fontSize: '30px' }}
+                  >
+                    {currentWord.english}
+                  </div>
+                  
+                  <button 
+                    className="px-6 py-3 font-semibold transition-all hover:scale-105"
+                    style={{ 
+                      backgroundColor: '#E7F0FF',
+                      color: '#1C6EF2',
+                      borderRadius: '12px'
+                    }}
+                  >
+                    הפוך כרטיס
+                  </button>
                 </div>
                 
                 {/* Back side - Hebrew translation */}
                 <div 
-                  className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg border-2 border-blue-300 p-8 flex flex-col items-center justify-center"
-                  style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                  className="absolute inset-0 bg-white shadow-xl flex flex-col items-center justify-center"
+                  style={{ 
+                    backfaceVisibility: 'hidden', 
+                    transform: 'rotateY(180deg)',
+                    borderRadius: '22px',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                  }}
                 >
-                  <div className="text-2xl font-bold text-blue-900">{currentWord.hebrew}</div>
-                  <div className="text-lg text-gray-600 mt-2" dir="ltr">{currentWord.english}</div>
+                  <div 
+                    className="w-16 border-t-2 mb-6"
+                    style={{ borderColor: '#E5E7EB' }}
+                  />
+                  <div 
+                    className="font-bold text-2xl"
+                    style={{ color: '#0A2540' }}
+                  >
+                    {currentWord.hebrew}
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -787,26 +849,38 @@ export default function VocabularyTrainingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="flex gap-4 mt-6"
+                  className="flex gap-3 mt-8"
+                  style={{ direction: 'rtl' }}
                 >
-                  <button onClick={() => handleSetFlashcardAnswer(false)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors">
-                    <X className="w-5 h-5 text-red-500" />
-                    <span className="font-medium">לא ידעתי</span>
+                  <button 
+                    onClick={() => handleSetFlashcardAnswer(true)} 
+                    className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ 
+                      width: '48%',
+                      backgroundColor: '#E7F0FF',
+                      color: '#1C6EF2',
+                      borderRadius: '16px'
+                    }}
+                  >
+                    <Check className="w-5 h-5" />
+                    <span>ידעתי</span>
                   </button>
-                  <button onClick={() => handleSetFlashcardAnswer(true)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="font-medium">ידעתי</span>
+                  <button 
+                    onClick={() => handleSetFlashcardAnswer(false)} 
+                    className="h-14 flex items-center justify-center gap-2 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ 
+                      width: '48%',
+                      backgroundColor: '#FFECEC',
+                      color: '#D93A3A',
+                      borderRadius: '16px'
+                    }}
+                  >
+                    <X className="w-5 h-5" />
+                    <span>לא ידעתי</span>
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
-            
-            {/* Tap to flip hint when not flipped */}
-            {!isFlipped && (
-              <div className="text-center mt-6 text-gray-400 text-sm">
-                לחץ על הכרטיס לראות תרגום
-              </div>
-            )}
           </motion.div>
         </div>
 
