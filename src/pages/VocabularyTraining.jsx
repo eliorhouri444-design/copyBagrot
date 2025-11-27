@@ -4,10 +4,19 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
   BookOpen, ChevronLeft, Layers, Target, AlertTriangle, 
-  RotateCcw, Loader2, Filter 
+  RotateCcw, Loader2, Filter, Plus, Save, X, Trash2 
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 import VocabularyDashboard from "@/components/vocabulary/VocabularyDashboard";
 import Flashcards from "@/components/vocabulary/Flashcards";
@@ -35,6 +44,16 @@ export default function VocabularyTrainingPage() {
   const [sessionResults, setSessionResults] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newWord, setNewWord] = useState({
+    hebrew_word: '',
+    english_answer: '',
+    acceptable_answers: '',
+    example_sentence: '',
+    category: '',
+    difficulty: 'medium'
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -164,6 +183,45 @@ export default function VocabularyTrainingPage() {
     return currentMastery;
   };
 
+  const handleAddWord = async () => {
+    if (!newWord.hebrew_word || !newWord.english_answer) {
+      alert('יש למלא מילה בעברית ותרגום באנגלית');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await base44.entities.VocabularyQuestion.create({
+        subject_id: displaySubject,
+        unit_level: displayUnits,
+        hebrew_word: newWord.hebrew_word,
+        english_answer: newWord.english_answer,
+        acceptable_answers: newWord.acceptable_answers ? newWord.acceptable_answers.split(',').map(a => a.trim()) : [],
+        example_sentence: newWord.example_sentence,
+        category: newWord.category || 'כללי',
+        difficulty: newWord.difficulty,
+        is_active: true
+      });
+
+      setShowAddDialog(false);
+      setNewWord({
+        hebrew_word: '',
+        english_answer: '',
+        acceptable_answers: '',
+        example_sentence: '',
+        category: '',
+        difficulty: 'medium'
+      });
+      loadData();
+      alert('המילה נוספה בהצלחה! ✅');
+    } catch (error) {
+      console.error("Error adding word:", error);
+      alert('שגיאה בהוספת המילה');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSessionComplete = async (results) => {
     setSessionResults(results);
     setMode(PRACTICE_MODES.SUMMARY);
@@ -241,6 +299,17 @@ export default function VocabularyTrainingPage() {
         {mode === PRACTICE_MODES.DASHBOARD && (
           <div className="space-y-4">
             <VocabularyDashboard stats={stats} />
+
+            {/* Admin Add Button */}
+            {user?.role === 'admin' && (
+              <Button
+                onClick={() => setShowAddDialog(true)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                הוסף מילה חדשה
+              </Button>
+            )}
 
             {/* Category Filter */}
             {categories.length > 0 && (
@@ -375,6 +444,119 @@ export default function VocabularyTrainingPage() {
           />
         )}
       </div>
+
+      {/* Add Word Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent dir="rtl" className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Plus className="w-5 h-5 text-green-600" />
+              הוסף מילה חדשה
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                מילה בעברית *
+              </label>
+              <Input
+                value={newWord.hebrew_word}
+                onChange={(e) => setNewWord({ ...newWord, hebrew_word: e.target.value })}
+                placeholder="לדוגמה: לרוץ"
+                className="text-right"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                תרגום לאנגלית *
+              </label>
+              <Input
+                value={newWord.english_answer}
+                onChange={(e) => setNewWord({ ...newWord, english_answer: e.target.value })}
+                placeholder="לדוגמה: run"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                תשובות מקובלות נוספות (מופרדות בפסיקים)
+              </label>
+              <Input
+                value={newWord.acceptable_answers}
+                onChange={(e) => setNewWord({ ...newWord, acceptable_answers: e.target.value })}
+                placeholder="לדוגמה: jog, sprint"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                משפט לדוגמה באנגלית
+              </label>
+              <Textarea
+                value={newWord.example_sentence}
+                onChange={(e) => setNewWord({ ...newWord, example_sentence: e.target.value })}
+                placeholder="לדוגמה: I like to run in the park."
+                dir="ltr"
+                className="h-20"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  קטגוריה
+                </label>
+                <Input
+                  value={newWord.category}
+                  onChange={(e) => setNewWord({ ...newWord, category: e.target.value })}
+                  placeholder="לדוגמה: פעלים"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  רמת קושי
+                </label>
+                <Select
+                  value={newWord.difficulty}
+                  onValueChange={(value) => setNewWord({ ...newWord, difficulty: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="easy">קל</SelectItem>
+                    <SelectItem value="medium">בינוני</SelectItem>
+                    <SelectItem value="hard">קשה</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              ביטול
+            </Button>
+            <Button
+              onClick={handleAddWord}
+              disabled={isSaving}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              שמור
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
