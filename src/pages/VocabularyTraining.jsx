@@ -748,21 +748,65 @@ export default function VocabularyTrainingPage() {
 
         <div className="flex-1 flex flex-col items-center justify-center p-6">
           <motion.div key={flashcardIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-4" dir="ltr">{currentWord.english}</div>
-              <div className="text-lg text-gray-600 pt-4 border-t border-gray-100">{currentWord.hebrew}</div>
+            {/* Flashcard with flip animation */}
+            <div 
+              className="relative h-56 cursor-pointer perspective-1000"
+              onClick={() => !isFlipped && setIsFlipped(true)}
+              style={{ perspective: '1000px' }}
+            >
+              <motion.div
+                className="w-full h-full relative"
+                style={{ transformStyle: 'preserve-3d' }}
+                animate={{ rotateY: isFlipped ? 180 : 0 }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+              >
+                {/* Front side - English word */}
+                <div 
+                  className="absolute inset-0 bg-white rounded-2xl shadow-lg border-2 border-blue-200 p-8 flex flex-col items-center justify-center backface-hidden"
+                  style={{ backfaceVisibility: 'hidden' }}
+                >
+                  <div className="text-3xl font-bold text-gray-900" dir="ltr">{currentWord.english}</div>
+                  <div className="mt-6 text-sm text-blue-500 font-medium">לחץ להפוך ←</div>
+                </div>
+                
+                {/* Back side - Hebrew translation */}
+                <div 
+                  className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg border-2 border-blue-300 p-8 flex flex-col items-center justify-center"
+                  style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                >
+                  <div className="text-2xl font-bold text-blue-900">{currentWord.hebrew}</div>
+                  <div className="text-lg text-gray-600 mt-2" dir="ltr">{currentWord.english}</div>
+                </div>
+              </motion.div>
             </div>
 
-            <div className="flex gap-4 mt-8">
-              <button onClick={() => handleSetFlashcardAnswer(false)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors">
-                <X className="w-5 h-5 text-red-500" />
-                <span className="font-medium">לא ידעתי</span>
-              </button>
-              <button onClick={() => handleSetFlashcardAnswer(true)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors">
-                <Check className="w-5 h-5 text-green-500" />
-                <span className="font-medium">ידעתי</span>
-              </button>
-            </div>
+            {/* Action buttons - only show when flipped */}
+            <AnimatePresence>
+              {isFlipped && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="flex gap-4 mt-6"
+                >
+                  <button onClick={() => handleSetFlashcardAnswer(false)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors">
+                    <X className="w-5 h-5 text-red-500" />
+                    <span className="font-medium">לא ידעתי</span>
+                  </button>
+                  <button onClick={() => handleSetFlashcardAnswer(true)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="font-medium">ידעתי</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {/* Tap to flip hint when not flipped */}
+            {!isFlipped && (
+              <div className="text-center mt-6 text-gray-400 text-sm">
+                לחץ על הכרטיס לראות תרגום
+              </div>
+            )}
           </motion.div>
         </div>
 
