@@ -830,7 +830,7 @@ export default function ExamsPage() {
                                 sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
                                 sessionStorage.setItem('mistakesExamId', attempt.exam_id);
                                 navigate(createPageUrl("ExamMistakesPractice"));
-                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-600 from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 w-full h-9 flex items-center justify-center gap-2">
+                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-600 from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
 
                                 <Target className="w-3.5 h-3.5" />
                                 תרגל {wrongCount} טעויות
@@ -847,8 +847,8 @@ export default function ExamsPage() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                   onClick={() => setShowAllExams(true)}
-                  variant="outline"
-                  className="bg-background text-[#0c234b] mt-2 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
+                  variant="outline" className="bg-[#ffffff] text-blue-500 mt-2 px-4 py-2 text-sm font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-[#E9F0FF] hover:bg-[#F5F8FF]">
+
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
@@ -1208,7 +1208,7 @@ export default function ExamsPage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
+                  className="w-full mt-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 text-white h-10 text-sm font-bold flex items-center justify-center gap-2">
 
                       <Target className="w-4 h-4" />
                       {isPremium ? 'מבחן טעויות מבגרויות' : '🔒 שדרג לפרימיום'}
@@ -1393,7 +1393,7 @@ export default function ExamsPage() {
                               navigate(createPageUrl("Premium"));
                             }
                           }}
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
                           {isPremium ?
                           <>
                               <Target className="w-3 h-3" />
