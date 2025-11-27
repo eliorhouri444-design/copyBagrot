@@ -207,9 +207,25 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     תרגול טעויות בנושא זה
                   </Button>
                   <Button
-                  onClick={() => {
-                    sessionStorage.setItem('selectedTopicForPractice', currentTopic.topic_id);
-                    navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
+                  onClick={async () => {
+                    if (currentTopic.isVocabulary || currentTopic.topic_id?.toLowerCase().includes('vocabulary') || currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+                      // Load vocabulary sets and show selector
+                      try {
+                        const user = await base44.auth.me();
+                        const sets = await base44.entities.VocabularySet.filter({
+                          subject_id: user?.selected_subject || 'אנגלית',
+                          unit_level: user?.selected_units || 3,
+                          is_active: true
+                        }, 'set_number', 100);
+                        setVocabularySets(sets);
+                        setShowVocabSetSelector(true);
+                      } catch (error) {
+                        console.error("Error loading vocabulary sets:", error);
+                      }
+                    } else {
+                      sessionStorage.setItem('selectedTopicForPractice', currentTopic.topic_id);
+                      navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
+                    }
                   }}
                   className="bg-[#3B82F6] text-white text-[13px] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
                     בחר תרגול ספציפי (מעל 500 שאלות)
