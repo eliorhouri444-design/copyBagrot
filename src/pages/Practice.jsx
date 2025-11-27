@@ -307,12 +307,12 @@ export default function PracticePage() {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-      </div>
-    );
+      </div>);
+
   }
 
   return (
-    <div className="bg-blue-50 pt-0 pb-20 min-h-screen">
+    <div className="bg-blue-100 pt-0 pb-20 min-h-screen">
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -326,7 +326,7 @@ export default function PracticePage() {
         </div>
       </div>
 
-      <div className="pb-6 px-6 space-y-6">
+      <div className="bg-blue-100 pb-6 px-6 space-y-6">
 
         <motion.div
           key={`${displaySubject}_${displayUnits}`}
@@ -403,8 +403,8 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer"
-                >
+                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer">
+
 
 
 
@@ -436,8 +436,8 @@ export default function PracticePage() {
                       navigate(createPageUrl("Premium"));
                     }
                   }}
-                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer"
-                >
+                  className="bg-blue-50 p-3 text-right rounded-xl w-full border-2 transition-all border-blue-200 hover:border-blue-400 cursor-pointer">
+
 
 
 
@@ -459,17 +459,17 @@ export default function PracticePage() {
                 </motion.button>
               </div>
 
-              {!user?.is_premium && (
-                <div className="mt-4 text-center">
+              {!user?.is_premium &&
+              <div className="mt-4 text-center">
                   <Button
-                    onClick={() => navigate(createPageUrl("Premium"))}
-                    className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8"
-                  >
+                  onClick={() => navigate(createPageUrl("Premium"))}
+                  className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8">
+
                     <Crown className="w-4 h-4 ml-2" />
                     שדרג לפרימיום
                   </Button>
                 </div>
-              )}
+              }
             </div>
           </div>
         </motion.div>
