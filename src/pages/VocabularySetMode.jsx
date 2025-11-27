@@ -11,12 +11,15 @@ export default function VocabularySetModePage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const setId = urlParams.get('setId');
+  const isMultiSet = urlParams.get('multiSet') === 'true';
+  const setsParam = urlParams.get('sets');
   const startIndex = parseInt(urlParams.get('start') || '0');
   const endIndex = parseInt(urlParams.get('end') || '10');
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState([]);
+  const [selectedSetsData, setSelectedSetsData] = useState([]);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -41,8 +44,20 @@ export default function VocabularySetModePage() {
         is_active: true
       }, 'order', 500);
 
-      // Get only the words for this set
-      setWords(allWords.slice(startIndex, endIndex));
+      if (isMultiSet) {
+        // Get words from multiple sets
+        const setsData = JSON.parse(sessionStorage.getItem('vocabSetsData') || '[]');
+        setSelectedSetsData(setsData);
+        
+        let multiSetWords = [];
+        setsData.forEach(set => {
+          multiSetWords = [...multiSetWords, ...allWords.slice(set.startIndex, set.endIndex)];
+        });
+        setWords(multiSetWords);
+      } else {
+        // Get only the words for this set
+        setWords(allWords.slice(startIndex, endIndex));
+      }
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
@@ -71,7 +86,9 @@ export default function VocabularySetModePage() {
             <ChevronLeft className="w-6 h-6" />
           </button>
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold text-white">סט {setId}</h1>
+            <h1 className="text-lg font-bold text-white">
+              {isMultiSet ? `${selectedSetsData.length} סטים` : `סט ${setId}`}
+            </h1>
             <p className="text-sm text-white/80">{words.length} מילים</p>
           </div>
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -106,7 +123,13 @@ export default function VocabularySetModePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            onClick={() => navigate(createPageUrl(`VocabularyFlashcards?setId=${setId}&start=${startIndex}&end=${endIndex}`))}
+            onClick={() => {
+              if (isMultiSet) {
+                navigate(createPageUrl(`VocabularyFlashcards?multiSet=true&sets=${setsParam}`));
+              } else {
+                navigate(createPageUrl(`VocabularyFlashcards?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+              }
+            }}
             className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border-2 border-blue-200 hover:border-blue-400 transition-all shadow-sm"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -124,7 +147,13 @@ export default function VocabularySetModePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            onClick={() => navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`))}
+            onClick={() => {
+              if (isMultiSet) {
+                navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
+              } else {
+                navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+              }
+            }}
             className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border-2 border-green-200 hover:border-green-400 transition-all shadow-sm"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">

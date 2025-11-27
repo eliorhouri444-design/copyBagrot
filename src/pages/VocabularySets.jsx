@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  BookOpen, ChevronLeft, Loader2, Check, Lock, Plus, Save, Crown
+  BookOpen, ChevronLeft, Loader2, Check, Lock, Plus, Save, Crown, CheckSquare, Square
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ export default function VocabularySetsPage() {
   const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
   const [bulkText, setBulkText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedSets, setSelectedSets] = useState([]);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -94,6 +96,37 @@ export default function VocabularySetsPage() {
     if (prog === 100) return 'completed';
     if (prog > 0) return 'in_progress';
     return 'not_started';
+  };
+
+  const toggleSetSelection = (setId) => {
+    setSelectedSets(prev => 
+      prev.includes(setId) 
+        ? prev.filter(id => id !== setId)
+        : [...prev, setId]
+    );
+  };
+
+  const selectAllSets = () => {
+    const availableSets = sets.filter((_, idx) => user?.is_premium || idx < 3);
+    setSelectedSets(availableSets.map(s => s.id));
+  };
+
+  const startSelectedSetsPractice = () => {
+    if (selectedSets.length === 0) return;
+    
+    // Get all words from selected sets
+    const selectedSetObjects = sets.filter(s => selectedSets.includes(s.id));
+    const allStartIndices = selectedSetObjects.map(s => s.startIndex);
+    const allEndIndices = selectedSetObjects.map(s => s.endIndex);
+    
+    const minStart = Math.min(...allStartIndices);
+    const maxEnd = Math.max(...allEndIndices);
+    
+    // Store selected sets in session for multi-set practice
+    sessionStorage.setItem('selectedVocabSets', JSON.stringify(selectedSets));
+    sessionStorage.setItem('vocabSetsData', JSON.stringify(selectedSetObjects));
+    
+    navigate(createPageUrl(`VocabularySetMode?multiSet=true&sets=${selectedSets.join(',')}`));
   };
 
   const handleBulkAdd = async () => {
@@ -214,7 +247,59 @@ export default function VocabularySetsPage() {
 
         {/* Sets List */}
         <div className="space-y-3">
-          <h3 className="font-bold text-gray-900">בחר סט לתרגול</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-gray-900">בחר סט לתרגול</h3>
+            <div className="flex gap-2">
+              {selectionMode ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={selectAllSets}
+                    className="text-blue-600 text-xs"
+                  >
+                    בחר הכל
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectionMode(false);
+                      setSelectedSets([]);
+                    }}
+                    className="text-gray-600 text-xs"
+                  >
+                    ביטול
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectionMode(true)}
+                  className="text-blue-600 text-xs"
+                >
+                  בחר מספר סטים
+                </Button>
+              )}
+            </div>
+          </div>
+          
+          {/* Selected sets action bar */}
+          {selectionMode && selectedSets.length > 0 && (
+            <div className="bg-blue-50 rounded-xl p-3 border border-blue-200 flex items-center justify-between">
+              <span className="text-sm font-semibold text-blue-800">
+                {selectedSets.length} סטים נבחרו ({selectedSets.length * 10} מילים)
+              </span>
+              <Button
+                onClick={startSelectedSetsPractice}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                התחל תרגול
+              </Button>
+            </div>
+          )}
           
           {sets.length === 0 ? (
             <div className="bg-white rounded-2xl p-6 text-center border border-gray-200">
@@ -228,6 +313,8 @@ export default function VocabularySetsPage() {
               const status = getSetStatus(set);
               const isLocked = !user?.is_premium && index >= 3;
 
+              const isSelected = selectedSets.includes(set.id);
+              
               return (
                 <motion.button
                   key={set.id}
@@ -235,38 +322,54 @@ export default function VocabularySetsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => {
-                    if (isLocked) {
+                    if (selectionMode && !isLocked) {
+                      toggleSetSelection(set.id);
+                    } else if (isLocked) {
                       navigate(createPageUrl("Premium"));
                     } else {
                       navigate(createPageUrl(`VocabularySetMode?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`));
                     }
                   }}
                   className={`w-full bg-white rounded-2xl p-4 flex items-center gap-4 border-2 transition-all ${
-                    isLocked 
-                      ? 'border-gray-200 opacity-70' 
-                      : status === 'completed' 
-                        ? 'border-green-300 bg-green-50' 
-                        : status === 'in_progress'
-                          ? 'border-blue-300'
-                          : 'border-gray-200 hover:border-blue-400'
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50'
+                      : isLocked 
+                        ? 'border-gray-200 opacity-70' 
+                        : status === 'completed' 
+                          ? 'border-green-300 bg-green-50' 
+                          : status === 'in_progress'
+                            ? 'border-blue-300'
+                            : 'border-gray-200 hover:border-blue-400'
                   }`}
                 >
-                  {/* Set Number */}
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isLocked 
-                      ? 'bg-gray-100' 
-                      : status === 'completed' 
-                        ? 'bg-green-500' 
-                        : 'bg-blue-600'
-                  }`}>
-                    {isLocked ? (
-                      <Lock className="w-6 h-6 text-gray-400" />
-                    ) : status === 'completed' ? (
-                      <Check className="w-6 h-6 text-white" />
-                    ) : (
-                      <span className="text-xl font-bold text-white">{set.id}</span>
-                    )}
-                  </div>
+                  {/* Selection checkbox or Set Number */}
+                  {selectionMode && !isLocked ? (
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      isSelected ? 'bg-blue-600' : 'bg-gray-100'
+                    }`}>
+                      {isSelected ? (
+                        <CheckSquare className="w-6 h-6 text-white" />
+                      ) : (
+                        <Square className="w-6 h-6 text-gray-400" />
+                      )}
+                    </div>
+                  ) : (
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      isLocked 
+                        ? 'bg-gray-100' 
+                        : status === 'completed' 
+                          ? 'bg-green-500' 
+                          : 'bg-blue-600'
+                    }`}>
+                      {isLocked ? (
+                        <Lock className="w-6 h-6 text-gray-400" />
+                      ) : status === 'completed' ? (
+                        <Check className="w-6 h-6 text-white" />
+                      ) : (
+                        <span className="text-xl font-bold text-white">{set.id}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Set Info */}
                   <div className="flex-1 text-right">

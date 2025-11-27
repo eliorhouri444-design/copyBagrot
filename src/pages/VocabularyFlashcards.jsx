@@ -13,6 +13,8 @@ export default function VocabularyFlashcardsPage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const setId = urlParams.get('setId');
+  const isMultiSet = urlParams.get('multiSet') === 'true';
+  const setsParam = urlParams.get('sets');
   const startIndex = parseInt(urlParams.get('start') || '0');
   const endIndex = parseInt(urlParams.get('end') || '10');
 
@@ -44,9 +46,18 @@ export default function VocabularyFlashcardsPage() {
         is_active: true
       }, 'order', 500);
 
-      const setWords = allWords.slice(startIndex, endIndex);
+      let wordsForPractice = [];
+      if (isMultiSet) {
+        const setsData = JSON.parse(sessionStorage.getItem('vocabSetsData') || '[]');
+        setsData.forEach(set => {
+          wordsForPractice = [...wordsForPractice, ...allWords.slice(set.startIndex, set.endIndex)];
+        });
+      } else {
+        wordsForPractice = allWords.slice(startIndex, endIndex);
+      }
+      
       // Shuffle words
-      const shuffled = [...setWords].sort(() => Math.random() - 0.5);
+      const shuffled = [...wordsForPractice].sort(() => Math.random() - 0.5);
       setWords(shuffled);
 
     } catch (error) {
@@ -171,11 +182,17 @@ export default function VocabularyFlashcardsPage() {
               נסה שוב
             </Button>
             <Button
-              onClick={() => navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`))}
+              onClick={() => {
+                if (isMultiSet) {
+                  navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
+                } else {
+                  navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+                }
+              }}
               variant="outline"
               className="w-full h-14 text-lg font-bold border-2"
             >
-              עבור לתרגול מהיר
+              עבור למבחן על הסט
             </Button>
             <Button
               onClick={() => navigate(createPageUrl("VocabularySets"))}
@@ -199,13 +216,19 @@ export default function VocabularyFlashcardsPage() {
       <div className="bg-blue-600 px-5 py-4 flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3">
           <button
-            onClick={() => navigate(createPageUrl(`VocabularySetMode?setId=${setId}&start=${startIndex}&end=${endIndex}`))}
+            onClick={() => {
+              if (isMultiSet) {
+                navigate(createPageUrl(`VocabularySetMode?multiSet=true&sets=${setsParam}`));
+              } else {
+                navigate(createPageUrl(`VocabularySetMode?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+              }
+            }}
             className="p-2 hover:bg-white/10 rounded-lg"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">כרטיסיות - סט {setId}</h1>
+            <h1 className="text-lg font-bold">כרטיסיות {isMultiSet ? '' : `- סט ${setId}`}</h1>
             <p className="text-sm opacity-90">מילה {currentIndex + 1} מתוך {words.length}</p>
           </div>
           <div className="w-10" />
