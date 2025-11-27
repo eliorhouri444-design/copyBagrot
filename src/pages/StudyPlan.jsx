@@ -10,6 +10,34 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
+// ============================================
+// 🧠 READINESS MODEL - 4 PILLARS OF SUCCESS
+// ============================================
+// 1. Topic Mastery (40%) - All topics at 85%+
+// 2. Exam Mastery (50%) - 5-6 exams with target score avg
+// 3. Error Mastery (10%) - Less than 20% active errors
+// 4. Speed Mastery (bonus) - 15% improvement in solve time
+
+// IMPROVEMENT RATES (how much each action improves readiness):
+// - 20 questions → +1-2% (depends on accuracy)
+// - 10 mistakes fixed → +1.5%
+// - Weak topic to 85% → +5-12% (most significant!)
+// - Full exam → +7-15% (strongest near end)
+// - Speed improvement → +2-4%
+
+const READINESS_WEIGHTS = {
+  exams: 0.50,
+  topics: 0.40,
+  errors: 0.10
+};
+
+const TARGET_REQUIREMENTS = {
+  90: { questions: 700, exams: 8, topicMastery: 90 },
+  85: { questions: 600, exams: 6, topicMastery: 85 },
+  70: { questions: 400, exams: 5, topicMastery: 75 },
+  56: { questions: 250, exams: 4, topicMastery: 60 }
+};
+
 export default function StudyPlanPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -32,36 +60,42 @@ export default function StudyPlanPage() {
         const unitLevel = currentUser?.selected_units || 3;
         const targetScore = currentUser?.target_score || 85;
         const examDate = currentUser?.exam_date ? new Date(currentUser.exam_date) : null;
-        const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : 60;
+        const daysUntilExam = examDate ? Math.max(1, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : 60;
 
         // Fetch all required data in parallel
         const [attempts, examAttempts, practiceSessions, topics] = await Promise.all([
-          base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 1000),
+          base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 2000),
           base44.entities.ExamAttempt.filter({ created_by: currentUser.email, subject: subject }, '-created_date', 100),
           base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 200),
           base44.entities.TopicNew.filter({ subject_id: subject, unit_level: unitLevel, is_active: true }, null, 50)
         ]);
 
-        // Calculate performance data
+        // ============================================
+        // 📊 CALCULATE PERFORMANCE DATA
+        // ============================================
         const totalQuestions = attempts.length;
         const correctAnswers = attempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
         const overallAccuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
         
         const totalExams = examAttempts.length;
-        const avgExamScore = totalExams > 0 
-          ? Math.round(examAttempts.reduce((sum, e) => sum + (e.score_percent || 0), 0) / totalExams) 
+        const last6Exams = examAttempts.slice(0, 6);
+        const avgExamScore = last6Exams.length > 0 
+          ? Math.round(last6Exams.reduce((sum, e) => sum + (e.score_percent || 0), 0) / last6Exams.length) 
           : 0;
 
-        // Calculate topic mastery
+        // Calculate topic mastery for each topic
         const topicStats = {};
         attempts.forEach(a => {
           if (a.topic_id) {
             if (!topicStats[a.topic_id]) {
-              topicStats[a.topic_id] = { correct: 0, total: 0 };
+              topicStats[a.topic_id] = { correct: 0, total: 0, times: [] };
             }
             topicStats[a.topic_id].total++;
             if (a.status === 'correct' || a.percentage >= 70) {
               topicStats[a.topic_id].correct++;
+            }
+            if (a.time_spent_seconds) {
+              topicStats[a.topic_id].times.push(a.time_spent_seconds);
             }
           }
         });
@@ -69,35 +103,61 @@ export default function StudyPlanPage() {
         const topicMasteryList = Object.entries(topicStats).map(([topicId, stats]) => ({
           topicId,
           mastery: Math.round((stats.correct / stats.total) * 100),
-          total: stats.total
+          total: stats.total,
+          avgTime: stats.times.length > 0 ? Math.round(stats.times.reduce((a,b) => a+b, 0) / stats.times.length) : null
         }));
 
-        const weakTopics = topicMasteryList.filter(t => t.mastery < 70);
-        const activeMistakes = attempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+        // Weak topics = mastery < 85% (changed from 70%)
+        const weakTopics = topicMasteryList.filter(t => t.mastery < 85 && t.total >= 3);
+        const masteredTopics = topicMasteryList.filter(t => t.mastery >= 85 && t.total >= 5);
+        
+        // Active mistakes = incorrect answers not yet corrected
+        const activeMistakes = attempts.filter(a => 
+          (a.status === 'incorrect' || a.percentage < 50) && 
+          !a.corrected
+        ).length;
 
-        // Calculate topic mastery average (for topics with at least 5 attempts)
-        const masteredTopics = topicMasteryList.filter(t => t.total >= 5);
-        const topicsMastery = masteredTopics.length > 0
-          ? Math.round(masteredTopics.reduce((sum, t) => sum + t.mastery, 0) / masteredTopics.length)
+        // ============================================
+        // 🎯 CALCULATE 4 MASTERY PILLARS
+        // ============================================
+        
+        // 1. TOPIC MASTERY (are all topics at 85%+?)
+        const totalTopicsCount = topics.length || 10;
+        const topicsAt85Plus = masteredTopics.length;
+        const topicsMastery = Math.round((topicsAt85Plus / totalTopicsCount) * 100);
+
+        // 2. EXAM MASTERY (5-6 exams with target avg?)
+        const requiredExams = 6;
+        const examCountScore = Math.min(100, (totalExams / requiredExams) * 50);
+        const examScoreScore = Math.min(100, (avgExamScore / targetScore) * 50);
+        const examsMastery = Math.round(examCountScore + examScoreScore);
+
+        // 3. ERROR MASTERY (less than 20% active errors?)
+        const errorRatio = totalQuestions > 0 ? activeMistakes / totalQuestions : 0;
+        const errorMastery = Math.round(Math.max(0, 100 - (errorRatio * 500))); // 20% errors = 0%
+
+        // 4. SPEED MASTERY (improvement over time)
+        const recentAttempts = attempts.slice(0, 50);
+        const oldAttempts = attempts.slice(-50);
+        const recentAvgTime = recentAttempts.filter(a => a.time_spent_seconds).length > 0
+          ? recentAttempts.filter(a => a.time_spent_seconds).reduce((s, a) => s + a.time_spent_seconds, 0) / recentAttempts.filter(a => a.time_spent_seconds).length
+          : null;
+        const oldAvgTime = oldAttempts.filter(a => a.time_spent_seconds).length > 0
+          ? oldAttempts.filter(a => a.time_spent_seconds).reduce((s, a) => s + a.time_spent_seconds, 0) / oldAttempts.filter(a => a.time_spent_seconds).length
+          : null;
+        const speedImprovement = (recentAvgTime && oldAvgTime && oldAvgTime > recentAvgTime) 
+          ? Math.round(((oldAvgTime - recentAvgTime) / oldAvgTime) * 100) 
           : 0;
+        const speedMastery = Math.min(100, 50 + speedImprovement * 3.33); // 15% improvement = 100%
 
-        // Calculate exams mastery (based on exam scores)
-        const examsMastery = avgExamScore;
-
-        // Calculate error mastery (inverse of active mistakes ratio)
-        const errorMastery = totalQuestions > 0 
-          ? Math.round(100 - (activeMistakes / totalQuestions) * 100) 
-          : 100;
-
-        // Calculate speed mastery (based on average time per question if available)
-        const speedMastery = 70; // Default value, can be calculated from actual time data
-
-        // FULL READINESS FORMULA
-        // FullReadiness = 0.40 * TopicsMastery + 0.50 * ExamsMastery + 0.10 * ErrorMastery
+        // ============================================
+        // 📈 FULL READINESS FORMULA
+        // ============================================
+        // FullReadiness = 0.50 * ExamsMastery + 0.40 * TopicsMastery + 0.10 * ErrorMastery
         const fullReadiness = Math.round(
-          0.40 * topicsMastery +
-          0.50 * examsMastery +
-          0.10 * errorMastery
+          READINESS_WEIGHTS.exams * examsMastery +
+          READINESS_WEIGHTS.topics * topicsMastery +
+          READINESS_WEIGHTS.errors * errorMastery
         );
 
         const perfData = {
@@ -107,16 +167,19 @@ export default function StudyPlanPage() {
           totalExams,
           avgExamScore,
           weakTopics,
+          masteredTopics,
           activeMistakes,
           topicsMastery,
           examsMastery,
           errorMastery,
           speedMastery,
-          topicMasteryList
+          speedImprovement,
+          topicMasteryList,
+          totalTopicsCount
         };
         setPerformanceData(perfData);
 
-        // Set readiness
+        // Set readiness with gap calculation
         const gap = Math.max(0, targetScore - fullReadiness);
         setReadiness({
           readinessScore: fullReadiness,
@@ -129,81 +192,108 @@ export default function StudyPlanPage() {
           }
         });
 
-        // Calculate requirements
-        const questionsTarget = targetScore >= 90 ? 700 : targetScore >= 70 ? 500 : 300;
-        const examsTarget = targetScore >= 90 ? 8 : targetScore >= 70 ? 6 : 4;
-        const questionsNeeded = Math.max(0, questionsTarget - totalQuestions);
-        const examsNeeded = Math.max(0, examsTarget - totalExams);
+        // ============================================
+        // 📋 CALCULATE REQUIREMENTS TO REACH TARGET
+        // ============================================
+        const targetReqs = TARGET_REQUIREMENTS[targetScore >= 90 ? 90 : targetScore >= 85 ? 85 : targetScore >= 70 ? 70 : 56];
+        const questionsNeeded = Math.max(0, targetReqs.questions - totalQuestions);
+        const examsNeeded = Math.max(0, targetReqs.exams - totalExams);
         const topicsToMaster = weakTopics.length;
         const mistakesToFix = activeMistakes;
 
-        // Estimated days to reach target
-        const dailyQuestions = isPremium ? 30 : 10;
-        const estimatedDays = questionsNeeded > 0 ? Math.ceil(questionsNeeded / dailyQuestions) : 0;
+        // Calculate daily workload based on days until exam
+        const questionsPerDay = Math.ceil(questionsNeeded / daysUntilExam);
+        const examsPerWeek = Math.ceil(examsNeeded / Math.ceil(daysUntilExam / 7));
+        const mistakesPerDay = Math.ceil(mistakesToFix / Math.min(daysUntilExam, 10));
+
+        // Estimated days to reach target (based on improvement rates)
+        // Each day: ~2% from questions, ~1.5% from mistakes, occasional ~8% from topics/exams
+        const dailyImprovement = isPremium ? 3.5 : 1.5;
+        const estimatedDays = gap > 0 ? Math.ceil(gap / dailyImprovement) : 0;
 
         setRequirements({
-          questionsTarget,
+          questionsTarget: targetReqs.questions,
           questionsSolved: totalQuestions,
           questionsNeeded,
-          examsTarget,
+          questionsPerDay: Math.min(questionsPerDay, isPremium ? 50 : 10),
+          examsTarget: targetReqs.exams,
           examsDone: totalExams,
           examsNeeded,
+          examsPerWeek: Math.min(examsPerWeek, 3),
           topicsToMaster,
           mistakesToFix,
-          estimatedDays: Math.max(estimatedDays, daysUntilExam > 0 ? daysUntilExam : estimatedDays)
+          mistakesPerDay: Math.min(mistakesPerDay, isPremium ? 15 : 3),
+          estimatedDays: Math.max(estimatedDays, 1),
+          daysUntilExam
         });
 
-        // Generate daily plan
+        // ============================================
+        // 📅 GENERATE SMART DAILY PLAN
+        // ============================================
         const dailyTasks = [];
         let totalMinutes = 0;
+        let expectedDailyImprovement = 0;
 
-        // Task 1: Fix mistakes (premium only)
+        // Priority order: 1. Mistakes, 2. Weak Topics, 3. Questions, 4. Exam/Vocab
+        
+        // Task 1: Fix mistakes (HIGHEST PRIORITY - +1.5% per 10 mistakes)
         if (activeMistakes > 0) {
-          const mistakeCount = isPremium ? Math.min(15, activeMistakes) : 3;
+          const mistakeCount = isPremium ? Math.min(15, Math.max(9, mistakesPerDay)) : 3;
+          const duration = mistakeCount * 3;
           dailyTasks.push({
             id: 'mistakes',
             type: 'mistakes',
             title: 'תיקון טעויות',
             description: `חזרה על ${mistakeCount} טעויות`,
-            duration: mistakeCount * 3,
+            duration,
             count: mistakeCount,
             isPremiumOnly: true,
-            isLocked: !isPremium
+            isLocked: !isPremium,
+            improvement: Math.round(mistakeCount / 10 * 1.5 * 10) / 10
           });
-          totalMinutes += mistakeCount * 3;
+          totalMinutes += duration;
+          if (isPremium) expectedDailyImprovement += mistakeCount / 10 * 1.5;
         }
 
-        // Task 2: Strengthen weak topics (premium only)
+        // Task 2: Strengthen weak topics (HIGH PRIORITY - +5-12% per topic mastered)
         if (weakTopics.length > 0) {
-          const topicToStudy = topics.find(t => weakTopics.some(w => w.topicId === t.topic_id))?.name || 'אוצר מילים';
+          const weakTopic = weakTopics[0];
+          const topicName = topics.find(t => t.topic_id === weakTopic?.topicId)?.name || 'נושא חלש';
+          const questionsToMaster = 15;
+          const duration = 30;
           dailyTasks.push({
             id: 'weak_topic',
             type: 'topic',
             title: 'חיזוק נושאים חלשים',
-            description: `חיזוק: ${topicToStudy}`,
-            duration: 30,
-            count: 15,
+            description: `חיזוק: ${topicName}`,
+            duration,
+            count: questionsToMaster,
             isPremiumOnly: true,
-            isLocked: !isPremium
+            isLocked: !isPremium,
+            improvement: 2.5 // Average contribution towards topic mastery
           });
-          totalMinutes += 30;
+          totalMinutes += duration;
+          if (isPremium) expectedDailyImprovement += 2.5;
         }
 
-        // Task 3: Solve questions (available to all)
-        const questionCount = isPremium ? 30 : 10;
+        // Task 3: Solve questions (MEDIUM PRIORITY - +1-2% per 20 questions)
+        const questionCount = isPremium ? Math.min(30, Math.max(20, questionsPerDay)) : 10;
+        const questionDuration = questionCount * 2;
         dailyTasks.push({
           id: 'questions',
           type: 'questions',
           title: 'פתרון שאלות מגוונות',
           description: `${questionCount} שאלות`,
-          duration: questionCount * 2,
+          duration: questionDuration,
           count: questionCount,
           isPremiumOnly: false,
-          isLocked: false
+          isLocked: false,
+          improvement: Math.round(questionCount / 20 * 1.5 * 10) / 10
         });
-        totalMinutes += questionCount * 2;
+        totalMinutes += questionDuration;
+        expectedDailyImprovement += questionCount / 20 * 1.5;
 
-        // Task 4: Vocabulary (for English)
+        // Task 4: Vocabulary (for English) or Exam prep
         if (subject === 'אנגלית') {
           dailyTasks.push({
             id: 'vocabulary',
@@ -213,17 +303,37 @@ export default function StudyPlanPage() {
             duration: 10,
             count: 10,
             isPremiumOnly: false,
-            isLocked: false
+            isLocked: false,
+            improvement: 0.5
           });
           totalMinutes += 10;
+          expectedDailyImprovement += 0.5;
+        }
+
+        // If close to exam and need exams, add exam task
+        if (daysUntilExam <= 14 && examsNeeded > 0) {
+          dailyTasks.push({
+            id: 'exam_prep',
+            type: 'exam',
+            title: 'סימולציית בגרות',
+            description: 'בגרות מלאה השבוע',
+            duration: 90,
+            count: 1,
+            isPremiumOnly: false,
+            isLocked: false,
+            improvement: 10
+          });
         }
 
         setDailyPlan({
           tasks: dailyTasks,
-          estimatedMinutes: totalMinutes
+          estimatedMinutes: Math.min(totalMinutes, 90), // Cap at 90 minutes
+          expectedImprovement: Math.round(expectedDailyImprovement * 10) / 10
         });
 
-        // Set motivation message based on readiness
+        // ============================================
+        // 💬 SET MOTIVATION MESSAGE
+        // ============================================
         if (fullReadiness >= 80) {
           setMotivationMessage({
             type: 'success',
