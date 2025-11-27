@@ -781,7 +781,7 @@ export default function VocabularyTrainingPage() {
             <div 
               className="relative cursor-pointer"
               onClick={() => setIsFlipped(!isFlipped)}
-              style={{ perspective: '1000px', height: '280px' }}
+              style={{ perspective: '1000px', height: '340px' }}
             >
               <motion.div
                 className="w-full h-full relative"
@@ -799,9 +799,9 @@ export default function VocabularyTrainingPage() {
                   }}
                 >
                   <div 
-                    className="font-bold mb-8" 
+                    className="font-bold mb-16" 
                     dir="ltr"
-                    style={{ color: '#0A2540', fontSize: '30px' }}
+                    style={{ color: '#0A2540', fontSize: '32px' }}
                   >
                     {currentWord.english}
                   </div>
