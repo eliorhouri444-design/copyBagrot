@@ -1167,7 +1167,8 @@ export default function ExamsPage() {
                         </div>
                   }
                     </div>
-                )}
+                );
+                  })}
 
                   {(!showAttemptDetails.answers || showAttemptDetails.answers.length === 0) &&
                 <div className="text-center text-gray-500 text-sm py-4">
