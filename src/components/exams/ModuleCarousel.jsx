@@ -206,7 +206,7 @@ export default function ModuleCarousel({
 
     const totalAttempts = moduleAttempts.length;
     const passedAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 56).length;
-    
+
     // חלוקה לפי טווחי ציונים
     const excellentAttempts = moduleAttempts.filter((attemptItem) => (attemptItem.score_percent || 0) >= 86).length;
     const mediumAttempts = moduleAttempts.filter((attemptItem) => {
@@ -220,36 +220,36 @@ export default function ModuleCarousel({
     let topicMastery = 0;
     const moduleTopics = currentModule.parts || [];
     if (Object.keys(topicStats).length > 0 && moduleTopics.length > 0) {
-      const relevantTopicScores = moduleTopics
-        .map(part => topicStats[part]?.accuracy || topicStats[part.toLowerCase()]?.accuracy || 0)
-        .filter(score => score > 0);
+      const relevantTopicScores = moduleTopics.
+      map((part) => topicStats[part]?.accuracy || topicStats[part.toLowerCase()]?.accuracy || 0).
+      filter((score) => score > 0);
       if (relevantTopicScores.length > 0) {
         topicMastery = relevantTopicScores.reduce((a, b) => a + b, 0) / relevantTopicScores.length;
       }
     } else if (practiceAttempts.length > 0) {
       // אם אין topicStats, חשב מתוך practiceAttempts
-      const correctCount = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
-      topicMastery = practiceAttempts.length > 0 ? (correctCount / practiceAttempts.length) * 100 : 0;
+      const correctCount = practiceAttempts.filter((a) => a.status === 'correct' || a.percentage >= 70).length;
+      topicMastery = practiceAttempts.length > 0 ? correctCount / practiceAttempts.length * 100 : 0;
     }
 
     // === חישוב PracticePerformance (30%) ===
     // 0.70 * Accuracy + 0.20 * SpeedScore + 0.10 * ReducedErrors
     let practicePerformance = 0;
     if (practiceAttempts.length > 0) {
-      const correctPractice = practiceAttempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
-      const accuracy = (correctPractice / practiceAttempts.length) * 100;
-      
+      const correctPractice = practiceAttempts.filter((a) => a.status === 'correct' || a.percentage >= 70).length;
+      const accuracy = correctPractice / practiceAttempts.length * 100;
+
       // חישוב מהירות (אם יש)
       const avgTime = practiceAttempts.reduce((sum, a) => sum + (a.time_spent_seconds || 60), 0) / practiceAttempts.length;
       const speedScore = avgTime < 30 ? 100 : avgTime < 60 ? 80 : avgTime < 120 ? 60 : 40;
-      
+
       // חישוב הפחתת שגיאות (השוואה בין ניסיונות ראשונים לאחרונים)
       const recentAttempts = practiceAttempts.slice(-10);
       const olderAttempts = practiceAttempts.slice(0, Math.max(10, practiceAttempts.length - 10));
-      const recentErrors = recentAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
-      const olderErrors = olderAttempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+      const recentErrors = recentAttempts.filter((a) => a.status === 'incorrect' || a.percentage < 50).length;
+      const olderErrors = olderAttempts.filter((a) => a.status === 'incorrect' || a.percentage < 50).length;
       const reducedErrors = olderErrors > 0 && recentErrors < olderErrors ? 100 : recentErrors === 0 ? 100 : 50;
-      
+
       practicePerformance = 0.70 * accuracy + 0.20 * speedScore + 0.10 * reducedErrors;
     }
 
@@ -269,9 +269,9 @@ export default function ModuleCarousel({
 
     const maxExams = isPremium === true ? 100 : 5;
     const progress = totalAttempts > 0 ? Math.min(100, Math.round(totalAttempts / maxExams * 100)) : 0;
-    const avgScore = moduleAttempts.length > 0 
-      ? Math.round(moduleAttempts.reduce((sum, a) => sum + (a.score_percent || 0), 0) / moduleAttempts.length)
-      : 0;
+    const avgScore = moduleAttempts.length > 0 ?
+    Math.round(moduleAttempts.reduce((sum, a) => sum + (a.score_percent || 0), 0) / moduleAttempts.length) :
+    0;
 
     return {
       totalAttempts,
@@ -415,19 +415,19 @@ export default function ModuleCarousel({
                         {isPremium === true ?
                   // צריך מינימום 3 ניסיונות במודול כדי לזהות נושאים חלשים
                   moduleStats.totalAttempts >= 3 ?
-                    <Button
-                      onClick={() => {
-                        // שומר את פרטי המודול כדי לבנות בגרות על נושאים חלשים במודול הזה
-                        sessionStorage.setItem('weakTopicsModule', currentModule.module_id || currentModule.id);
-                        sessionStorage.setItem('weakTopicsModuleEntity', currentModule.entity || 'GenericExam');
-                        sessionStorage.setItem('weakTopicsModuleTitle', currentModule.title || '');
-                        navigate(createPageUrl("CustomWeakExam"));
-                      }} 
-                      className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
+                  <Button
+                    onClick={() => {
+                      // שומר את פרטי המודול כדי לבנות בגרות על נושאים חלשים במודול הזה
+                      sessionStorage.setItem('weakTopicsModule', currentModule.module_id || currentModule.id);
+                      sessionStorage.setItem('weakTopicsModuleEntity', currentModule.entity || 'GenericExam');
+                      sessionStorage.setItem('weakTopicsModuleTitle', currentModule.title || '');
+                      navigate(createPageUrl("CustomWeakExam"));
+                    }}
+                    className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
                       <Target className="w-4 h-4 ml-2" />
                       בגרות על נושאים חלשים
                     </Button> :
-                    <div className="bg-gray-100 rounded-xl p-3 text-center border border-blue-500">
+                  <div className="bg-gray-100 rounded-xl p-3 text-center border border-blue-500">
                       <div className="flex items-center justify-center gap-2 mb-1">
                         <AlertTriangle className="w-4 h-4 text-gray-500" />
                         <span className="text-[12px] font-bold text-gray-700">בגרות על נושאים חלשים</span>
@@ -435,8 +435,8 @@ export default function ModuleCarousel({
                       <p className="text-[11px] text-gray-500">
                         פתור עוד {3 - moduleStats.totalAttempts} בגרויות כדי שנזהה את הנושאים החלשים שלך
                       </p>
-                    </div>
-                  :
+                    </div> :
+
                   <Button
                     onClick={() => navigate(createPageUrl("Premium"))}
                     className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
@@ -453,8 +453,8 @@ export default function ModuleCarousel({
                         {isPremium === true ?
                   <Button
                     onClick={() => handleModuleClick(currentModule)}
-                    variant="outline"
-                    className="w-full h-10 text-[12px] font-semibold border-2 border-blue-500 hover:bg-[#F5F8FF] rounded-[14px]">
+                    variant="outline" className="bg-[#ffffff] text-blue-500 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-blue-500 hover:bg-[#F5F8FF]">
+
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
                           </Button> :
