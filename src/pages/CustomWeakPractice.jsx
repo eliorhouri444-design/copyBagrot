@@ -270,12 +270,69 @@ Return JSON:`,
     );
   }
 
+  // עדכון משימה יומית כשמסיימים
+  const updateDailyTask = async () => {
+    const taskId = taskIdFromUrl || sessionStorage.getItem('currentTaskId');
+    const taskTarget = parseInt(sessionStorage.getItem('currentTaskTarget') || '3');
+    const totalAnswered = Object.keys(answers).length;
+    
+    if (taskId && user?.email) {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const dailyRecords = await base44.entities.DailyPractice.filter({
+          user_email: user.email,
+          date: today
+        });
+        
+        if (dailyRecords && dailyRecords.length > 0) {
+          const record = dailyRecords[0];
+          const updatedTasks = (record.tasks || []).map(task => {
+            if (task.task_id === taskId) {
+              const newCompleted = (task.completed_questions || 0) + totalAnswered;
+              const isFullyDone = newCompleted >= (task.question_count || taskTarget);
+              return {
+                ...task,
+                status: isFullyDone ? 'done' : 'in_progress',
+                completed_questions: newCompleted,
+                completed_at: isFullyDone ? new Date().toISOString() : null
+              };
+            }
+            return task;
+          });
+          
+          const allDone = updatedTasks.every(t => t.status === 'done');
+          const totalCompleted = updatedTasks.reduce((sum, t) => sum + (t.completed_questions || 0), 0);
+          
+          await base44.entities.DailyPractice.update(record.id, {
+            tasks: updatedTasks,
+            completed_questions: totalCompleted,
+            is_completed: allDone,
+            completion_time: allDone ? new Date().toISOString() : null
+          });
+        }
+        
+        // נקה את ה-session storage
+        sessionStorage.removeItem('currentTaskId');
+        sessionStorage.removeItem('currentTaskType');
+        sessionStorage.removeItem('currentTaskTarget');
+        sessionStorage.removeItem('currentTaskCurrent');
+      } catch (error) {
+        console.error("Error updating daily task:", error);
+      }
+    }
+  };
+
   if (showSummary) {
     const correctCount = Object.values(answers).filter(a => a.correct).length;
     const totalAnswered = Object.keys(answers).length;
     const avgScore = totalAnswered > 0 
       ? Object.values(answers).reduce((sum, a) => sum + (a.score || 0), 0) / totalAnswered 
       : 0;
+
+    // עדכון המשימה היומית
+    useEffect(() => {
+      updateDailyTask();
+    }, []);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
