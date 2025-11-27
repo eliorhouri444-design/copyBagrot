@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -180,12 +180,23 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               className="space-y-2">
 
               <Button
-                onClick={handleStartPractice}
-                className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+              onClick={handleStartPractice}
+              className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
-                <Play className="w-4 h-4 ml-2" />
-                התחל תרגול
+              <Play className="w-4 h-4 ml-2" />
+              קח והתחל תרגול
               </Button>
+
+              {(currentTopic.isVocabulary || currentTopic.topic_id?.toLowerCase().includes('vocabulary') || currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים')) && (
+              <Button
+                onClick={() => navigate(createPageUrl(`VocabularyPractice?selectSet=true`))}
+                variant="outline"
+                className="w-full h-10 text-sm font-semibold border-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+              >
+                <List className="w-4 h-4 ml-2" />
+                בחר סט ספציפי
+              </Button>
+              )}
 
               {isPremium ?
               <>
