@@ -814,7 +814,7 @@ export default function ExamsPage() {
                         {hasMistakes && isPremium && (() => {
                         const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                         return (
-                          <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
+                          <div className="bg-zinc-50 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                               <div className="flex items-center gap-2 mb-2">
                                 <h4 className="bg-transparent text-[#000000] text-sm font-bold">טעויות לתיקון בבגרות זו</h4>
                               </div>
