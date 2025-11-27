@@ -27,6 +27,7 @@ import PracticeSummary from "@/components/vocabulary/PracticeSummary";
 
 const PRACTICE_MODES = {
   DASHBOARD: 'dashboard',
+  SET_PRACTICE: 'set_practice', // New mode for set-based practice
   FLASHCARDS: 'flashcards',
   QUICK_PRACTICE: 'quick_practice',
   WEAK_WORDS: 'weak_words',
@@ -36,6 +37,10 @@ const PRACTICE_MODES = {
 
 export default function VocabularyTrainingPage() {
   const navigate = useNavigate();
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedSetNumber = urlParams.get('set');
+  const showSelectorOnLoad = urlParams.get('selectSet') === 'true';
+  
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState(PRACTICE_MODES.DASHBOARD);
@@ -48,7 +53,9 @@ export default function VocabularyTrainingPage() {
   const [categories, setCategories] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
+  const [showBulkJsonDialog, setShowBulkJsonDialog] = useState(false);
   const [bulkText, setBulkText] = useState('');
+  const [bulkJsonText, setBulkJsonText] = useState('');
   const [newWord, setNewWord] = useState({
     hebrew_word: '',
     english_answer: '',
@@ -58,6 +65,23 @@ export default function VocabularyTrainingPage() {
     difficulty: 'medium'
   });
   const [isSaving, setIsSaving] = useState(false);
+  
+  // NEW: Vocabulary Sets state
+  const [vocabularySets, setVocabularySets] = useState([]);
+  const [currentSet, setCurrentSet] = useState(null);
+  const [currentSetNumber, setCurrentSetNumber] = useState(1);
+  const [showSetSelector, setShowSetSelector] = useState(false);
+  
+  // Set practice state
+  const [setPhase, setSetPhase] = useState('flashcards'); // 'flashcards' | 'quiz' | 'summary'
+  const [flashcardIndex, setFlashcardIndex] = useState(0);
+  const [flashcardResults, setFlashcardResults] = useState({ known: 0, unknown: 0 });
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizAnswer, setQuizAnswer] = useState('');
+  const [showQuizResult, setShowQuizResult] = useState(false);
+  const [isQuizCorrect, setIsQuizCorrect] = useState(false);
+  const [quizResults, setQuizResults] = useState({ correct: 0, incorrect: 0 });
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
