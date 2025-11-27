@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { CheckCircle, Target, BookOpen, RotateCcw, FileCheck, Play, Repeat, AlertTriangle } from "lucide-react";
 import { CardSimple, CardTitle } from "@/components/ui/card-simple";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { base44 } from "@/api/base44Client";
 
 export default function DailyPlanCard({
   readinessData,
