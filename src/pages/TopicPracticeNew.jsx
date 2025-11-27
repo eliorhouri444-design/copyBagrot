@@ -282,11 +282,11 @@ export default function TopicPracticeNewPage() {
 
       setResults((prev) => ({
         ...prev,
-        [currentQuestion.question_id]: { 
-          isCorrect: false, 
-          status: "unanswered", 
-          correctAnswer: currentQuestion.correct_answer || "", 
-          userAnswer: "" 
+        [currentQuestion.question_id]: {
+          isCorrect: false,
+          status: "unanswered",
+          correctAnswer: currentQuestion.correct_answer || "",
+          userAnswer: ""
         }
       }));
 
@@ -319,31 +319,31 @@ export default function TopicPracticeNewPage() {
 
         // נרמול התשובה - שמירה על רווחים בודדים
         const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s+/g, ' ');
-        
+
         console.log(`🔍 Multiple choice check:`);
         console.log(`   User answer: "${userAnswer}" -> normalized: "${normalizedUserAnswer}"`);
         console.log(`   Correct answer: "${correctAnswerDisplay}" -> normalized: "${correctAnswer}"`);
-        
+
         // בדיקה - השוואה עם נרמול סטנדרטי
         let isCorrect = false;
-        
+
         if (correctAnswer && normalizedUserAnswer.length > 0) {
           // בדיקה ישירה
           isCorrect = normalizedUserAnswer === correctAnswer;
-          
+
           // אם לא נמצאה התאמה, נסה בלי רווחים בכלל
           if (!isCorrect) {
             const noSpaceUser = normalizedUserAnswer.replace(/\s/g, '');
             const noSpaceCorrect = correctAnswer.replace(/\s/g, '');
             isCorrect = noSpaceUser === noSpaceCorrect;
           }
-          
+
           // אם עדיין לא נמצאה התאמה, בדוק אם התשובה הנכונה נמצאת בתוך תשובת המשתמש או להיפך
           if (!isCorrect) {
             isCorrect = normalizedUserAnswer.includes(correctAnswer) || correctAnswer.includes(normalizedUserAnswer);
           }
         }
-        
+
         console.log(`   Result: ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'}`);
 
         // שמירה ברקע
@@ -875,7 +875,7 @@ export default function TopicPracticeNewPage() {
       // עדכון משימה יומית אם הגענו מתוך DailyPlanCard
       const taskId = urlParams.get("taskId") || sessionStorage.getItem('currentTaskId');
       const taskTarget = parseInt(sessionStorage.getItem('currentTaskTarget') || '10');
-      
+
       if (taskId && user?.email) {
         try {
           const today = new Date().toISOString().split('T')[0];
@@ -883,10 +883,10 @@ export default function TopicPracticeNewPage() {
             user_email: user.email,
             date: today
           });
-          
+
           if (dailyRecords && dailyRecords.length > 0) {
             const record = dailyRecords[0];
-            const updatedTasks = (record.tasks || []).map(task => {
+            const updatedTasks = (record.tasks || []).map((task) => {
               if (task.task_id === taskId) {
                 const newCompleted = (task.completed_questions || 0) + totalQuestions;
                 const isFullyDone = newCompleted >= (task.question_count || taskTarget);
@@ -899,10 +899,10 @@ export default function TopicPracticeNewPage() {
               }
               return task;
             });
-            
-            const allDone = updatedTasks.every(t => t.status === 'done');
+
+            const allDone = updatedTasks.every((t) => t.status === 'done');
             const totalCompleted = updatedTasks.reduce((sum, t) => sum + (t.completed_questions || 0), 0);
-            
+
             await base44.entities.DailyPractice.update(record.id, {
               tasks: updatedTasks,
               completed_questions: totalCompleted,
@@ -910,7 +910,7 @@ export default function TopicPracticeNewPage() {
               completion_time: allDone ? new Date().toISOString() : null
             });
           }
-          
+
           // נקה את ה-session storage
           sessionStorage.removeItem('currentTaskId');
           sessionStorage.removeItem('currentTaskType');
@@ -1009,11 +1009,11 @@ export default function TopicPracticeNewPage() {
               {currentSetQuestions.map((q, idx) => {
                 const result = results[q.question_id];
                 return (
-                  <div key={idx} className={`rounded-xl p-4 border-2 ${
-                  q.question_type === "writing" ?
-                  'bg-blue-50 border-blue-500' :
-                  result?.isCorrect ? 'bg-green-50 border-blue-500' : 'bg-red-50 border-blue-500'}`
-                  }>
+                  <div key={idx} className="bg-blue-50 p-4 rounded-xl border-2 border-blue-500">
+
+
+
+
                     <div className="flex items-start gap-3">
                       {q.question_type === "writing" ?
                       <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
@@ -1110,17 +1110,17 @@ export default function TopicPracticeNewPage() {
                         !result?.isCorrect && q.question_type !== "writing" &&
                         <div className="space-y-2">
                             {result?.correctAnswer &&
-                            <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <div className="bg-white rounded-lg p-3 border border-green-200">
                               <div className="text-xs text-gray-600 mb-1">התשובה הנכונה:</div>
                               <div className="text-sm font-semibold text-green-700" dir="ltr">{result?.correctAnswer}</div>
                             </div>
-                            }
+                          }
                             {result?.explanation &&
-                            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                          <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
                               <div className="text-xs font-bold text-blue-900 mb-1">💡 הסבר:</div>
                               <div className="text-sm text-gray-700">{result?.explanation}</div>
                             </div>
-                            }
+                          }
                           </div>
                         }
                       </div>
@@ -1131,16 +1131,16 @@ export default function TopicPracticeNewPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              {hasNextSet ? (
-                <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
+              {hasNextSet ?
+              <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
                   המשך לסט הבא
                   <ChevronLeft className="w-5 h-5 mr-2" />
-                </Button>
-              ) : (
-                <Button onClick={finishPractice} className="w-full bg-green-600 hover:bg-green-700" disabled>
+                </Button> :
+
+              <Button onClick={finishPractice} className="w-full bg-green-600 hover:bg-green-700" disabled>
                   כל הכבוד! סיימת את כל השאלות
                 </Button>
-              )}
+              }
               <Button onClick={finishPractice} variant="outline" className="w-full">
                 סיים וחזור לתרגול
               </Button>
@@ -1333,17 +1333,17 @@ export default function TopicPracticeNewPage() {
             <p className="text-xs sm:text-sm opacity-90">סט {setNumber} • שאלה {currentQuestionIndex + 1} מתוך {currentSetQuestions.length}</p>
           </div>
 
-          {readingText && !isListeningTopic ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowStoryDialog(true)}
-              className="text-white hover:bg-white/20">
+          {readingText && !isListeningTopic ?
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowStoryDialog(true)}
+            className="text-white hover:bg-white/20">
               <BookOpen className="w-5 h-5" />
-            </Button>
-          ) : (
-            <div className="w-8 sm:w-10" />
-          )}
+            </Button> :
+
+          <div className="w-8 sm:w-10" />
+          }
         </div>
 
         <div className="bg-white/20 rounded-full h-1.5 sm:h-2 overflow-hidden">
