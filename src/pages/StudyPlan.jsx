@@ -126,7 +126,71 @@ export default function StudyPlanPage() {
         </div>
       </div>
 
-      <div className="px-4 space-y-4">
+      <div className="px-6 space-y-4">
+        {/* Readiness Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-[#3B82F6] p-4">
+            <div className="flex items-center gap-3 text-white">
+              <div className="flex-1 text-right">
+                <h3 className="text-base font-bold">מוכנות לבגרות</h3>
+                <p className="text-xs opacity-90">יעד: {targetScore} נקודות</p>
+              </div>
+              <Target className="w-7 h-7" />
+            </div>
+          </div>
+          <div className="p-4">
+            <div className="flex items-center justify-center gap-6 mb-4">
+              <div className="relative w-24 h-24">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                  <circle
+                    cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"
+                    strokeDasharray={`${readinessScore}, 100`} />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold text-gray-900">{readinessScore}%</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-gray-600 mb-1">
+                  {gap > 0 ? `חסרות ${gap} נקודות` : '🎉 הגעת ליעד!'}
+                </div>
+                {daysUntilExam !== null && (
+                  <div className="text-sm font-bold text-blue-600">
+                    {daysUntilExam} ימים לבגרות
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Breakdown */}
+            {readiness?.breakdown && (
+              <div className="grid grid-cols-4 gap-2 text-center">
+                <div className="bg-blue-50 p-2 rounded-xl">
+                  <div className="font-bold text-blue-900">{readiness.breakdown.content.score}%</div>
+                  <div className="text-[10px] text-gray-600">שליטה</div>
+                </div>
+                <div className="bg-blue-50 p-2 rounded-xl">
+                  <div className="font-bold text-blue-900">{readiness.breakdown.practice.score}%</div>
+                  <div className="text-[10px] text-gray-600">תרגול</div>
+                </div>
+                <div className="bg-blue-50 p-2 rounded-xl">
+                  <div className="font-bold text-blue-900">{readiness.breakdown.exam.score}%</div>
+                  <div className="text-[10px] text-gray-600">בגרויות</div>
+                </div>
+                <div className="bg-blue-50 p-2 rounded-xl">
+                  <div className="font-bold text-blue-900">{readiness.breakdown.speed.score}%</div>
+                  <div className="text-[10px] text-gray-600">מהירות</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
         {/* Exam Day Message */}
         {daysUntilExam === 0 && (
           <motion.div
