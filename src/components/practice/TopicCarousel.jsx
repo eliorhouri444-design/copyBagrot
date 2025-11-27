@@ -43,7 +43,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
     if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-      navigate(createPageUrl(`VocabularySets`));
+      navigate(createPageUrl(`VocabularyPractice`));
       return;
     }
 
