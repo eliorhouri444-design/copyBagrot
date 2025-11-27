@@ -1373,7 +1373,7 @@ export default function ExamsPage() {
                   {hasMistakes && (() => {
                     const wrongCount = attempt.answers?.filter((a) => !a.is_correct).length || 0;
                     return (
-                      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 border-2 border-blue-500 mr-2">
+                      <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                         <div className="flex items-center gap-2 mb-2">
                           <Target className="w-4 h-4 text-orange-600" />
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
@@ -1420,8 +1420,8 @@ export default function ExamsPage() {
             </Button>
             <Button
               onClick={handleDeleteAllAttempts}
-              variant="destructive"
-              className="w-full sm:w-auto bg-red-500 hover:bg-red-600 flex items-center justify-center gap-2">
+              variant="destructive" className="bg-blue-500 text-destructive-foreground px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm h-9 w-full sm:w-auto hover:bg-red-600 flex items-center justify-center gap-2">
+
 
               <Trash2 className="w-4 h-4 mr-2" />
               מחק הכל
