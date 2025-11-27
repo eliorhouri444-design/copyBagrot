@@ -3,10 +3,10 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  ChevronLeft, RotateCcw, Check, X, Loader2, Trophy, ArrowLeft, ArrowRight
+  ChevronLeft, Check, X, Loader2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 
 export default function VocabularyFlashcardsPage() {
@@ -22,10 +22,9 @@ export default function VocabularyFlashcardsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState({ known: 0, unknown: 0 });
-  const [showSummary, setShowSummary] = useState(false);
   const [answeredWords, setAnsweredWords] = useState([]);
+  const [showSummary, setShowSummary] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -56,9 +55,7 @@ export default function VocabularyFlashcardsPage() {
         wordsForPractice = allWords.slice(startIndex, endIndex);
       }
       
-      // Shuffle words
-      const shuffled = [...wordsForPractice].sort(() => Math.random() - 0.5);
-      setWords(shuffled);
+      setWords(wordsForPractice);
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
@@ -117,91 +114,98 @@ export default function VocabularyFlashcardsPage() {
 
     // Move to next word or show summary
     if (currentIndex < words.length - 1) {
-      setIsFlipped(false);
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
+      setTimeout(() => setCurrentIndex(prev => prev + 1), 200);
     } else {
       setShowSummary(true);
     }
   };
 
+  const getEvaluation = () => {
+    const ratio = results.known / words.length;
+    if (ratio >= 0.8) return { text: "מצוין! אתה שולט במילים", color: "text-green-600" };
+    if (ratio >= 0.6) return { text: "בסדר, אפשר להתקדם", color: "text-blue-600" };
+    if (ratio >= 0.4) return { text: "כדאי לחזור על המילים שוב", color: "text-orange-600" };
+    return { text: "צריך לתרגל עוד, אל תוותר!", color: "text-red-600" };
+  };
+
+  // Store words for quiz
+  const goToQuiz = () => {
+    sessionStorage.setItem('flashcardResults', JSON.stringify(answeredWords));
+    if (isMultiSet) {
+      navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
+    } else {
+      navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
   }
 
   if (showSummary) {
-    const accuracy = Math.round((results.known / words.length) * 100);
+    const evaluation = getEvaluation();
+    const unknownWords = answeredWords.filter(w => !w.isKnown);
+    
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full"
         >
           <div className="text-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Trophy className="w-12 h-12 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">סיימת!</h2>
-            <p className="text-gray-600">סט {setId} - כרטיסיות</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">סיימת את הכרטיסיות</h2>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 mb-6">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="bg-white rounded-xl p-4 text-center border border-green-200">
-                <div className="text-3xl font-bold text-green-600">{results.known}</div>
-                <div className="text-sm text-gray-600">ידעתי</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 text-center border border-red-200">
-                <div className="text-3xl font-bold text-red-600">{results.unknown}</div>
-                <div className="text-sm text-gray-600">לא ידעתי</div>
-              </div>
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">ידעת</span>
+              <span className="font-bold text-green-600">{results.known} מילים</span>
             </div>
-            <div className="text-center">
-              <div className="text-5xl font-black text-blue-600">{accuracy}%</div>
-              <div className="text-sm text-gray-600 mt-1">הצלחה</div>
+            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+              <span className="text-gray-600">לא ידעת</span>
+              <span className="font-bold text-red-600">{results.unknown} מילים</span>
+            </div>
+            <div className="pt-2">
+              <p className={`text-center font-semibold ${evaluation.color}`}>
+                {evaluation.text}
+              </p>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <Button
-              onClick={() => {
-                setCurrentIndex(0);
-                setIsFlipped(false);
-                setResults({ known: 0, unknown: 0 });
-                setAnsweredWords([]);
-                setShowSummary(false);
-                loadData();
-              }}
-              className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold"
-            >
-              <RotateCcw className="w-5 h-5 ml-2" />
-              נסה שוב
-            </Button>
-            <Button
-              onClick={() => {
-                if (isMultiSet) {
-                  navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
-                } else {
-                  navigate(createPageUrl(`VocabularyQuickPractice?setId=${setId}&start=${startIndex}&end=${endIndex}`));
-                }
-              }}
-              variant="outline"
-              className="w-full h-14 text-lg font-bold border-2"
-            >
-              עבור למבחן על הסט
-            </Button>
-            <Button
-              onClick={() => navigate(createPageUrl("VocabularySets"))}
-              variant="ghost"
-              className="w-full"
-            >
-              חזור לסטים
-            </Button>
-          </div>
+          {unknownWords.length > 0 && (
+            <div className="bg-gray-50 rounded-xl p-4 mb-6">
+              <div className="text-sm text-gray-500 mb-2">מילים לחזרה:</div>
+              <div className="flex flex-wrap gap-2">
+                {unknownWords.slice(0, 5).map((word, idx) => (
+                  <span key={idx} className="bg-white px-2 py-1 rounded text-sm text-gray-700 border">
+                    {word.hebrew_word}
+                  </span>
+                ))}
+                {unknownWords.length > 5 && (
+                  <span className="text-sm text-gray-400">+{unknownWords.length - 5} עוד</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <Button
+            onClick={goToQuiz}
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-bold"
+          >
+            עבור לבוחן
+          </Button>
+          
+          <button
+            onClick={() => navigate(createPageUrl("VocabularySets"))}
+            className="w-full mt-3 text-gray-500 text-sm hover:text-gray-700"
+          >
+            חזרה לנושאים
+          </button>
         </motion.div>
       </div>
     );
@@ -210,102 +214,83 @@ export default function VocabularyFlashcardsPage() {
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-blue-600 px-5 py-4 flex-shrink-0">
-        <div className="flex items-center justify-between text-white mb-3">
-          <button
-            onClick={() => {
-              if (isMultiSet) {
-                navigate(createPageUrl(`VocabularySetMode?multiSet=true&sets=${setsParam}`));
-              } else {
-                navigate(createPageUrl(`VocabularySetMode?setId=${setId}&start=${startIndex}&end=${endIndex}`));
-              }
-            }}
-            className="p-2 hover:bg-white/10 rounded-lg"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">כרטיסיות {isMultiSet ? '' : `- סט ${setId}`}</h1>
-            <p className="text-sm opacity-90">מילה {currentIndex + 1} מתוך {words.length}</p>
-          </div>
-          <div className="w-10" />
+  if (!currentWord) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">אין מילים זמינות</p>
+          <Button onClick={() => navigate(createPageUrl("VocabularySets"))}>
+            חזור
+          </Button>
         </div>
-        <Progress value={progress} className="h-2 bg-white/20" />
       </div>
+    );
+  }
 
-      {/* Flashcard */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="perspective-1000"
-          >
-            <motion.div
-              onClick={() => setIsFlipped(!isFlipped)}
-              animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.5 }}
-              className="relative w-full h-64 cursor-pointer"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Front */}
-              <div 
-                className="absolute inset-0 bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center justify-center backface-hidden border-4 border-blue-200"
-                style={{ backfaceVisibility: 'hidden' }}
-              >
-                <div className="text-sm text-blue-600 font-semibold mb-4">עברית</div>
-                <div className="text-4xl font-bold text-gray-900 text-center">
-                  {currentWord?.hebrew_word}
-                </div>
-                <div className="text-sm text-gray-500 mt-6">לחץ להפוך</div>
-              </div>
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header - minimal */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
+        <button
+          onClick={() => navigate(createPageUrl("VocabularySets"))}
+          className="p-2 -ml-2 text-gray-500"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <span className="text-sm text-gray-500">
+          {currentIndex + 1} / {words.length}
+        </span>
+        <div className="w-9" />
+      </div>
+      
+      <Progress value={progress} className="h-1 rounded-none" />
 
-              {/* Back */}
-              <div 
-                className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl shadow-2xl p-8 flex flex-col items-center justify-center backface-hidden"
-                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-              >
-                <div className="text-sm text-white/80 font-semibold mb-4">English</div>
-                <div className="text-4xl font-bold text-white text-center" dir="ltr">
-                  {currentWord?.english_answer}
-                </div>
-                {currentWord?.example_sentence && (
-                  <div className="text-sm text-white/70 mt-6 text-center italic" dir="ltr">
-                    "{currentWord.example_sentence}"
-                  </div>
-                )}
+      {/* Card */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-sm"
+        >
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+            {/* English word */}
+            <div className="text-3xl font-bold text-gray-900 mb-4" dir="ltr">
+              {currentWord.english_answer}
+            </div>
+            
+            {/* Example sentence */}
+            {currentWord.example_sentence && (
+              <div className="text-sm text-gray-500 italic mb-6" dir="ltr">
+                "{currentWord.example_sentence}"
               </div>
-            </motion.div>
-          </motion.div>
+            )}
+
+            {/* Hebrew translation - smaller */}
+            <div className="text-lg text-gray-600 pt-4 border-t border-gray-100">
+              {currentWord.hebrew_word}
+            </div>
+          </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mt-8 justify-center">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
+          <div className="flex gap-4 mt-8">
+            <button
               onClick={() => handleAnswer(false)}
-              className="w-20 h-20 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center shadow-lg"
+              className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors"
             >
-              <X className="w-10 h-10 text-white" />
-            </motion.button>
+              <X className="w-5 h-5 text-red-500" />
+              <span className="font-medium">לא ידעתי</span>
+            </button>
             
-            <motion.button
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => handleAnswer(true)}
-              className="w-20 h-20 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg"
+              className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors"
             >
-              <Check className="w-10 h-10 text-white" />
-            </motion.button>
+              <Check className="w-5 h-5 text-green-500" />
+              <span className="font-medium">ידעתי</span>
+            </button>
           </div>
-
-          <div className="flex justify-center gap-8 mt-4 text-sm">
-            <span className="text-red-600 font-semibold">לא ידעתי</span>
-            <span className="text-green-600 font-semibold">ידעתי</span>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
