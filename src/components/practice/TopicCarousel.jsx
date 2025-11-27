@@ -146,21 +146,21 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
+              <div className="bg-blue-50 p-3 text-center rounded-xl">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                   <Target className="w-4 h-4 text-white" />
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.excellentSets || 0}</div>
               </div>
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
+              <div className="bg-blue-50 p-3 text-center rounded-xl">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                   <BookOpen className="w-4 h-4 text-white" />
                 </div>
                 <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
                 <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.mediumSets || 0}</div>
               </div>
-              <div className="bg-slate-100 p-3 text-center rounded-xl">
+              <div className="bg-blue-50 p-3 text-center rounded-xl">
                 <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                   <Target className="w-4 h-4 text-white" />
                 </div>
