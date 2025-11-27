@@ -549,6 +549,177 @@ export default function VocabularyTrainingPage() {
     );
   }
 
+  // SET PRACTICE MODE RENDER
+  if (mode === PRACTICE_MODES.SET_PRACTICE && currentSet) {
+    // Summary phase
+    if (setPhase === 'summary') {
+      const accuracy = quizQuestions.length > 0 ? Math.round((quizResults.correct / quizQuestions.length) * 100) : 0;
+      const hasNextSet = vocabularySets.some(s => s.set_number === currentSetNumber + 1);
+
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full"
+          >
+            <div className="text-center mb-6">
+              <div className="text-5xl font-bold text-gray-900 mb-1">{accuracy}%</div>
+              <p className="text-gray-500">ציון סט {currentSetNumber}</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-gray-50 rounded-xl p-3 text-center">
+                <div className="text-2xl font-bold text-gray-900">{currentSet.words.length}</div>
+                <div className="text-xs text-gray-500">מילים</div>
+              </div>
+              <div className="bg-green-50 rounded-xl p-3 text-center">
+                <div className="text-2xl font-bold text-green-600">{quizResults.correct}</div>
+                <div className="text-xs text-gray-500">נכון</div>
+              </div>
+              <div className="bg-red-50 rounded-xl p-3 text-center">
+                <div className="text-2xl font-bold text-red-600">{quizResults.incorrect}</div>
+                <div className="text-xs text-gray-500">שגוי</div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {hasNextSet && (
+                <Button onClick={goToNextSet} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-bold">
+                  המשך לסט הבא
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                </Button>
+              )}
+              <Button onClick={() => startSetPractice(currentSet)} variant="outline" className="w-full h-11">
+                <RotateCcw className="w-4 h-4 ml-2" />
+                רענן את הסט
+              </Button>
+              <button onClick={() => setMode(PRACTICE_MODES.DASHBOARD)} className="w-full text-gray-500 text-sm hover:text-gray-700 py-2">
+                חזרה לדשבורד
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      );
+    }
+
+    // Quiz phase
+    if (setPhase === 'quiz') {
+      const question = quizQuestions[quizIndex];
+      const quizProgress = quizQuestions.length > 0 ? ((quizIndex + 1) / quizQuestions.length) * 100 : 0;
+
+      return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
+            <button onClick={() => setShowSetSelector(true)} className="p-2 -ml-2 text-gray-500">
+              <List className="w-5 h-5" />
+            </button>
+            <div className="text-center">
+              <span className="text-sm font-medium text-gray-900">בוחן - סט {currentSetNumber}</span>
+              <span className="text-xs text-gray-500 block">{quizIndex + 1} / {quizQuestions.length}</span>
+            </div>
+            <div className="w-9" />
+          </div>
+          
+          <Progress value={quizProgress} className="h-1 rounded-none" />
+
+          <div className="flex-1 flex flex-col p-4">
+            <AnimatePresence mode="wait">
+              <motion.div key={quizIndex} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="flex-1 flex flex-col">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-4">
+                  <div className="text-xs text-gray-400 mb-3 uppercase tracking-wide">
+                    {question.type === 'choose' ? 'בחירה' : question.type === 'fill' ? 'השלמה' : 'תרגום'}
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">{question.question}</h2>
+                </div>
+
+                {!showQuizResult ? (
+                  <div className="space-y-3">
+                    {question.options ? (
+                      <div className="space-y-2">
+                        {question.options.map((option, idx) => (
+                          <button key={idx} onClick={() => handleQuizSubmit(option)} className="w-full bg-white rounded-xl p-4 text-right border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <span className="text-base font-medium text-gray-900">{option}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Input value={quizAnswer} onChange={(e) => setQuizAnswer(e.target.value)} placeholder="הקלד את התשובה..." className="h-12 text-base" dir="auto" autoFocus onKeyDown={(e) => { if (e.key === 'Enter' && quizAnswer.trim()) handleQuizSubmit(); }} />
+                        <Button onClick={() => handleQuizSubmit()} disabled={!quizAnswer.trim()} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-semibold">בדוק</Button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                    <div className={`rounded-xl p-4 ${isQuizCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {isQuizCorrect ? <Check className="w-5 h-5 text-green-600" /> : <X className="w-5 h-5 text-red-600" />}
+                        <span className={`font-semibold ${isQuizCorrect ? 'text-green-700' : 'text-red-700'}`}>{isQuizCorrect ? 'נכון!' : 'לא נכון'}</span>
+                      </div>
+                      {!isQuizCorrect && (
+                        <div className="bg-white rounded-lg p-3 mt-2">
+                          <div className="text-xs text-gray-500 mb-1">התשובה הנכונה:</div>
+                          <div className="font-semibold text-gray-900">{question.correctAnswer}</div>
+                        </div>
+                      )}
+                    </div>
+                    <Button onClick={handleQuizNext} className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-base font-semibold">{quizIndex < quizQuestions.length - 1 ? 'הבא' : 'סיים'}</Button>
+                  </motion.div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <SetSelectorDialog open={showSetSelector} onOpenChange={setShowSetSelector} sets={vocabularySets} currentSetNumber={currentSetNumber} onSelectSet={(setNum) => { setShowSetSelector(false); const set = vocabularySets.find(s => s.set_number === setNum); if (set) startSetPractice(set); }} />
+        </div>
+      );
+    }
+
+    // Flashcards phase
+    const currentWord = currentSet.words[flashcardIndex];
+    const flashcardProgress = ((flashcardIndex + 1) / currentSet.words.length) * 100;
+
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
+          <button onClick={() => setShowSetSelector(true)} className="p-2 -ml-2 text-gray-500">
+            <List className="w-5 h-5" />
+          </button>
+          <div className="text-center">
+            <span className="text-sm font-medium text-gray-900">סט {currentSetNumber}</span>
+            <span className="text-xs text-gray-500 block">{flashcardIndex + 1} / {currentSet.words.length}</span>
+          </div>
+          <div className="w-9" />
+        </div>
+        
+        <Progress value={flashcardProgress} className="h-1 rounded-none" />
+
+        <div className="flex-1 flex flex-col items-center justify-center p-6">
+          <motion.div key={flashcardIndex} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="text-3xl font-bold text-gray-900 mb-4" dir="ltr">{currentWord.english}</div>
+              <div className="text-lg text-gray-600 pt-4 border-t border-gray-100">{currentWord.hebrew}</div>
+            </div>
+
+            <div className="flex gap-4 mt-8">
+              <button onClick={() => handleSetFlashcardAnswer(false)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors">
+                <X className="w-5 h-5 text-red-500" />
+                <span className="font-medium">לא ידעתי</span>
+              </button>
+              <button onClick={() => handleSetFlashcardAnswer(true)} className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors">
+                <Check className="w-5 h-5 text-green-500" />
+                <span className="font-medium">ידעתי</span>
+              </button>
+            </div>
+          </motion.div>
+        </div>
+
+        <SetSelectorDialog open={showSetSelector} onOpenChange={setShowSetSelector} sets={vocabularySets} currentSetNumber={currentSetNumber} onSelectSet={(setNum) => { setShowSetSelector(false); const set = vocabularySets.find(s => s.set_number === setNum); if (set) startSetPractice(set); }} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
@@ -575,22 +746,51 @@ export default function VocabularyTrainingPage() {
           <div className="space-y-4">
             <VocabularyDashboard stats={stats} />
 
+            {/* Vocabulary Sets Section - NEW */}
+            {vocabularySets.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-gray-900">סטים ({vocabularySets.length})</h3>
+                  <button onClick={() => setShowSetSelector(true)} className="text-blue-600 text-sm font-medium">הצג הכל</button>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {vocabularySets.slice(0, 5).map(set => (
+                    <button
+                      key={set.id}
+                      onClick={() => startSetPractice(set)}
+                      className="flex-shrink-0 w-16 h-16 bg-blue-50 border-2 border-blue-200 rounded-xl flex flex-col items-center justify-center hover:border-blue-400 transition-colors"
+                    >
+                      <span className="text-lg font-bold text-blue-600">{set.set_number}</span>
+                      <span className="text-xs text-gray-500">{set.words?.length || 0}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Admin Add Buttons */}
             {user?.role === 'admin' && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <Button
                   onClick={() => setShowAddDialog(true)}
-                  className="bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+                  className="bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-1 text-xs"
                 >
-                  <Plus className="w-5 h-5" />
-                  הוסף מילה
+                  <Plus className="w-4 h-4" />
+                  מילה
                 </Button>
                 <Button
                   onClick={() => setShowBulkAddDialog(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+                  className="bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-1 text-xs"
                 >
-                  <Plus className="w-5 h-5" />
-                  הוסף הרבה
+                  <Plus className="w-4 h-4" />
+                  הרבה
+                </Button>
+                <Button
+                  onClick={() => setShowBulkJsonDialog(true)}
+                  className="bg-orange-600 hover:bg-orange-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-1 text-xs"
+                >
+                  <Upload className="w-4 h-4" />
+                  JSON
                 </Button>
               </div>
             )}
@@ -622,6 +822,26 @@ export default function VocabularyTrainingPage() {
             <div className="space-y-3">
               <h3 className="font-bold text-gray-900">בחר סוג תרגול</h3>
 
+              {/* Start from Set 1 - NEW */}
+              {vocabularySets.length > 0 && (
+                <button
+                  onClick={() => {
+                    const firstSet = vocabularySets.find(s => s.set_number === 1) || vocabularySets[0];
+                    if (firstSet) startSetPractice(firstSet);
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl border border-blue-600 p-4 flex items-center gap-4 hover:from-blue-700 hover:to-blue-800 transition-colors text-white"
+                >
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <Layers className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 text-right">
+                    <div className="font-bold">התחל מסט 1</div>
+                    <div className="text-sm text-white/80">כרטיסיות + מבחן על 10 מילים</div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-white/80" />
+                </button>
+              )}
+
               <button
                 onClick={() => setMode(PRACTICE_MODES.FLASHCARDS)}
                 className="w-full bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:border-blue-300 transition-colors"
@@ -630,7 +850,7 @@ export default function VocabularyTrainingPage() {
                   <Layers className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="flex-1 text-right">
-                  <div className="font-bold text-gray-900">כרטיסיות</div>
+                  <div className="font-bold text-gray-900">כרטיסיות (כל המילים)</div>
                   <div className="text-sm text-gray-600">למידת מילים חדשות</div>
                 </div>
                 <ChevronLeft className="w-5 h-5 text-gray-400" />
