@@ -671,7 +671,7 @@ export default function ExamGenericPage() {
             <motion.button
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-500 hover:border-purple-500 transition-all shadow-lg">
+              onClick={() => handleStartExam('carousel')} className="bg-sky-50 p-6 text-right rounded-2xl from-purple-50 to-purple-100 border-2 border-blue-500 hover:border-blue-600 transition-all shadow-lg">
 
 
               <div className="flex items-center gap-3 mb-4">
