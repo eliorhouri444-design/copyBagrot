@@ -832,6 +832,7 @@ export default function ExamsPage() {
                                 navigate(createPageUrl("ExamMistakesPractice"));
                               }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-600 from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
 
+                                <Target className="w-3.5 h-3.5" />
                                 תרגל {wrongCount} טעויות
                               </Button>
                             </div>);
@@ -1196,8 +1197,8 @@ export default function ExamsPage() {
               return sortedWeakTopics.length > 0 &&
               <div className="bg-blue-50 p-4 rounded-xl from-orange-50 to-red-50 border-2 border-blue-5000">
                     <div className="flex items-center gap-2 mb-3">
-                      <Crown className="w-5 h-5 text-orange-600" />
                       <h4 className="font-bold text-gray-900">מבחן מותאם לטעויות שלך</h4>
+                      <Crown className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="space-y-2">
                       {sortedWeakTopics.map(([topic, count]) =>
@@ -1406,15 +1407,8 @@ export default function ExamsPage() {
                           }}
                           className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-9 text-xs font-bold flex items-center justify-center gap-2">
                           {isPremium ?
-                          <>
-                              <Target className="w-3 h-3" />
-                              <span>תרגל {wrongCount} טעויות</span>
-                            </> :
-
-                          <>
-                              <Lock className="w-3 h-3" />
-                              <span>שדרג לפרימיום</span>
-                            </>
+                          <span>תרגל {wrongCount} טעויות</span> :
+                          <span>שדרג לפרימיום</span>
                           }
                         </Button>
                       </div>);
