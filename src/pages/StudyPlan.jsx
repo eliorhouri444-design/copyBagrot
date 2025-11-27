@@ -32,10 +32,17 @@ const READINESS_WEIGHTS = {
 };
 
 const TARGET_REQUIREMENTS = {
-  90: { questions: 700, exams: 8, topicMastery: 90 },
-  85: { questions: 600, exams: 6, topicMastery: 85 },
-  70: { questions: 400, exams: 5, topicMastery: 75 },
-  56: { questions: 250, exams: 4, topicMastery: 60 }
+  100: { questions: 800, exams: 12, topicMastery: 95 },
+  90: { questions: 600, exams: 8, topicMastery: 85 },
+  85: { questions: 500, exams: 6, topicMastery: 80 },
+  70: { questions: 300, exams: 4, topicMastery: 65 },
+  55: { questions: 100, exams: 2, topicMastery: 50 }
+};
+
+// Time limits per user type (minutes)
+const MAX_DAILY_TIME = {
+  premium: 120,
+  free: 45
 };
 
 export default function StudyPlanPage() {
@@ -228,107 +235,127 @@ export default function StudyPlanPage() {
         });
 
         // ============================================
-        // 📅 GENERATE SMART DAILY PLAN
+        // 📅 GENERATE SMART DAILY PLAN (PRIORITY-BASED)
         // ============================================
+        // Priority order: 1. Errors, 2. Weak Topics, 3. Questions, 4. Vocabulary, 5. Full Exam
         const dailyTasks = [];
         let totalMinutes = 0;
         let expectedDailyImprovement = 0;
+        const maxDailyTime = isPremium ? MAX_DAILY_TIME.premium : MAX_DAILY_TIME.free;
 
-        // Priority order: 1. Mistakes, 2. Weak Topics, 3. Questions, 4. Exam/Vocab
-        
-        // Task 1: Fix mistakes (HIGHEST PRIORITY - +1.5% per 10 mistakes)
-        if (activeMistakes > 0) {
+        // TASK 1: Fix mistakes (HIGHEST PRIORITY - +1.5% per 10 mistakes)
+        if (activeMistakes > 0 && totalMinutes < maxDailyTime) {
           const mistakeCount = isPremium ? Math.min(15, Math.max(9, mistakesPerDay)) : 3;
           const duration = mistakeCount * 3;
-          dailyTasks.push({
-            id: 'mistakes',
-            type: 'mistakes',
-            title: 'תיקון טעויות',
-            description: `חזרה על ${mistakeCount} טעויות`,
-            duration,
-            count: mistakeCount,
-            isPremiumOnly: true,
-            isLocked: !isPremium,
-            improvement: Math.round(mistakeCount / 10 * 1.5 * 10) / 10
-          });
-          totalMinutes += duration;
-          if (isPremium) expectedDailyImprovement += mistakeCount / 10 * 1.5;
+          if (totalMinutes + duration <= maxDailyTime) {
+            dailyTasks.push({
+              id: 'mistakes',
+              type: 'mistakes',
+              title: 'תיקון טעויות',
+              description: `${mistakeCount} טעויות לתקן`,
+              duration,
+              count: mistakeCount,
+              isPremiumOnly: !isPremium,
+              isLocked: !isPremium,
+              improvement: Math.round(mistakeCount / 10 * 1.5 * 10) / 10,
+              route: 'CustomWeakPractice'
+            });
+            totalMinutes += duration;
+            if (isPremium) expectedDailyImprovement += mistakeCount / 10 * 1.5;
+          }
         }
 
-        // Task 2: Strengthen weak topics (HIGH PRIORITY - +5-12% per topic mastered)
-        if (weakTopics.length > 0) {
+        // TASK 2: Strengthen weak topics (HIGH PRIORITY - +2.5-5% per session)
+        if (weakTopics.length > 0 && totalMinutes < maxDailyTime) {
           const weakTopic = weakTopics[0];
-          const topicName = topics.find(t => t.topic_id === weakTopic?.topicId)?.name || 'נושא חלש';
+          const topicName = topics.find(t => t.topic_id === weakTopic?.topicId)?.name || 'נושא לחיזוק';
           const questionsToMaster = 15;
           const duration = 30;
-          dailyTasks.push({
-            id: 'weak_topic',
-            type: 'topic',
-            title: 'חיזוק נושאים חלשים',
-            description: `חיזוק: ${topicName}`,
-            duration,
-            count: questionsToMaster,
-            isPremiumOnly: true,
-            isLocked: !isPremium,
-            improvement: 2.5 // Average contribution towards topic mastery
-          });
-          totalMinutes += duration;
-          if (isPremium) expectedDailyImprovement += 2.5;
+          if (totalMinutes + duration <= maxDailyTime) {
+            dailyTasks.push({
+              id: 'weak_topic',
+              type: 'topic',
+              title: 'חיזוק נושא חלש',
+              topicId: weakTopic?.topicId,
+              description: `${topicName} (${weakTopic?.mastery || 0}%)`,
+              duration,
+              count: questionsToMaster,
+              isPremiumOnly: !isPremium,
+              isLocked: !isPremium,
+              improvement: 2.5,
+              route: 'WeakAreaSelection'
+            });
+            totalMinutes += duration;
+            if (isPremium) expectedDailyImprovement += 2.5;
+          }
         }
 
-        // Task 3: Solve questions (MEDIUM PRIORITY - +1-2% per 20 questions)
-        const questionCount = isPremium ? Math.min(30, Math.max(20, questionsPerDay)) : 10;
-        const questionDuration = questionCount * 2;
-        dailyTasks.push({
-          id: 'questions',
-          type: 'questions',
-          title: 'פתרון שאלות מגוונות',
-          description: `${questionCount} שאלות`,
-          duration: questionDuration,
-          count: questionCount,
-          isPremiumOnly: false,
-          isLocked: false,
-          improvement: Math.round(questionCount / 20 * 1.5 * 10) / 10
-        });
-        totalMinutes += questionDuration;
-        expectedDailyImprovement += questionCount / 20 * 1.5;
+        // TASK 3: Solve questions (MEDIUM PRIORITY - +1-2% per 20 questions)
+        if (totalMinutes < maxDailyTime) {
+          const remainingTime = maxDailyTime - totalMinutes;
+          const maxQuestions = Math.floor(remainingTime / 2);
+          const questionCount = Math.min(
+            isPremium ? Math.min(30, Math.max(20, questionsPerDay)) : 10,
+            maxQuestions
+          );
+          const questionDuration = questionCount * 2;
+          
+          dailyTasks.push({
+            id: 'questions',
+            type: 'questions',
+            title: 'תרגול יומי',
+            description: `${questionCount} שאלות מגוונות`,
+            duration: questionDuration,
+            count: questionCount,
+            isPremiumOnly: false,
+            isLocked: false,
+            improvement: Math.round(questionCount / 20 * 1.5 * 10) / 10,
+            route: 'Practice'
+          });
+          totalMinutes += questionDuration;
+          expectedDailyImprovement += questionCount / 20 * 1.5;
+        }
 
-        // Task 4: Vocabulary (for English) or Exam prep
-        if (subject === 'אנגלית') {
+        // TASK 4: Vocabulary (for English - +0.5%)
+        if (subject === 'אנגלית' && totalMinutes + 10 <= maxDailyTime) {
           dailyTasks.push({
             id: 'vocabulary',
             type: 'vocabulary',
-            title: 'אוצר מילים יומי',
-            description: 'תרגול מילים יומי',
+            title: 'אוצר מילים — יומי',
+            description: '10 מילים חדשות',
             duration: 10,
             count: 10,
             isPremiumOnly: false,
             isLocked: false,
-            improvement: 0.5
+            improvement: 0.5,
+            route: 'VocabularyTraining'
           });
           totalMinutes += 10;
           expectedDailyImprovement += 0.5;
         }
 
-        // If close to exam and need exams, add exam task
-        if (daysUntilExam <= 14 && examsNeeded > 0) {
+        // TASK 5: Full exam simulation (weekends / last 14 days - +7-15%)
+        const isExamPriority = daysUntilExam <= 14 || new Date().getDay() === 5 || new Date().getDay() === 6;
+        if (isExamPriority && examsNeeded > 0) {
           dailyTasks.push({
             id: 'exam_prep',
             type: 'exam',
             title: 'סימולציית בגרות',
-            description: 'בגרות מלאה השבוע',
+            description: isPremium ? 'בגרות מלאה' : 'עם פרסומת',
             duration: 90,
             count: 1,
             isPremiumOnly: false,
             isLocked: false,
-            improvement: 10
+            improvement: 10,
+            route: 'Exams'
           });
         }
 
         setDailyPlan({
           tasks: dailyTasks,
-          estimatedMinutes: Math.min(totalMinutes, 90), // Cap at 90 minutes
-          expectedImprovement: Math.round(expectedDailyImprovement * 10) / 10
+          estimatedMinutes: Math.min(totalMinutes, maxDailyTime),
+          expectedImprovement: Math.round(expectedDailyImprovement * 10) / 10,
+          maxTime: maxDailyTime
         });
 
         // ============================================
@@ -700,17 +727,30 @@ export default function StudyPlanPage() {
                         {task.count && <div className="text-xs text-gray-500">{task.count} פריטים</div>}
                       </div>
                     </div>
-                    {task.isPremiumOnly && !isPremium && (
-                      <div className="mt-2 text-xs text-amber-600 font-medium flex items-center gap-1">
-                        <Crown className="w-3 h-3" />
-                        פרימיום בלבד
-                      </div>
-                    )}
-                    {task.improvement && isPremium && (
-                      <div className="mt-2 text-xs text-green-600 font-medium">
-                        📈 +{task.improvement}% במוכנות
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between mt-2">
+                      {task.isPremiumOnly && !isPremium ? (
+                        <div className="text-xs text-amber-600 font-medium flex items-center gap-1">
+                          <Crown className="w-3 h-3" />
+                          פרימיום בלבד
+                        </div>
+                      ) : task.improvement ? (
+                        <div className="text-xs text-green-600 font-medium">
+                          📈 +{task.improvement}% במוכנות
+                        </div>
+                      ) : <div />}
+                      {!task.isLocked && task.route && (
+                        <Button
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(createPageUrl(task.route));
+                          }}
+                          className="h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                        >
+                          התחל
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -736,7 +776,7 @@ export default function StudyPlanPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="space-y-3"
+          className="grid grid-cols-2 gap-3"
         >
           {/* Button 1: Fix Mistakes */}
           <Button
@@ -747,13 +787,15 @@ export default function StudyPlanPage() {
                 navigate(createPageUrl("Premium"));
               }
             }}
-            className={`w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 ${
-              isPremium ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-400 hover:bg-gray-500'
+            className={`h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 ${
+              isPremium ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300'
             } text-white`}
           >
             <Repeat className="w-5 h-5" />
-            תרגל טעויות
-            {!isPremium && <Lock className="w-4 h-4 ml-2" />}
+            <span className="flex items-center gap-1">
+              תרגל טעויות
+              {!isPremium && <Lock className="w-3 h-3" />}
+            </span>
           </Button>
 
           {/* Button 2: Weak Topics */}
@@ -765,32 +807,33 @@ export default function StudyPlanPage() {
                 navigate(createPageUrl("Premium"));
               }
             }}
-            className={`w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 ${
-              isPremium ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-400 hover:bg-gray-500'
+            className={`h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 ${
+              isPremium ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-300'
             } text-white`}
           >
             <Target className="w-5 h-5" />
-            תרגל נושאים חלשים
-            {!isPremium && <Lock className="w-4 h-4 ml-2" />}
+            <span className="flex items-center gap-1">
+              נושאים חלשים
+              {!isPremium && <Lock className="w-3 h-3" />}
+            </span>
           </Button>
 
           {/* Button 3: Full Exam */}
           <Button
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+            className="h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white"
           >
             <FileCheck className="w-5 h-5" />
-            בגרות מלאה — סימולציה
-            {!isPremium && <span className="text-xs opacity-80">(צפייה בפרסומת)</span>}
+            <span>בגרות מלאה</span>
           </Button>
 
           {/* Button 4: Daily Task */}
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-blue-700 text-white"
+            className="h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 bg-[#3B82F6] hover:bg-blue-700 text-white"
           >
             <Play className="w-5 h-5" />
-            משימה יומית
+            <span>משימה יומית</span>
           </Button>
         </motion.div>
 
