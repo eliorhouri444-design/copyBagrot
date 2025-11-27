@@ -715,7 +715,17 @@ export default function VocabularyTrainingPage() {
     }
 
     // Flashcards phase
-    const currentWord = currentSet.words[flashcardIndex];
+    const currentWord = currentSet?.words?.[flashcardIndex];
+    if (!currentWord) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">אין מילים בסט זה</p>
+            <Button onClick={() => setMode(PRACTICE_MODES.DASHBOARD)}>חזרה</Button>
+          </div>
+        </div>
+      );
+    }
     const flashcardProgress = ((flashcardIndex + 1) / currentSet.words.length) * 100;
 
     return (
