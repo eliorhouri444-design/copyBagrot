@@ -1355,7 +1355,7 @@ export default function TopicPracticeNewPage() {
         </div>
       </div>
 
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-2 sm:p-3 gap-3">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-2 sm:p-3 gap-3">
         {/* Reading text panel on the right */}
         {readingText && !isListeningTopic &&
         <div className="hidden md:flex md:w-1/2 bg-white rounded-2xl shadow-xl overflow-hidden flex-col">
@@ -1496,7 +1496,7 @@ export default function TopicPracticeNewPage() {
 
           {/* Answer input area - fixed at bottom */}
           {currentQuestion.question_type !== "writing" &&
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-2xl p-4 z-20">
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-4 z-20">
               <div className="space-y-3 max-w-2xl mx-auto">
                 {(currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "multi_choice") && currentQuestion.options?.length > 0 ?
               <div></div> :
