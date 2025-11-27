@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { motion } from "framer-motion";
 import {
   Loader2, Target, CheckCircle, BookOpen, Repeat, AlertTriangle,
   Clock, Play, Zap, Crown, Lock, TrendingUp, FileCheck,
