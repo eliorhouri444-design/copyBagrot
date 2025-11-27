@@ -1387,7 +1387,7 @@ export default function ExamsPage() {
                     return (
                       <div className="bg-gray-100 mr-2 p-3 rounded-xl from-orange-50 to-red-50 border-2 border-blue-500">
                         <div className="flex items-center gap-2 mb-2">
-                          <Target className="w-4 h-4 text-orange-600" />
+                          
                           <h4 className="font-bold text-gray-900 text-sm">תרגול טעויות ממבחן זה</h4>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">
