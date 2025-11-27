@@ -453,7 +453,7 @@ export default function ModuleCarousel({
                         {isPremium === true ?
                   <Button
                     onClick={() => handleModuleClick(currentModule)}
-                    variant="outline" className="bg-[#ffffff] text-blue-500 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-accent-foreground w-full h-10 border-2 border-blue-500 hover:bg-[#F5F8FF]">
+                    variant="outline" className="bg-[#ffffff] text-blue-500 px-4 py-2 font-semibold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:text-blue-500 w-full h-10 border-2 border-blue-500 hover:bg-blue-500 hover:text-white">
 
 
                             בחר בגרות ספציפית (מעל 100 בגרויות)
