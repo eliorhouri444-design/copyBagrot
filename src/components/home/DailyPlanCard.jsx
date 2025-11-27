@@ -16,9 +16,117 @@ export default function DailyPlanCard({
   isPremium = false,
   completedTasks = [],
   onToggleTask,
-  engineData = null
+  engineData = null,
+  subject = '',
+  unitLevel = 0,
+  userEmail = ''
 }) {
   const navigate = useNavigate();
+  const [dailyPracticeRecord, setDailyPracticeRecord] = useState(null);
+  const [taskStatuses, setTaskStatuses] = useState({});
+
+  // טעינת רשומת DailyPractice של היום
+  const loadDailyPractice = useCallback(async () => {
+    if (!userEmail || !subject) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    try {
+      const records = await base44.entities.DailyPractice.filter({
+        user_email: userEmail,
+        subject_id: subject,
+        unit_level: unitLevel,
+        date: today
+      });
+      
+      if (records && records.length > 0) {
+        setDailyPracticeRecord(records[0]);
+        // טעינת סטטוס משימות מהרשומה
+        const statuses = {};
+        (records[0].tasks || []).forEach(task => {
+          statuses[task.task_id] = {
+            status: task.status,
+            completed: task.completed_questions || 0,
+            target: task.question_count || 1
+          };
+        });
+        setTaskStatuses(statuses);
+      }
+    } catch (error) {
+      console.error('Error loading daily practice:', error);
+    }
+  }, [userEmail, subject, unitLevel]);
+
+  useEffect(() => {
+    loadDailyPractice();
+  }, [loadDailyPractice]);
+
+  // עדכון סטטוס משימה ב-DailyPractice
+  const updateTaskStatus = useCallback(async (taskId, completedCount, targetCount) => {
+    if (!userEmail || !subject) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const isFullyCompleted = completedCount >= targetCount;
+    const newStatus = isFullyCompleted ? 'done' : completedCount > 0 ? 'in_progress' : 'pending';
+    
+    try {
+      if (dailyPracticeRecord) {
+        // עדכון רשומה קיימת
+        const updatedTasks = (dailyPracticeRecord.tasks || []).map(task => {
+          if (task.task_id === taskId) {
+            return {
+              ...task,
+              status: newStatus,
+              completed_questions: completedCount,
+              completed_at: isFullyCompleted ? new Date().toISOString() : null
+            };
+          }
+          return task;
+        });
+        
+        // בדיקה אם כל המשימות הושלמו
+        const allCompleted = updatedTasks.every(t => t.status === 'done');
+        const totalCompleted = updatedTasks.reduce((sum, t) => sum + (t.completed_questions || 0), 0);
+        
+        await base44.entities.DailyPractice.update(dailyPracticeRecord.id, {
+          tasks: updatedTasks,
+          completed_questions: totalCompleted,
+          is_completed: allCompleted,
+          completion_time: allCompleted ? new Date().toISOString() : null
+        });
+        
+        // עדכון state מקומי
+        setTaskStatuses(prev => ({
+          ...prev,
+          [taskId]: { status: newStatus, completed: completedCount, target: targetCount }
+        }));
+        
+        // רענון הרשומה
+        loadDailyPractice();
+      } else {
+        // יצירת רשומה חדשה אם לא קיימת
+        const newRecord = await base44.entities.DailyPractice.create({
+          date: today,
+          user_email: userEmail,
+          subject_id: subject,
+          unit_level: unitLevel,
+          tasks: [{
+            task_id: taskId,
+            task_type: 'new_content',
+            status: newStatus,
+            question_count: targetCount,
+            completed_questions: completedCount,
+            completed_at: isFullyCompleted ? new Date().toISOString() : null
+          }],
+          total_questions: targetCount,
+          completed_questions: completedCount,
+          is_completed: isFullyCompleted
+        });
+        setDailyPracticeRecord(newRecord);
+      }
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
+  }, [userEmail, subject, unitLevel, dailyPracticeRecord, loadDailyPractice]);
 
   // חישוב התקדמות יומית מתוך הניסיונות של היום
   const todayProgress = useMemo(() => {
