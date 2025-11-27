@@ -189,11 +189,18 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               className="space-y-2">
 
               <Button
-              onClick={handleStartPractice}
+              onClick={() => {
+                const topic = topics[currentIndex];
+                if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+                  navigate(createPageUrl(`VocabularyTraining?set=1`));
+                } else {
+                  handleStartPractice();
+                }
+              }}
               className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
               <Play className="w-4 h-4 ml-2" />
-              קח והתחל תרגול
+              התחל תרגול
               </Button>
 
               {isPremium ?
