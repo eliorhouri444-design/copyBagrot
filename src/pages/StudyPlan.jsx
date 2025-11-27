@@ -195,8 +195,25 @@ export default function StudyPlanPage() {
       </div>
 
       <div className="px-4 space-y-4">
+        {/* Exam Day Message */}
+        {daysUntilExam === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl p-6 text-center shadow-xl">
+            <div className="text-5xl mb-3">🎯🍀</div>
+            <h2 className="text-2xl font-bold text-white mb-2">היום הגדול הגיע!</h2>
+            <p className="text-white/90 text-lg mb-1">
+              בהצלחה בבגרות ב{displaySubject}! 💪
+            </p>
+            <p className="text-white/80 text-sm">
+              אתה מוכן לזה - תאמין בעצמך!
+            </p>
+          </motion.div>
+        )}
+
         {/* Pace Status */}
-        {paceStatus && (
+        {paceStatus && daysUntilExam !== 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
