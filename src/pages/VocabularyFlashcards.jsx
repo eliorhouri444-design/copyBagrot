@@ -177,6 +177,14 @@ export default function VocabularyFlashcardsPage() {
 
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const handleFlip = () => setIsFlipped(!isFlipped);
+
+  const handleAnswerWithFlip = (isKnown) => {
+    setIsFlipped(false);
+    handleAnswer(isKnown);
+  };
 
   if (!currentWord) {
     return (
@@ -193,7 +201,7 @@ export default function VocabularyFlashcardsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header - minimal */}
+      {/* Header */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
         <button
           onClick={() => navigate(createPageUrl("VocabularySets"))}
@@ -201,57 +209,93 @@ export default function VocabularyFlashcardsPage() {
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm text-gray-500">
-          {currentIndex + 1} / {words.length}
+        <span className="text-sm font-semibold text-blue-600">
+          שאלה {currentIndex + 1} מתוך {words.length}
         </span>
-        <div className="w-9" />
+        <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
       </div>
       
-      <Progress value={progress} className="h-1 rounded-none" />
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 h-2.5">
+        <div 
+          className="bg-blue-600 h-2.5 transition-all duration-300" 
+          style={{ width: `${progress}%` }} 
+        />
+      </div>
 
       {/* Card */}
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="w-full max-w-sm"
         >
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            {/* English word */}
-            <div className="text-3xl font-bold text-gray-900 mb-4" dir="ltr">
-              {currentWord.english_answer}
-            </div>
-            
-            {/* Example sentence */}
-            {currentWord.example_sentence && (
-              <div className="text-sm text-gray-500 italic mb-6" dir="ltr">
-                "{currentWord.example_sentence}"
+          {/* 3D Flip Card */}
+          <div 
+            className="relative w-full h-[300px] cursor-pointer"
+            style={{ perspective: '1000px' }}
+            onClick={handleFlip}
+          >
+            <motion.div
+              className="relative w-full h-full"
+              animate={{ rotateY: isFlipped ? 180 : 0 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Front Side */}
+              <div 
+                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-100 shadow-lg flex flex-col items-center justify-center p-8"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
+                <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
+                  {currentWord.english_answer}
+                </div>
+                <p className="text-blue-500 text-lg mb-6">← לחץ להפוך</p>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
+                  className="px-6 py-2.5 rounded-2xl border-2 border-blue-400 text-blue-600 font-medium bg-transparent hover:bg-blue-50 transition-colors"
+                >
+                  הפוך כרטיס
+                </button>
               </div>
-            )}
 
-            {/* Hebrew translation - smaller */}
-            <div className="text-lg text-gray-600 pt-4 border-t border-gray-100">
-              {currentWord.hebrew_word}
-            </div>
+              {/* Back Side */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-8"
+                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+              >
+                <div className="text-3xl font-bold text-gray-900 mb-3 text-center">
+                  {currentWord.hebrew_word}
+                </div>
+                <div className="text-xl text-blue-600 text-center" dir="ltr">
+                  {currentWord.english_answer}
+                </div>
+                {currentWord.example_sentence && (
+                  <div className="text-sm text-gray-500 text-center mt-6 p-3 bg-white/70 rounded-xl max-w-xs" dir="ltr">
+                    "{currentWord.example_sentence}"
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 mt-8">
             <button
-              onClick={() => handleAnswer(false)}
-              className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-red-300 hover:bg-red-50 transition-colors"
+              onClick={() => handleAnswerWithFlip(true)}
+              className="flex-1 h-14 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-green-100 hover:border-green-300 transition-all"
             >
-              <X className="w-5 h-5 text-red-500" />
-              <span className="font-medium">לא ידעתי</span>
+              <Check className="w-5 h-5 text-green-600" />
+              <span className="font-semibold">ידעתי</span>
             </button>
             
             <button
-              onClick={() => handleAnswer(true)}
-              className="flex-1 h-14 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:border-green-300 hover:bg-green-50 transition-colors"
+              onClick={() => handleAnswerWithFlip(false)}
+              className="flex-1 h-14 bg-red-50 border-2 border-red-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-red-100 hover:border-red-300 transition-all"
             >
-              <Check className="w-5 h-5 text-green-500" />
-              <span className="font-medium">ידעתי</span>
+              <X className="w-5 h-5 text-red-500" />
+              <span className="font-semibold">לא ידעתי</span>
             </button>
           </div>
         </motion.div>
