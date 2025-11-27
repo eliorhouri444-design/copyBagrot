@@ -308,6 +308,7 @@ export default function StudyPlanPage() {
                 צפי להגעה ליעד: <strong>{requirements.estimatedDaysToTarget} ימים</strong>
               </span>
             </div>
+            </div>
           </motion.div>
         )}
 
