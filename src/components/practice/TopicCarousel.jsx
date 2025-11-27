@@ -303,6 +303,39 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
         )}
         </div>
       }
+
+      {/* Vocabulary Set Selector Dialog */}
+      <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
+        <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold">בחר סט</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[60vh] py-2">
+            <div className="space-y-3">
+              {vocabularySets.map(set => (
+                <button
+                  key={set.id}
+                  onClick={() => {
+                    setShowVocabSetSelector(false);
+                    navigate(createPageUrl(`VocabularyPractice?set=${set.set_number}`));
+                  }}
+                  className="w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all border-gray-100 hover:border-blue-300 bg-white"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold bg-blue-100 text-blue-600">
+                      {set.set_number}
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-gray-900">סט {set.set_number}</div>
+                      <div className="text-sm text-blue-600">מילים {(set.set_number - 1) * 10 + 1} - {set.set_number * 10}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>);
 
 }
