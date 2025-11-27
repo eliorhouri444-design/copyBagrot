@@ -5,17 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   Loader2, Target, CheckCircle, BookOpen, Repeat, AlertTriangle,
-  Play, Zap, Crown, Lock, TrendingUp, FileCheck, BarChart3
+  Play, Zap, Crown, Lock, TrendingUp, FileCheck, BarChart3, Clock, Calendar
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  fetchUserPerformanceData,
-  calculateFullReadiness,
-  calculateGapAndRequirements,
-  buildCompleteDailyPlan,
-  checkPaceStatus
-} from "@/components/studyplan/ReadinessEngine";
 
 export default function StudyPlanPage() {
   const navigate = useNavigate();
@@ -25,7 +18,7 @@ export default function StudyPlanPage() {
   const [readiness, setReadiness] = useState(null);
   const [requirements, setRequirements] = useState(null);
   const [dailyPlan, setDailyPlan] = useState(null);
-  const [paceStatus, setPaceStatus] = useState(null);
+  const [motivationMessage, setMotivationMessage] = useState(null);
 
   const isPremium = user?.is_premium;
 
@@ -36,47 +29,222 @@ export default function StudyPlanPage() {
         setUser(currentUser);
 
         const subject = currentUser?.selected_subject || 'אנגלית';
-        const unitLevel = currentUser?.selected_units || 5;
+        const unitLevel = currentUser?.selected_units || 3;
         const targetScore = currentUser?.target_score || 85;
         const examDate = currentUser?.exam_date ? new Date(currentUser.exam_date) : null;
         const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : 60;
 
-        const perfData = await fetchUserPerformanceData(base44, currentUser.email, subject, unitLevel);
+        // Fetch all required data in parallel
+        const [attempts, examAttempts, practiceSessions, topics] = await Promise.all([
+          base44.entities.AttemptNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 1000),
+          base44.entities.ExamAttempt.filter({ created_by: currentUser.email, subject: subject }, '-created_date', 100),
+          base44.entities.PracticeSessionNew.filter({ created_by: currentUser.email, subject_id: subject }, '-created_date', 200),
+          base44.entities.TopicNew.filter({ subject_id: subject, unit_level: unitLevel, is_active: true }, null, 50)
+        ]);
+
+        // Calculate performance data
+        const totalQuestions = attempts.length;
+        const correctAnswers = attempts.filter(a => a.status === 'correct' || a.percentage >= 70).length;
+        const overallAccuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+        
+        const totalExams = examAttempts.length;
+        const avgExamScore = totalExams > 0 
+          ? Math.round(examAttempts.reduce((sum, e) => sum + (e.score_percent || 0), 0) / totalExams) 
+          : 0;
+
+        // Calculate topic mastery
+        const topicStats = {};
+        attempts.forEach(a => {
+          if (a.topic_id) {
+            if (!topicStats[a.topic_id]) {
+              topicStats[a.topic_id] = { correct: 0, total: 0 };
+            }
+            topicStats[a.topic_id].total++;
+            if (a.status === 'correct' || a.percentage >= 70) {
+              topicStats[a.topic_id].correct++;
+            }
+          }
+        });
+
+        const topicMasteryList = Object.entries(topicStats).map(([topicId, stats]) => ({
+          topicId,
+          mastery: Math.round((stats.correct / stats.total) * 100),
+          total: stats.total
+        }));
+
+        const weakTopics = topicMasteryList.filter(t => t.mastery < 70);
+        const activeMistakes = attempts.filter(a => a.status === 'incorrect' || a.percentage < 50).length;
+
+        // Calculate topic mastery average (for topics with at least 5 attempts)
+        const masteredTopics = topicMasteryList.filter(t => t.total >= 5);
+        const topicsMastery = masteredTopics.length > 0
+          ? Math.round(masteredTopics.reduce((sum, t) => sum + t.mastery, 0) / masteredTopics.length)
+          : 0;
+
+        // Calculate exams mastery (based on exam scores)
+        const examsMastery = avgExamScore;
+
+        // Calculate error mastery (inverse of active mistakes ratio)
+        const errorMastery = totalQuestions > 0 
+          ? Math.round(100 - (activeMistakes / totalQuestions) * 100) 
+          : 100;
+
+        // Calculate speed mastery (based on average time per question if available)
+        const speedMastery = 70; // Default value, can be calculated from actual time data
+
+        // FULL READINESS FORMULA
+        // FullReadiness = 0.40 * TopicsMastery + 0.50 * ExamsMastery + 0.10 * ErrorMastery
+        const fullReadiness = Math.round(
+          0.40 * topicsMastery +
+          0.50 * examsMastery +
+          0.10 * errorMastery
+        );
+
+        const perfData = {
+          totalQuestions,
+          correctAnswers,
+          overallAccuracy,
+          totalExams,
+          avgExamScore,
+          weakTopics,
+          activeMistakes,
+          topicsMastery,
+          examsMastery,
+          errorMastery,
+          speedMastery,
+          topicMasteryList
+        };
         setPerformanceData(perfData);
 
-        if (perfData) {
-          const readinessData = calculateFullReadiness(perfData, subject, unitLevel);
-          setReadiness(readinessData);
+        // Set readiness
+        const gap = Math.max(0, targetScore - fullReadiness);
+        setReadiness({
+          readinessScore: fullReadiness,
+          gap,
+          breakdown: {
+            topics: topicsMastery,
+            practice: overallAccuracy,
+            exams: examsMastery,
+            speed: speedMastery
+          }
+        });
 
-          const reqs = calculateGapAndRequirements({
-            targetScore,
-            readinessScore: readinessData.readinessScore,
-            performanceData: perfData,
-            subject,
-            unitLevel,
-            daysUntilExam
-          });
-          setRequirements(reqs);
+        // Calculate requirements
+        const questionsTarget = targetScore >= 90 ? 700 : targetScore >= 70 ? 500 : 300;
+        const examsTarget = targetScore >= 90 ? 8 : targetScore >= 70 ? 6 : 4;
+        const questionsNeeded = Math.max(0, questionsTarget - totalQuestions);
+        const examsNeeded = Math.max(0, examsTarget - totalExams);
+        const topicsToMaster = weakTopics.length;
+        const mistakesToFix = activeMistakes;
 
-          const plan = buildCompleteDailyPlan({
-            performanceData: perfData,
-            requirements: reqs,
-            targetScore,
-            daysUntilExam,
-            subject,
-            unitLevel,
-            dayOfWeek: new Date().getDay()
-          });
-          setDailyPlan(plan);
+        // Estimated days to reach target
+        const dailyQuestions = isPremium ? 30 : 10;
+        const estimatedDays = questionsNeeded > 0 ? Math.ceil(questionsNeeded / dailyQuestions) : 0;
 
-          const pace = checkPaceStatus({
-            targetScore,
-            currentReadiness: readinessData.readinessScore,
-            daysUntilExam,
-            startReadiness: currentUser?.start_readiness || 30,
-            startDaysUntilExam: currentUser?.start_days_until_exam || 90
+        setRequirements({
+          questionsTarget,
+          questionsSolved: totalQuestions,
+          questionsNeeded,
+          examsTarget,
+          examsDone: totalExams,
+          examsNeeded,
+          topicsToMaster,
+          mistakesToFix,
+          estimatedDays: Math.max(estimatedDays, daysUntilExam > 0 ? daysUntilExam : estimatedDays)
+        });
+
+        // Generate daily plan
+        const dailyTasks = [];
+        let totalMinutes = 0;
+
+        // Task 1: Fix mistakes (premium only)
+        if (activeMistakes > 0) {
+          const mistakeCount = isPremium ? Math.min(15, activeMistakes) : 3;
+          dailyTasks.push({
+            id: 'mistakes',
+            type: 'mistakes',
+            title: 'תיקון טעויות',
+            description: `חזרה על ${mistakeCount} טעויות`,
+            duration: mistakeCount * 3,
+            count: mistakeCount,
+            isPremiumOnly: true,
+            isLocked: !isPremium
           });
-          setPaceStatus(pace);
+          totalMinutes += mistakeCount * 3;
+        }
+
+        // Task 2: Strengthen weak topics (premium only)
+        if (weakTopics.length > 0) {
+          const topicToStudy = topics.find(t => weakTopics.some(w => w.topicId === t.topic_id))?.name || 'אוצר מילים';
+          dailyTasks.push({
+            id: 'weak_topic',
+            type: 'topic',
+            title: 'חיזוק נושאים חלשים',
+            description: `חיזוק: ${topicToStudy}`,
+            duration: 30,
+            count: 15,
+            isPremiumOnly: true,
+            isLocked: !isPremium
+          });
+          totalMinutes += 30;
+        }
+
+        // Task 3: Solve questions (available to all)
+        const questionCount = isPremium ? 30 : 10;
+        dailyTasks.push({
+          id: 'questions',
+          type: 'questions',
+          title: 'פתרון שאלות מגוונות',
+          description: `${questionCount} שאלות`,
+          duration: questionCount * 2,
+          count: questionCount,
+          isPremiumOnly: false,
+          isLocked: false
+        });
+        totalMinutes += questionCount * 2;
+
+        // Task 4: Vocabulary (for English)
+        if (subject === 'אנגלית') {
+          dailyTasks.push({
+            id: 'vocabulary',
+            type: 'vocabulary',
+            title: 'אוצר מילים יומי',
+            description: 'תרגול מילים יומי',
+            duration: 10,
+            count: 10,
+            isPremiumOnly: false,
+            isLocked: false
+          });
+          totalMinutes += 10;
+        }
+
+        setDailyPlan({
+          tasks: dailyTasks,
+          estimatedMinutes: totalMinutes
+        });
+
+        // Set motivation message based on readiness
+        if (fullReadiness >= 80) {
+          setMotivationMessage({
+            type: 'success',
+            icon: '📗',
+            title: 'אתה כמעט שם!',
+            message: 'המשך בקצב הזה – אתה יכול להגיע ליעד!'
+          });
+        } else if (fullReadiness >= 40) {
+          setMotivationMessage({
+            type: 'effort',
+            icon: '🟧',
+            title: 'אתה בדרך הנכונה',
+            message: 'נשאר עוד מאמץ קטן כדי להגיע ליעד.'
+          });
+        } else {
+          setMotivationMessage({
+            type: 'intensive',
+            icon: '🔴',
+            title: `פער של ${gap} נקודות`,
+            message: 'נדרש מאמץ מוגבר. נתמקד בטעויות ונושאים חלשים.'
+          });
         }
 
       } catch (error) {
@@ -89,24 +257,25 @@ export default function StudyPlanPage() {
   }, []);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
-  const displayUnits = user?.selected_units || 5;
+  const displayUnits = user?.selected_units || 3;
   const targetScore = user?.target_score || 85;
   const examDate = user?.exam_date ? new Date(user.exam_date) : null;
   const daysUntilExam = examDate ? Math.max(0, Math.ceil((examDate - new Date()) / (1000 * 60 * 60 * 24))) : null;
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-blue-50">
+      <div className="flex items-center justify-center min-h-screen bg-blue-100">
         <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
       </div>
     );
   }
 
   const readinessScore = readiness?.readinessScore || 0;
-  const gap = requirements?.gap || 0;
+  const gap = readiness?.gap || 0;
 
   return (
-    <div className="bg-blue-50 pb-24 min-h-screen">
+    <div className="bg-blue-100 pb-24 min-h-screen">
+      {/* 1️⃣ Header */}
       <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
@@ -121,6 +290,7 @@ export default function StudyPlanPage() {
       </div>
 
       <div className="px-6 space-y-4">
+        {/* 2️⃣ Readiness Box */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -137,111 +307,111 @@ export default function StudyPlanPage() {
           </div>
           <div className="p-4">
             <div className="flex items-center justify-center gap-6 mb-4">
-              <div className="relative w-24 h-24">
+              <div className="relative w-28 h-28">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                   <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
                   <circle
                     cx="18" cy="18" r="15.9" fill="none"
-                    stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"
+                    stroke={readinessScore >= 80 ? '#22C55E' : readinessScore >= 40 ? '#F59E0B' : '#EF4444'}
+                    strokeWidth="3" strokeLinecap="round"
                     strokeDasharray={`${readinessScore}, 100`}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900">{readinessScore}%</span>
+                  <span className="text-3xl font-bold text-gray-900">{readinessScore}%</span>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-600 mb-1">
-                  {gap > 0 ? `חסרות ${gap} נקודות` : 'הגעת ליעד!'}
+              <div className="text-right space-y-1">
+                <div className="text-sm text-gray-600">
+                  {gap > 0 ? `חסרות ${gap} נקודות` : '🎉 הגעת ליעד!'}
                 </div>
                 {daysUntilExam !== null && (
-                  <div className="text-sm font-bold text-blue-600">
+                  <div className="text-sm font-bold text-blue-600 flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
                     {daysUntilExam} ימים לבגרות
                   </div>
                 )}
               </div>
             </div>
             
-            {readiness?.breakdown && (
-              <div className="grid grid-cols-4 gap-2 text-center">
-                <div className="bg-blue-50 p-2 rounded-xl">
-                  <div className="font-bold text-blue-900">{readiness.breakdown.content.score}%</div>
-                  <div className="text-[10px] text-gray-600">שליטה</div>
+            {/* 4 Mastery Indicators */}
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="bg-blue-50 p-3 rounded-xl">
+                <div className="relative w-12 h-12 mx-auto mb-1">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${performanceData?.topicsMastery || 0}, 100`} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold">{performanceData?.topicsMastery || 0}%</span>
+                  </div>
                 </div>
-                <div className="bg-blue-50 p-2 rounded-xl">
-                  <div className="font-bold text-blue-900">{readiness.breakdown.practice.score}%</div>
-                  <div className="text-[10px] text-gray-600">תרגול</div>
-                </div>
-                <div className="bg-blue-50 p-2 rounded-xl">
-                  <div className="font-bold text-blue-900">{readiness.breakdown.exam.score}%</div>
-                  <div className="text-[10px] text-gray-600">בגרויות</div>
-                </div>
-                <div className="bg-blue-50 p-2 rounded-xl">
-                  <div className="font-bold text-blue-900">{readiness.breakdown.speed.score}%</div>
-                  <div className="text-[10px] text-gray-600">מהירות</div>
-                </div>
+                <div className="text-[10px] text-gray-600 font-medium">שליטה</div>
               </div>
-            )}
+              <div className="bg-purple-50 p-3 rounded-xl">
+                <div className="relative w-12 h-12 mx-auto mb-1">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#8B5CF6" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${performanceData?.overallAccuracy || 0}, 100`} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold">{performanceData?.overallAccuracy || 0}%</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-gray-600 font-medium">תרגול</div>
+              </div>
+              <div className="bg-green-50 p-3 rounded-xl">
+                <div className="relative w-12 h-12 mx-auto mb-1">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#22C55E" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${performanceData?.examsMastery || 0}, 100`} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold">{performanceData?.examsMastery || 0}%</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-gray-600 font-medium">בגרויות</div>
+              </div>
+              <div className="bg-orange-50 p-3 rounded-xl">
+                <div className="relative w-12 h-12 mx-auto mb-1">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={`${performanceData?.speedMastery || 0}, 100`} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold">{performanceData?.speedMastery || 0}%</span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-gray-600 font-medium">מהירות</div>
+              </div>
+            </div>
           </div>
         </motion.div>
 
-        {daysUntilExam === 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl p-6 text-center shadow-xl"
-          >
-            <h2 className="text-2xl font-bold text-white mb-2">היום הגדול הגיע!</h2>
-            <p className="text-white/90 text-lg mb-1">בהצלחה בבגרות ב{displaySubject}!</p>
-            <p className="text-white/80 text-sm">אתה מוכן לזה - תאמין בעצמך!</p>
-          </motion.div>
-        )}
-
-        {paceStatus && daysUntilExam !== 0 && (
+        {/* 3️⃣ Motivation Message */}
+        {motivationMessage && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`bg-white rounded-2xl shadow-lg p-4 flex items-center gap-3 border-r-4 ${
-              paceStatus.status === 'ahead' ? 'border-r-green-500' :
-              paceStatus.status === 'on_track' ? 'border-r-blue-500' :
-              paceStatus.status === 'behind' ? 'border-r-yellow-500' :
+              motivationMessage.type === 'success' ? 'border-r-green-500' :
+              motivationMessage.type === 'effort' ? 'border-r-amber-500' :
               'border-r-red-500'
             }`}
           >
-            <span className="text-3xl">{paceStatus.icon}</span>
+            <span className="text-3xl">{motivationMessage.icon}</span>
             <div className="flex-1">
-              <div className="font-bold text-gray-900">{paceStatus.message}</div>
-              <div className="text-sm text-gray-600">
-                {daysUntilExam !== null && `${daysUntilExam} ימים לבגרות`}
-              </div>
+              <div className="font-bold text-gray-900">{motivationMessage.title}</div>
+              <div className="text-sm text-gray-600">{motivationMessage.message}</div>
             </div>
           </motion.div>
         )}
 
-        {dailyPlan?.alert && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={`bg-white rounded-2xl shadow-lg p-4 border-r-4 ${
-              dailyPlan.alert.type === 'success' 
-                ? 'border-r-green-500'
-                : dailyPlan.alert.type === 'critical'
-                  ? 'border-r-red-500'
-                  : 'border-r-amber-500'
-            }`}
-          >
-            <p className={`font-medium text-sm ${
-              dailyPlan.alert.type === 'success' 
-                ? 'text-green-800'
-                : dailyPlan.alert.type === 'critical'
-                  ? 'text-red-800'
-                  : 'text-amber-800'
-            }`}>
-              {dailyPlan.alert.message}
-            </p>
-          </motion.div>
-        )}
-
+        {/* 4️⃣ Requirements Box */}
         {requirements && gap > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -252,54 +422,64 @@ export default function StudyPlanPage() {
             <div className="bg-[#3B82F6] p-4">
               <div className="flex items-center gap-3 text-white">
                 <div className="flex-1 text-right">
-                  <h3 className="text-base font-bold">מה צריך כדי להגיע ל-{targetScore}</h3>
+                  <h3 className="text-base font-bold">מה צריך כדי להגיע ליעד</h3>
                   <p className="text-xs opacity-90">התוכנית שלך להצלחה</p>
                 </div>
                 <Target className="w-7 h-7" />
               </div>
             </div>
-            <div className="p-5">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">שאלות לפתור</span>
-                  <span className="font-bold text-blue-600">
-                    {requirements.requirements.questionsNeeded} ({requirements.requirements.questionsPerDay}/יום)
-                  </span>
+            <div className="p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-sm text-gray-700 mb-1">שאלות לפתור:</div>
+                  <div className="font-bold text-blue-600 text-lg">
+                    {requirements.questionsSolved} מתוך {requirements.questionsTarget}
+                  </div>
                 </div>
-                <Progress value={Math.min(100, (performanceData?.totalQuestions || 0) / (requirements.requirements.questionsNeeded + (performanceData?.totalQuestions || 0)) * 100)} className="h-2" />
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">בגרויות מלאות</span>
-                  <span className="font-bold text-purple-600">
-                    {requirements.requirements.examsNeeded} ({requirements.requirements.examsPerWeek}/שבוע)
-                  </span>
+                <Progress value={(requirements.questionsSolved / requirements.questionsTarget) * 100} className="w-24 h-2" />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-sm text-gray-700 mb-1">בגרויות מלאות:</div>
+                  <div className="font-bold text-purple-600 text-lg">
+                    {requirements.examsDone} מתוך {requirements.examsTarget}
+                  </div>
                 </div>
-                <Progress value={Math.min(100, (performanceData?.totalExams || 0) / (requirements.requirements.examsNeeded + (performanceData?.totalExams || 0)) * 100)} className="h-2" />
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">נושאים לשליטה</span>
-                  <span className="font-bold text-green-600">
-                    {requirements.requirements.topicsToMaster}
-                  </span>
+                <Progress value={(requirements.examsDone / requirements.examsTarget) * 100} className="w-24 h-2" />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-sm text-gray-700 mb-1">נושאים לשליטה:</div>
+                  <div className="font-bold text-orange-600 text-lg">
+                    {requirements.topicsToMaster} שאינם ברמת שליטה
+                  </div>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">טעויות לתקן</span>
-                  <span className="font-bold text-red-600">
-                    {requirements.requirements.mistakesToFix} ({requirements.requirements.mistakesPerDay}/יום)
-                  </span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-sm text-gray-700 mb-1">טעויות לתקן:</div>
+                  <div className="font-bold text-red-600 text-lg">
+                    {requirements.mistakesToFix} טעויות פעילות
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-blue-50 rounded-xl text-center">
-                <span className="text-sm text-blue-800">
-                  צפי להגעה ליעד: <strong>{requirements.estimatedDaysToTarget} ימים</strong>
-                </span>
+              <div className="mt-4 p-3 bg-blue-50 rounded-xl text-center border-2 border-blue-200">
+                <div className="flex items-center justify-center gap-2">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm text-blue-800">
+                    זמן משוער להגעה ליעד: <strong>{requirements.estimatedDays} ימים</strong>
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
         )}
 
+        {/* 5️⃣ Learning Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -309,8 +489,8 @@ export default function StudyPlanPage() {
           <div className="bg-[#3B82F6] p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
-                <h3 className="text-base font-bold">הביצועים שלך</h3>
-                <p className="text-xs opacity-90">סטטיסטיקות למידה</p>
+                <h3 className="text-base font-bold">סטטיסטיקות למידה</h3>
+                <p className="text-xs opacity-90">הביצועים שלך</p>
               </div>
               <BarChart3 className="w-7 h-7" />
             </div>
@@ -324,9 +504,9 @@ export default function StudyPlanPage() {
               </div>
               
               <div className="bg-purple-50 p-4 rounded-xl">
-                <div className="text-sm text-purple-800 font-semibold mb-1">בגרויות</div>
+                <div className="text-sm text-purple-800 font-semibold mb-1">בגרויות שנעשו</div>
                 <div className="text-2xl font-bold text-purple-900">{performanceData?.totalExams || 0}</div>
-                <div className="text-xs text-purple-600">ממוצע: {performanceData?.avgExamScore || 0}</div>
+                <div className="text-xs text-purple-600">ממוצע ציון: {performanceData?.avgExamScore || 0}</div>
               </div>
               
               <div className="bg-orange-50 p-4 rounded-xl">
@@ -344,6 +524,7 @@ export default function StudyPlanPage() {
           </div>
         </motion.div>
 
+        {/* 6️⃣ Daily Tasks */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -372,81 +553,118 @@ export default function StudyPlanPage() {
                   'vocabulary': BookOpen
                 };
                 const colorMap = {
-                  'mistakes': { bg: 'bg-red-50', icon: 'bg-red-500', text: 'text-red-800' },
-                  'topic': { bg: 'bg-orange-50', icon: 'bg-orange-500', text: 'text-orange-800' },
-                  'questions': { bg: 'bg-blue-50', icon: 'bg-blue-500', text: 'text-blue-800' },
-                  'exam': { bg: 'bg-green-50', icon: 'bg-green-500', text: 'text-green-800' },
-                  'vocabulary': { bg: 'bg-purple-50', icon: 'bg-purple-500', text: 'text-purple-800' }
+                  'mistakes': { bg: 'bg-red-50', icon: 'bg-red-500', text: 'text-red-800', border: 'border-red-200' },
+                  'topic': { bg: 'bg-orange-50', icon: 'bg-orange-500', text: 'text-orange-800', border: 'border-orange-200' },
+                  'questions': { bg: 'bg-blue-50', icon: 'bg-blue-500', text: 'text-blue-800', border: 'border-blue-200' },
+                  'exam': { bg: 'bg-green-50', icon: 'bg-green-500', text: 'text-green-800', border: 'border-green-200' },
+                  'vocabulary': { bg: 'bg-purple-50', icon: 'bg-purple-500', text: 'text-purple-800', border: 'border-purple-200' }
                 };
                 const Icon = iconMap[task.type] || BookOpen;
                 const colors = colorMap[task.type] || colorMap['questions'];
                 
                 return (
-                  <div key={task.id || idx} className={`flex items-center justify-between ${colors.bg} p-4 rounded-xl`}>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 ${colors.icon} rounded-full flex items-center justify-center`}>
-                        <Icon className="w-5 h-5 text-white" />
+                  <div key={task.id || idx} className={`${colors.bg} p-4 rounded-xl border-2 ${colors.border} ${task.isLocked ? 'opacity-70' : ''}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 ${colors.icon} rounded-full flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className={`font-semibold ${colors.text} flex items-center gap-2`}>
+                            {task.title}
+                            {task.isLocked && <Lock className="w-4 h-4 text-gray-400" />}
+                          </div>
+                          <div className="text-sm text-gray-600">{task.description}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className={`font-semibold ${colors.text}`}>{task.title}</div>
-                        <div className="text-sm text-gray-600">{task.description}</div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-700">{task.duration} דק'</div>
+                        {task.count && <div className="text-xs text-gray-500">{task.count} פריטים</div>}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-gray-700">{task.duration} דק'</div>
-                      {task.count && <div className="text-xs text-gray-500">{task.count} פריטים</div>}
-                    </div>
+                    {task.isPremiumOnly && !isPremium && (
+                      <div className="mt-2 text-xs text-amber-600 font-medium flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        פרימיום בלבד
+                      </div>
+                    )}
                   </div>
                 );
               })}
-
-              {(!dailyPlan?.tasks || dailyPlan.tasks.length === 0) && (
-                <>
-                  <div className="flex items-center justify-between bg-blue-50 p-4 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                        <BookOpen className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900">פתרון שאלות</div>
-                        <div className="text-sm text-gray-600">{isPremium ? '30 שאלות' : '10 שאלות'}</div>
-                      </div>
-                    </div>
-                    {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-                  </div>
-                  
-                  <div className="flex items-center justify-between bg-orange-50 p-4 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                        <Repeat className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900">תיקון טעויות</div>
-                        <div className="text-sm text-gray-600">{isPremium ? '8 טעויות' : '3 טעויות'}</div>
-                      </div>
-                    </div>
-                    {!isPremium && <Lock className="w-5 h-5 text-gray-400" />}
-                  </div>
-                </>
-              )}
             </div>
-
-            {dailyPlan?.expectedImprovement > 0 && (
-              <div className="mt-4 p-3 bg-green-50 rounded-xl text-center">
-                <span className="text-sm text-green-800">
-                  שיפור צפוי: <strong>+{dailyPlan.expectedImprovement}%</strong> במוכנות
-                </span>
-              </div>
-            )}
           </div>
         </motion.div>
 
+        {/* 7️⃣ Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-3"
+        >
+          {/* Button 1: Fix Mistakes */}
+          <Button
+            onClick={() => {
+              if (isPremium) {
+                navigate(createPageUrl("CustomWeakPractice"));
+              } else {
+                navigate(createPageUrl("Premium"));
+              }
+            }}
+            className={`w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 ${
+              isPremium ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-400 hover:bg-gray-500'
+            } text-white`}
+          >
+            <Repeat className="w-5 h-5" />
+            תרגל טעויות
+            {!isPremium && <Lock className="w-4 h-4 ml-2" />}
+          </Button>
+
+          {/* Button 2: Weak Topics */}
+          <Button
+            onClick={() => {
+              if (isPremium) {
+                navigate(createPageUrl("WeakAreaSelection"));
+              } else {
+                navigate(createPageUrl("Premium"));
+              }
+            }}
+            className={`w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 ${
+              isPremium ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-400 hover:bg-gray-500'
+            } text-white`}
+          >
+            <Target className="w-5 h-5" />
+            תרגל נושאים חלשים
+            {!isPremium && <Lock className="w-4 h-4 ml-2" />}
+          </Button>
+
+          {/* Button 3: Full Exam */}
+          <Button
+            onClick={() => navigate(createPageUrl("Exams"))}
+            className="w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+          >
+            <FileCheck className="w-5 h-5" />
+            בגרות מלאה — סימולציה
+            {!isPremium && <span className="text-xs opacity-80">(צפייה בפרסומת)</span>}
+          </Button>
+
+          {/* Button 4: Daily Task */}
+          <Button
+            onClick={() => navigate(createPageUrl("Practice"))}
+            className="w-full h-14 text-base font-bold rounded-[14px] flex items-center justify-center gap-2 bg-[#3B82F6] hover:bg-blue-700 text-white"
+          >
+            <Play className="w-5 h-5" />
+            משימה יומית
+          </Button>
+        </motion.div>
+
+        {/* 8️⃣ Premium Upsell */}
         {!isPremium && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl shadow-lg p-5"
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl shadow-lg p-5 border-2 border-amber-200"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
@@ -458,14 +676,14 @@ export default function StudyPlanPage() {
               </div>
             </div>
             <ul className="text-gray-700 text-sm space-y-2 mb-4">
-              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> שאלות ללא הגבלה</li>
-              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> כל הנושאים פתוחים</li>
-              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> סימולציות מלאות</li>
-              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> ללא פרסומות</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> תיקון טעויות ללא הגבלה</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> תרגול נושאים חלשים</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> סימולציות מלאות ללא פרסומות</li>
+              <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> גישה מלאה לתוכנית</li>
             </ul>
             <Button
               onClick={() => navigate(createPageUrl("Premium"))}
-              className="w-full bg-[#3B82F6] hover:bg-blue-700 text-white font-bold h-12 rounded-[14px]"
+              className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold h-12 rounded-[14px]"
             >
               <Crown className="w-5 h-5 ml-2" />
               שדרג עכשיו
@@ -473,62 +691,7 @@ export default function StudyPlanPage() {
           </motion.div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-2 gap-3"
-        >
-          <Button
-            onClick={() => navigate(createPageUrl("CustomWeakPractice"))}
-            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1"
-          >
-            <Repeat className="w-5 h-5" />
-            תקן טעויות
-          </Button>
-          
-          <Button
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1"
-          >
-            <Play className="w-5 h-5" />
-            המשך לתרגל
-          </Button>
-          
-          <Button
-            onClick={() => navigate(createPageUrl("WeakAreaSelection"))}
-            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] col-span-2 flex items-center justify-center gap-2"
-          >
-            <Zap className="w-5 h-5" />
-            תרגל נושאים חלשים
-          </Button>
-          
-          <Button
-            onClick={() => {
-              if (isPremium) {
-                navigate(createPageUrl("Exams"));
-              } else {
-                navigate(createPageUrl("Premium"));
-              }
-            }}
-            className={`h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1 ${
-              isPremium ? 'bg-[#3B82F6] hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500'
-            } text-white`}
-          >
-            <FileCheck className="w-5 h-5" />
-            בגרות מלאה
-            {!isPremium && <Lock className="w-3 h-3" />}
-          </Button>
-          
-          <Button
-            onClick={() => navigate(createPageUrl("Practice"))}
-            className="bg-[#3B82F6] hover:bg-blue-700 text-white h-14 text-sm font-bold rounded-[14px] flex flex-col items-center justify-center gap-1"
-          >
-            <Target className="w-5 h-5" />
-            משימה יומית
-          </Button>
-        </motion.div>
-
+        {/* Weak Topics Alert */}
         {performanceData?.weakTopics?.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
