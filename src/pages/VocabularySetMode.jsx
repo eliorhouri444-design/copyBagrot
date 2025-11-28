@@ -77,7 +77,7 @@ export default function VocabularySetModePage() {
   return (
     <div className="min-h-screen bg-blue-50 pb-24">
       {/* Header */}
-      <div className="bg-blue-600 px-5 py-4 rounded-b-2xl">
+      <div className="bg-[#2086b1] px-5 py-4 rounded-b-2xl">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(createPageUrl("VocabularySets"))}
