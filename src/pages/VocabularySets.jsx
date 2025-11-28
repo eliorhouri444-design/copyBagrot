@@ -870,7 +870,11 @@ export default function VocabularySetsPage() {
                 if (confirm(`האם למחוק את כל ${existingDuplicates.length} הכפילויות?`)) {
                   setIsSaving(true);
                   for (const dup of existingDuplicates) {
-                    await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                    try {
+                      await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                    } catch (e) {
+                      // Already deleted, ignore
+                    }
                   }
                   setExistingDuplicates([]);
                   setShowDuplicatesDialog(false);
