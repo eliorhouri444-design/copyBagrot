@@ -211,7 +211,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   </div>
                   <p className="text-white/80 text-sm">
                     {vocabStats 
-                      ? `${vocabStats.masteredWords}/${vocabStats.totalWords} מילים נשלטו`
+                      ? `${vocabStats.masteredWords} מתוך ${vocabStats.totalWords} מילים בשליטה מלאה`
                       : `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
@@ -228,9 +228,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="text-[9px] text-[#6E6E6E]">מילים</div>
                 </div>
                 <div className="bg-green-50 p-2.5 text-center rounded-xl">
-                  <div className="text-[10px] text-green-700 font-medium mb-0.5">בקיאות</div>
+                  <div className="text-[10px] text-green-700 font-medium mb-0.5">בשליטה</div>
                   <div className="text-lg font-bold text-green-600">{vocabStats.masteredWords}</div>
-                  <div className="text-[9px] text-green-600">4+ ברצף</div>
+                  <div className="text-[9px] text-green-600">נכון 4+ פעמים</div>
                 </div>
                 <div className="bg-orange-50 p-2.5 text-center rounded-xl">
                   <div className="text-[10px] text-orange-700 font-medium mb-0.5">לחיזוק</div>
