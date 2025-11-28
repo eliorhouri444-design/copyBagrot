@@ -237,26 +237,30 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
             {/* Stats Cards - Different for Vocabulary */}
             {vocabStats ? (
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                <div className="bg-blue-50 p-2.5 text-center rounded-xl">
-                  <div className="text-[10px] text-[#6E6E6E] font-medium mb-0.5">סה"כ</div>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <BookOpen className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">סה"כ</div>
                   <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.totalWords}</div>
                   <div className="text-[9px] text-[#6E6E6E]">מילים</div>
                 </div>
-                <div className="bg-green-50 p-2.5 text-center rounded-xl">
-                  <div className="text-[10px] text-green-700 font-medium mb-0.5">בשליטה</div>
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בשליטה</div>
                   <div className="text-lg font-bold text-green-600">{vocabStats.masteredWords}</div>
-                  <div className="text-[9px] text-green-600">נכון 4+ פעמים</div>
+                  <div className="text-[9px] text-[#6E6E6E]">נכון 4+ פעמים</div>
                 </div>
-                <div className="bg-orange-50 p-2.5 text-center rounded-xl">
-                  <div className="text-[10px] text-orange-700 font-medium mb-0.5">לחיזוק</div>
-                  <div className="text-lg font-bold text-orange-600">{vocabStats.weakWords}</div>
-                  <div className="text-[9px] text-orange-600">מילים</div>
-                </div>
-                <div className="bg-purple-50 p-2.5 text-center rounded-xl">
-                  <div className="text-[10px] text-purple-700 font-medium mb-0.5">דיוק</div>
-                  <div className="text-lg font-bold text-purple-600">{vocabStats.accuracy}%</div>
-                  <div className="text-[9px] text-purple-600">הצלחה</div>
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נלמדו</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.learnedWords}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">מילים</div>
                 </div>
               </div>
             ) : (
