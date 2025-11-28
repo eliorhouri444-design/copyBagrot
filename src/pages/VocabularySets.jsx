@@ -36,6 +36,8 @@ export default function VocabularySetsPage() {
   const [editingWord, setEditingWord] = useState(null);
   const [deletingSet, setDeletingSet] = useState(null);
   const [maxWordsLimit, setMaxWordsLimit] = useState(50);
+  const [existingDuplicates, setExistingDuplicates] = useState([]);
+  const [showDuplicatesDialog, setShowDuplicatesDialog] = useState(false);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
