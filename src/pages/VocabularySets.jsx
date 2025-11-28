@@ -150,18 +150,37 @@ export default function VocabularySetsPage() {
         parsedData = [parsedData];
       }
 
-      const wordsToAdd = parsedData.map((item, idx) => ({
-        subject_id: displaySubject,
-        unit_level: displayUnits,
-        hebrew_word: item.hebrew_word || item.hebrew || item.heb,
-        english_answer: item.english_answer || item.english || item.eng || item.answer,
-        category: item.category || 'כללי',
-        example_sentence: item.example_sentence || item.example || '',
-        acceptable_answers: item.acceptable_answers || [],
-        difficulty: item.difficulty || 'medium',
-        is_active: true,
-        order: words.length + idx
-      })).filter(w => w.hebrew_word && w.english_answer);
+      const wordsToAdd = parsedData.map((item, idx) => {
+        // Support multiple key formats
+        const hebrewWord = item.hebrew_word || item.hebrew || item.heb;
+        const englishAnswer = item.english_answer || item.english || item.eng || item.word || item.answer;
+
+        if (!hebrewWord || !englishAnswer) return null;
+
+        return {
+          subject_id: displaySubject,
+          unit_level: displayUnits,
+          hebrew_word: hebrewWord,
+          english_answer: englishAnswer,
+          category: item.category || 'כללי',
+          example_sentence: item.example_sentence || item.example || item.sentence || '',
+          example_sentence_he: item.example_sentence_he || '',
+          acceptable_answers: item.acceptable_answers || [],
+          synonyms: item.synonyms || [],
+          antonyms: item.antonyms || [],
+          part_of_speech: item.part_of_speech || item.pos || item.type || '',
+          difficulty: typeof item.difficulty === 'number' ? item.difficulty : (item.level || 1),
+          cefr_level: item.cefr_level || item.cefr || '',
+          phonetic: item.phonetic || '',
+          audio: item.audio || (item.audio_url ? { english_audio_url: item.audio_url } : {}),
+          image_url: item.image_url || '',
+          collocations: item.collocations || [],
+          context_sentences: item.context_sentences || [],
+          tags: item.tags || [],
+          is_active: true,
+          order: words.length + idx
+        };
+      }).filter(w => w !== null);
 
       if (wordsToAdd.length === 0) {
         alert('לא נמצאו מילים תקינות. וודא שכל אובייקט מכיל hebrew_word ו-english_answer');
@@ -443,47 +462,134 @@ export default function VocabularySetsPage() {
       {/* Bulk Add Dialog */}
       <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
         <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <Plus className="w-5 h-5 text-purple-600" />
-              הוסף מילים חדשות (JSON)
-            </DialogTitle>
-          </DialogHeader>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-600" />
+                הוסף מילים חדשות (JSON)
+              </DialogTitle>
+            </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
-              <div className="text-sm font-bold text-purple-900 mb-1">📋 פורמט JSON:</div>
-              <div className="text-xs text-purple-700 mb-2">העתק מערך JSON עם המילים</div>
-              <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 overflow-x-auto" dir="ltr">
-{`[
-  {
-    "hebrew_word": "לרוץ",
-    "english_answer": "run",
-    "category": "פעלים",
-    "example_sentence": "I run every morning"
-  },
-  {
-    "hebrew_word": "בית",
-    "english_answer": "house",
-    "category": "שמות עצם"
-  }
-]`}
-              </pre>
-            </div>
+            <div className="space-y-4 py-4">
+              {/* Format Examples Tabs */}
+              <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+                <div className="text-sm font-bold text-purple-900 mb-2">📋 פורמטים נתמכים:</div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                הדבק JSON כאן:
-              </label>
-              <Textarea
-                value={bulkText}
-                onChange={(e) => setBulkText(e.target.value)}
-                placeholder='[{"hebrew_word": "...", "english_answer": "...", "category": "..."}]'
-                className="h-64 font-mono text-sm"
-                dir="ltr"
-              />
+                {/* Basic Format */}
+                <details className="mb-2">
+                  <summary className="text-xs font-semibold text-purple-700 cursor-pointer hover:text-purple-900">
+                    🟢 פורמט בסיסי (3 יח')
+                  </summary>
+                  <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1 overflow-x-auto" dir="ltr">
+        {`[
+        {
+        "hebrew_word": "לרוץ",
+        "english_answer": "run",
+        "example_sentence": "I run every morning."
+        }
+        ]`}
+                  </pre>
+                </details>
+
+                {/* Intermediate Format */}
+                <details className="mb-2">
+                  <summary className="text-xs font-semibold text-purple-700 cursor-pointer hover:text-purple-900">
+                    🟡 פורמט בינוני (4 יח')
+                  </summary>
+                  <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1 overflow-x-auto" dir="ltr">
+        {`[
+        {
+        "hebrew_word": "להעדיף",
+        "english_answer": "prefer",
+        "example_sentence": "I prefer to study at night.",
+        "synonyms": ["like more"],
+        "part_of_speech": "verb",
+        "difficulty": 3
+        }
+        ]`}
+                  </pre>
+                </details>
+
+                {/* Advanced Format */}
+                <details className="mb-2">
+                  <summary className="text-xs font-semibold text-purple-700 cursor-pointer hover:text-purple-900">
+                    🟠 פורמט מתקדם (5 יח')
+                  </summary>
+                  <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1 overflow-x-auto" dir="ltr">
+        {`[
+        {
+        "hebrew_word": "להעריך",
+        "english_answer": "evaluate",
+        "example_sentence": "We need to evaluate the results.",
+        "example_sentence_he": "אנחנו צריכים להעריך את התוצאות.",
+        "synonyms": ["assess", "judge"],
+        "antonyms": ["ignore"],
+        "part_of_speech": "verb",
+        "difficulty": 5,
+        "cefr_level": "B2"
+        }
+        ]`}
+                  </pre>
+                </details>
+
+                {/* Full Format */}
+                <details className="mb-2">
+                  <summary className="text-xs font-semibold text-purple-700 cursor-pointer hover:text-purple-900">
+                    🔴 פורמט מלא (עם אודיו ותמונה)
+                  </summary>
+                  <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1 overflow-x-auto" dir="ltr">
+        {`[
+        {
+        "hebrew_word": "להעריך",
+        "english_answer": "evaluate",
+        "example_sentence": "Evaluate the results carefully.",
+        "synonyms": ["assess"],
+        "antonyms": ["ignore"],
+        "part_of_speech": "verb",
+        "difficulty": 5,
+        "cefr_level": "C1",
+        "phonetic": "ɪˈvæljueɪt",
+        "audio": {
+        "english_audio_url": "https://...",
+        "hebrew_audio_url": "https://..."
+        },
+        "image_url": "https://...",
+        "collocations": ["evaluate results", "evaluate performance"],
+        "context_sentences": ["The teacher evaluated the project."],
+        "tags": ["academic", "bagrut"]
+        }
+        ]`}
+                  </pre>
+                </details>
+
+                {/* Alternative Keys */}
+                <details>
+                  <summary className="text-xs font-semibold text-purple-700 cursor-pointer hover:text-purple-900">
+                    🔄 מפתחות חלופיים נתמכים
+                  </summary>
+                  <div className="text-xs text-purple-800 bg-white rounded p-2 mt-1" dir="ltr">
+                    <div><code>english</code> / <code>eng</code> / <code>word</code> → english_answer</div>
+                    <div><code>hebrew</code> / <code>heb</code> → hebrew_word</div>
+                    <div><code>example</code> / <code>sentence</code> → example_sentence</div>
+                    <div><code>pos</code> / <code>type</code> → part_of_speech</div>
+                    <div><code>level</code> → difficulty</div>
+                    <div><code>audio_url</code> → audio.english_audio_url</div>
+                  </div>
+                </details>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  הדבק JSON כאן:
+                </label>
+                <Textarea
+                  value={bulkText}
+                  onChange={(e) => setBulkText(e.target.value)}
+                  placeholder='[{"hebrew_word": "...", "english_answer": "...", ...}]'
+                  className="h-48 font-mono text-sm"
+                  dir="ltr"
+                />
+              </div>
             </div>
-          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBulkAddDialog(false)}>
