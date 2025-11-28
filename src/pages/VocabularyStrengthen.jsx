@@ -238,7 +238,7 @@ export default function VocabularyStrengthenPage() {
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col">
       {/* Header */}
-      <div className="bg-orange-500 px-4 py-3 flex items-center justify-between">
+      <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("Practice"))}
           className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
@@ -260,7 +260,7 @@ export default function VocabularyStrengthenPage() {
       </div>
       
       {/* Progress Bar */}
-      <div className="w-full bg-orange-300 h-2">
+      <div className="w-full bg-blue-400 h-2">
         <div 
           className="bg-white h-2 transition-all duration-300 rounded-r-full" 
           style={{ width: `${progress}%` }} 
@@ -289,11 +289,11 @@ export default function VocabularyStrengthenPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-3xl border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 bg-white rounded-3xl border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-8"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 {/* Weak indicator */}
-                <span className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                <span className="absolute top-4 left-4 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full">
                   🔥 לחיזוק
                 </span>
 
@@ -322,14 +322,14 @@ export default function VocabularyStrengthenPage() {
                       speakWord(currentWord.english_answer, 'en-US');
                     }
                   }}
-                  className="mb-4 p-3 rounded-full bg-orange-50 hover:bg-orange-100 transition-colors"
+                  className="mb-4 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
                 >
-                  <Volume2 className="w-6 h-6 text-orange-600" />
+                  <Volume2 className="w-6 h-6 text-blue-600" />
                 </button>
 
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
-                  className="px-6 py-2.5 rounded-2xl border-2 border-orange-400 text-orange-600 font-bold bg-transparent hover:bg-orange-50 transition-colors"
+                  className="px-6 py-2.5 rounded-2xl border-2 border-blue-400 text-blue-600 font-bold bg-transparent hover:bg-blue-50 transition-colors"
                 >
                   הפוך כרטיס
                 </button>
@@ -337,7 +337,7 @@ export default function VocabularyStrengthenPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-orange-50 to-white rounded-3xl border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
+                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-3xl border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 {currentWord.part_of_speech && (
@@ -349,7 +349,7 @@ export default function VocabularyStrengthenPage() {
                 <div className="text-2xl font-bold text-gray-900 mb-1 text-center">
                   {currentWord.hebrew_word}
                 </div>
-                <div className="text-lg text-orange-600 text-center mb-3" dir="ltr">
+                <div className="text-lg text-blue-600 text-center mb-3" dir="ltr">
                   {currentWord.english_answer}
                 </div>
 
@@ -365,7 +365,7 @@ export default function VocabularyStrengthenPage() {
                         speakWord(currentWord.english_answer, 'en-US');
                       }
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-100 hover:bg-orange-200 transition-colors text-xs text-orange-700 font-medium"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors text-xs text-blue-700 font-medium"
                   >
                     <Volume2 className="w-4 h-4" />
                     מילה
@@ -424,7 +424,7 @@ export default function VocabularyStrengthenPage() {
           <div className="flex gap-4 mt-8">
             <button
               onClick={() => handleAnswer(true)}
-              className="flex-1 h-14 bg-green-500 hover:bg-green-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+              className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
               <Check className="w-6 h-6" />
               <span className="font-bold text-lg">יודע!</span>
@@ -432,7 +432,7 @@ export default function VocabularyStrengthenPage() {
             
             <button
               onClick={() => handleAnswer(false)}
-              className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+              className="flex-1 h-14 bg-blue-400 hover:bg-blue-500 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
               <X className="w-6 h-6" />
               <span className="font-bold text-lg">עוד לא</span>
