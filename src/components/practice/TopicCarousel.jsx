@@ -421,7 +421,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
       {/* Vocabulary Set Selector Dialog */}
       <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
-        <DialogContent className="sm:max-w-md max-h-[85vh]" dir="rtl">
+        <DialogContent className="w-full h-full max-w-none max-h-none m-0 rounded-none" dir="rtl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
               <BookOpen className="w-6 h-6 text-blue-600" />
