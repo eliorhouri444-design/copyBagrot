@@ -191,8 +191,13 @@ export default function VocabularyQuickPracticePage() {
     };
 
     setWords.forEach((word, idx) => {
-      // Rotate between question types: 60% multiple choice, 20% fill blank, 20% translate
-      const rand = idx % 5;
+      // Rotate between question types: 
+      // 0-2: multiple choice (30%)
+      // 3: fill blank (10%)
+      // 4-5: translate reverse - English to Hebrew multiple choice (20%)
+      // 6-7: open recall - free text Hebrew to English (20%)
+      // 8-9: reverse open - English to Hebrew free text (20%)
+      const rand = idx % 10;
 
       if (rand < 3) {
         // Multiple choice - Hebrew to English
@@ -216,8 +221,8 @@ export default function VocabularyQuickPracticePage() {
           hint: hint,
           correctAnswer: word.english_answer
         });
-      } else {
-        // Translate - English to Hebrew (multiple choice)
+      } else if (rand >= 4 && rand <= 5) {
+        // Translate reverse - English to Hebrew (multiple choice)
         const distractors = getHebrewDistractors(word, 3);
         const options = [word.hebrew_word, ...distractors].sort(() => Math.random() - 0.5);
 
@@ -227,6 +232,24 @@ export default function VocabularyQuickPracticePage() {
           question: `מה המילה בעברית?`,
           englishWord: word.english_answer,
           options: options,
+          correctAnswer: word.hebrew_word
+        });
+      } else if (rand >= 6 && rand <= 7) {
+        // Open recall - free text Hebrew to English
+        questions.push({
+          type: 'open_recall',
+          word: word,
+          question: `תרגם לאנגלית:`,
+          hebrewWord: word.hebrew_word,
+          correctAnswer: word.english_answer
+        });
+      } else {
+        // Reverse open - English to Hebrew free text
+        questions.push({
+          type: 'reverse_open',
+          word: word,
+          question: `מה התרגום לעברית של:`,
+          englishWord: word.english_answer,
           correctAnswer: word.hebrew_word
         });
       }
@@ -517,12 +540,20 @@ export default function VocabularyQuickPracticePage() {
               <div className="text-xs text-blue-500 mb-3 font-medium text-center">
                 {question.type === 'multiple_choice' ? 'בחירה מרובה' :
                 question.type === 'fill_blank' ? 'השלמת מילה' :
-                question.type === 'translate' ? 'תרגום לעברית' : 'כתיבה חופשית'}
+                question.type === 'translate' ? 'תרגום לעברית' : 
+                question.type === 'open_recall' ? 'כתיבה חופשית' :
+                question.type === 'reverse_open' ? 'תרגום הפוך' : 'כתיבה חופשית'}
               </div>
               
-              {question.type === 'translate' &&
+              {(question.type === 'translate' || question.type === 'reverse_open') &&
               <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
                   {question.englishWord}
+                </div>
+              }
+
+              {question.type === 'open_recall' &&
+              <div className="text-3xl font-bold text-gray-900 mb-4 text-center">
+                  {question.hebrewWord}
                 </div>
               }
               
@@ -563,15 +594,19 @@ export default function VocabularyQuickPracticePage() {
                     <Input
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="הקלד את התשובה..."
+                  placeholder={question.type === 'reverse_open' ? "הקלד בעברית..." : "הקלד באנגלית..."}
                   className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-400"
-                  dir="ltr"
+                  dir={question.type === 'reverse_open' ? 'rtl' : 'ltr'}
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && userAnswer.trim()) {
                       handleSubmit();
                     }
                   }} />
+
+                    {question.type === 'fill_blank' && question.hint &&
+                      <div className="text-center text-gray-400 text-sm">רמז: <span dir="ltr">{question.hint}</span></div>
+                    }
 
                     <Button
                   onClick={() => handleSubmit()}
