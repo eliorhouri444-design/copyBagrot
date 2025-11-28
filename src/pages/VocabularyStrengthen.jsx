@@ -189,11 +189,11 @@ export default function VocabularyStrengthenPage() {
               </Button>
             )}
             <Button
-              onClick={() => navigate(createPageUrl("VocabularySets"))}
+              onClick={() => navigate(createPageUrl("Practice"))}
               variant="outline"
               className="w-full h-12 text-lg font-semibold rounded-xl"
             >
-              חזור לסטים
+              חזור לתרגול
             </Button>
           </div>
         </motion.div>
