@@ -50,7 +50,7 @@ export default function VocabularyFlashcardsPage() {
     setGeneratingImage(true);
     try {
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: `Simple, clean icon illustration of "${word.english_answer}" concept, minimalist flat design, white background, suitable for vocabulary learning app, no text`
+        prompt: `A realistic, clear photograph or illustration representing the concept of "${word.english_answer}". Show the most common and recognizable visual representation that people associate with this word. High quality, well-lit, centered composition, clean white or light gradient background. Educational flashcard style, no text or labels on the image.`
       });
       
       if (result?.url) {
