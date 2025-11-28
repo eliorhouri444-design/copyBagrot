@@ -137,27 +137,34 @@ export default function VocabularySetsPage() {
 
     setIsSaving(true);
     try {
-      const lines = bulkText.trim().split('\n').filter(line => line.trim());
-      const wordsToAdd = [];
-
-      for (const line of lines) {
-        const parts = line.split('|').map(p => p.trim());
-        if (parts.length >= 2) {
-          wordsToAdd.push({
-            subject_id: displaySubject,
-            unit_level: displayUnits,
-            hebrew_word: parts[0],
-            english_answer: parts[1],
-            category: parts[2] || 'כללי',
-            difficulty: 'medium',
-            is_active: true,
-            order: words.length + wordsToAdd.length
-          });
-        }
+      let parsedData;
+      try {
+        parsedData = JSON.parse(bulkText.trim());
+      } catch (e) {
+        alert('שגיאה בפורמט JSON. וודא שהפורמט תקין.');
+        setIsSaving(false);
+        return;
       }
 
+      if (!Array.isArray(parsedData)) {
+        parsedData = [parsedData];
+      }
+
+      const wordsToAdd = parsedData.map((item, idx) => ({
+        subject_id: displaySubject,
+        unit_level: displayUnits,
+        hebrew_word: item.hebrew_word || item.hebrew || item.heb,
+        english_answer: item.english_answer || item.english || item.eng || item.answer,
+        category: item.category || 'כללי',
+        example_sentence: item.example_sentence || item.example || '',
+        acceptable_answers: item.acceptable_answers || [],
+        difficulty: item.difficulty || 'medium',
+        is_active: true,
+        order: words.length + idx
+      })).filter(w => w.hebrew_word && w.english_answer);
+
       if (wordsToAdd.length === 0) {
-        alert('לא נמצאו מילים בפורמט הנכון.\nפורמט: מילה בעברית | תרגום באנגלית | קטגוריה');
+        alert('לא נמצאו מילים תקינות. וודא שכל אובייקט מכיל hebrew_word ו-english_answer');
         setIsSaving(false);
         return;
       }
@@ -170,7 +177,7 @@ export default function VocabularySetsPage() {
       alert(`${wordsToAdd.length} מילים נוספו בהצלחה! ✅`);
     } catch (error) {
       console.error("Error bulk adding words:", error);
-      alert('שגיאה בהוספת המילים');
+      alert('שגיאה בהוספת המילים: ' + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -422,36 +429,45 @@ export default function VocabularySetsPage() {
 
       {/* Bulk Add Dialog */}
       <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
-        <DialogContent dir="rtl" className="max-w-lg">
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Plus className="w-5 h-5 text-purple-600" />
-              הוסף מילים חדשות
+              הוסף מילים חדשות (JSON)
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
-              <div className="text-sm font-bold text-purple-900 mb-1">📋 פורמט:</div>
-              <div className="text-xs text-purple-700">מילה בעברית | תרגום באנגלית | קטגוריה</div>
-              <div className="text-xs text-purple-600 mt-1">לדוגמה:</div>
-              <div className="text-xs text-purple-800 font-mono bg-white rounded p-2 mt-1">
-                לרוץ | run | פעלים{'\n'}
-                בית | house | שמות עצם{'\n'}
-                מהר | fast | תארים
-              </div>
+              <div className="text-sm font-bold text-purple-900 mb-1">📋 פורמט JSON:</div>
+              <div className="text-xs text-purple-700 mb-2">העתק מערך JSON עם המילים</div>
+              <pre className="text-xs text-purple-800 font-mono bg-white rounded p-2 overflow-x-auto" dir="ltr">
+{`[
+  {
+    "hebrew_word": "לרוץ",
+    "english_answer": "run",
+    "category": "פעלים",
+    "example_sentence": "I run every morning"
+  },
+  {
+    "hebrew_word": "בית",
+    "english_answer": "house",
+    "category": "שמות עצם"
+  }
+]`}
+              </pre>
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                הזן מילים (כל שורה = מילה אחת)
+                הדבק JSON כאן:
               </label>
               <Textarea
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
-                placeholder="מילה בעברית | תרגום באנגלית | קטגוריה"
-                className="h-48 font-mono text-sm"
-                dir="rtl"
+                placeholder='[{"hebrew_word": "...", "english_answer": "...", "category": "..."}]'
+                className="h-64 font-mono text-sm"
+                dir="ltr"
               />
             </div>
           </div>
