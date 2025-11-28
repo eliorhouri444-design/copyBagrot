@@ -413,7 +413,7 @@ export default function StudyPlanPage() {
   return (
     <div className="bg-blue-100 pb-24 min-h-screen">
       {/* 1️⃣ Header */}
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+      <div className="bg-[#2086b1] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity"
@@ -433,7 +433,7 @@ export default function StudyPlanPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-[#3B82F6] p-4">
+          <div className="bg-[#2086b1] p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
                 <h3 className="text-base font-bold">מוכנות לבגרות</h3>
@@ -477,7 +477,7 @@ export default function StudyPlanPage() {
                 <div className="relative w-12 h-12 mx-auto mb-1">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#2086b1" strokeWidth="3" strokeLinecap="round"
                       strokeDasharray={`${performanceData?.topicsMastery || 0}, 100`} />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -556,7 +556,7 @@ export default function StudyPlanPage() {
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-[#3B82F6] p-4">
+            <div className="bg-[#2086b1] p-4">
               <div className="flex items-center gap-3 text-white">
                 <div className="flex-1 text-right">
                   <h3 className="text-base font-bold">מה צריך כדי להגיע ליעד</h3>
@@ -631,7 +631,7 @@ export default function StudyPlanPage() {
           transition={{ delay: 0.15 }}
           className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-[#3B82F6] p-4">
+          <div className="bg-[#2086b1] p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
                 <h3 className="text-base font-bold">סטטיסטיקות למידה</h3>
@@ -676,7 +676,7 @@ export default function StudyPlanPage() {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-[#3B82F6] p-4">
+          <div className="bg-[#2086b1] p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
                 <h3 className="text-base font-bold">המשימות להיום</h3>
@@ -745,7 +745,7 @@ export default function StudyPlanPage() {
                             e.stopPropagation();
                             navigate(createPageUrl(task.route));
                           }}
-                          className="h-7 text-xs bg-blue-600 hover:bg-blue-700"
+                          className="h-7 text-xs bg-[#2086b1] hover:bg-blue-700"
                         >
                           התחל
                         </Button>
@@ -830,7 +830,7 @@ export default function StudyPlanPage() {
           {/* Button 4: Daily Task */}
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 bg-[#3B82F6] hover:bg-blue-700 text-white"
+            className="h-16 text-sm font-bold rounded-xl flex flex-col items-center justify-center gap-1 bg-[#2086b1] hover:bg-blue-700 text-white"
           >
             <Play className="w-5 h-5" />
             <span>משימה יומית</span>

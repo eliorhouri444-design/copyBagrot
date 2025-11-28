@@ -248,7 +248,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-blue-50 pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+      <div className="bg-[#2086b1] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">שלום, {user?.full_name?.split(' ')[0] || 'תלמיד'}! 👋</h1>
           <p className="text-[11px] text-white/90">{user?.selected_subject} • {user?.selected_units} יחידות</p>
@@ -288,7 +288,7 @@ export default function HomePage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-[#3B82F6] p-4">
+            <div className="bg-[#2086b1] p-4">
               <div className="flex items-center gap-3 text-white">
                 <div className="flex-1 text-right">
                   <h3 className="text-base font-bold">המשך מאיפה שהפסקת</h3>
@@ -311,7 +311,7 @@ export default function HomePage() {
                     navigate(`${createPageUrl("ExamGeneric")}?examId=${lastActivity.examId}`);
                   }
                 }}
-                className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+                className="w-full h-12 bg-[#2086b1] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
               >
                 <PlayCircle className="w-5 h-5 ml-2" />
                 המשך

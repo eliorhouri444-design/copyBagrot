@@ -271,7 +271,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-blue-50 pb-20">
-      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+      <div className="bg-[#2086b1] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <div className="text-right flex-1">
           <h1 className="text-[16px] font-bold text-white">{user?.full_name || 'תלמיד'}</h1>
           <p className="text-[11px] text-white/90">{displaySubject} • {displayUnits} יחידות</p>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
             transition={{ delay: 0.05 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-[#3B82F6] p-4">
+            <div className="bg-[#2086b1] p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-white">
                   <Crown className="w-5 h-5" />
@@ -338,7 +338,7 @@ export default function ProfilePage() {
             <p className="text-[13px] text-gray-600 mb-3">גישה בלתי מוגבלת לכל התכונות</p>
             <Button
               onClick={() => navigate(createPageUrl("Premium"))}
-              className="w-full h-12 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
+              className="w-full h-12 bg-[#2086b1] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[15px]"
             >
               <Crown className="w-4 h-4 ml-2" />
               שדרג עכשיו
@@ -353,7 +353,7 @@ export default function ProfilePage() {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <div className="bg-[#3B82F6] p-4">
+          <div className="bg-[#2086b1] p-4">
             <div className="flex items-center gap-3 text-white">
               <div className="flex-1 text-right">
                 <h3 className="text-base font-bold">הגדרות חשבון</h3>
@@ -364,7 +364,7 @@ export default function ProfilePage() {
           <div className="p-5 space-y-2">
             <Button
               variant="outline"
-              className="w-full justify-start h-12 border-2 border-blue-200 text-[#3B82F6] hover:bg-blue-50 rounded-[14px]"
+              className="w-full justify-start h-12 border-2 border-blue-200 text-[#2086b1] hover:bg-blue-50 rounded-[14px]"
               onClick={() => navigate(createPageUrl("Settings"))}
             >
               <Settings className="w-5 h-5 ml-3" />
@@ -373,7 +373,7 @@ export default function ProfilePage() {
 
             <Button
               variant="outline"
-              className="w-full justify-start h-12 border-2 border-blue-200 text-[#3B82F6] hover:bg-blue-50 rounded-[14px]"
+              className="w-full justify-start h-12 border-2 border-blue-200 text-[#2086b1] hover:bg-blue-50 rounded-[14px]"
               onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 ml-3" />
@@ -431,7 +431,7 @@ export default function ProfilePage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditing(false)}>ביטול</Button>
-            <Button onClick={handleSaveProfile} className="bg-[#3B82F6]">שמור</Button>
+            <Button onClick={handleSaveProfile} className="bg-[#2086b1]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
