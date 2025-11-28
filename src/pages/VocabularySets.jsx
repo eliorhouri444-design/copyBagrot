@@ -35,7 +35,7 @@ export default function VocabularySetsPage() {
   const [managingWords, setManagingWords] = useState([]);
   const [editingWord, setEditingWord] = useState(null);
   const [deletingSet, setDeletingSet] = useState(null);
-  const [maxWordsLimit, setMaxWordsLimit] = useState(50);
+  const [maxWordsLimit, setMaxWordsLimit] = useState(100);
   const [existingDuplicates, setExistingDuplicates] = useState([]);
   const [showDuplicatesDialog, setShowDuplicatesDialog] = useState(false);
 
