@@ -189,14 +189,14 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               }
 
               <div className="flex items-center gap-4">
-                {/* Progress Circle */}
+                {/* Progress Circle - Use vocab mastery for vocabulary topics */}
                 <div className="relative w-16 h-16 flex-shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
                     <circle
                       cx="18" cy="18" r="14" fill="none"
                       stroke="white" strokeWidth="3" strokeLinecap="round"
-                      strokeDasharray={`${progress}, 100`} />
+                      strokeDasharray={`${vocabStats ? vocabStats.masteryProgress : progress}, 100`} />
 
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -206,8 +206,15 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                 
                 <div className="flex-1 text-right">
                   <h2 className="text-white text-lg font-bold mb-0.5">{currentTopic.name}</h2>
-                  <div className="text-3xl font-black text-white">{progress}%</div>
-                  <p className="text-white/80 text-sm">{totalPractices} תרגולים בוצעו</p>
+                  <div className="text-3xl font-black text-white">
+                    {vocabStats ? vocabStats.masteryProgress : progress}%
+                  </div>
+                  <p className="text-white/80 text-sm">
+                    {vocabStats 
+                      ? `${vocabStats.masteredWords}/${vocabStats.totalWords} מילים נשלטו`
+                      : `${totalPractices} תרגולים בוצעו`
+                    }
+                  </p>
                 </div>
               </div>
             </div>
