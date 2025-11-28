@@ -616,7 +616,7 @@ export default function ExamGenericPage() {
           </div>
 
           <DialogFooter className="flex flex-col gap-2">
-            <Button onClick={handleResumeProgress} className="w-full bg-blue-600">
+            <Button onClick={handleResumeProgress} className="w-full bg-[#2086b1]">
               המשך מאיפה שעצרתי
             </Button>
             <Button onClick={handleStartFresh} variant="outline" className="w-full">
@@ -647,7 +647,7 @@ export default function ExamGenericPage() {
               className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-500 hover:border-blue-500 transition-all text-right shadow-lg">
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-[#2086b1] rounded-full flex items-center justify-center">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-right">
@@ -675,7 +675,7 @@ export default function ExamGenericPage() {
 
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="bg-blue-600 rounded-full w-16 h-16 flex items-center justify-center">
+                <div className="bg-[#2086b1] rounded-full w-16 h-16 flex items-center justify-center">
                   <Zap className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-right">
@@ -852,14 +852,14 @@ export default function ExamGenericPage() {
               {user?.subscription_status === 'premium' ?
               <Button
                 onClick={() => window.location.reload()}
-                className="flex-1 bg-blue-600 hover:bg-blue-700">
+                className="flex-1 bg-[#2086b1] hover:bg-blue-700">
 
                   נסה שוב
                 </Button> :
 
               <Button
                 onClick={() => setShowRetryAd(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700">
+                className="flex-1 bg-[#2086b1] hover:bg-blue-700">
 
                   נסה שוב
                 </Button>
@@ -1108,7 +1108,7 @@ export default function ExamGenericPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700">
+                  className="flex-1 h-12 bg-[#2086b1] hover:bg-blue-700">
 
                       {isSubmitting ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" />שומר...</> : 'סיים מבחן'}
                     </Button> :
@@ -1124,7 +1124,7 @@ export default function ExamGenericPage() {
                     }
                   }}
                   disabled={!userAnswers[question.question_number]?.trim()}
-                  className="flex-1 h-12 bg-blue-600">
+                  className="flex-1 h-12 bg-[#2086b1]">
 
                       הבא
                       <ChevronLeft className="w-5 h-5 mr-2" />

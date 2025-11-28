@@ -794,7 +794,7 @@ export default function ExamModuleBPage() {
             </Button>
             <Button
               onClick={handleResumeProgress}
-              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex-1 h-12 bg-[#2086b1] hover:bg-blue-700 text-white"
             >
               המשך מאיפה שעצרתי
             </Button>
@@ -856,7 +856,7 @@ export default function ExamModuleBPage() {
               className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-500 hover:border-blue-500 transition-all text-right shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-[#2086b1] rounded-full flex items-center justify-center">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-right">
