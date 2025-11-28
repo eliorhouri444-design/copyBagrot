@@ -418,6 +418,23 @@ export default function VocabularySetsPage() {
       </div>
 
       <div className="px-5 py-4 space-y-4">
+        {/* Duplicates Warning */}
+        {existingDuplicates.length > 0 && user?.role === 'admin' && (
+          <div 
+            onClick={() => setShowDuplicatesDialog(true)}
+            className="bg-amber-50 rounded-2xl p-4 shadow-sm border-2 border-amber-300 cursor-pointer hover:bg-amber-100 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-8 h-8 text-amber-600" />
+              <div className="flex-1">
+                <h4 className="font-bold text-amber-900">נמצאו {existingDuplicates.length} כפילויות!</h4>
+                <p className="text-sm text-amber-700">לחץ כאן לצפייה ומחיקה</p>
+              </div>
+              <ChevronLeft className="w-5 h-5 text-amber-600" />
+            </div>
+          </div>
+        )}
+
         {/* Stats Card */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-blue-100">
           <div className="flex items-center justify-between mb-3">
