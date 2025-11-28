@@ -190,7 +190,13 @@ export default function VocabularyQuickPracticePage() {
       return distractors;
     };
 
+    const usedWordIds = new Set();
+    
     setWords.forEach((word, idx) => {
+      // Skip if word already used
+      if (usedWordIds.has(word.id)) return;
+      usedWordIds.add(word.id);
+      
       // Rotate between question types: 
       // 0-2: multiple choice (30%)
       // 3: fill blank (10%)
