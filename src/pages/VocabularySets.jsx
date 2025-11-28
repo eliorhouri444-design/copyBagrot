@@ -63,6 +63,40 @@ export default function VocabularySetsPage() {
       }, 'order', 500);
       setWords(allWords);
 
+      // Check for existing duplicates in the database
+      const duplicatesFound = [];
+      const seenEnglish = new Map();
+      const seenHebrew = new Map();
+      
+      allWords.forEach((word, idx) => {
+        const englishLower = word.english_answer.toLowerCase().trim();
+        const hebrewTrim = word.hebrew_word.trim();
+        
+        if (seenEnglish.has(englishLower)) {
+          duplicatesFound.push({
+            type: 'english',
+            word: word,
+            originalIndex: seenEnglish.get(englishLower),
+            duplicateIndex: idx
+          });
+        } else {
+          seenEnglish.set(englishLower, idx);
+        }
+        
+        if (seenHebrew.has(hebrewTrim)) {
+          duplicatesFound.push({
+            type: 'hebrew',
+            word: word,
+            originalIndex: seenHebrew.get(hebrewTrim),
+            duplicateIndex: idx
+          });
+        } else {
+          seenHebrew.set(hebrewTrim, idx);
+        }
+      });
+      
+      setExistingDuplicates(duplicatesFound);
+
       // Chunk into sets of 10
       const chunkedSets = [];
       for (let i = 0; i < allWords.length; i += 10) {
