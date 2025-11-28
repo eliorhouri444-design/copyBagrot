@@ -35,6 +35,7 @@ export default function VocabularySetsPage() {
   const [managingWords, setManagingWords] = useState([]);
   const [editingWord, setEditingWord] = useState(null);
   const [deletingSet, setDeletingSet] = useState(null);
+  const [maxWordsLimit, setMaxWordsLimit] = useState(50);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -269,12 +270,13 @@ export default function VocabularySetsPage() {
         return;
       }
 
-      // Split into batches of 50 for bulk creation (API limit)
+      // Split into batches for bulk creation (API limit)
       const batchSize = 50;
+      const limitedWords = wordsToAdd.slice(0, maxWordsLimit);
       let totalAdded = 0;
 
-      for (let i = 0; i < wordsToAdd.length; i += batchSize) {
-        const batch = wordsToAdd.slice(i, i + batchSize);
+      for (let i = 0; i < limitedWords.length; i += batchSize) {
+        const batch = limitedWords.slice(i, i + batchSize);
         await base44.entities.VocabularyQuestion.bulkCreate(batch);
         totalAdded += batch.length;
       }
@@ -701,6 +703,24 @@ export default function VocabularySetsPage() {
             </DialogHeader>
 
             <div className="space-y-4 py-4">
+              {/* Max Words Limit Selector */}
+              <div className="flex items-center gap-3 bg-blue-50 rounded-xl p-3 border border-blue-200">
+                <span className="text-sm font-semibold text-blue-900">מקסימום מילים:</span>
+                <Select value={maxWordsLimit.toString()} onValueChange={(val) => setMaxWordsLimit(parseInt(val))}>
+                  <SelectTrigger className="w-24 h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                    <SelectItem value="200">200</SelectItem>
+                    <SelectItem value="500">500</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-xs text-blue-600">(יותר מילים = יותר זמן)</span>
+              </div>
+
               {/* Format Examples Tabs */}
               <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
                 <div className="text-sm font-bold text-purple-900 mb-2">📋 פורמטים נתמכים:</div>
