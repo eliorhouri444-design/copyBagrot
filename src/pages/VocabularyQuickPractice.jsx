@@ -565,9 +565,7 @@ export default function VocabularyQuickPracticePage() {
             שאלה {currentIndex + 1} מתוך {questions.length}
           </div>
         </div>
-        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-          <span className="text-sm font-bold text-white">{Math.round(progress)}%</span>
-        </div>
+        <div className="w-10" />
       </div>
       
       {/* Progress Bar */}
