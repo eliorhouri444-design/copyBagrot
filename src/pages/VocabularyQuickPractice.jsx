@@ -94,67 +94,100 @@ export default function VocabularyQuickPracticePage() {
   const generateQuestions = (setWords, allWords) => {
     const questions = [];
 
+    // Default fallback distractors - common English words
+    const defaultEnglishDistractors = [
+      'walk', 'jump', 'swim', 'read', 'write', 'speak', 'listen', 'think', 'make', 'take',
+      'go', 'come', 'see', 'know', 'get', 'give', 'find', 'tell', 'ask', 'work',
+      'big', 'small', 'good', 'bad', 'new', 'old', 'high', 'low', 'long', 'short',
+      'house', 'school', 'book', 'water', 'food', 'time', 'day', 'night', 'year', 'place'
+    ];
+
+    const defaultHebrewDistractors = [
+      'ללכת', 'לקפוץ', 'לשחות', 'לקרוא', 'לכתוב', 'לדבר', 'להקשיב', 'לחשוב', 'לעשות', 'לקחת',
+      'לבוא', 'לראות', 'לדעת', 'לתת', 'למצוא', 'לספר', 'לשאול', 'לעבוד', 'לאכול', 'לשתות',
+      'גדול', 'קטן', 'טוב', 'רע', 'חדש', 'ישן', 'גבוה', 'נמוך', 'ארוך', 'קצר',
+      'בית', 'ספר', 'מים', 'אוכל', 'זמן', 'יום', 'לילה', 'שנה', 'מקום', 'עבודה'
+    ];
+
     // Helper function to get good distractors
     const getDistractors = (currentWord, count = 3) => {
+      const correctAnswer = currentWord.english_answer.toLowerCase().trim();
+      const distractors = [];
+      const usedAnswers = new Set([correctAnswer]);
+
       // First try custom distractors if available
-      if (currentWord.advanced_quiz?.custom_distractors?.length >= count) {
-        return currentWord.advanced_quiz.custom_distractors.slice(0, count);
+      if (currentWord.advanced_quiz?.custom_distractors?.length > 0) {
+        for (const d of currentWord.advanced_quiz.custom_distractors) {
+          if (!usedAnswers.has(d.toLowerCase().trim())) {
+            usedAnswers.add(d.toLowerCase().trim());
+            distractors.push(d);
+            if (distractors.length >= count) return distractors;
+          }
+        }
       }
 
-      // Get words from same category/difficulty for better distractors
-      let candidates = allWords.filter(w => 
+      // Try to get from other words in the set/database
+      const candidates = allWords.filter(w => 
         w.id !== currentWord.id && 
-        w.english_answer !== currentWord.english_answer
+        !usedAnswers.has(w.english_answer.toLowerCase().trim())
       );
 
       // Prefer same category
       const sameCategory = candidates.filter(w => w.category === currentWord.category);
-      if (sameCategory.length >= count) {
-        candidates = sameCategory;
-      }
-
-      // Prefer same difficulty
-      const sameDifficulty = candidates.filter(w => w.difficulty === currentWord.difficulty);
-      if (sameDifficulty.length >= count) {
-        candidates = sameDifficulty;
-      }
-
-      // Shuffle and pick unique answers
-      const shuffled = candidates.sort(() => Math.random() - 0.5);
-      const uniqueAnswers = [];
-      const seenAnswers = new Set([currentWord.english_answer.toLowerCase()]);
+      const sortedCandidates = [...sameCategory, ...candidates.filter(w => w.category !== currentWord.category)];
       
-      for (const w of shuffled) {
-        const answer = w.english_answer.toLowerCase();
-        if (!seenAnswers.has(answer)) {
-          seenAnswers.add(answer);
-          uniqueAnswers.push(w.english_answer);
-          if (uniqueAnswers.length >= count) break;
+      for (const w of sortedCandidates.sort(() => Math.random() - 0.5)) {
+        const answer = w.english_answer.toLowerCase().trim();
+        if (!usedAnswers.has(answer)) {
+          usedAnswers.add(answer);
+          distractors.push(w.english_answer);
+          if (distractors.length >= count) return distractors;
         }
       }
 
-      return uniqueAnswers;
+      // Fill remaining with fallback options
+      const shuffledFallbacks = [...defaultEnglishDistractors].sort(() => Math.random() - 0.5);
+      for (const fallback of shuffledFallbacks) {
+        if (!usedAnswers.has(fallback.toLowerCase())) {
+          usedAnswers.add(fallback.toLowerCase());
+          distractors.push(fallback);
+          if (distractors.length >= count) return distractors;
+        }
+      }
+
+      return distractors;
     };
 
     const getHebrewDistractors = (currentWord, count = 3) => {
-      let candidates = allWords.filter(w => 
+      const correctAnswer = currentWord.hebrew_word.trim();
+      const distractors = [];
+      const usedAnswers = new Set([correctAnswer]);
+
+      // Try to get from other words
+      const candidates = allWords.filter(w => 
         w.id !== currentWord.id && 
-        w.hebrew_word !== currentWord.hebrew_word
+        !usedAnswers.has(w.hebrew_word.trim())
       );
 
-      const shuffled = candidates.sort(() => Math.random() - 0.5);
-      const uniqueAnswers = [];
-      const seenAnswers = new Set([currentWord.hebrew_word]);
-      
-      for (const w of shuffled) {
-        if (!seenAnswers.has(w.hebrew_word)) {
-          seenAnswers.add(w.hebrew_word);
-          uniqueAnswers.push(w.hebrew_word);
-          if (uniqueAnswers.length >= count) break;
+      for (const w of candidates.sort(() => Math.random() - 0.5)) {
+        if (!usedAnswers.has(w.hebrew_word.trim())) {
+          usedAnswers.add(w.hebrew_word.trim());
+          distractors.push(w.hebrew_word);
+          if (distractors.length >= count) return distractors;
         }
       }
 
-      return uniqueAnswers;
+      // Fill with fallback Hebrew words
+      const shuffledFallbacks = [...defaultHebrewDistractors].sort(() => Math.random() - 0.5);
+      for (const fallback of shuffledFallbacks) {
+        if (!usedAnswers.has(fallback)) {
+          usedAnswers.add(fallback);
+          distractors.push(fallback);
+          if (distractors.length >= count) return distractors;
+        }
+      }
+
+      return distractors;
     };
 
     setWords.forEach((word, idx) => {
@@ -164,22 +197,7 @@ export default function VocabularyQuickPracticePage() {
       if (rand < 3) {
         // Multiple choice - Hebrew to English
         const distractors = getDistractors(word, 3);
-        // Make sure we have 4 options total (correct + 3 distractors)
-        // If not enough distractors, add fallback options
-        let finalDistractors = [...distractors];
-        const fallbackOptions = ['walk', 'jump', 'swim', 'read', 'write', 'speak', 'listen', 'think', 'make', 'take'];
-        while (finalDistractors.length < 3) {
-          const fallback = fallbackOptions.find(f => 
-            f.toLowerCase() !== word.english_answer.toLowerCase() && 
-            !finalDistractors.includes(f)
-          );
-          if (fallback) {
-            finalDistractors.push(fallback);
-            fallbackOptions.splice(fallbackOptions.indexOf(fallback), 1);
-          } else break;
-        }
-        
-        const options = [word.english_answer, ...finalDistractors].sort(() => Math.random() - 0.5);
+        const options = [word.english_answer, ...distractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'multiple_choice',
@@ -201,21 +219,7 @@ export default function VocabularyQuickPracticePage() {
       } else {
         // Translate - English to Hebrew (multiple choice)
         const distractors = getHebrewDistractors(word, 3);
-        // Fallback Hebrew options
-        let finalDistractors = [...distractors];
-        const fallbackHebrew = ['ללכת', 'לקפוץ', 'לשחות', 'לקרוא', 'לכתוב', 'לדבר', 'להקשיב', 'לחשוב', 'לעשות', 'לקחת'];
-        while (finalDistractors.length < 3) {
-          const fallback = fallbackHebrew.find(f => 
-            f !== word.hebrew_word && 
-            !finalDistractors.includes(f)
-          );
-          if (fallback) {
-            finalDistractors.push(fallback);
-            fallbackHebrew.splice(fallbackHebrew.indexOf(fallback), 1);
-          } else break;
-        }
-        
-        const options = [word.hebrew_word, ...finalDistractors].sort(() => Math.random() - 0.5);
+        const options = [word.hebrew_word, ...distractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'translate',
