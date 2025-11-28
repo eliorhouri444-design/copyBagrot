@@ -38,6 +38,10 @@ export default function VocabularySetsPage() {
   const [maxWordsLimit, setMaxWordsLimit] = useState(100);
   const [existingDuplicates, setExistingDuplicates] = useState([]);
   const [showDuplicatesDialog, setShowDuplicatesDialog] = useState(false);
+  const [showCSVImportDialog, setShowCSVImportDialog] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 0, status: '' });
+  const [isImporting, setIsImporting] = useState(false);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
