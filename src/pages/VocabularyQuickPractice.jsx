@@ -347,7 +347,17 @@ export default function VocabularyQuickPracticePage() {
     if (nextSetId) {
       const nextStart = endIndex;
       const nextEnd = nextStart + 10;
-      navigate(createPageUrl(`VocabularySetMode?setId=${nextSetId}&start=${nextStart}&end=${nextEnd}`));
+      
+      // Save progress for next time
+      localStorage.setItem('vocabSetProgress', JSON.stringify({
+        currentSet: nextSetId,
+        startIndex: nextStart,
+        endIndex: nextEnd,
+        lastCompleted: parseInt(setId) || 0,
+        completedAt: new Date().toISOString()
+      }));
+      
+      navigate(createPageUrl(`VocabularyFlashcards?setId=${nextSetId}&start=${nextStart}&end=${nextEnd}`));
     }
   };
 
