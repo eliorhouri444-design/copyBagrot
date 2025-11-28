@@ -275,10 +275,26 @@ ${baseStyle}`;
     return { text: "צריך לתרגל עוד, אל תוותר!", color: "text-red-600" };
   };
 
-  // Auto-continue to quiz after 2 seconds
+  // Save progress and auto-continue to quiz after 2 seconds
   useEffect(() => {
     if (showSummary) {
       sessionStorage.setItem('flashcardResults', JSON.stringify(answeredWords));
+      
+      // Save current set progress for next time
+      const currentSetNum = parseInt(setId) || 1;
+      const nextSetNum = currentSetNum + 1;
+      const nextStart = endIndex;
+      const nextEnd = nextStart + 10;
+      
+      // Save progress to localStorage - next set to continue from
+      localStorage.setItem('vocabSetProgress', JSON.stringify({
+        currentSet: nextSetNum,
+        startIndex: nextStart,
+        endIndex: nextEnd,
+        lastCompleted: currentSetNum,
+        completedAt: new Date().toISOString()
+      }));
+      
       const timer = setTimeout(() => {
         if (isMultiSet) {
           navigate(createPageUrl(`VocabularyQuickPractice?multiSet=true&sets=${setsParam}`));
