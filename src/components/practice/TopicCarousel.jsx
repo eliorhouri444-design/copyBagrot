@@ -58,12 +58,18 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           const totalSeen = userProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
           const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
           
+          // Calculate mastery progress - percentage of words user truly knows
+          const masteryProgress = allWords.length > 0 
+            ? Math.round((masteredWords / allWords.length) * 100) 
+            : 0;
+          
           setVocabStats({
             totalWords: allWords.length,
             learnedWords: userProgress.length,
             masteredWords,
             weakWords,
-            accuracy
+            accuracy,
+            masteryProgress
           });
         } catch (error) {
           console.error("Error loading vocab stats:", error);
