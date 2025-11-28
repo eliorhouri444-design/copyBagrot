@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown, Check, Trophy, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
@@ -19,6 +19,10 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   const [showVocabSetSelector, setShowVocabSetSelector] = useState(false);
   const [vocabularySets, setVocabularySets] = useState([]);
   const [vocabStats, setVocabStats] = useState(null);
+  const [showContinueDialog, setShowContinueDialog] = useState(false);
+  const [savedProgress, setSavedProgress] = useState(null);
+  const [totalSets, setTotalSets] = useState(0);
+  const [showCompletedDialog, setShowCompletedDialog] = useState(false);
 
   useEffect(() => {
     setTopics(initialTopics);
@@ -280,10 +284,39 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               className="space-y-2">
 
               <Button
-              onClick={() => {
+              onClick={async () => {
                 const topic = topics[currentIndex];
                 if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-                  navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                  // Check saved progress
+                  const saved = localStorage.getItem('vocabSetProgress');
+                  if (saved) {
+                    const progress = JSON.parse(saved);
+                    // Load total sets to check if completed
+                    try {
+                      const user = await base44.auth.me();
+                      const allWords = await base44.entities.VocabularyQuestion.filter({
+                        subject_id: user?.selected_subject || 'אנגלית',
+                        unit_level: user?.selected_units || 3,
+                        is_active: true
+                      }, null, 2000);
+                      const totalSetsCount = Math.ceil(allWords.length / 10);
+                      setTotalSets(totalSetsCount);
+                      
+                      if (progress.currentSet > totalSetsCount) {
+                        // User completed all sets!
+                        setShowCompletedDialog(true);
+                        return;
+                      }
+                      
+                      setSavedProgress(progress);
+                      setShowContinueDialog(true);
+                    } catch (error) {
+                      // If error, just start from beginning
+                      navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                    }
+                  } else {
+                    navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                  }
                 } else {
                   handleStartPractice();
                 }
@@ -418,6 +451,89 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
         )}
         </div>
       }
+
+      {/* Continue Progress Dialog */}
+      <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center">
+              להמשיך מאיפה שהפסקת?
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 text-center">
+            <div className="bg-blue-50 rounded-xl p-4 mb-4">
+              <div className="text-3xl font-bold text-blue-600 mb-1">סט {savedProgress?.currentSet}</div>
+              <div className="text-sm text-gray-600">מילים {savedProgress?.startIndex + 1} - {savedProgress?.endIndex}</div>
+            </div>
+            <p className="text-gray-600 text-sm">נשמר התקדמות מהפעם הקודמת</p>
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              onClick={() => {
+                setShowContinueDialog(false);
+                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}`));
+              }}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+            >
+              המשך מסט {savedProgress?.currentSet}
+            </Button>
+            <Button
+              onClick={() => {
+                localStorage.removeItem('vocabSetProgress');
+                setShowContinueDialog(false);
+                navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+              }}
+              variant="outline"
+              className="w-full h-12 border-2 border-gray-300 text-gray-700 font-bold rounded-xl"
+            >
+              התחל מחדש מסט 1
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Completed All Sets Dialog */}
+      <Dialog open={showCompletedDialog} onOpenChange={setShowCompletedDialog}>
+        <DialogContent className="max-w-sm mx-auto rounded-2xl" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+              <Trophy className="w-6 h-6 text-yellow-500" />
+              כל הכבוד!
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">אתה בקיא בכל אוצר המילים!</h3>
+            <p className="text-gray-600 text-sm">סיימת את כל {totalSets} הסטים בהצלחה</p>
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              onClick={() => {
+                localStorage.removeItem('vocabSetProgress');
+                setShowCompletedDialog(false);
+                navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+              }}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+            >
+              <RotateCcw className="w-4 h-4 ml-2" />
+              תרגול מחדש מסט 1
+            </Button>
+            <Button
+              onClick={() => setShowCompletedDialog(false)}
+              variant="ghost"
+              className="w-full h-10 text-gray-500"
+            >
+              סגור
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Vocabulary Set Selector Dialog */}
       <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
