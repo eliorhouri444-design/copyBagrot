@@ -533,16 +533,31 @@ export default function VocabularyQuickPracticePage() {
               <div className="space-y-3">
                 {(question.type === 'multiple_choice' || question.type === 'translate') ? (
                   <div className="space-y-3">
-                    {question.options.map((option, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSubmit(option)}
-                        className="w-full bg-white rounded-2xl p-4 text-center border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all"
-                        dir={question.type === 'translate' ? 'rtl' : 'ltr'}
+                    {question.options.map((option, idx) => {
+                      const isSelected = userAnswer === option;
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setUserAnswer(option)}
+                          className={`w-full bg-white rounded-2xl p-4 text-center border-2 transition-all ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
+                              : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                          }`}
+                          dir={question.type === 'translate' ? 'rtl' : 'ltr'}
+                        >
+                          <span className="text-lg font-medium text-gray-900">{option}</span>
+                        </button>
+                      );
+                    })}
+                    {userAnswer && (
+                      <Button
+                        onClick={() => handleSubmit(userAnswer)}
+                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4"
                       >
-                        <span className="text-lg font-medium text-gray-900">{option}</span>
-                      </button>
-                    ))}
+                        אשר תשובה
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
