@@ -233,7 +233,7 @@ export default function VocabularyFlashcardsPage() {
 
           {/* 3D Flip Card */}
           <div
-            className="relative w-full h-[300px] cursor-pointer"
+            className="relative w-full h-[380px] cursor-pointer"
             style={{ perspective: '1000px' }}
             onClick={handleFlip}>
 
@@ -281,7 +281,7 @@ export default function VocabularyFlashcardsPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mt-8">
+          <div className="flex gap-4 mt-12">
             <button
               onClick={() => handleAnswerWithFlip(true)}
               className="flex-1 h-14 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-green-100 hover:border-green-300 transition-all">
