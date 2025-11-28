@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  ChevronLeft, Check, X, Loader2, Zap, Trophy, RotateCcw
+  ChevronLeft, Check, X, Loader2, Zap, Trophy, RotateCcw, Volume2, Target
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
