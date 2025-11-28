@@ -843,7 +843,11 @@ export default function VocabularySetsPage() {
                   variant="destructive"
                   onClick={async () => {
                     if (confirm(`האם למחוק את הכפילות "${dup.word.english_answer}"?`)) {
-                      await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                      try {
+                        await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                      } catch (e) {
+                        // Already deleted, ignore
+                      }
                       setExistingDuplicates(prev => prev.filter((_, i) => i !== idx));
                       loadData();
                     }
