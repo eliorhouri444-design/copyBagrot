@@ -471,11 +471,10 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           </div>
 
           <Button
-            variant="ghost"
             onClick={() => setShowVocabSetSelector(false)}
-            className="w-full text-gray-500 mt-2"
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl mt-2"
           >
-            ביטול
+            סגור
           </Button>
         </DialogContent>
       </Dialog>
