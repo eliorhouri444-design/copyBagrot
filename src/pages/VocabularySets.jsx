@@ -34,6 +34,7 @@ export default function VocabularySetsPage() {
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [managingWords, setManagingWords] = useState([]);
   const [editingWord, setEditingWord] = useState(null);
+  const [deletingSet, setDeletingSet] = useState(null);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -173,6 +174,25 @@ export default function VocabularySetsPage() {
     } catch (error) {
       console.error("Error saving order:", error);
       alert('שגיאה בשמירת הסדר');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteSet = async (set) => {
+    if (!confirm(`האם למחוק את סט ${set.id}? (${set.words.length} מילים)`)) return;
+    
+    setIsSaving(true);
+    try {
+      // Delete all words in this set
+      for (const word of set.words) {
+        await base44.entities.VocabularyQuestion.delete(word.id);
+      }
+      loadData();
+      alert(`סט ${set.id} נמחק בהצלחה!`);
+    } catch (error) {
+      console.error("Error deleting set:", error);
+      alert('שגיאה במחיקת הסט');
     } finally {
       setIsSaving(false);
     }
@@ -501,8 +521,20 @@ export default function VocabularySetsPage() {
                     <div className="text-xs text-gray-500 mt-1">{setProgress}% הושלם</div>
                   </div>
 
+                  {user?.role === 'admin' && !selectionMode && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteSet(set);
+                      }}
+                      className="p-2 rounded-lg hover:bg-red-50 text-red-500"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+
                   <ChevronLeft className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                </motion.button>
+                  </motion.button>
               );
             })
           )}
