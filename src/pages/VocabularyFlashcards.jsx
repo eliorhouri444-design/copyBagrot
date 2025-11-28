@@ -58,6 +58,38 @@ export default function VocabularyFlashcardsPage() {
         wordsForPractice = allWords.slice(startIndex, endIndex);
       }
 
+      // Load user progress to prioritize weak words
+      const userProgress = await base44.entities.VocabularyProgress.filter({
+        user_email: currentUser.email,
+        subject_id: subject
+      }, null, 1000);
+
+      const progressMap = {};
+      userProgress.forEach(p => {
+        progressMap[p.word_id] = p;
+      });
+
+      // Sort words: weak words first, then by streak (ascending), then unlearned
+      wordsForPractice.sort((a, b) => {
+        const progA = progressMap[a.id];
+        const progB = progressMap[b.id];
+
+        // Weak words first
+        if (progA?.is_weak && !progB?.is_weak) return -1;
+        if (!progA?.is_weak && progB?.is_weak) return 1;
+
+        // Then by streak (lower streak = needs more practice)
+        const streakA = progA?.streak || 0;
+        const streakB = progB?.streak || 0;
+        if (streakA !== streakB) return streakA - streakB;
+
+        // Unlearned words before mastered ones
+        if (!progA?.is_known && progB?.is_known) return -1;
+        if (progA?.is_known && !progB?.is_known) return 1;
+
+        return 0;
+      });
+
       setWords(wordsForPractice);
 
     } catch (error) {
