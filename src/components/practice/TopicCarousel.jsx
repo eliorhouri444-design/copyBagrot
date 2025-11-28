@@ -57,8 +57,14 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             }, null, 2000)
           ]);
           
-          const masteredWords = userProgress.filter(p => p.streak >= 4 || p.is_known).length;
-          const weakWords = userProgress.filter(p => p.is_weak).length;
+          // Get word IDs that actually exist in VocabularyQuestion
+          const validWordIds = new Set(allWords.map(w => w.id));
+          
+          // Filter progress to only include words that exist in VocabularyQuestion
+          const validProgress = userProgress.filter(p => validWordIds.has(p.word_id));
+          
+          const masteredWords = validProgress.filter(p => p.streak >= 4 || p.is_known).length;
+          const weakWords = validProgress.filter(p => p.is_weak).length;
           const totalCorrect = userProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
           const totalSeen = userProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
           const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
