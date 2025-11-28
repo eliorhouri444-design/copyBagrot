@@ -312,15 +312,27 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <Button
                   onClick={async () => {
                     if (currentTopic.isVocabulary || currentTopic.topic_id?.toLowerCase().includes('vocabulary') || currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-                      // Load vocabulary sets and show selector
+                      // Load vocabulary words and create sets of 10
                       try {
                         const user = await base44.auth.me();
-                        const sets = await base44.entities.VocabularySet.filter({
+                        const allWords = await base44.entities.VocabularyQuestion.filter({
                           subject_id: user?.selected_subject || 'אנגלית',
                           unit_level: user?.selected_units || 3,
                           is_active: true
-                        }, 'set_number', 100);
-                        setVocabularySets(sets);
+                        }, 'order', 2000);
+                        
+                        // Create sets of 10 words each
+                        const generatedSets = [];
+                        for (let i = 0; i < allWords.length; i += 10) {
+                          generatedSets.push({
+                            id: Math.floor(i / 10) + 1,
+                            set_number: Math.floor(i / 10) + 1,
+                            words: allWords.slice(i, i + 10),
+                            startIndex: i,
+                            endIndex: Math.min(i + 10, allWords.length)
+                          });
+                        }
+                        setVocabularySets(generatedSets);
                         setShowVocabSetSelector(true);
                       } catch (error) {
                         console.error("Error loading vocabulary sets:", error);
