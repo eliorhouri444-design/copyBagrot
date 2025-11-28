@@ -13,7 +13,13 @@ import { Progress } from "@/components/ui/progress";
 
 export default function VocabularyFlashcardsPage() {
   const navigate = useNavigate();
-  
+  const urlParams = new URLSearchParams(window.location.search);
+  const setId = urlParams.get('setId');
+  const isMultiSet = urlParams.get('multiSet') === 'true';
+  const setsParam = urlParams.get('sets');
+  const startIndex = parseInt(urlParams.get('start') || '0');
+  const endIndex = parseInt(urlParams.get('end') || '10');
+
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState([]);
@@ -24,13 +30,6 @@ export default function VocabularyFlashcardsPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [generatedImages, setGeneratedImages] = useState({});
   const [generatingImage, setGeneratingImage] = useState(false);
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const setId = urlParams.get('setId');
-  const isMultiSet = urlParams.get('multiSet') === 'true';
-  const setsParam = urlParams.get('sets');
-  const startIndex = parseInt(urlParams.get('start') || '0');
-  const endIndex = parseInt(urlParams.get('end') || '10');
 
   // Text-to-Speech function
   const speakWord = (text, lang = 'en-US') => {
