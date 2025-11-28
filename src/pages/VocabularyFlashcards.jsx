@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  ChevronLeft, Check, X, Loader2 } from
+  ChevronLeft, Check, X, Loader2, Volume2, Image as ImageIcon } from
 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -28,10 +28,60 @@ export default function VocabularyFlashcardsPage() {
   const [answeredWords, setAnsweredWords] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState({});
+  const [generatingImage, setGeneratingImage] = useState(false);
+
+  // Text-to-Speech function
+  const speakWord = (text, lang = 'en-US') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.85;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Generate image for word if not exists
+  const generateImageForWord = async (word) => {
+    if (word.image_url || generatedImages[word.id] || generatingImage) return;
+    
+    setGeneratingImage(true);
+    try {
+      const result = await base44.integrations.Core.GenerateImage({
+        prompt: `Simple, clean icon illustration of "${word.english_answer}" concept, minimalist flat design, white background, suitable for vocabulary learning app, no text`
+      });
+      
+      if (result?.url) {
+        setGeneratedImages(prev => ({ ...prev, [word.id]: result.url }));
+        // Save to database for future use
+        try {
+          await base44.entities.VocabularyQuestion.update(word.id, {
+            image_url: result.url
+          });
+        } catch (e) {
+          console.log("Could not save image to DB");
+        }
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Generate image when word changes
+  useEffect(() => {
+    const currentWord = words[currentIndex];
+    if (currentWord && !currentWord.image_url && !generatedImages[currentWord.id]) {
+      generateImageForWord(currentWord);
+    }
+  }, [currentIndex, words]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -344,16 +394,20 @@ export default function VocabularyFlashcardsPage() {
                   </span>
                 )}
 
-                {/* Image */}
-                {currentWord.image_url && (
+                {/* Image - show generated or existing */}
+                {(currentWord.image_url || generatedImages[currentWord.id]) ? (
                   <div className="w-24 h-24 rounded-xl overflow-hidden mb-3 shadow-md">
                     <img 
-                      src={currentWord.image_url} 
+                      src={currentWord.image_url || generatedImages[currentWord.id]} 
                       alt={currentWord.english_answer}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                )}
+                ) : generatingImage ? (
+                  <div className="w-24 h-24 rounded-xl bg-gray-100 mb-3 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  </div>
+                ) : null}
 
                 <div className="text-3xl font-bold text-gray-900 mb-1 text-center" dir="ltr">
                   {currentWord.english_answer}
@@ -364,21 +418,21 @@ export default function VocabularyFlashcardsPage() {
                   <div className="text-sm text-gray-400 mb-2" dir="ltr">/{currentWord.phonetic}/</div>
                 )}
 
-                {/* Audio Button */}
-                {(currentWord.audio?.english_audio_url || currentWord.audio_url) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                {/* Audio Button - Always available with TTS fallback */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (currentWord.audio?.english_audio_url || currentWord.audio_url) {
                       const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
                       audio.play();
-                    }}
-                    className="mb-3 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    </svg>
-                  </button>
-                )}
+                    } else {
+                      speakWord(currentWord.english_answer, 'en-US');
+                    }
+                  }}
+                  className="mb-3 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                >
+                  <Volume2 className="w-6 h-6 text-blue-600" />
+                </button>
 
                 <button
                   onClick={(e) => {e.stopPropagation();setIsFlipped(true);}}
@@ -401,10 +455,10 @@ export default function VocabularyFlashcardsPage() {
                 )}
 
                 {/* Image on back too */}
-                {currentWord.image_url && (
+                {(currentWord.image_url || generatedImages[currentWord.id]) && (
                   <div className="w-20 h-20 rounded-xl overflow-hidden mb-2 shadow-md">
                     <img 
-                      src={currentWord.image_url} 
+                      src={currentWord.image_url || generatedImages[currentWord.id]} 
                       alt={currentWord.english_answer}
                       className="w-full h-full object-cover"
                     />
@@ -418,44 +472,55 @@ export default function VocabularyFlashcardsPage() {
                   {currentWord.english_answer}
                 </div>
 
-                {/* Audio buttons for both word and sentence */}
+                {/* Audio buttons - Always available with TTS fallback */}
                 <div className="flex gap-2 mb-3">
-                  {(currentWord.audio?.english_audio_url || currentWord.audio_url) && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (currentWord.audio?.english_audio_url || currentWord.audio_url) {
                         const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
                         audio.play();
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors text-xs text-blue-700 font-medium"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                      </svg>
-                      מילה
-                    </button>
-                  )}
-                  {currentWord.audio?.hebrew_audio_url && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      } else {
+                        speakWord(currentWord.english_answer, 'en-US');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors text-xs text-blue-700 font-medium"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    מילה
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (currentWord.audio?.hebrew_audio_url) {
                         const audio = new Audio(currentWord.audio.hebrew_audio_url);
                         audio.play();
-                      }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 hover:bg-green-200 transition-colors text-xs text-green-700 font-medium"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                      </svg>
-                      עברית
-                    </button>
-                  )}
+                      } else {
+                        speakWord(currentWord.hebrew_word, 'he-IL');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 hover:bg-green-200 transition-colors text-xs text-green-700 font-medium"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    עברית
+                  </button>
                 </div>
 
                 {/* Example Sentence with audio */}
                 {currentWord.example_sentence && (
-                  <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
-                    "{currentWord.example_sentence}"
+                  <div className="relative">
+                    <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
+                      "{currentWord.example_sentence}"
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speakWord(currentWord.example_sentence, 'en-US');
+                      }}
+                      className="absolute -top-1 -left-1 p-1.5 rounded-full bg-purple-100 hover:bg-purple-200 transition-colors"
+                    >
+                      <Volume2 className="w-3 h-3 text-purple-600" />
+                    </button>
                   </div>
                 )}
 
