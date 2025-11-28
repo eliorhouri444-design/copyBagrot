@@ -89,7 +89,7 @@ export default function PracticeSummary({ results, onRetry, onHome, onPracticeWe
         </Button>
         <Button
           onClick={onHome}
-          className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+          className="flex-1 h-12 bg-[#2086b1] hover:bg-blue-700 text-white"
         >
           <Home className="w-4 h-4 ml-2" />
           חזור
