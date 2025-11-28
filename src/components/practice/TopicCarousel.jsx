@@ -219,6 +219,18 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                       : `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
+                  {vocabStats && (
+                    <div className="flex gap-3 mt-2">
+                      <div className="bg-white/20 rounded-lg px-2 py-1">
+                        <span className="text-white/90 text-xs">דיוק: </span>
+                        <span className="text-white font-bold text-sm">{vocabStats.accuracy}%</span>
+                      </div>
+                      <div className="bg-white/20 rounded-lg px-2 py-1">
+                        <span className="text-white/90 text-xs">לחיזוק: </span>
+                        <span className="text-white font-bold text-sm">{vocabStats.weakWords}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
