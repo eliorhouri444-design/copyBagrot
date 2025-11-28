@@ -112,10 +112,25 @@ export default function VocabularyStrengthenPage() {
     }
   };
 
+  // Text-to-Speech function
+  const speakWord = (text, lang = 'en-US') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.85;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-orange-600 mx-auto mb-3" />
+          <p className="text-gray-600 font-medium">טוען מילים לחיזוק...</p>
+        </div>
       </div>
     );
   }
@@ -123,57 +138,73 @@ export default function VocabularyStrengthenPage() {
   // No weak words
   if (weakWords.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full text-center"
-        >
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Trophy className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-blue-50 pb-8">
+        {/* Header */}
+        <div className="bg-green-600 px-5 py-6 rounded-b-3xl">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">מצוין!</h2>
+            <p className="text-white/90">אין לך מילים לחיזוק כרגע</p>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">מצוין!</h2>
-          <p className="text-gray-600 mb-6">אין לך מילים לחיזוק כרגע. כל המילים נשלטות!</p>
+        </div>
+        
+        <div className="px-5 py-6">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-green-200 text-center mb-6">
+            <Check className="w-12 h-12 text-green-600 mx-auto mb-3" />
+            <p className="text-gray-700 font-medium">כל המילים נשלטות! המשך לתרגל כדי לשמור על הרמה.</p>
+          </div>
+          
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold rounded-xl"
+            className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg font-bold rounded-2xl shadow-lg"
           >
             חזור לתרגול
           </Button>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   // Summary
   if (showSummary) {
+    const accuracy = Math.round((results.mastered / (results.mastered + results.stillWeak)) * 100);
+    
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full"
-        >
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-orange-600" />
+      <div className="min-h-screen bg-blue-50 pb-8">
+        {/* Header */}
+        <div className="bg-orange-500 px-5 py-6 rounded-b-3xl">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">סיימת חיזוק!</h2>
-            <p className="text-gray-600">סיכום התרגול</p>
+            <div className="text-5xl font-bold text-white mb-2">{accuracy}%</div>
+            <p className="text-white/90 text-lg font-medium">סיימת חיזוק!</p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-green-50 rounded-xl p-4 text-center">
+        <div className="px-5 py-6 space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-green-200">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                <Check className="w-5 h-5 text-green-600" />
+              </div>
               <div className="text-3xl font-bold text-green-600">{results.mastered}</div>
-              <div className="text-sm text-gray-600">נשלטו</div>
+              <div className="text-sm text-gray-600 font-medium">נשלטו</div>
             </div>
-            <div className="bg-orange-50 rounded-xl p-4 text-center">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-orange-200">
+              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                <Target className="w-5 h-5 text-orange-600" />
+              </div>
               <div className="text-3xl font-bold text-orange-600">{results.stillWeak}</div>
-              <div className="text-sm text-gray-600">עדיין לחיזוק</div>
+              <div className="text-sm text-gray-600 font-medium">עדיין לחיזוק</div>
             </div>
           </div>
 
-          <div className="space-y-3">
+          {/* Action Buttons */}
+          <div className="space-y-3 pt-4">
             {results.stillWeak > 0 && (
               <Button
                 onClick={() => {
@@ -182,7 +213,7 @@ export default function VocabularyStrengthenPage() {
                   setShowSummary(false);
                   loadWeakWords();
                 }}
-                className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-lg font-bold rounded-xl"
+                className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-lg font-bold rounded-2xl shadow-lg"
               >
                 <RotateCcw className="w-5 h-5 ml-2" />
                 המשך לחזק
@@ -191,12 +222,12 @@ export default function VocabularyStrengthenPage() {
             <Button
               onClick={() => navigate(createPageUrl("Practice"))}
               variant="outline"
-              className="w-full h-12 text-lg font-semibold rounded-xl"
+              className="w-full h-12 text-base font-bold border-2 border-blue-300 text-blue-600 rounded-2xl hover:bg-blue-50"
             >
               חזור לתרגול
             </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
