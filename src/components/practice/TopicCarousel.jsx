@@ -298,11 +298,16 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               <>
                   <Button
                   onClick={() => {
-                    sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                    navigate(createPageUrl("CustomWeakPractice"));
+                    const topic = topics[currentIndex];
+                    if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+                      navigate(createPageUrl("VocabularyStrengthen"));
+                    } else {
+                      sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
+                      navigate(createPageUrl("CustomWeakPractice"));
+                    }
                   }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
                     <Target className="w-4 h-4 ml-2" />
-                    תרגול טעויות בנושא זה
+                    {vocabStats ? 'תרגול מילים חלשות' : 'תרגול טעויות בנושא זה'}
                   </Button>
                   <Button
                   onClick={async () => {
