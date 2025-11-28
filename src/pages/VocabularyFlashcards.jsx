@@ -43,14 +43,63 @@ export default function VocabularyFlashcardsPage() {
     }
   };
 
-  // Generate image for word if not exists
+  // Generate image for word based on unit level
   const generateImageForWord = async (word) => {
     if (word.image_url || generatedImages[word.id] || generatingImage) return;
     
     setGeneratingImage(true);
     try {
+      const unitLevel = user?.selected_units || 3;
+      
+      // Base style rules for all levels
+      const baseStyle = `
+STYLE RULES:
+- Clean educational flat illustration (VECTOR style).
+- Soft pastel colors only (light blue, yellow, green, gray).
+- White or light-blue solid background.
+- No text, no words, no letters.
+- No realistic photos or real people.
+- No busy background, no extra objects.
+- Thin outline (1-2px), rounded corners.
+- Single object/action in center.
+- 1:1 square image, 10-15% padding.
+- Must be instantly clear to a language learner.`;
+
+      let levelPrompt = '';
+      
+      if (unitLevel === 3) {
+        // A1-A2 level - very simple
+        levelPrompt = `Create a simple flat illustration for the word: "${word.english_answer}" for A1-A2 learners.
+RULES:
+- Draw ONLY one object or one simple action.
+- No facial details, no emotion details.
+- Shapes must be basic (icons style).
+- Avoid complex ideas. Show the most basic meaning only.
+- Use clear symbols.
+${baseStyle}`;
+      } else if (unitLevel === 4) {
+        // A2-B1 level - medium complexity
+        levelPrompt = `Create a flat illustration for the word: "${word.english_answer}" for A2-B1 learners.
+RULES:
+- Keep the flat educational style.
+- You may add 1-2 supporting objects ONLY if they help explain meaning.
+- Simple emotion indicators allowed (smile, sad face).
+- Small scene allowed but must stay minimal.
+- Still no real faces, no realism, no text.
+${baseStyle}`;
+      } else {
+        // B1-B2 level - conceptual
+        levelPrompt = `Create an advanced educational flat illustration for the word: "${word.english_answer}" at B1-B2 level.
+RULES:
+- Still flat, vector, pastel colors, 1:1 - style must match lower levels.
+- You may draw small scenes or conceptual symbols.
+- You may use metaphors (balance scale, idea lightbulb, path forward).
+- No realism, no text, no detailed characters.
+${baseStyle}`;
+      }
+
       const result = await base44.integrations.Core.GenerateImage({
-        prompt: `A realistic, clear photograph or illustration representing the concept of "${word.english_answer}". Show the most common and recognizable visual representation that people associate with this word. High quality, well-lit, centered composition, clean white or light gradient background. Educational flashcard style, no text or labels on the image.`
+        prompt: levelPrompt
       });
       
       if (result?.url) {
