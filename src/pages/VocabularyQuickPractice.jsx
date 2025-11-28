@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { 
-  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft
-} from 'lucide-react';
+import {
+  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft } from
+'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,7 +58,7 @@ export default function VocabularyQuickPracticePage() {
       let wordsForPractice = [];
       if (isMultiSet) {
         const setsData = JSON.parse(sessionStorage.getItem('vocabSetsData') || '[]');
-        setsData.forEach(set => {
+        setsData.forEach((set) => {
           wordsForPractice = [...wordsForPractice, ...allWords.slice(set.startIndex, set.endIndex)];
         });
       } else {
@@ -69,7 +69,7 @@ export default function VocabularyQuickPracticePage() {
       const flashcardResults = sessionStorage.getItem('flashcardResults');
       if (flashcardResults) {
         const parsed = JSON.parse(flashcardResults);
-        const unknownWords = parsed.filter(w => !w.isKnown);
+        const unknownWords = parsed.filter((w) => !w.isKnown);
         // If user didn't know many words, generate more questions for those
         if (unknownWords.length > 0) {
           // Add extra questions for unknown words
@@ -96,18 +96,18 @@ export default function VocabularyQuickPracticePage() {
 
     // Default fallback distractors - common English words
     const defaultEnglishDistractors = [
-      'walk', 'jump', 'swim', 'read', 'write', 'speak', 'listen', 'think', 'make', 'take',
-      'go', 'come', 'see', 'know', 'get', 'give', 'find', 'tell', 'ask', 'work',
-      'big', 'small', 'good', 'bad', 'new', 'old', 'high', 'low', 'long', 'short',
-      'house', 'school', 'book', 'water', 'food', 'time', 'day', 'night', 'year', 'place'
-    ];
+    'walk', 'jump', 'swim', 'read', 'write', 'speak', 'listen', 'think', 'make', 'take',
+    'go', 'come', 'see', 'know', 'get', 'give', 'find', 'tell', 'ask', 'work',
+    'big', 'small', 'good', 'bad', 'new', 'old', 'high', 'low', 'long', 'short',
+    'house', 'school', 'book', 'water', 'food', 'time', 'day', 'night', 'year', 'place'];
+
 
     const defaultHebrewDistractors = [
-      'ללכת', 'לקפוץ', 'לשחות', 'לקרוא', 'לכתוב', 'לדבר', 'להקשיב', 'לחשוב', 'לעשות', 'לקחת',
-      'לבוא', 'לראות', 'לדעת', 'לתת', 'למצוא', 'לספר', 'לשאול', 'לעבוד', 'לאכול', 'לשתות',
-      'גדול', 'קטן', 'טוב', 'רע', 'חדש', 'ישן', 'גבוה', 'נמוך', 'ארוך', 'קצר',
-      'בית', 'ספר', 'מים', 'אוכל', 'זמן', 'יום', 'לילה', 'שנה', 'מקום', 'עבודה'
-    ];
+    'ללכת', 'לקפוץ', 'לשחות', 'לקרוא', 'לכתוב', 'לדבר', 'להקשיב', 'לחשוב', 'לעשות', 'לקחת',
+    'לבוא', 'לראות', 'לדעת', 'לתת', 'למצוא', 'לספר', 'לשאול', 'לעבוד', 'לאכול', 'לשתות',
+    'גדול', 'קטן', 'טוב', 'רע', 'חדש', 'ישן', 'גבוה', 'נמוך', 'ארוך', 'קצר',
+    'בית', 'ספר', 'מים', 'אוכל', 'זמן', 'יום', 'לילה', 'שנה', 'מקום', 'עבודה'];
+
 
     // Helper function to get good distractors
     const getDistractors = (currentWord, count = 3) => {
@@ -127,15 +127,15 @@ export default function VocabularyQuickPracticePage() {
       }
 
       // Try to get from other words in the set/database
-      const candidates = allWords.filter(w => 
-        w.id !== currentWord.id && 
-        !usedAnswers.has(w.english_answer.toLowerCase().trim())
+      const candidates = allWords.filter((w) =>
+      w.id !== currentWord.id &&
+      !usedAnswers.has(w.english_answer.toLowerCase().trim())
       );
 
       // Prefer same category
-      const sameCategory = candidates.filter(w => w.category === currentWord.category);
-      const sortedCandidates = [...sameCategory, ...candidates.filter(w => w.category !== currentWord.category)];
-      
+      const sameCategory = candidates.filter((w) => w.category === currentWord.category);
+      const sortedCandidates = [...sameCategory, ...candidates.filter((w) => w.category !== currentWord.category)];
+
       for (const w of sortedCandidates.sort(() => Math.random() - 0.5)) {
         const answer = w.english_answer.toLowerCase().trim();
         if (!usedAnswers.has(answer)) {
@@ -164,9 +164,9 @@ export default function VocabularyQuickPracticePage() {
       const usedAnswers = new Set([correctAnswer]);
 
       // Try to get from other words
-      const candidates = allWords.filter(w => 
-        w.id !== currentWord.id && 
-        !usedAnswers.has(w.hebrew_word.trim())
+      const candidates = allWords.filter((w) =>
+      w.id !== currentWord.id &&
+      !usedAnswers.has(w.hebrew_word.trim())
       );
 
       for (const w of candidates.sort(() => Math.random() - 0.5)) {
@@ -193,7 +193,7 @@ export default function VocabularyQuickPracticePage() {
     setWords.forEach((word, idx) => {
       // Rotate between question types: 60% multiple choice, 20% fill blank, 20% translate
       const rand = idx % 5;
-      
+
       if (rand < 3) {
         // Multiple choice - Hebrew to English
         const distractors = getDistractors(word, 3);
@@ -238,10 +238,10 @@ export default function VocabularyQuickPracticePage() {
   const checkAnswer = (answer) => {
     const question = questions[currentIndex];
     const correct = answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-    
+
     const acceptableAnswers = question.word.acceptable_answers || [];
-    const isAcceptable = acceptableAnswers.some(a => 
-      a.toLowerCase().trim() === answer.toLowerCase().trim()
+    const isAcceptable = acceptableAnswers.some((a) =>
+    a.toLowerCase().trim() === answer.toLowerCase().trim()
     );
 
     return correct || isAcceptable;
@@ -251,14 +251,14 @@ export default function VocabularyQuickPracticePage() {
     const answer = selectedAnswer || userAnswer;
     const correct = checkAnswer(answer);
     const question = questions[currentIndex];
-    
+
     setIsCorrect(correct);
     setShowResult(true);
-    setResults(prev => ({
+    setResults((prev) => ({
       correct: prev.correct + (correct ? 1 : 0),
       incorrect: prev.incorrect + (correct ? 0 : 1)
     }));
-    setAnsweredQuestions(prev => [...prev, { ...question, userAnswer: answer, isCorrect: correct }]);
+    setAnsweredQuestions((prev) => [...prev, { ...question, userAnswer: answer, isCorrect: correct }]);
 
     // Update progress
     try {
@@ -300,7 +300,7 @@ export default function VocabularyQuickPracticePage() {
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
       setUserAnswer('');
       setShowResult(false);
     } else {
@@ -323,10 +323,10 @@ export default function VocabularyQuickPracticePage() {
   };
 
   const practiceErrors = () => {
-    const wrongQuestions = answeredQuestions.filter(q => !q.isCorrect);
+    const wrongQuestions = answeredQuestions.filter((q) => !q.isCorrect);
     if (wrongQuestions.length === 0) return;
-    
-    sessionStorage.setItem('errorPracticeWords', JSON.stringify(wrongQuestions.map(q => q.word)));
+
+    sessionStorage.setItem('errorPracticeWords', JSON.stringify(wrongQuestions.map((q) => q.word)));
     // For now, just refresh with the wrong words
     // Could create a dedicated error practice page
     navigate(createPageUrl("VocabularySets"));
@@ -336,25 +336,25 @@ export default function VocabularyQuickPracticePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (showSummary) {
     const totalQuestions = questions.length || 1;
     const correctCount = results.correct || 0;
-    const accuracy = Math.round((correctCount / totalQuestions) * 100);
-    const wrongQuestions = answeredQuestions.filter(q => !q.isCorrect);
-    const correctQuestions = answeredQuestions.filter(q => q.isCorrect);
+    const accuracy = Math.round(correctCount / totalQuestions * 100);
+    const wrongQuestions = answeredQuestions.filter((q) => !q.isCorrect);
+    const correctQuestions = answeredQuestions.filter((q) => q.isCorrect);
     const nextSetId = getNextSetId();
-    
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full"
-        >
+          animate={{ opacity: 1, y: 0 }} className="bg-white pt-4 pr-6 pb-2 pl-6 rounded-2xl shadow-lg max-w-sm w-full">
+
+
           <div className="text-center mb-6">
             <div className="text-5xl font-bold text-gray-900 mb-1">{accuracy}%</div>
             <p className="text-gray-500">ציון הסט</p>
@@ -376,62 +376,62 @@ export default function VocabularyQuickPracticePage() {
           </div>
 
           {/* Mastered words */}
-          {correctQuestions.length > 0 && (
-            <div className="mb-4">
+          {correctQuestions.length > 0 &&
+          <div className="mb-4">
               <div className="text-sm text-gray-600 mb-2 font-medium">מילים שנשלטו:</div>
               <div className="flex flex-wrap gap-1.5">
-                {correctQuestions.slice(0, 6).map((q, idx) => (
-                  <span key={idx} className="bg-green-100 text-green-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
+                {correctQuestions.slice(0, 6).map((q, idx) =>
+              <span key={idx} className="bg-green-100 text-green-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
                     {q.word.english_answer}
                   </span>
-                ))}
+              )}
               </div>
             </div>
-          )}
+          }
 
           {/* Words to review - link to strengthen mode */}
-          {wrongQuestions.length > 0 && (
-            <div className="mb-6">
+          {wrongQuestions.length > 0 &&
+          <div className="mb-6">
               <div className="text-sm text-gray-600 mb-2 font-medium">מילים לחיזוק:</div>
               <div className="flex flex-wrap gap-1.5">
-                {wrongQuestions.map((q, idx) => (
-                  <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
+                {wrongQuestions.map((q, idx) =>
+              <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
                     {q.word.english_answer}
                   </span>
-                ))}
+              )}
               </div>
             </div>
-          )}
+          }
 
-          <div className="space-y-3">
+          <div className="mx-1 my-2 pt-6 pr-1 pb-1 pl-1 py-1 space-y-3">
             {/* Main CTA - Next set */}
-            {nextSetId && (
-              <Button
-                onClick={goToNextSet}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
-              >
+            {nextSetId &&
+            <Button
+              onClick={goToNextSet}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+
                 המשך לסט הבא
                 <ArrowLeft className="w-5 h-5 mr-2" />
               </Button>
-            )}
+            }
 
             {/* Practice errors - Premium */}
-            {wrongQuestions.length > 0 && (
-              <Button
-                onClick={() => {
-                  if (user?.is_premium) {
-                    practiceErrors();
-                  } else {
-                    navigate(createPageUrl("Premium"));
-                  }
-                }}
-                variant="outline"
-                className="w-full h-12 text-base font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50"
-              >
+            {wrongQuestions.length > 0 &&
+            <Button
+              onClick={() => {
+                if (user?.is_premium) {
+                  practiceErrors();
+                } else {
+                  navigate(createPageUrl("Premium"));
+                }
+              }}
+              variant="outline"
+              className="w-full h-12 text-base font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50">
+
                 {!user?.is_premium && <Crown className="w-4 h-4 ml-2 text-amber-500" />}
                 חזרה על טעויות
               </Button>
-            )}
+            }
 
             {/* Refresh set */}
             <button
@@ -444,26 +444,26 @@ export default function VocabularyQuickPracticePage() {
                 setShowSummary(false);
                 loadData();
               }}
-              className="w-full h-12 text-lg font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50 flex items-center justify-center gap-2"
-            >
+              className="w-full h-12 text-lg font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50 flex items-center justify-center gap-2">
+
               <RotateCcw className="w-5 h-5" />
               רענן את הסט
             </button>
 
             <button
-              onClick={() => navigate(createPageUrl("VocabularySets"))}
-              className="w-full text-[#0A2540] text-lg font-medium hover:text-gray-700 py-3 mb-10"
-            >
+              onClick={() => navigate(createPageUrl("VocabularySets"))} className="text-[#0A2540] mb-10 py-1 text-lg font-medium w-full hover:text-gray-700">
+
+
               חזרה לנושאים
             </button>
           </div>
         </motion.div>
-      </div>
-    );
+      </div>);
+
   }
 
   const question = questions[currentIndex];
-  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const progress = questions.length > 0 ? (currentIndex + 1) / questions.length * 100 : 0;
 
   if (!question) {
     return (
@@ -474,8 +474,8 @@ export default function VocabularyQuickPracticePage() {
             חזור לסטים
           </Button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -484,8 +484,8 @@ export default function VocabularyQuickPracticePage() {
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
         <button
           onClick={() => navigate(createPageUrl("VocabularySets"))}
-          className="p-2 -ml-2 text-gray-500"
-        >
+          className="p-2 -ml-2 text-gray-500">
+
           <ChevronLeft className="w-5 h-5" />
         </button>
         <span className="text-sm font-semibold text-blue-600">
@@ -496,10 +496,10 @@ export default function VocabularyQuickPracticePage() {
       
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 h-2.5">
-        <div 
-          className="bg-blue-600 h-2.5 transition-all duration-300" 
-          style={{ width: `${progress}%` }} 
-        />
+        <div
+          className="bg-blue-600 h-2.5 transition-all duration-300"
+          style={{ width: `${progress}%` }} />
+
       </div>
 
       {/* Question */}
@@ -510,93 +510,78 @@ export default function VocabularyQuickPracticePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full max-w-sm"
-          >
+            className="w-full max-w-sm">
+
             {/* Question Card */}
             <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-lg p-6 mb-4">
               <div className="text-xs text-blue-500 mb-3 font-medium text-center">
-                {question.type === 'multiple_choice' ? 'בחירה מרובה' : 
-                 question.type === 'fill_blank' ? 'השלמת מילה' : 
-                 question.type === 'translate' ? 'תרגום לעברית' : 'כתיבה חופשית'}
+                {question.type === 'multiple_choice' ? 'בחירה מרובה' :
+                question.type === 'fill_blank' ? 'השלמת מילה' :
+                question.type === 'translate' ? 'תרגום לעברית' : 'כתיבה חופשית'}
               </div>
               
-              {question.type === 'translate' && (
-                <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
+              {question.type === 'translate' &&
+              <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
                   {question.englishWord}
                 </div>
-              )}
+              }
               
               <h2 className="text-xl font-bold text-gray-900 text-center">{question.question}</h2>
             </div>
 
-            {!showResult ? (
+            {!showResult ?
+            <div className="space-y-3">
+                {question.type === 'multiple_choice' || question.type === 'translate' ?
               <div className="space-y-3">
-                {(question.type === 'multiple_choice' || question.type === 'translate') ? (
-                  <div className="space-y-3">
-                    {question.options.map((option, idx) => {
-                      const isSelected = userAnswer === option;
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => setUserAnswer(option)}
-                          className={`w-full bg-white rounded-2xl p-4 text-center border-2 transition-all ${
-                            isSelected 
-                              ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
-                              : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
-                          }`}
-                          dir={question.type === 'translate' ? 'rtl' : 'ltr'}
-                        >
-                          <span className="text-lg font-medium text-gray-900">{option}</span>
-                        </button>
-                      );
-                    })}
-                    {userAnswer && (
-                      <Button
-                        onClick={() => handleSubmit(userAnswer)}
-                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4"
-                      >
-                        אשר תשובה
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
+                    {question.options.map((option, idx) =>
+                <button
+                  key={idx}
+                  onClick={() => handleSubmit(option)}
+                  className="w-full bg-white rounded-2xl p-4 text-center border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all"
+                  dir={question.type === 'translate' ? 'rtl' : 'ltr'}>
+
+                        <span className="text-lg font-medium text-gray-900">{option}</span>
+                      </button>
+                )}
+                  </div> :
+
+              <div className="space-y-4">
                     <Input
-                      value={userAnswer}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      placeholder="הקלד את התשובה..."
-                      className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-400"
-                      dir="ltr"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && userAnswer.trim()) {
-                          handleSubmit();
-                        }
-                      }}
-                    />
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="הקלד את התשובה..."
+                  className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-400"
+                  dir="ltr"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && userAnswer.trim()) {
+                      handleSubmit();
+                    }
+                  }} />
+
                     <Button
-                      onClick={() => handleSubmit()}
-                      disabled={!userAnswer.trim()}
-                      className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
-                    >
+                  onClick={() => handleSubmit()}
+                  disabled={!userAnswer.trim()}
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+
                       בדוק תשובה
                     </Button>
                   </div>
-                )}
-              </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
-              >
+              }
+              </div> :
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4">
+
                 <div className={`rounded-2xl p-5 ${isCorrect ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'}`}>
                   <div className="flex items-center justify-center gap-2 mb-3">
-                    {isCorrect ? (
-                      <Check className="w-6 h-6 text-green-600" />
-                    ) : (
-                      <X className="w-6 h-6 text-red-500" />
-                    )}
+                    {isCorrect ?
+                  <Check className="w-6 h-6 text-green-600" /> :
+
+                  <X className="w-6 h-6 text-red-500" />
+                  }
                     <span className={`text-xl font-bold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
                       {isCorrect ? 'נכון!' : 'לא נכון'}
                     </span>
@@ -611,53 +596,53 @@ export default function VocabularyQuickPracticePage() {
                       <div className="text-xl font-bold text-gray-900 flex items-center justify-center gap-2" dir="ltr">
                         {question.correctAnswer}
                         {/* Audio button */}
-                        {(question.word.audio?.english_audio_url || question.word.audio_url) && (
-                          <button
-                            onClick={() => {
-                              const audio = new Audio(question.word.audio?.english_audio_url || question.word.audio_url);
-                              audio.play();
-                            }}
-                            className="p-1.5 rounded-full bg-blue-50 hover:bg-blue-100"
-                          >
+                        {(question.word.audio?.english_audio_url || question.word.audio_url) &&
+                      <button
+                        onClick={() => {
+                          const audio = new Audio(question.word.audio?.english_audio_url || question.word.audio_url);
+                          audio.play();
+                        }}
+                        className="p-1.5 rounded-full bg-blue-50 hover:bg-blue-100">
+
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                             </svg>
                           </button>
-                        )}
+                      }
                       </div>
                     </div>
 
                     {/* Example sentence for wrong answers */}
-                    {!isCorrect && question.word.example_sentence && (
-                      <div className="text-sm text-gray-600 text-center border-t pt-3" dir="ltr">
+                    {!isCorrect && question.word.example_sentence &&
+                  <div className="text-sm text-gray-600 text-center border-t pt-3" dir="ltr">
                         <span className="text-gray-400">דוגמה: </span>
                         "{question.word.example_sentence}"
                       </div>
-                    )}
+                  }
 
                     {/* Synonyms hint for wrong answers */}
-                    {!isCorrect && question.word.synonyms && question.word.synonyms.length > 0 && (
-                      <div className="flex flex-wrap gap-1 justify-center border-t pt-3">
+                    {!isCorrect && question.word.synonyms && question.word.synonyms.length > 0 &&
+                  <div className="flex flex-wrap gap-1 justify-center border-t pt-3">
                         <span className="text-xs text-gray-400">נרדפות:</span>
-                        {question.word.synonyms.slice(0, 2).map((syn, i) => (
-                          <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
-                        ))}
-                      </div>
+                        {question.word.synonyms.slice(0, 2).map((syn, i) =>
+                    <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
                     )}
+                      </div>
+                  }
                   </div>
                 </div>
 
                 <Button
-                  onClick={handleNext}
-                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
-                >
+                onClick={handleNext}
+                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+
                   {currentIndex < questions.length - 1 ? 'לשאלה הבאה' : 'סיים'}
                 </Button>
               </motion.div>
-            )}
+            }
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>
-  );
+    </div>);
+
 }
