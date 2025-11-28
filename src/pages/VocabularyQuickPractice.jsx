@@ -162,7 +162,22 @@ export default function VocabularyQuickPracticePage() {
       if (rand < 3) {
         // Multiple choice - Hebrew to English
         const distractors = getDistractors(word, 3);
-        const options = [word.english_answer, ...distractors].sort(() => Math.random() - 0.5);
+        // Make sure we have 4 options total (correct + 3 distractors)
+        // If not enough distractors, add fallback options
+        let finalDistractors = [...distractors];
+        const fallbackOptions = ['walk', 'jump', 'swim', 'read', 'write', 'speak', 'listen', 'think', 'make', 'take'];
+        while (finalDistractors.length < 3) {
+          const fallback = fallbackOptions.find(f => 
+            f.toLowerCase() !== word.english_answer.toLowerCase() && 
+            !finalDistractors.includes(f)
+          );
+          if (fallback) {
+            finalDistractors.push(fallback);
+            fallbackOptions.splice(fallbackOptions.indexOf(fallback), 1);
+          } else break;
+        }
+        
+        const options = [word.english_answer, ...finalDistractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'multiple_choice',
@@ -184,7 +199,21 @@ export default function VocabularyQuickPracticePage() {
       } else {
         // Translate - English to Hebrew (multiple choice)
         const distractors = getHebrewDistractors(word, 3);
-        const options = [word.hebrew_word, ...distractors].sort(() => Math.random() - 0.5);
+        // Fallback Hebrew options
+        let finalDistractors = [...distractors];
+        const fallbackHebrew = ['ללכת', 'לקפוץ', 'לשחות', 'לקרוא', 'לכתוב', 'לדבר', 'להקשיב', 'לחשוב', 'לעשות', 'לקחת'];
+        while (finalDistractors.length < 3) {
+          const fallback = fallbackHebrew.find(f => 
+            f !== word.hebrew_word && 
+            !finalDistractors.includes(f)
+          );
+          if (fallback) {
+            finalDistractors.push(fallback);
+            fallbackHebrew.splice(fallbackHebrew.indexOf(fallback), 1);
+          } else break;
+        }
+        
+        const options = [word.hebrew_word, ...finalDistractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'translate',
