@@ -641,28 +641,37 @@ export default function VocabularySetsPage() {
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
               <Button
+                onClick={() => setShowCSVImportDialog(true)}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+              >
+                <Upload className="w-5 h-5" />
+                ייבוא CSV
+              </Button>
+              <Button
                 onClick={() => setShowBulkAddDialog(true)}
                 className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                הוסף מילים
+                הוסף JSON
               </Button>
+            </div>
+            <div className="flex gap-2">
               <Button
                 onClick={openManageDialog}
                 variant="outline"
-                className="flex-1 border-2 border-purple-300 text-purple-600 h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+                className="flex-1 border-2 border-purple-300 text-purple-600 h-10 font-bold rounded-xl flex items-center justify-center gap-2"
               >
                 <Edit className="w-5 h-5" />
                 סדר מילים
               </Button>
+              <Button
+                onClick={exportWordsAsJSON}
+                variant="outline"
+                className="flex-1 border-2 border-green-300 text-green-600 h-10 font-bold rounded-xl flex items-center justify-center gap-2"
+              >
+                📥 ייצוא
+              </Button>
             </div>
-            <Button
-              onClick={exportWordsAsJSON}
-              variant="outline"
-              className="w-full border-2 border-green-300 text-green-600 h-10 font-bold rounded-xl flex items-center justify-center gap-2"
-            >
-              📥 ייצא רשימת מילים (JSON)
-            </Button>
           </div>
         )}
 
