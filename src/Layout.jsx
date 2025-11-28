@@ -23,7 +23,10 @@ function LayoutContent({ children, currentPageName }) {
     'ExtendedReading',
     'Onboarding',
     'SubjectSelection',
-    'CustomWeakExam'
+    'CustomWeakExam',
+    'VocabularyFlashcards',
+    'VocabularyQuickPractice',
+    'VocabularyTraining'
   ].includes(currentPageName);
   
   useEffect(() => {
