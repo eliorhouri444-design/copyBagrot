@@ -256,7 +256,9 @@ export default function VocabularyQuickPracticePage() {
   }
 
   if (showSummary) {
-    const accuracy = questions.length > 0 ? Math.round((results.correct / questions.length) * 100) : 0;
+    const totalQuestions = questions.length || 1;
+    const correctCount = results.correct || 0;
+    const accuracy = Math.round((correctCount / totalQuestions) * 100);
     const wrongQuestions = answeredQuestions.filter(q => !q.isCorrect);
     const correctQuestions = answeredQuestions.filter(q => q.isCorrect);
     const nextSetId = getNextSetId();
@@ -275,15 +277,15 @@ export default function VocabularyQuickPracticePage() {
 
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-gray-50 rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold text-gray-900">{questions.length}</div>
+              <div className="text-2xl font-bold text-gray-900">{totalQuestions}</div>
               <div className="text-xs text-gray-500">שאלות</div>
             </div>
             <div className="bg-green-50 rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold text-green-600">{results.correct}</div>
+              <div className="text-2xl font-bold text-green-600">{correctCount}</div>
               <div className="text-xs text-gray-500">נכון</div>
             </div>
             <div className="bg-red-50 rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold text-red-600">{results.incorrect}</div>
+              <div className="text-2xl font-bold text-red-600">{results.incorrect || 0}</div>
               <div className="text-xs text-gray-500">שגוי</div>
             </div>
           </div>
@@ -291,10 +293,10 @@ export default function VocabularyQuickPracticePage() {
           {/* Mastered words */}
           {correctQuestions.length > 0 && (
             <div className="mb-4">
-              <div className="text-sm text-gray-500 mb-2">מילים שנשלטו:</div>
-              <div className="flex flex-wrap gap-1">
+              <div className="text-sm text-gray-600 mb-2 font-medium">מילים שנשלטו:</div>
+              <div className="flex flex-wrap gap-1.5">
                 {correctQuestions.slice(0, 6).map((q, idx) => (
-                  <span key={idx} className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs">
+                  <span key={idx} className="bg-green-100 text-green-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
                     {q.word.english_answer}
                   </span>
                 ))}
@@ -305,10 +307,10 @@ export default function VocabularyQuickPracticePage() {
           {/* Words to review */}
           {wrongQuestions.length > 0 && (
             <div className="mb-6">
-              <div className="text-sm text-gray-500 mb-2">מילים לחזרה:</div>
-              <div className="flex flex-wrap gap-1">
+              <div className="text-sm text-gray-600 mb-2 font-medium">מילים לחזרה:</div>
+              <div className="flex flex-wrap gap-1.5">
                 {wrongQuestions.map((q, idx) => (
-                  <span key={idx} className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs">
+                  <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
                     {q.word.english_answer}
                   </span>
                 ))}
@@ -316,15 +318,15 @@ export default function VocabularyQuickPracticePage() {
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {/* Main CTA - Next set */}
             {nextSetId && (
               <Button
                 onClick={goToNextSet}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-bold"
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
               >
                 המשך לסט הבא
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-5 h-5 mr-2" />
               </Button>
             )}
 
@@ -339,7 +341,7 @@ export default function VocabularyQuickPracticePage() {
                   }
                 }}
                 variant="outline"
-                className="w-full h-11 text-sm font-semibold border-2"
+                className="w-full h-12 text-base font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50"
               >
                 {!user?.is_premium && <Crown className="w-4 h-4 ml-2 text-amber-500" />}
                 חזרה על טעויות
@@ -347,7 +349,7 @@ export default function VocabularyQuickPracticePage() {
             )}
 
             {/* Refresh set */}
-            <Button
+            <button
               onClick={() => {
                 setCurrentIndex(0);
                 setUserAnswer('');
@@ -357,16 +359,15 @@ export default function VocabularyQuickPracticePage() {
                 setShowSummary(false);
                 loadData();
               }}
-              variant="ghost"
-              className="w-full h-10 text-sm"
+              className="w-full h-12 text-lg font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50 flex items-center justify-center gap-2"
             >
-              <RotateCcw className="w-4 h-4 ml-2" />
+              <RotateCcw className="w-5 h-5" />
               רענן את הסט
-            </Button>
+            </button>
 
             <button
               onClick={() => navigate(createPageUrl("VocabularySets"))}
-              className="w-full text-gray-500 text-sm hover:text-gray-700 py-2"
+              className="w-full text-[#0A2540] text-lg font-medium hover:text-gray-700 py-3 mb-10"
             >
               חזרה לנושאים
             </button>
