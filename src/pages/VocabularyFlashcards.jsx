@@ -403,7 +403,7 @@ ${baseStyle}`;
         <span className="text-sm font-semibold text-blue-600">
           שאלה {currentIndex + 1} מתוך {words.length}
         </span>
-        <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+        <div className="w-10" />
       </div>
       
       {/* Progress Bar */}
