@@ -70,6 +70,7 @@ import VocabularySets from './pages/VocabularySets';
 import VocabularySetMode from './pages/VocabularySetMode';
 import VocabularyFlashcards from './pages/VocabularyFlashcards';
 import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
+import VocabularyStrengthen from './pages/VocabularyStrengthen';
 import __Layout from './Layout.jsx';
 
 
@@ -146,6 +147,7 @@ export const PAGES = {
     "VocabularySetMode": VocabularySetMode,
     "VocabularyFlashcards": VocabularyFlashcards,
     "VocabularyQuickPractice": VocabularyQuickPractice,
+    "VocabularyStrengthen": VocabularyStrengthen,
 }
 
 export const pagesConfig = {

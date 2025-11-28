@@ -407,6 +407,19 @@ export default function VocabularySetsPage() {
           )}
         </div>
 
+        {/* Strengthen Weak Words Button */}
+        {Object.values(progress).filter(p => p.is_weak).length > 0 && (
+          <Button
+            onClick={() => navigate(createPageUrl("VocabularyStrengthen"))}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white h-14 font-bold rounded-xl flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            חזק {Object.values(progress).filter(p => p.is_weak).length} מילים חלשות
+          </Button>
+        )}
+
         {/* Premium Banner */}
         {!user?.is_premium && sets.length > 3 && (
           <div className="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl p-4 text-white">

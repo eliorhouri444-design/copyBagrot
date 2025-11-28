@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 
+// מצב 2 - מבחן אוצר מילים - בחירה מרובה, השלמה, כתיבה חופשית
+
 export default function VocabularyQuickPracticePage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
@@ -383,10 +385,10 @@ export default function VocabularyQuickPracticePage() {
             </div>
           )}
 
-          {/* Words to review */}
+          {/* Words to review - link to strengthen mode */}
           {wrongQuestions.length > 0 && (
             <div className="mb-6">
-              <div className="text-sm text-gray-600 mb-2 font-medium">מילים לחזרה:</div>
+              <div className="text-sm text-gray-600 mb-2 font-medium">מילים לחיזוק:</div>
               <div className="flex flex-wrap gap-1.5">
                 {wrongQuestions.map((q, idx) => (
                   <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-2xl text-xs font-medium">

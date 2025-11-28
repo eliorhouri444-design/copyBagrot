@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 
+// מצב 1 - FLASHCARDS בלבד - לימוד נקי ללא שאלות
+
 export default function VocabularyFlashcardsPage() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
@@ -129,7 +131,7 @@ export default function VocabularyFlashcardsPage() {
     return { text: "צריך לתרגל עוד, אל תוותר!", color: "text-red-600" };
   };
 
-  // Auto-continue to quiz
+  // Auto-continue to quiz after 2 seconds
   useEffect(() => {
     if (showSummary) {
       sessionStorage.setItem('flashcardResults', JSON.stringify(answeredWords));
@@ -142,7 +144,7 @@ export default function VocabularyFlashcardsPage() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [showSummary]);
+  }, [showSummary, answeredWords, isMultiSet, setsParam, setId, startIndex, endIndex, navigate]);
 
   if (isLoading) {
     return (
