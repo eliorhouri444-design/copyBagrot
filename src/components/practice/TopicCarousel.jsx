@@ -421,13 +421,30 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
       {/* Vocabulary Set Selector Dialog */}
       <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
-        <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
+        <DialogContent className="sm:max-w-md max-h-[85vh]" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="text-center text-lg font-bold">
-              בחר סט ({vocabularySets.length} סטים)
+            <DialogTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
+              <BookOpen className="w-6 h-6 text-blue-600" />
+              בחר סט לתרגול
             </DialogTitle>
           </DialogHeader>
-          <div className="overflow-y-auto max-h-[60vh] py-2">
+          
+          {/* Stats Summary */}
+          <div className="bg-blue-50 rounded-xl p-3 border border-blue-200 mb-2">
+            <div className="flex items-center justify-between">
+              <div className="text-center flex-1">
+                <div className="text-2xl font-bold text-blue-600">{vocabularySets.length}</div>
+                <div className="text-xs text-gray-600">סטים</div>
+              </div>
+              <div className="w-px h-8 bg-blue-200" />
+              <div className="text-center flex-1">
+                <div className="text-2xl font-bold text-blue-600">{vocabularySets.length * 10}</div>
+                <div className="text-xs text-gray-600">מילים</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-y-auto max-h-[50vh] py-2">
             <div className="space-y-2">
               {vocabularySets.map(set => (
                 <button
@@ -436,22 +453,30 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     setShowVocabSetSelector(false);
                     navigate(createPageUrl(`VocabularyFlashcards?setId=${set.set_number}&start=${set.startIndex}&end=${set.endIndex}`));
                   }}
-                  className="w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all border-gray-100 hover:border-blue-300 bg-white"
+                  className="w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all border-gray-200 hover:border-blue-400 hover:bg-blue-50 bg-white"
                 >
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold bg-blue-100 text-blue-600">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold bg-blue-100 text-blue-600">
                     {set.set_number}
                   </div>
                   <div className="text-right flex-1">
-                    <div className="font-bold text-gray-900 text-sm">סט {set.set_number}</div>
-                    <div className="text-xs text-gray-500">
-                      {set.words?.length || 10} מילים
+                    <div className="font-bold text-gray-900">סט {set.set_number}</div>
+                    <div className="text-sm text-blue-600">
+                      מילים {set.startIndex + 1} - {set.endIndex}
                     </div>
                   </div>
-                  <ChevronLeft className="w-4 h-4 text-gray-400" />
+                  <ChevronLeft className="w-5 h-5 text-blue-400" />
                 </button>
               ))}
             </div>
           </div>
+
+          <Button
+            variant="ghost"
+            onClick={() => setShowVocabSetSelector(false)}
+            className="w-full text-gray-500 mt-2"
+          >
+            ביטול
+          </Button>
         </DialogContent>
       </Dialog>
     </div>);
