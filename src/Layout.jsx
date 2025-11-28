@@ -49,7 +49,7 @@ function LayoutContent({ children, currentPageName }) {
   const navItems = [
     { name: "StudyPlan", icon: TrendingUp, path: createPageUrl("StudyPlan"), label: "התוכנית", color: "#EC4899" },
     { name: "Practice", icon: BookOpen, path: createPageUrl("Practice"), label: "תרגול", color: "#8B5CF6" },
-    { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#3B82F6" },
+    { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#2086b1" },
     { name: "Exams", icon: FileCheck, path: createPageUrl("Exams"), label: "בגרויות", color: "#10B981" },
     { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }
   ];
@@ -63,7 +63,7 @@ function LayoutContent({ children, currentPageName }) {
       <style>
         {`
           :root {
-            --primary-blue: #3B82F6;
+            --primary-blue: #2086b1;
             --primary-blue-light: #60A5FA;
             --accent-blue: #93C5FD;
             --primary-purple: #8B5CF6;
@@ -137,7 +137,7 @@ function LayoutContent({ children, currentPageName }) {
             font-size: 2rem !important;
             line-height: 1.2 !important;
             font-weight: 700 !important;
-            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%) !important;
+            background: linear-gradient(135deg, #2086b1 0%, #8B5CF6 100%) !important;
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             background-clip: text !important;
@@ -210,7 +210,7 @@ function LayoutContent({ children, currentPageName }) {
           }
           
           .base44-auth-form button[type="submit"] {
-            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%) !important;
+            background: linear-gradient(135deg, #2086b1 0%, #8B5CF6 100%) !important;
             font-weight: 600 !important;
             height: 48px !important;
           }
@@ -229,7 +229,7 @@ function LayoutContent({ children, currentPageName }) {
           
           .base44-auth-link::after {
             font-size: 0.875rem !important;
-            color: #3B82F6 !important;
+            color: #2086b1 !important;
             display: inline !important;
           }
           
@@ -275,8 +275,8 @@ function LayoutContent({ children, currentPageName }) {
                   to={item.path}
                   className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
                     isActive 
-                      ? 'text-[#3B82F6]' 
-                      : 'text-gray-500 hover:text-[#3B82F6]'
+                      ? 'text-[#2086b1]' 
+                      : 'text-gray-500 hover:text-[#2086b1]'
                   }`}
                 >
                   <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
@@ -285,7 +285,7 @@ function LayoutContent({ children, currentPageName }) {
                   </span>
                   {isActive && (
                     <div 
-                      className="absolute bottom-0 w-8 h-1 rounded-t-full bg-[#3B82F6]"
+                      className="absolute bottom-0 w-8 h-1 rounded-t-full bg-[#2086b1]"
                     />
                   )}
                 </Link>

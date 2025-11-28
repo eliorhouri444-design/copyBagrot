@@ -437,7 +437,7 @@ export default function VocabularyQuickPracticePage() {
             {nextSetId &&
             <Button
               onClick={goToNextSet}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+              className="w-full h-12 bg-[#2086b1] hover:bg-blue-700 text-lg font-bold rounded-2xl">
 
                 המשך לסט הבא
                 <ArrowLeft className="w-5 h-5 mr-2" />
@@ -526,7 +526,7 @@ export default function VocabularyQuickPracticePage() {
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 h-2.5">
         <div
-          className="bg-blue-600 h-2.5 transition-all duration-300"
+          className="bg-[#2086b1] h-2.5 transition-all duration-300"
           style={{ width: `${progress}%` }} />
 
       </div>
@@ -589,7 +589,7 @@ export default function VocabularyQuickPracticePage() {
                     {userAnswer && (
                       <Button
                         onClick={() => handleSubmit(userAnswer)}
-                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4"
+                        className="w-full h-14 bg-[#2086b1] hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4"
                       >
                         אשר תשובה
                       </Button>
@@ -617,7 +617,7 @@ export default function VocabularyQuickPracticePage() {
                     <Button
                   onClick={() => handleSubmit()}
                   disabled={!userAnswer.trim()}
-                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+                  className="w-full h-14 bg-[#2086b1] hover:bg-blue-700 text-lg font-bold rounded-2xl">
 
                       בדוק תשובה
                     </Button>
@@ -689,7 +689,7 @@ export default function VocabularyQuickPracticePage() {
 
                 <Button
                 onClick={handleNext}
-                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
+                className="w-full h-14 bg-[#2086b1] hover:bg-blue-700 text-lg font-bold rounded-2xl">
 
                   {currentIndex < questions.length - 1 ? 'לשאלה הבאה' : 'סיים'}
                 </Button>

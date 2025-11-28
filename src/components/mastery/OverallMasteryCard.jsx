@@ -33,7 +33,7 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
       className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
       {/* מד מוכנות כללי */}
-      <div className="bg-[#3B82F6] text-white p-4">
+      <div className="bg-[#2086b1] text-white p-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -122,12 +122,12 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
             className="bg-blue-50 p-3 rounded-xl border border-blue-200">
 
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#2086b1] rounded-lg flex items-center justify-center">
                 <FileText className="w-4 h-4 text-white" />
               </div>
               <div>
                 <div className="text-[10px] text-gray-600">בגרויות</div>
-                <div className="text-lg font-bold text-[#3B82F6]">{examsMastery}%</div>
+                <div className="text-lg font-bold text-[#2086b1]">{examsMastery}%</div>
               </div>
             </div>
             <div className="bg-blue-200 rounded-full h-1.5 overflow-hidden">
@@ -135,7 +135,7 @@ export default function OverallMasteryCard({ overallMastery, isLoading }) {
                 initial={{ width: 0 }}
                 animate={{ width: `${examsMastery}%` }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="h-full bg-[#3B82F6] rounded-full" />
+                className="h-full bg-[#2086b1] rounded-full" />
 
             </div>
           </motion.div>
