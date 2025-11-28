@@ -1075,6 +1075,114 @@ export default function VocabularySetsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* CSV Import Dialog */}
+      <Dialog open={showCSVImportDialog} onOpenChange={setShowCSVImportDialog}>
+        <DialogContent dir="rtl" className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-green-600" />
+              ייבוא מילים מקובץ CSV
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Format Instructions */}
+            <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+              <div className="text-sm font-bold text-green-900 mb-2">📋 פורמט הקובץ הנדרש:</div>
+              <div className="text-xs text-green-800 space-y-1">
+                <p>שורה ראשונה (כותרות):</p>
+                <code className="block bg-white rounded p-2 text-xs overflow-x-auto" dir="ltr">
+                  hebrew_word,english_answer,example_sentence,example_sentence_he,part_of_speech,image_url,english_audio_url,hebrew_audio_url
+                </code>
+                <p className="mt-2">שדות חובה: <strong>hebrew_word, english_answer</strong></p>
+                <p>שאר השדות אופציונליים</p>
+              </div>
+            </div>
+
+            {/* Features List */}
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <div className="text-sm font-bold text-blue-900 mb-2">✨ מה המערכת עושה:</div>
+              <ul className="text-xs text-blue-800 space-y-1">
+                <li>✓ מזהה ומדלגת על כפילויות אוטומטית</li>
+                <li>✓ תומכת ב-100 עד 5,000+ מילים</li>
+                <li>✓ יוצרת שאלות לכל סוגי התרגול (בחירה, כתיבה, הפוך)</li>
+                <li>✓ ממיינת לסטים של 10 מילים</li>
+                <li>✓ תומכת ב-3, 4, 5 יחידות</li>
+              </ul>
+            </div>
+
+            {/* File Upload */}
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setCsvFile(e.target.files[0])}
+                className="hidden"
+                id="csv-upload"
+              />
+              <label htmlFor="csv-upload" className="cursor-pointer">
+                {csvFile ? (
+                  <div className="space-y-2">
+                    <FileSpreadsheet className="w-12 h-12 mx-auto text-green-600" />
+                    <p className="text-sm font-semibold text-gray-900">{csvFile.name}</p>
+                    <p className="text-xs text-gray-500">לחץ לבחירת קובץ אחר</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Upload className="w-12 h-12 mx-auto text-gray-400" />
+                    <p className="text-sm font-semibold text-gray-700">לחץ לבחירת קובץ CSV</p>
+                    <p className="text-xs text-gray-500">או גרור לכאן</p>
+                  </div>
+                )}
+              </label>
+            </div>
+
+            {/* Progress */}
+            {isImporting && (
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-center gap-3 mb-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-900">{importProgress.status}</span>
+                </div>
+                {importProgress.total > 0 && (
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowCSVImportDialog(false);
+                setCsvFile(null);
+              }}
+              disabled={isImporting}
+            >
+              ביטול
+            </Button>
+            <Button
+              onClick={handleCSVImport}
+              disabled={!csvFile || isImporting}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isImporting ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
+              התחל ייבוא
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk Add Dialog */}
       <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
         <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
