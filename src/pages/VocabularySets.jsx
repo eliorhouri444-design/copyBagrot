@@ -392,6 +392,175 @@ export default function VocabularySetsPage() {
     }
   };
 
+  // CSV Import Handler
+  const handleCSVImport = async () => {
+    if (!csvFile) {
+      alert('יש לבחור קובץ CSV');
+      return;
+    }
+
+    setIsImporting(true);
+    setImportProgress({ current: 0, total: 0, status: 'קורא קובץ...' });
+
+    try {
+      const text = await csvFile.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        alert('הקובץ ריק או לא תקין');
+        setIsImporting(false);
+        return;
+      }
+
+      // Parse header
+      const header = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+      const headerMap = {};
+      header.forEach((h, idx) => {
+        headerMap[h] = idx;
+      });
+
+      // Validate required columns
+      if (headerMap['hebrew_word'] === undefined || headerMap['english_answer'] === undefined) {
+        alert('הקובץ חייב להכיל עמודות hebrew_word ו-english_answer');
+        setIsImporting(false);
+        return;
+      }
+
+      // Build existing words lookup for duplicate detection
+      const existingEnglish = new Set(words.map(w => w.english_answer.toLowerCase().trim()));
+      const existingHebrew = new Set(words.map(w => w.hebrew_word.trim()));
+
+      const wordsToAdd = [];
+      let duplicatesSkipped = 0;
+      let currentOrder = words.length;
+
+      setImportProgress({ current: 0, total: lines.length - 1, status: 'מעבד שורות...' });
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Parse CSV line (handle quoted values)
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        for (const char of line) {
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim());
+
+        const getValue = (colName) => {
+          const idx = headerMap[colName];
+          return idx !== undefined ? (values[idx] || '').replace(/^"|"$/g, '').trim() : '';
+        };
+
+        const hebrewWord = getValue('hebrew_word');
+        const englishAnswer = getValue('english_answer');
+
+        if (!hebrewWord || !englishAnswer) continue;
+
+        // Check for duplicates
+        const englishLower = englishAnswer.toLowerCase();
+        if (existingEnglish.has(englishLower) || existingHebrew.has(hebrewWord)) {
+          duplicatesSkipped++;
+          continue;
+        }
+
+        // Add to lookup to prevent duplicates within the same upload
+        existingEnglish.add(englishLower);
+        existingHebrew.add(hebrewWord);
+
+        const newWord = {
+          subject_id: displaySubject,
+          unit_level: displayUnits,
+          hebrew_word: hebrewWord,
+          english_answer: englishAnswer,
+          category: 'כללי',
+          example_sentence: getValue('example_sentence'),
+          example_sentence_he: getValue('example_sentence_he'),
+          acceptable_answers: [],
+          synonyms: [],
+          antonyms: [],
+          part_of_speech: getValue('part_of_speech'),
+          difficulty: 1,
+          cefr_level: '',
+          phonetic: '',
+          audio: {
+            english_audio_url: getValue('english_audio_url'),
+            hebrew_audio_url: getValue('hebrew_audio_url')
+          },
+          image_url: getValue('image_url'),
+          collocations: [],
+          context_sentences: [],
+          tags: [],
+          is_active: true,
+          order: currentOrder++,
+          // Enable all question types
+          advanced_quiz: {
+            question_types: ['multiple_choice', 'fill_blank', 'context', 'matching', 'spelling']
+          }
+        };
+
+        wordsToAdd.push(newWord);
+        setImportProgress({ current: i, total: lines.length - 1, status: `מעבד שורה ${i}/${lines.length - 1}` });
+      }
+
+      if (wordsToAdd.length === 0) {
+        if (duplicatesSkipped > 0) {
+          alert(`❌ כל ${duplicatesSkipped} המילים כבר קיימות במאגר.`);
+        } else {
+          alert('לא נמצאו מילים תקינות בקובץ.');
+        }
+        setIsImporting(false);
+        return;
+      }
+
+      // Bulk create in batches
+      const batchSize = 50;
+      let totalAdded = 0;
+
+      setImportProgress({ current: 0, total: wordsToAdd.length, status: 'שומר למאגר...' });
+
+      for (let i = 0; i < wordsToAdd.length; i += batchSize) {
+        const batch = wordsToAdd.slice(i, i + batchSize);
+        await base44.entities.VocabularyQuestion.bulkCreate(batch);
+        totalAdded += batch.length;
+        setImportProgress({ 
+          current: totalAdded, 
+          total: wordsToAdd.length, 
+          status: `נשמרו ${totalAdded}/${wordsToAdd.length} מילים...` 
+        });
+      }
+
+      const newSetsCount = Math.ceil(totalAdded / 10);
+
+      setShowCSVImportDialog(false);
+      setCsvFile(null);
+      setImportProgress({ current: 0, total: 0, status: '' });
+      loadData();
+
+      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`;
+      if (duplicatesSkipped > 0) {
+        message += `\n\n⚠️ ${duplicatesSkipped} מילים כפולות לא נוספו`;
+      }
+      message += `\n\n🎯 כל המילים זמינות לתרגול:\n• בחירה מרובה\n• כתיבה חופשית\n• תרגום הפוך`;
+      alert(message);
+
+    } catch (error) {
+      console.error("Error importing CSV:", error);
+      alert('שגיאה בייבוא הקובץ: ' + error.message);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
