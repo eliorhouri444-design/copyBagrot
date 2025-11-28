@@ -292,10 +292,13 @@ ${baseStyle}`;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>);
-
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600 mx-auto mb-3" />
+          <p className="text-gray-600 font-medium">טוען כרטיסיות...</p>
+        </div>
+      </div>
+    );
   }
 
   if (showSummary) {
@@ -379,43 +382,51 @@ ${baseStyle}`;
 
   if (!currentWord) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">אין מילים זמינות</p>
-          <Button onClick={() => navigate(createPageUrl("VocabularySets"))}>
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
+        <div className="text-center bg-white rounded-2xl p-8 shadow-lg">
+          <p className="text-gray-600 mb-4 font-medium">אין מילים זמינות</p>
+          <Button 
+            onClick={() => navigate(createPageUrl("VocabularySets"))}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             חזור
           </Button>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-blue-50 flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
+      <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("VocabularySets"))}
-          className="p-2 -ml-2 text-gray-500">
-
-          <ChevronLeft className="w-5 h-5" />
+          className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
+        >
+          <ChevronLeft className="w-6 h-6" />
         </button>
-        <span className="text-sm font-semibold text-blue-600">
-          שאלה {currentIndex + 1} מתוך {words.length}
-        </span>
-        <div className="w-10" />
+        <div className="text-center">
+          <span className="text-sm font-bold text-white">כרטיסיות</span>
+          <div className="text-xs text-white/80">
+            {currentIndex + 1} מתוך {words.length}
+          </div>
+        </div>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <span className="text-sm font-bold text-white">{Math.round(progress)}%</span>
+        </div>
       </div>
       
       {/* Progress Bar */}
-      <div className="w-full bg-gray-200 h-2.5">
+      <div className="w-full bg-blue-400 h-2">
         <div
-          className="bg-blue-600 h-2.5 transition-all duration-300"
-          style={{ width: `${progress}%` }} />
-
+          className="bg-white h-2 transition-all duration-300 rounded-r-full"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       {/* Card */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-5">
         <motion.div
           key={currentIndex}
           initial={{ opacity: 0 }}
@@ -600,21 +611,21 @@ ${baseStyle}`;
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mt-12">
+          <div className="flex gap-4 mt-8">
             <button
               onClick={() => handleAnswerWithFlip(true)}
-              className="flex-1 h-14 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-green-100 hover:border-green-300 transition-all">
-
-              <Check className="w-5 h-5 text-green-600" />
-              <span className="font-semibold">ידעתי</span>
+              className="flex-1 h-14 bg-green-500 hover:bg-green-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+            >
+              <Check className="w-6 h-6" />
+              <span className="font-bold text-lg">ידעתי</span>
             </button>
             
             <button
               onClick={() => handleAnswerWithFlip(false)}
-              className="flex-1 h-14 bg-red-50 border-2 border-red-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-red-100 hover:border-red-300 transition-all">
-
-              <X className="w-5 h-5 text-red-500" />
-              <span className="font-semibold">לא ידעתי</span>
+              className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+            >
+              <X className="w-6 h-6" />
+              <span className="font-bold text-lg">לא ידעתי</span>
             </button>
           </div>
         </motion.div>
