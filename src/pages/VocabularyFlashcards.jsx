@@ -76,7 +76,7 @@ export default function VocabularyFlashcardsPage() {
       unknown: prev.unknown + (isKnown ? 0 : 1)
     }));
 
-    // Update progress in database
+    // Update progress in database with streak tracking
     try {
       const existingProgress = await base44.entities.VocabularyProgress.filter({
         user_email: user.email,
@@ -85,14 +85,23 @@ export default function VocabularyFlashcardsPage() {
 
       if (existingProgress.length > 0) {
         const p = existingProgress[0];
+        // Calculate new streak - if correct, increment; if wrong, reset to 0
+        const newStreak = isKnown ? (p.streak || 0) + 1 : 0;
+        // Word is considered "mastered" if streak reaches 4-5
+        const isMastered = newStreak >= 4;
+        // Calculate mastery level based on streak
+        const masteryBoost = isKnown ? (newStreak >= 3 ? 15 : 10) : -20;
+        const newMastery = Math.min(100, Math.max(0, (p.mastery_level || 0) + masteryBoost));
+
         await base44.entities.VocabularyProgress.update(p.id, {
           times_seen: (p.times_seen || 0) + 1,
           times_correct: (p.times_correct || 0) + (isKnown ? 1 : 0),
           times_incorrect: (p.times_incorrect || 0) + (isKnown ? 0 : 1),
-          is_known: isKnown ? true : p.is_known,
-          is_weak: !isKnown ? true : false,
+          streak: newStreak,
+          is_known: isMastered || p.is_known,
+          is_weak: !isKnown ? true : (newStreak >= 2 ? false : p.is_weak),
           last_practiced: new Date().toISOString(),
-          mastery_level: Math.min(100, Math.max(0, (p.mastery_level || 0) + (isKnown ? 10 : -15)))
+          mastery_level: newMastery
         });
       } else {
         await base44.entities.VocabularyProgress.create({
@@ -105,7 +114,8 @@ export default function VocabularyFlashcardsPage() {
           times_seen: 1,
           times_correct: isKnown ? 1 : 0,
           times_incorrect: isKnown ? 0 : 1,
-          is_known: isKnown,
+          streak: isKnown ? 1 : 0,
+          is_known: false,
           is_weak: !isKnown,
           last_practiced: new Date().toISOString(),
           mastery_level: isKnown ? 20 : 0
@@ -156,22 +166,67 @@ export default function VocabularyFlashcardsPage() {
 
   if (showSummary) {
     const evaluation = getEvaluation();
+    const masteredWords = answeredWords.filter(w => w.isKnown);
+    const weakWords = answeredWords.filter(w => !w.isKnown);
 
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full text-center">
+          className="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full">
 
-          <div className="mb-4">
-            <div className="text-4xl font-bold text-gray-900">{results.known}/{words.length}</div>
-            <p className={`text-sm mt-2 ${evaluation.color}`}>{evaluation.text}</p>
+          <div className="text-center mb-6">
+            <div className="text-5xl font-bold text-gray-900">{results.known}/{words.length}</div>
+            <p className={`text-base mt-2 ${evaluation.color}`}>{evaluation.text}</p>
           </div>
-          
-          <div className="flex items-center justify-center gap-2 text-gray-500">
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-green-50 rounded-xl p-3 text-center">
+              <div className="text-2xl font-bold text-green-600">{masteredWords.length}</div>
+              <div className="text-xs text-green-700">ידעתי</div>
+            </div>
+            <div className="bg-red-50 rounded-xl p-3 text-center">
+              <div className="text-2xl font-bold text-red-600">{weakWords.length}</div>
+              <div className="text-xs text-red-700">לחיזוק</div>
+            </div>
+          </div>
+
+          {/* Mastered words with streak info */}
+          {masteredWords.length > 0 && (
+            <div className="mb-4">
+              <div className="text-sm font-semibold text-gray-700 mb-2">מילים שנשלטו:</div>
+              <div className="flex flex-wrap gap-1.5">
+                {masteredWords.slice(0, 8).map((w, idx) => (
+                  <span key={idx} className="bg-green-100 text-green-800 px-2 py-1 rounded-lg text-xs font-medium" dir="ltr">
+                    {w.english_answer}
+                  </span>
+                ))}
+                {masteredWords.length > 8 && (
+                  <span className="text-xs text-gray-500">+{masteredWords.length - 8}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Weak words */}
+          {weakWords.length > 0 && (
+            <div className="mb-6">
+              <div className="text-sm font-semibold text-gray-700 mb-2">לחיזוק:</div>
+              <div className="flex flex-wrap gap-1.5">
+                {weakWords.map((w, idx) => (
+                  <span key={idx} className="bg-red-100 text-red-800 px-2 py-1 rounded-lg text-xs font-medium" dir="ltr">
+                    {w.english_answer}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-2 text-blue-600 bg-blue-50 rounded-xl p-3">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">עובר לבוחן...</span>
+            <span className="text-sm font-medium">עובר לבוחן...</span>
           </div>
         </motion.div>
       </div>);
