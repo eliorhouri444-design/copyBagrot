@@ -26,7 +26,8 @@ function LayoutContent({ children, currentPageName }) {
     'CustomWeakExam',
     'VocabularyFlashcards',
     'VocabularyQuickPractice',
-    'VocabularyTraining'
+    'VocabularyTraining',
+    'VocabularyStrengthen'
   ].includes(currentPageName);
   
   useEffect(() => {

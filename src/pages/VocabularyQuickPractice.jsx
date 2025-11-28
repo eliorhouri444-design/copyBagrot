@@ -3,12 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft } from
+  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft, Volume2, BookOpen, Target, Trophy } from
 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { Progress } from "@/components/ui/progress";
 
 // מצב 2 - מבחן אוצר מילים - בחירה מרובה, השלמה, כתיבה חופשית
 
@@ -362,12 +361,27 @@ export default function VocabularyQuickPracticePage() {
     navigate(createPageUrl("VocabularySets"));
   };
 
+  // Text-to-Speech function
+  const speakWord = (text, lang = 'en-US') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.85;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>);
-
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600 mx-auto mb-3" />
+          <p className="text-gray-600 font-medium">טוען שאלות...</p>
+        </div>
+      </div>
+    );
   }
 
   if (showSummary) {
@@ -378,93 +392,112 @@ export default function VocabularyQuickPracticePage() {
     const correctQuestions = answeredQuestions.filter((q) => q.isCorrect);
     const nextSetId = getNextSetId();
 
+    const getEvaluation = () => {
+      if (accuracy >= 90) return { text: "מצוין! שליטה מושלמת!", icon: Trophy, color: "text-green-600", bg: "bg-green-50" };
+      if (accuracy >= 70) return { text: "יפה מאוד! כמעט שם!", icon: Target, color: "text-blue-600", bg: "bg-blue-50" };
+      if (accuracy >= 50) return { text: "בסדר, המשך לתרגל", icon: BookOpen, color: "text-orange-600", bg: "bg-orange-50" };
+      return { text: "צריך לחזור על החומר", icon: RotateCcw, color: "text-red-600", bg: "bg-red-50" };
+    };
+    const evaluation = getEvaluation();
+    const EvalIcon = evaluation.icon;
+
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }} className="bg-white pt-4 pr-6 pb-2 pl-6 rounded-2xl shadow-lg max-w-sm w-full">
-
-
-          <div className="text-center mb-6">
-            <div className="text-5xl font-bold text-gray-900 mb-1">{accuracy}%</div>
-            <p className="text-gray-500">ציון הסט</p>
+      <div className="min-h-screen bg-blue-50 pb-8">
+        {/* Header */}
+        <div className="bg-blue-600 px-5 py-6 rounded-b-3xl">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <EvalIcon className="w-10 h-10 text-white" />
+            </div>
+            <div className="text-5xl font-bold text-white mb-2">{accuracy}%</div>
+            <p className="text-white/90 text-lg font-medium">{evaluation.text}</p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+        <div className="px-5 py-6 space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-blue-100">
               <div className="text-2xl font-bold text-gray-900">{totalQuestions}</div>
-              <div className="text-xs text-gray-500">שאלות</div>
+              <div className="text-xs text-gray-500 font-medium">שאלות</div>
             </div>
-            <div className="bg-green-50 rounded-xl p-3 text-center">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-green-200">
               <div className="text-2xl font-bold text-green-600">{correctCount}</div>
-              <div className="text-xs text-gray-500">נכון</div>
+              <div className="text-xs text-gray-500 font-medium">נכון</div>
             </div>
-            <div className="bg-red-50 rounded-xl p-3 text-center">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-sm border border-red-200">
               <div className="text-2xl font-bold text-red-600">{results.incorrect || 0}</div>
-              <div className="text-xs text-gray-500">שגוי</div>
+              <div className="text-xs text-gray-500 font-medium">שגוי</div>
             </div>
           </div>
 
           {/* Mastered words */}
-          {correctQuestions.length > 0 &&
-          <div className="mb-4">
-              <div className="text-sm text-gray-600 mb-2 font-medium">מילים שנשלטו:</div>
-              <div className="flex flex-wrap gap-1.5">
-                {correctQuestions.slice(0, 6).map((q, idx) =>
-              <span key={idx} className="bg-green-100 text-green-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
+          {correctQuestions.length > 0 && (
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-blue-100">
+              <div className="text-sm text-gray-700 mb-3 font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600" />
+                מילים שנשלטו:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {correctQuestions.slice(0, 8).map((q, idx) => (
+                  <span key={idx} className="bg-green-100 text-green-800 px-3 py-1.5 rounded-xl text-sm font-medium" dir="ltr">
                     {q.word.english_answer}
                   </span>
-              )}
+                ))}
+                {correctQuestions.length > 8 && (
+                  <span className="text-sm text-gray-500">+{correctQuestions.length - 8}</span>
+                )}
               </div>
             </div>
-          }
+          )}
 
-          {/* Words to review - link to strengthen mode */}
-          {wrongQuestions.length > 0 &&
-          <div className="mb-6">
-              <div className="text-sm text-gray-600 mb-2 font-medium">מילים לחיזוק:</div>
-              <div className="flex flex-wrap gap-1.5">
-                {wrongQuestions.map((q, idx) =>
-              <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-2xl text-xs font-medium">
+          {/* Words to review */}
+          {wrongQuestions.length > 0 && (
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-red-200">
+              <div className="text-sm text-gray-700 mb-3 font-bold flex items-center gap-2">
+                <X className="w-4 h-4 text-red-500" />
+                מילים לחיזוק:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {wrongQuestions.map((q, idx) => (
+                  <span key={idx} className="bg-red-100 text-red-800 px-3 py-1.5 rounded-xl text-sm font-medium" dir="ltr">
                     {q.word.english_answer}
                   </span>
-              )}
+                ))}
               </div>
             </div>
-          }
+          )}
 
-          <div className="mx-1 my-2 pt-6 pr-1 pb-1 pl-1 py-1 space-y-3">
-            {/* Main CTA - Next set */}
-            {nextSetId &&
-            <Button
-              onClick={goToNextSet}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
-
+          {/* Action Buttons */}
+          <div className="space-y-3 pt-4">
+            {nextSetId && (
+              <Button
+                onClick={goToNextSet}
+                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl shadow-lg"
+              >
                 המשך לסט הבא
                 <ArrowLeft className="w-5 h-5 mr-2" />
               </Button>
-            }
+            )}
 
-            {/* Practice errors - Premium */}
-            {wrongQuestions.length > 0 &&
-            <Button
-              onClick={() => {
-                if (user?.is_premium) {
-                  practiceErrors();
-                } else {
-                  navigate(createPageUrl("Premium"));
-                }
-              }}
-              variant="outline"
-              className="w-full h-12 text-base font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50">
-
+            {wrongQuestions.length > 0 && (
+              <Button
+                onClick={() => {
+                  if (user?.is_premium) {
+                    practiceErrors();
+                  } else {
+                    navigate(createPageUrl("Premium"));
+                  }
+                }}
+                variant="outline"
+                className="w-full h-12 text-base font-bold border-2 border-orange-400 text-orange-600 rounded-2xl hover:bg-orange-50"
+              >
                 {!user?.is_premium && <Crown className="w-4 h-4 ml-2 text-amber-500" />}
-                חזרה על טעויות
+                תרגול טעויות
               </Button>
-            }
+            )}
 
-            {/* Refresh set */}
-            <button
+            <Button
               onClick={() => {
                 setCurrentIndex(0);
                 setUserAnswer('');
@@ -474,22 +507,24 @@ export default function VocabularyQuickPracticePage() {
                 setShowSummary(false);
                 loadData();
               }}
-              className="w-full h-12 text-lg font-semibold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50 flex items-center justify-center gap-2">
+              variant="outline"
+              className="w-full h-12 text-base font-bold border-2 border-blue-300 text-blue-600 rounded-2xl hover:bg-blue-50"
+            >
+              <RotateCcw className="w-5 h-5 ml-2" />
+              תרגל שוב
+            </Button>
 
-              <RotateCcw className="w-5 h-5" />
-              רענן את הסט
-            </button>
-
-            <button
-              onClick={() => navigate(createPageUrl("VocabularySets"))} className="text-[#0A2540] mb-10 py-1 text-lg font-medium w-full hover:text-gray-700">
-
-
-              חזרה לנושאים
-            </button>
+            <Button
+              variant="ghost"
+              onClick={() => navigate(createPageUrl("Practice"))}
+              className="w-full text-gray-500 font-medium"
+            >
+              חזרה לתרגול
+            </Button>
           </div>
-        </motion.div>
-      </div>);
-
+        </div>
+      </div>
+    );
   }
 
   const question = questions[currentIndex];
@@ -497,208 +532,260 @@ export default function VocabularyQuickPracticePage() {
 
   if (!question) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">אין שאלות זמינות</p>
-          <Button onClick={() => navigate(createPageUrl("VocabularySets"))}>
-            חזור לסטים
+      <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
+        <div className="text-center bg-white rounded-2xl p-8 shadow-lg">
+          <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4 font-medium">אין שאלות זמינות</p>
+          <Button 
+            onClick={() => navigate(createPageUrl("Practice"))}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            חזרה לתרגול
           </Button>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-blue-50 flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 bg-white">
+      <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
-          onClick={() => navigate(createPageUrl("VocabularySets"))}
-          className="p-2 -ml-2 text-gray-500">
-
-          <ChevronLeft className="w-5 h-5" />
+          onClick={() => navigate(createPageUrl("Practice"))}
+          className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
+        >
+          <ChevronLeft className="w-6 h-6" />
         </button>
-        <span className="text-sm font-semibold text-blue-600">
-          שאלה {currentIndex + 1} מתוך {questions.length}
-        </span>
-        <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+        <div className="text-center">
+          <span className="text-sm font-bold text-white">
+            בוחן אוצר מילים
+          </span>
+          <div className="text-xs text-white/80">
+            שאלה {currentIndex + 1} מתוך {questions.length}
+          </div>
+        </div>
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <span className="text-sm font-bold text-white">{Math.round(progress)}%</span>
+        </div>
       </div>
       
       {/* Progress Bar */}
-      <div className="w-full bg-gray-200 h-2.5">
+      <div className="w-full bg-blue-400 h-2">
         <div
-          className="bg-blue-600 h-2.5 transition-all duration-300"
-          style={{ width: `${progress}%` }} />
-
+          className="bg-white h-2 transition-all duration-300 rounded-r-full"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       {/* Question */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-5">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full max-w-sm">
-
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="w-full max-w-sm"
+          >
             {/* Question Card */}
-            <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-lg p-6 mb-4">
-              <div className="text-xs text-blue-500 mb-3 font-medium text-center">
-                {question.type === 'multiple_choice' ? 'בחירה מרובה' :
-                question.type === 'fill_blank' ? 'השלמת מילה' :
-                question.type === 'translate' ? 'תרגום לעברית' : 
-                question.type === 'open_recall' ? 'כתיבה חופשית' :
-                question.type === 'reverse_open' ? 'תרגום הפוך' : 'כתיבה חופשית'}
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 border border-blue-100">
+              {/* Question Type Badge */}
+              <div className="flex justify-center mb-4">
+                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full">
+                  {question.type === 'multiple_choice' ? 'בחירה מרובה' :
+                  question.type === 'fill_blank' ? 'השלמת מילה' :
+                  question.type === 'translate' ? 'תרגום לעברית' : 
+                  question.type === 'open_recall' ? 'כתיבה חופשית' :
+                  question.type === 'reverse_open' ? 'תרגום הפוך' : 'כתיבה חופשית'}
+                </span>
               </div>
               
-              {(question.type === 'translate' || question.type === 'reverse_open') &&
-              <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
-                  {question.englishWord}
+              {/* Word Display with Audio */}
+              {(question.type === 'translate' || question.type === 'reverse_open') && (
+                <div className="text-center mb-4">
+                  <div className="text-3xl font-bold text-gray-900 mb-2" dir="ltr">
+                    {question.englishWord}
+                  </div>
+                  <button
+                    onClick={() => speakWord(question.englishWord, 'en-US')}
+                    className="p-2 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <Volume2 className="w-5 h-5 text-blue-600" />
+                  </button>
                 </div>
-              }
+              )}
 
-              {question.type === 'open_recall' &&
-              <div className="text-3xl font-bold text-gray-900 mb-4 text-center">
-                  {question.hebrewWord}
+              {question.type === 'open_recall' && (
+                <div className="text-center mb-4">
+                  <div className="text-3xl font-bold text-gray-900 mb-2">
+                    {question.hebrewWord}
+                  </div>
+                  <button
+                    onClick={() => speakWord(question.hebrewWord, 'he-IL')}
+                    className="p-2 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <Volume2 className="w-5 h-5 text-blue-600" />
+                  </button>
                 </div>
-              }
+              )}
+
+              {question.type === 'multiple_choice' && (
+                <div className="text-center mb-2">
+                  <div className="text-2xl font-bold text-gray-900 mb-2">
+                    {question.word.hebrew_word}
+                  </div>
+                  <button
+                    onClick={() => speakWord(question.word.hebrew_word, 'he-IL')}
+                    className="p-2 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <Volume2 className="w-5 h-5 text-blue-600" />
+                  </button>
+                </div>
+              )}
               
-              <h2 className="text-xl font-bold text-gray-900 text-center">{question.question}</h2>
+              <h2 className="text-lg font-bold text-gray-700 text-center">{question.question}</h2>
             </div>
 
-            {!showResult ?
-            <div className="space-y-3">
-                {question.type === 'multiple_choice' || question.type === 'translate' ?
+            {!showResult ? (
               <div className="space-y-3">
+                {question.type === 'multiple_choice' || question.type === 'translate' ? (
+                  <div className="space-y-3">
                     {question.options.map((option, idx) => {
                       const isSelected = userAnswer === option;
                       return (
                         <button
                           key={idx}
                           onClick={() => setUserAnswer(option)}
-                          className={`w-full bg-white rounded-2xl p-4 text-center border-2 transition-all ${
+                          className={`w-full bg-white rounded-2xl p-4 text-center border-2 transition-all shadow-sm ${
                             isSelected 
                               ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
                               : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
                           }`}
-                          dir={question.type === 'translate' ? 'rtl' : 'ltr'}>
-                          <span className="text-lg font-medium text-gray-900">{option}</span>
+                          dir={question.type === 'translate' ? 'rtl' : 'ltr'}
+                        >
+                          <span className="text-lg font-semibold text-gray-900">{option}</span>
                         </button>
                       );
                     })}
                     {userAnswer && (
                       <Button
                         onClick={() => handleSubmit(userAnswer)}
-                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4"
+                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl mt-4 shadow-lg"
                       >
                         אשר תשובה
                       </Button>
                     )}
-                  </div> :
-
-              <div className="space-y-4">
+                  </div>
+                ) : (
+                  <div className="space-y-4">
                     <Input
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder={question.type === 'reverse_open' ? "הקלד בעברית..." : "הקלד באנגלית..."}
-                  className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-400"
-                  dir={question.type === 'reverse_open' ? 'rtl' : 'ltr'}
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && userAnswer.trim()) {
-                      handleSubmit();
-                    }
-                  }} />
+                      value={userAnswer}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      placeholder={question.type === 'reverse_open' ? "הקלד בעברית..." : "הקלד באנגלית..."}
+                      className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-500 bg-white shadow-sm"
+                      dir={question.type === 'reverse_open' ? 'rtl' : 'ltr'}
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && userAnswer.trim()) {
+                          handleSubmit();
+                        }
+                      }}
+                    />
 
-                    {question.type === 'fill_blank' && question.hint &&
-                      <div className="text-center text-gray-400 text-sm">רמז: <span dir="ltr">{question.hint}</span></div>
-                    }
+                    {question.type === 'fill_blank' && question.hint && (
+                      <div className="text-center text-gray-400 text-sm bg-white rounded-xl py-2">
+                        רמז: <span dir="ltr" className="font-mono">{question.hint}</span>
+                      </div>
+                    )}
 
                     <Button
-                  onClick={() => handleSubmit()}
-                  disabled={!userAnswer.trim()}
-                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
-
+                      onClick={() => handleSubmit()}
+                      disabled={!userAnswer.trim()}
+                      className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl shadow-lg disabled:opacity-50"
+                    >
                       בדוק תשובה
                     </Button>
                   </div>
-              }
-              </div> :
+                )}
+              </div>
+            ) : (
 
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4">
-
-                <div className={`rounded-2xl p-5 ${isCorrect ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'}`}>
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    {isCorrect ?
-                  <Check className="w-6 h-6 text-green-600" /> :
-
-                  <X className="w-6 h-6 text-red-500" />
-                  }
-                    <span className={`text-xl font-bold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-4"
+              >
+                <div className={`rounded-2xl p-5 shadow-lg ${isCorrect ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300'}`}>
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                      {isCorrect ? (
+                        <Check className="w-7 h-7 text-white" />
+                      ) : (
+                        <X className="w-7 h-7 text-white" />
+                      )}
+                    </div>
+                    <span className={`text-2xl font-bold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
                       {isCorrect ? 'נכון!' : 'לא נכון'}
                     </span>
                   </div>
 
-                  {/* Always show the word details for learning */}
-                  <div className="bg-white rounded-xl p-4 mt-3 space-y-3">
+                  {/* Word details */}
+                  <div className="bg-white rounded-xl p-4 space-y-3">
                     <div className="text-center">
                       <div className="text-sm text-gray-500 mb-1">
                         {!isCorrect ? 'התשובה הנכונה:' : 'המילה:'}
                       </div>
-                      <div className="text-xl font-bold text-gray-900 flex items-center justify-center gap-2" dir="ltr">
+                      <div className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2" dir="ltr">
                         {question.correctAnswer}
-                        {/* Audio button */}
-                        {(question.word.audio?.english_audio_url || question.word.audio_url) &&
-                      <button
-                        onClick={() => {
-                          const audio = new Audio(question.word.audio?.english_audio_url || question.word.audio_url);
-                          audio.play();
-                        }}
-                        className="p-1.5 rounded-full bg-blue-50 hover:bg-blue-100">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            </svg>
-                          </button>
-                      }
+                        <button
+                          onClick={() => {
+                            if (question.word.audio?.english_audio_url || question.word.audio_url) {
+                              const audio = new Audio(question.word.audio?.english_audio_url || question.word.audio_url);
+                              audio.play();
+                            } else {
+                              speakWord(question.correctAnswer, 'en-US');
+                            }
+                          }}
+                          className="p-2 rounded-full bg-blue-50 hover:bg-blue-100"
+                        >
+                          <Volume2 className="w-5 h-5 text-blue-600" />
+                        </button>
                       </div>
                     </div>
 
                     {/* Example sentence for wrong answers */}
-                    {!isCorrect && question.word.example_sentence &&
-                  <div className="text-sm text-gray-600 text-center border-t pt-3" dir="ltr">
+                    {!isCorrect && question.word.example_sentence && (
+                      <div className="text-sm text-gray-600 text-center border-t pt-3" dir="ltr">
                         <span className="text-gray-400">דוגמה: </span>
                         "{question.word.example_sentence}"
                       </div>
-                  }
+                    )}
 
                     {/* Synonyms hint for wrong answers */}
-                    {!isCorrect && question.word.synonyms && question.word.synonyms.length > 0 &&
-                  <div className="flex flex-wrap gap-1 justify-center border-t pt-3">
+                    {!isCorrect && question.word.synonyms && question.word.synonyms.length > 0 && (
+                      <div className="flex flex-wrap gap-1 justify-center border-t pt-3">
                         <span className="text-xs text-gray-400">נרדפות:</span>
-                        {question.word.synonyms.slice(0, 2).map((syn, i) =>
-                    <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
-                    )}
+                        {question.word.synonyms.slice(0, 2).map((syn, i) => (
+                          <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
+                        ))}
                       </div>
-                  }
+                    )}
                   </div>
                 </div>
 
                 <Button
-                onClick={handleNext}
-                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl">
-
-                  {currentIndex < questions.length - 1 ? 'לשאלה הבאה' : 'סיים'}
+                  onClick={handleNext}
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl shadow-lg"
+                >
+                  {currentIndex < questions.length - 1 ? 'לשאלה הבאה' : 'סיום'}
+                  <ArrowLeft className="w-5 h-5 mr-2" />
                 </Button>
               </motion.div>
-            }
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
-    </div>);
-
+    </div>
+  );
 }
