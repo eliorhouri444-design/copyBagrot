@@ -312,7 +312,7 @@ export default function ExtendedReadingPage() {
           <p className="text-gray-700 mb-6">{loadError}</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-[#2086b1] hover:bg-blue-700"
           >
             <ChevronRight className="w-5 h-5 ml-2" />
             חזור לתרגול
@@ -331,7 +331,7 @@ export default function ExtendedReadingPage() {
           <p className="text-gray-600 mb-6">לא נמצאו שאלות עבור נושא זה</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-[#2086b1] hover:bg-blue-700"
           >
             חזור לתרגול
           </Button>
@@ -409,7 +409,7 @@ export default function ExtendedReadingPage() {
 
             <div className="flex flex-col gap-2">
               {nextSetExists && (
-                <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleContinueToNextSet} className="w-full bg-[#2086b1] hover:bg-blue-700">
                   המשך לסט הבא
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </Button>
@@ -446,7 +446,7 @@ export default function ExtendedReadingPage() {
             <DialogFooter className="flex flex-col sm:flex-col gap-2">
               <Button
                 onClick={handleConfirmWatchAd}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-[#2086b1] hover:bg-blue-700"
               >
                 צפה בסרטון והמשך
               </Button>
@@ -494,7 +494,7 @@ export default function ExtendedReadingPage() {
   if (listeningText && showListeningIntro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
-        <div className="bg-blue-600 rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
+        <div className="bg-[#2086b1] rounded-b-[2rem] p-4 sm:p-6 shadow-xl mb-4">
           <div className="flex items-center justify-between text-white">
             <Button
               variant="ghost"
@@ -520,7 +520,7 @@ export default function ExtendedReadingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <div className="bg-blue-600 rounded-2xl shadow-xl p-6 text-white text-center">
+            <div className="bg-[#2086b1] rounded-2xl shadow-xl p-6 text-white text-center">
               <div className="text-5xl mb-3">🎧</div>
               <h2 className="text-2xl font-bold mb-2">Listen Carefully</h2>
               <p className="text-blue-100">שים לב - תוכל לשמוע את הקטע פעמיים בלבד</p>
@@ -556,7 +556,7 @@ export default function ExtendedReadingPage() {
             <Button
               onClick={() => setShowListeningIntro(false)}
               disabled={!canProceedToQuestions}
-              className="w-full h-14 sm:h-16 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 sm:h-16 bg-[#2086b1] hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {canProceedToQuestions ? (
                 <>
@@ -576,7 +576,7 @@ export default function ExtendedReadingPage() {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col max-w-md mx-auto">
       {/* Header */}
-      <div className="bg-blue-600 p-3 sm:p-4 shadow-xl flex-shrink-0">
+      <div className="bg-[#2086b1] p-3 sm:p-4 shadow-xl flex-shrink-0">
         <div className="flex items-center justify-between text-white mb-3 sm:mb-4">
           <Button
             variant="ghost"
@@ -633,7 +633,7 @@ export default function ExtendedReadingPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-[#2086b1] hover:bg-blue-700">
                 Close
               </Button>
             </DialogFooter>

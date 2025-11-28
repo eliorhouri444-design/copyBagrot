@@ -119,7 +119,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   if (topics.length === 0) {
     return (
       <div className="bg-indigo-50 rounded-2xl p-6 text-center">
-        <Target className="w-12 h-12 mx-auto mb-3 text-[#3B82F6]" />
+        <Target className="w-12 h-12 mx-auto mb-3 text-[#2086b1]" />
         <h3 className="text-[16px] font-bold text-[#2B2B2B] mb-1">אין שאלות זמינות</h3>
         <p className="text-[#6E6E6E] text-[12px]">הוסף שאלות במאגר כדי להתחיל לתרגל</p>
       </div>);
@@ -154,7 +154,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
           <div className="bg-[#ffffff] p-4 rounded-2xl">
             {/* Header with gradient */}
-            <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
+            <div className="bg-[#2086b1] text-white mb-3 p-4 rounded-xl relative">
               {onEditTopic &&
               <Button
                 variant="ghost"
@@ -233,7 +233,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             ) : (
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <div className="w-8 h-8 bg-[#2086b1] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
@@ -241,7 +241,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
                 </div>
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <div className="w-8 h-8 bg-[#2086b1] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <BookOpen className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
@@ -249,7 +249,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
                 </div>
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                  <div className="w-8 h-8 bg-[#2086b1] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
@@ -275,7 +275,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   handleStartPractice();
                 }
               }}
-              className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+              className="bg-[#2086b1] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
               <Play className="w-4 h-4 ml-2" />
               התחל תרגול
@@ -312,7 +312,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                       navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
                     }
                   }}
-                  className="bg-[#3B82F6] text-white text-[13px] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+                  className="bg-[#2086b1] text-white text-[13px] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
                     בחר תרגול ספציפי (מעל 500 שאלות)
                   </Button>
                 </> :
@@ -320,7 +320,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               <>
                   <Button
                   onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+                  className="bg-[#2086b1] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
                     <Lock className="w-4 h-4 ml-2" />
                     תרגול טעויות
                   </Button>
@@ -332,7 +332,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     <Button
                     onClick={handleStartPractice}
                     variant="outline"
-                    className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
+                    className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#2086b1] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
                       בחר תרגול (מוגבל ל-10)
                     </Button>
                     <Button
@@ -358,7 +358,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           onClick={handlePrevious}
           className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto -translate-x-3 border-0">
 
-            <ChevronRight className="w-5 h-5 text-[#3B82F6]" />
+            <ChevronRight className="w-5 h-5 text-[#2086b1]" />
           </Button>
 
           <Button
@@ -367,7 +367,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           onClick={handleNext}
           className="rounded-full shadow-lg bg-white hover:bg-gray-50 w-9 h-9 pointer-events-auto translate-x-3 border-0">
 
-            <ChevronLeft className="w-5 h-5 text-[#3B82F6]" />
+            <ChevronLeft className="w-5 h-5 text-[#2086b1]" />
           </Button>
         </div>
       }
@@ -381,7 +381,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           onClick={() => setCurrentIndex(idx)}
           className={`h-1.5 rounded-full transition-all duration-300 ${
           idx === currentIndex ?
-          'w-6 bg-[#3B82F6]' :
+          'w-6 bg-[#2086b1]' :
           'w-1.5 bg-gray-300 hover:bg-gray-400'}`
           } />
 
