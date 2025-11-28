@@ -402,66 +402,73 @@ export default function VocabularyQuickPracticePage() {
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="text-sm text-gray-500">
-          {currentIndex + 1} / {questions.length}
+        <span className="text-sm font-semibold text-blue-600">
+          שאלה {currentIndex + 1} מתוך {questions.length}
         </span>
-        <div className="w-9" />
+        <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
       </div>
       
-      <Progress value={progress} className="h-1 rounded-none" />
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 h-2.5">
+        <div 
+          className="bg-blue-600 h-2.5 transition-all duration-300" 
+          style={{ width: `${progress}%` }} 
+        />
+      </div>
 
       {/* Question */}
-      <div className="flex-1 flex flex-col p-4">
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            className="flex-1 flex flex-col"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full max-w-sm"
           >
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-4">
-              <div className="text-xs text-gray-400 mb-3 uppercase tracking-wide">
-                {question.type === 'multiple_choice' ? 'בחירה' : 
-                 question.type === 'fill_blank' ? 'השלמה' : 
-                 question.type === 'translate' ? 'תרגום' : 'כתיבה'}
+            {/* Question Card */}
+            <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-lg p-8 mb-6">
+              <div className="text-xs text-blue-500 mb-3 font-medium text-center">
+                {question.type === 'multiple_choice' ? 'בחירה מרובה' : 
+                 question.type === 'fill_blank' ? 'השלמת מילה' : 
+                 question.type === 'translate' ? 'תרגום לעברית' : 'כתיבה חופשית'}
               </div>
               
               {question.type === 'translate' && (
-                <div className="text-2xl font-bold text-gray-900 mb-3" dir="ltr">
+                <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
                   {question.englishWord}
                 </div>
               )}
               
-              <h2 className="text-lg font-semibold text-gray-900">{question.question}</h2>
+              <h2 className="text-xl font-bold text-gray-900 text-center">{question.question}</h2>
               
               {question.hint && (
-                <div className="text-base text-gray-400 font-mono mt-2" dir="ltr">{question.hint}</div>
+                <div className="text-lg text-blue-400 font-mono mt-4 text-center" dir="ltr">{question.hint}</div>
               )}
             </div>
 
             {!showResult ? (
               <div className="space-y-3">
                 {(question.type === 'multiple_choice' || question.type === 'translate') ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {question.options.map((option, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleSubmit(option)}
-                        className="w-full bg-white rounded-xl p-4 text-right border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all"
+                        className="w-full bg-white rounded-2xl p-4 text-center border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all"
                         dir={question.type === 'translate' ? 'rtl' : 'ltr'}
                       >
-                        <span className="text-base font-medium text-gray-900">{option}</span>
+                        <span className="text-lg font-medium text-gray-900">{option}</span>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <Input
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
                       placeholder="הקלד את התשובה..."
-                      className="h-12 text-base"
+                      className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-400"
                       dir="ltr"
                       autoFocus
                       onKeyDown={(e) => {
@@ -473,9 +480,9 @@ export default function VocabularyQuickPracticePage() {
                     <Button
                       onClick={() => handleSubmit()}
                       disabled={!userAnswer.trim()}
-                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base font-semibold"
+                      className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
                     >
-                      בדוק
+                      בדוק תשובה
                     </Button>
                   </div>
                 )}
@@ -484,23 +491,23 @@ export default function VocabularyQuickPracticePage() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-3"
+                className="space-y-4"
               >
-                <div className={`rounded-xl p-4 ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                  <div className="flex items-center gap-2 mb-2">
+                <div className={`rounded-2xl p-5 ${isCorrect ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'}`}>
+                  <div className="flex items-center justify-center gap-2 mb-3">
                     {isCorrect ? (
-                      <Check className="w-5 h-5 text-green-600" />
+                      <Check className="w-6 h-6 text-green-600" />
                     ) : (
-                      <X className="w-5 h-5 text-red-600" />
+                      <X className="w-6 h-6 text-red-500" />
                     )}
-                    <span className={`font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                    <span className={`text-xl font-bold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
                       {isCorrect ? 'נכון!' : 'לא נכון'}
                     </span>
                   </div>
                   {!isCorrect && (
-                    <div className="bg-white rounded-lg p-3 mt-2">
-                      <div className="text-xs text-gray-500 mb-1">התשובה הנכונה:</div>
-                      <div className="font-semibold text-gray-900" dir="ltr">
+                    <div className="bg-white rounded-xl p-4 mt-3">
+                      <div className="text-sm text-gray-500 mb-1 text-center">התשובה הנכונה:</div>
+                      <div className="text-xl font-bold text-gray-900 text-center" dir="ltr">
                         {question.correctAnswer}
                       </div>
                     </div>
@@ -509,9 +516,9 @@ export default function VocabularyQuickPracticePage() {
 
                 <Button
                   onClick={handleNext}
-                  className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-base font-semibold"
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-lg font-bold rounded-2xl"
                 >
-                  {currentIndex < questions.length - 1 ? 'הבא' : 'סיים'}
+                  {currentIndex < questions.length - 1 ? 'לשאלה הבאה' : 'סיים'}
                 </Button>
               </motion.div>
             )}
