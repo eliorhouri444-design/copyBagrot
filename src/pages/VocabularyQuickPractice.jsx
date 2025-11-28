@@ -14,13 +14,7 @@ import { Progress } from "@/components/ui/progress";
 
 export default function VocabularyQuickPracticePage() {
   const navigate = useNavigate();
-  const urlParams = new URLSearchParams(window.location.search);
-  const setId = urlParams.get('setId');
-  const isMultiSet = urlParams.get('multiSet') === 'true';
-  const setsParam = urlParams.get('sets');
-  const startIndex = parseInt(urlParams.get('start') || '0');
-  const endIndex = parseInt(urlParams.get('end') || '10');
-
+  
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState([]);
@@ -33,6 +27,13 @@ export default function VocabularyQuickPracticePage() {
   const [results, setResults] = useState({ correct: 0, incorrect: 0 });
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const setId = urlParams.get('setId');
+  const isMultiSet = urlParams.get('multiSet') === 'true';
+  const setsParam = urlParams.get('sets');
+  const startIndex = parseInt(urlParams.get('start') || '0');
+  const endIndex = parseInt(urlParams.get('end') || '10');
 
   useEffect(() => {
     loadData();
