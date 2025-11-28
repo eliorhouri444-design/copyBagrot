@@ -60,7 +60,7 @@ export default function VocabularySetsPage() {
         subject_id: subject,
         unit_level: units,
         is_active: true
-      }, 'order', 500);
+      }, 'order', 2000);
       setWords(allWords);
 
       // Check for existing duplicates in the database
