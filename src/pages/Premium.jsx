@@ -312,7 +312,7 @@ export default function PremiumPage() {
               </ul>
               <Button
               onClick={() => navigate(createPageUrl("Home"))}
-              className="mt-6 w-full bg-[#2086b1] hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl">
+              className="mt-6 w-full bg-[#2086b1] hover:bg-[#1a6d91] text-white py-3 text-lg font-bold rounded-xl">
 
                 חזור לדף הבית
               </Button>
@@ -388,7 +388,7 @@ export default function PremiumPage() {
 
                     <Button
                   onClick={() => handleSelectPlan(plan)}
-                  className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-[#2086b1] hover:bg-blue-700 text-white' : 'bg-[#2086b1] hover:bg-blue-700 text-white'}`}>
+                  className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-[#2086b1] hover:bg-[#1a6d91] text-white' : 'bg-[#2086b1] hover:bg-[#1a6d91] text-white'}`}>
                       בחר מסלול
                     </Button>
                   </motion.div>
@@ -557,7 +557,7 @@ export default function PremiumPage() {
             <Button
               onClick={() => handleSelectPlan(selectedPlan)}
               disabled={!selectedPlan}
-              className="w-full bg-[#2086b1] hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl">
+              className="w-full bg-[#2086b1] hover:bg-[#1a6d91] text-white py-3 text-lg font-bold rounded-xl">
 
               המשך לתשלום
             </Button>

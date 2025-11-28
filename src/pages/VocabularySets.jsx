@@ -542,7 +542,7 @@ export default function VocabularySetsPage() {
               <Button
                 onClick={startSelectedSetsPractice}
                 size="sm"
-                className="bg-[#2086b1] hover:bg-blue-700"
+                className="bg-[#2086b1] hover:bg-[#1a6d91]"
               >
                 התחל תרגול
               </Button>
