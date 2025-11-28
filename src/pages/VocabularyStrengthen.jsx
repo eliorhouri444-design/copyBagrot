@@ -236,38 +236,43 @@ export default function VocabularyStrengthenPage() {
   const progress = ((currentIndex + 1) / weakWords.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-blue-50 flex flex-col">
       {/* Header */}
       <div className="bg-orange-500 px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("Practice"))}
-          className="p-2 -ml-2 text-white"
+          className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-6 h-6" />
         </button>
-        <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-white" />
-          <span className="text-sm font-semibold text-white">
-            חיזוק מילים • {currentIndex + 1}/{weakWords.length}
-          </span>
+        <div className="text-center">
+          <div className="flex items-center gap-2 justify-center">
+            <Zap className="w-5 h-5 text-white" />
+            <span className="text-sm font-bold text-white">חיזוק מילים</span>
+          </div>
+          <div className="text-xs text-white/80">
+            {currentIndex + 1} מתוך {weakWords.length}
+          </div>
         </div>
-
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <span className="text-sm font-bold text-white">{Math.round(progress)}%</span>
+        </div>
       </div>
       
       {/* Progress Bar */}
-      <div className="w-full bg-orange-200 h-2">
+      <div className="w-full bg-orange-300 h-2">
         <div 
-          className="bg-orange-600 h-2 transition-all duration-300" 
+          className="bg-white h-2 transition-all duration-300 rounded-r-full" 
           style={{ width: `${progress}%` }} 
         />
       </div>
 
       {/* Card */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-5">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-sm"
         >
           {/* 3D Flip Card */}
@@ -284,16 +289,16 @@ export default function VocabularyStrengthenPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-[28px] border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 bg-white rounded-3xl border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-8"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 {/* Weak indicator */}
-                <span className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">
-                  לחיזוק
+                <span className="absolute top-4 left-4 bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                  🔥 לחיזוק
                 </span>
 
                 {currentWord.part_of_speech && (
-                  <span className="absolute top-4 right-4 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="absolute top-4 right-4 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                     {currentWord.part_of_speech}
                   </span>
                 )}
@@ -306,24 +311,25 @@ export default function VocabularyStrengthenPage() {
                   <div className="text-sm text-gray-400 mb-3" dir="ltr">/{currentWord.phonetic}/</div>
                 )}
 
-                {(currentWord.audio?.english_audio_url || currentWord.audio_url) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                {/* Audio Button - Always available with TTS fallback */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (currentWord.audio?.english_audio_url || currentWord.audio_url) {
                       const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
                       audio.play();
-                    }}
-                    className="mb-4 p-3 rounded-full bg-orange-50 hover:bg-orange-100 transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    </svg>
-                  </button>
-                )}
+                    } else {
+                      speakWord(currentWord.english_answer, 'en-US');
+                    }
+                  }}
+                  className="mb-4 p-3 rounded-full bg-orange-50 hover:bg-orange-100 transition-colors"
+                >
+                  <Volume2 className="w-6 h-6 text-orange-600" />
+                </button>
 
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
-                  className="px-6 py-2.5 rounded-2xl border-2 border-orange-400 text-orange-600 font-medium bg-transparent hover:bg-orange-50 transition-colors"
+                  className="px-6 py-2.5 rounded-2xl border-2 border-orange-400 text-orange-600 font-bold bg-transparent hover:bg-orange-50 transition-colors"
                 >
                   הפוך כרטיס
                 </button>
@@ -331,11 +337,11 @@ export default function VocabularyStrengthenPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-orange-50 to-white rounded-[28px] border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
+                className="absolute inset-0 bg-gradient-to-br from-orange-50 to-white rounded-3xl border-2 border-orange-200 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 {currentWord.part_of_speech && (
-                  <span className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                     {currentWord.part_of_speech}
                   </span>
                 )}
@@ -347,9 +353,49 @@ export default function VocabularyStrengthenPage() {
                   {currentWord.english_answer}
                 </div>
 
+                {/* Audio Buttons */}
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (currentWord.audio?.english_audio_url || currentWord.audio_url) {
+                        const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
+                        audio.play();
+                      } else {
+                        speakWord(currentWord.english_answer, 'en-US');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-100 hover:bg-orange-200 transition-colors text-xs text-orange-700 font-medium"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    מילה
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakWord(currentWord.hebrew_word, 'he-IL');
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 hover:bg-green-200 transition-colors text-xs text-green-700 font-medium"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                    עברית
+                  </button>
+                </div>
+
                 {currentWord.example_sentence && (
-                  <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
-                    "{currentWord.example_sentence}"
+                  <div className="relative">
+                    <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
+                      "{currentWord.example_sentence}"
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speakWord(currentWord.example_sentence, 'en-US');
+                      }}
+                      className="absolute -top-1 -left-1 p-1.5 rounded-full bg-purple-100 hover:bg-purple-200 transition-colors"
+                    >
+                      <Volume2 className="w-3 h-3 text-purple-600" />
+                    </button>
                   </div>
                 )}
 
@@ -375,21 +421,21 @@ export default function VocabularyStrengthenPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 mt-12">
+          <div className="flex gap-4 mt-8">
             <button
               onClick={() => handleAnswer(true)}
-              className="flex-1 h-14 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-green-100 hover:border-green-300 transition-all"
+              className="flex-1 h-14 bg-green-500 hover:bg-green-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
-              <Check className="w-5 h-5 text-green-600" />
-              <span className="font-semibold">עכשיו יודע!</span>
+              <Check className="w-6 h-6" />
+              <span className="font-bold text-lg">יודע!</span>
             </button>
             
             <button
               onClick={() => handleAnswer(false)}
-              className="flex-1 h-14 bg-orange-50 border-2 border-orange-200 rounded-2xl flex items-center justify-center gap-2 text-gray-800 hover:bg-orange-100 hover:border-orange-300 transition-all"
+              className="flex-1 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
-              <X className="w-5 h-5 text-orange-500" />
-              <span className="font-semibold">עוד לא</span>
+              <X className="w-6 h-6" />
+              <span className="font-bold text-lg">עוד לא</span>
             </button>
           </div>
         </motion.div>
