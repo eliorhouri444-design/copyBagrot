@@ -3,7 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  BookOpen, ChevronLeft, Loader2, Check, Lock, Plus, Save, Crown, CheckSquare, Square
+  BookOpen, ChevronLeft, Loader2, Check, Lock, Plus, Save, Crown, CheckSquare, Square,
+  ArrowUp, ArrowDown, Trash2, Edit, GripVertical
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,9 @@ export default function VocabularySetsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [selectedSets, setSelectedSets] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [showManageDialog, setShowManageDialog] = useState(false);
+  const [managingWords, setManagingWords] = useState([]);
+  const [editingWord, setEditingWord] = useState(null);
 
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
@@ -127,6 +131,63 @@ export default function VocabularySetsPage() {
     sessionStorage.setItem('vocabSetsData', JSON.stringify(selectedSetObjects));
     
     navigate(createPageUrl(`VocabularyFlashcards?multiSet=true&sets=${selectedSets.join(',')}`));
+  };
+
+  const openManageDialog = () => {
+    setManagingWords([...words].sort((a, b) => (a.order || 0) - (b.order || 0)));
+    setShowManageDialog(true);
+  };
+
+  const moveWord = (index, direction) => {
+    const newWords = [...managingWords];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newWords.length) return;
+    
+    [newWords[index], newWords[targetIndex]] = [newWords[targetIndex], newWords[index]];
+    setManagingWords(newWords);
+  };
+
+  const deleteWord = async (wordId) => {
+    if (!confirm('האם למחוק את המילה?')) return;
+    try {
+      await base44.entities.VocabularyQuestion.delete(wordId);
+      setManagingWords(prev => prev.filter(w => w.id !== wordId));
+      setWords(prev => prev.filter(w => w.id !== wordId));
+    } catch (error) {
+      console.error("Error deleting word:", error);
+      alert('שגיאה במחיקת המילה');
+    }
+  };
+
+  const saveWordOrder = async () => {
+    setIsSaving(true);
+    try {
+      for (let i = 0; i < managingWords.length; i++) {
+        if (managingWords[i].order !== i) {
+          await base44.entities.VocabularyQuestion.update(managingWords[i].id, { order: i });
+        }
+      }
+      setShowManageDialog(false);
+      loadData();
+      alert('הסדר נשמר בהצלחה!');
+    } catch (error) {
+      console.error("Error saving order:", error);
+      alert('שגיאה בשמירת הסדר');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateWord = async (wordId, updates) => {
+    try {
+      await base44.entities.VocabularyQuestion.update(wordId, updates);
+      setManagingWords(prev => prev.map(w => w.id === wordId ? { ...w, ...updates } : w));
+      setEditingWord(null);
+      loadData();
+    } catch (error) {
+      console.error("Error updating word:", error);
+      alert('שגיאה בעדכון המילה');
+    }
   };
 
   const handleBulkAdd = async () => {
@@ -260,15 +321,25 @@ export default function VocabularySetsPage() {
           </div>
         </div>
 
-        {/* Admin Add Button */}
+        {/* Admin Buttons */}
         {user?.role === 'admin' && (
-          <Button
-            onClick={() => setShowBulkAddDialog(true)}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            הוסף מילים חדשות
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowBulkAddDialog(true)}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              הוסף מילים
+            </Button>
+            <Button
+              onClick={openManageDialog}
+              variant="outline"
+              className="flex-1 border-2 border-purple-300 text-purple-600 h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+            >
+              <Edit className="w-5 h-5" />
+              סדר מילים
+            </Button>
+          </div>
         )}
 
         {/* Sets List */}
@@ -458,6 +529,123 @@ export default function VocabularySetsPage() {
           </div>
         )}
       </div>
+
+      {/* Manage Words Dialog */}
+      <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Edit className="w-5 h-5 text-purple-600" />
+              ניהול וסידור מילים
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-2 py-4 max-h-[60vh] overflow-y-auto">
+            {managingWords.map((word, index) => (
+              <div
+                key={word.id}
+                className="bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-3"
+              >
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => moveWord(index, 'up')}
+                    disabled={index === 0}
+                    className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveWord(index, 'down')}
+                    disabled={index === managingWords.length - 1}
+                    className="p-1 rounded hover:bg-gray-100 disabled:opacity-30"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-sm font-bold text-blue-600">
+                  {index + 1}
+                </div>
+
+                <div className="flex-1">
+                  {editingWord === word.id ? (
+                    <div className="flex gap-2">
+                      <Input
+                        defaultValue={word.hebrew_word}
+                        id={`heb-${word.id}`}
+                        placeholder="עברית"
+                        className="flex-1 text-sm"
+                      />
+                      <Input
+                        defaultValue={word.english_answer}
+                        id={`eng-${word.id}`}
+                        placeholder="English"
+                        className="flex-1 text-sm"
+                        dir="ltr"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const heb = document.getElementById(`heb-${word.id}`).value;
+                          const eng = document.getElementById(`eng-${word.id}`).value;
+                          updateWord(word.id, { hebrew_word: heb, english_answer: eng });
+                        }}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900">{word.hebrew_word}</span>
+                      <span className="text-gray-400">→</span>
+                      <span className="text-blue-600" dir="ltr">{word.english_answer}</span>
+                      {word.part_of_speech && (
+                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                          {word.part_of_speech}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setEditingWord(editingWord === word.id ? null : word.id)}
+                    className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteWord(word.id)}
+                    className="p-2 rounded-lg hover:bg-red-50 text-red-500"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowManageDialog(false)}>
+              ביטול
+            </Button>
+            <Button
+              onClick={saveWordOrder}
+              disabled={isSaving}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              שמור סדר
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Bulk Add Dialog */}
       <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
