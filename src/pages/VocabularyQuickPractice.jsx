@@ -428,7 +428,7 @@ export default function VocabularyQuickPracticePage() {
             className="w-full max-w-sm"
           >
             {/* Question Card */}
-            <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-lg p-8 mb-6">
+            <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-lg p-8 mb-6 min-h-[380px] flex flex-col justify-center">
               <div className="text-xs text-blue-500 mb-3 font-medium text-center">
                 {question.type === 'multiple_choice' ? 'בחירה מרובה' : 
                  question.type === 'fill_blank' ? 'השלמת מילה' : 
