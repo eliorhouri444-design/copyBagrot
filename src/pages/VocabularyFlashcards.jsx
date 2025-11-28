@@ -248,10 +248,38 @@ export default function VocabularyFlashcardsPage() {
                 className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-100 shadow-lg flex flex-col items-center justify-center p-8"
                 style={{ backfaceVisibility: 'hidden' }}>
 
-                <div className="text-3xl font-bold text-gray-900 mb-4 text-center" dir="ltr">
+                {/* Part of Speech Tag */}
+                {currentWord.part_of_speech && (
+                  <span className="absolute top-4 right-4 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                    {currentWord.part_of_speech}
+                  </span>
+                )}
+
+                <div className="text-3xl font-bold text-gray-900 mb-2 text-center" dir="ltr">
                   {currentWord.english_answer}
                 </div>
-                <p className="text-blue-500 text-lg mb-6"></p>
+
+                {/* Phonetic */}
+                {currentWord.phonetic && (
+                  <div className="text-sm text-gray-400 mb-3" dir="ltr">/{currentWord.phonetic}/</div>
+                )}
+
+                {/* Audio Button */}
+                {(currentWord.audio?.english_audio_url || currentWord.audio_url) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
+                      audio.play();
+                    }}
+                    className="mb-4 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                  </button>
+                )}
+
                 <button
                   onClick={(e) => {e.stopPropagation();setIsFlipped(true);}}
                   className="px-6 py-2.5 rounded-2xl border-2 border-blue-400 text-blue-600 font-medium bg-transparent hover:bg-blue-50 transition-colors">
@@ -262,20 +290,49 @@ export default function VocabularyFlashcardsPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
 
-                <div className="text-3xl font-bold text-gray-900 mb-3 text-center">
+                {/* Part of Speech Tag */}
+                {currentWord.part_of_speech && (
+                  <span className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                    {currentWord.part_of_speech}
+                  </span>
+                )}
+
+                <div className="text-2xl font-bold text-gray-900 mb-1 text-center">
                   {currentWord.hebrew_word}
                 </div>
-                <div className="text-xl text-blue-600 text-center" dir="ltr">
+                <div className="text-lg text-blue-600 text-center mb-3" dir="ltr">
                   {currentWord.english_answer}
                 </div>
-                {currentWord.example_sentence &&
-                <div className="text-sm text-gray-500 text-center mt-6 p-3 bg-white/70 rounded-xl max-w-xs" dir="ltr">
+
+                {/* Example Sentence */}
+                {currentWord.example_sentence && (
+                  <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
                     "{currentWord.example_sentence}"
                   </div>
-                }
+                )}
+
+                {/* Synonyms */}
+                {currentWord.synonyms && currentWord.synonyms.length > 0 && (
+                  <div className="flex flex-wrap gap-1 justify-center mb-2">
+                    <span className="text-xs text-gray-500">נרדפות:</span>
+                    {currentWord.synonyms.slice(0, 3).map((syn, i) => (
+                      <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Antonyms */}
+                {currentWord.antonyms && currentWord.antonyms.length > 0 && (
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    <span className="text-xs text-gray-500">הפכים:</span>
+                    {currentWord.antonyms.slice(0, 3).map((ant, i) => (
+                      <span key={i} className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{ant}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

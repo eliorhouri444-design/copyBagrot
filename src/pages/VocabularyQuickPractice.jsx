@@ -90,19 +90,79 @@ export default function VocabularyQuickPracticePage() {
   };
 
   const generateQuestions = (setWords, allWords) => {
-    const questionTypes = ['multiple_choice', 'fill_blank', 'write', 'translate'];
     const questions = [];
 
-    setWords.forEach((word, idx) => {
-      const type = questionTypes[idx % questionTypes.length];
+    // Helper function to get good distractors
+    const getDistractors = (currentWord, count = 3) => {
+      // First try custom distractors if available
+      if (currentWord.advanced_quiz?.custom_distractors?.length >= count) {
+        return currentWord.advanced_quiz.custom_distractors.slice(0, count);
+      }
+
+      // Get words from same category/difficulty for better distractors
+      let candidates = allWords.filter(w => 
+        w.id !== currentWord.id && 
+        w.english_answer !== currentWord.english_answer
+      );
+
+      // Prefer same category
+      const sameCategory = candidates.filter(w => w.category === currentWord.category);
+      if (sameCategory.length >= count) {
+        candidates = sameCategory;
+      }
+
+      // Prefer same difficulty
+      const sameDifficulty = candidates.filter(w => w.difficulty === currentWord.difficulty);
+      if (sameDifficulty.length >= count) {
+        candidates = sameDifficulty;
+      }
+
+      // Shuffle and pick unique answers
+      const shuffled = candidates.sort(() => Math.random() - 0.5);
+      const uniqueAnswers = [];
+      const seenAnswers = new Set([currentWord.english_answer.toLowerCase()]);
       
-      if (type === 'multiple_choice') {
-        const otherWords = allWords.filter(w => w.id !== word.id);
-        const shuffled = otherWords.sort(() => Math.random() - 0.5).slice(0, 3);
-        const options = [
-          word.english_answer,
-          ...shuffled.map(w => w.english_answer)
-        ].sort(() => Math.random() - 0.5);
+      for (const w of shuffled) {
+        const answer = w.english_answer.toLowerCase();
+        if (!seenAnswers.has(answer)) {
+          seenAnswers.add(answer);
+          uniqueAnswers.push(w.english_answer);
+          if (uniqueAnswers.length >= count) break;
+        }
+      }
+
+      return uniqueAnswers;
+    };
+
+    const getHebrewDistractors = (currentWord, count = 3) => {
+      let candidates = allWords.filter(w => 
+        w.id !== currentWord.id && 
+        w.hebrew_word !== currentWord.hebrew_word
+      );
+
+      const shuffled = candidates.sort(() => Math.random() - 0.5);
+      const uniqueAnswers = [];
+      const seenAnswers = new Set([currentWord.hebrew_word]);
+      
+      for (const w of shuffled) {
+        if (!seenAnswers.has(w.hebrew_word)) {
+          seenAnswers.add(w.hebrew_word);
+          uniqueAnswers.push(w.hebrew_word);
+          if (uniqueAnswers.length >= count) break;
+        }
+      }
+
+      return uniqueAnswers;
+    };
+
+    setWords.forEach((word, idx) => {
+      // Rotate between question types: 60% multiple choice, 20% fill blank, 20% translate
+      const rand = idx % 5;
+      
+      if (rand < 3) {
+        // Multiple choice - Hebrew to English
+        const distractors = getDistractors(word, 3);
+        const options = [word.english_answer, ...distractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'multiple_choice',
@@ -111,7 +171,8 @@ export default function VocabularyQuickPracticePage() {
           options: options,
           correctAnswer: word.english_answer
         });
-      } else if (type === 'fill_blank') {
+      } else if (rand === 3) {
+        // Fill in the blank
         const hint = word.english_answer.charAt(0) + '_'.repeat(word.english_answer.length - 1);
         questions.push({
           type: 'fill_blank',
@@ -120,14 +181,10 @@ export default function VocabularyQuickPracticePage() {
           hint: hint,
           correctAnswer: word.english_answer
         });
-      } else if (type === 'translate') {
-        // Reverse - show English, ask for Hebrew
-        const otherWords = allWords.filter(w => w.id !== word.id);
-        const shuffled = otherWords.sort(() => Math.random() - 0.5).slice(0, 3);
-        const options = [
-          word.hebrew_word,
-          ...shuffled.map(w => w.hebrew_word)
-        ].sort(() => Math.random() - 0.5);
+      } else {
+        // Translate - English to Hebrew (multiple choice)
+        const distractors = getHebrewDistractors(word, 3);
+        const options = [word.hebrew_word, ...distractors].sort(() => Math.random() - 0.5);
 
         questions.push({
           type: 'translate',
@@ -136,13 +193,6 @@ export default function VocabularyQuickPracticePage() {
           englishWord: word.english_answer,
           options: options,
           correctAnswer: word.hebrew_word
-        });
-      } else {
-        questions.push({
-          type: 'write',
-          word: word,
-          question: `תרגם לאנגלית: "${word.hebrew_word}"`,
-          correctAnswer: word.english_answer
         });
       }
     });
@@ -501,14 +551,50 @@ export default function VocabularyQuickPracticePage() {
                       {isCorrect ? 'נכון!' : 'לא נכון'}
                     </span>
                   </div>
-                  {!isCorrect && (
-                    <div className="bg-white rounded-xl p-4 mt-3">
-                      <div className="text-sm text-gray-500 mb-1 text-center">התשובה הנכונה:</div>
-                      <div className="text-xl font-bold text-gray-900 text-center" dir="ltr">
+
+                  {/* Always show the word details for learning */}
+                  <div className="bg-white rounded-xl p-4 mt-3 space-y-3">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-500 mb-1">
+                        {!isCorrect ? 'התשובה הנכונה:' : 'המילה:'}
+                      </div>
+                      <div className="text-xl font-bold text-gray-900 flex items-center justify-center gap-2" dir="ltr">
                         {question.correctAnswer}
+                        {/* Audio button */}
+                        {(question.word.audio?.english_audio_url || question.word.audio_url) && (
+                          <button
+                            onClick={() => {
+                              const audio = new Audio(question.word.audio?.english_audio_url || question.word.audio_url);
+                              audio.play();
+                            }}
+                            className="p-1.5 rounded-full bg-blue-50 hover:bg-blue-100"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </div>
-                  )}
+
+                    {/* Example sentence for wrong answers */}
+                    {!isCorrect && question.word.example_sentence && (
+                      <div className="text-sm text-gray-600 text-center border-t pt-3" dir="ltr">
+                        <span className="text-gray-400">דוגמה: </span>
+                        "{question.word.example_sentence}"
+                      </div>
+                    )}
+
+                    {/* Synonyms hint for wrong answers */}
+                    {!isCorrect && question.word.synonyms && question.word.synonyms.length > 0 && (
+                      <div className="flex flex-wrap gap-1 justify-center border-t pt-3">
+                        <span className="text-xs text-gray-400">נרדפות:</span>
+                        {question.word.synonyms.slice(0, 2).map((syn, i) => (
+                          <span key={i} className="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full" dir="ltr">{syn}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <Button
