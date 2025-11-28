@@ -249,12 +249,23 @@ export default function VocabularySetsPage() {
         return;
       }
 
-      await base44.entities.VocabularyQuestion.bulkCreate(wordsToAdd);
+      // Split into batches of 50 for bulk creation (API limit)
+      const batchSize = 50;
+      let totalAdded = 0;
+
+      for (let i = 0; i < wordsToAdd.length; i += batchSize) {
+        const batch = wordsToAdd.slice(i, i + batchSize);
+        await base44.entities.VocabularyQuestion.bulkCreate(batch);
+        totalAdded += batch.length;
+      }
+
+      // Calculate how many sets were created
+      const newSetsCount = Math.ceil(wordsToAdd.length / 10);
 
       setShowBulkAddDialog(false);
       setBulkText('');
       loadData();
-      alert(`${wordsToAdd.length} מילים נוספו בהצלחה! ✅`);
+      alert(`✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`);
     } catch (error) {
       console.error("Error bulk adding words:", error);
       alert('שגיאה בהוספת המילים: ' + error.message);
