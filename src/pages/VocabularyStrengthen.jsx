@@ -220,7 +220,7 @@ export default function VocabularyStrengthenPage() {
             חיזוק מילים • {currentIndex + 1}/{weakWords.length}
           </span>
         </div>
-        <span className="text-sm text-white/80">{Math.round(progress)}%</span>
+
       </div>
       
       {/* Progress Bar */}
