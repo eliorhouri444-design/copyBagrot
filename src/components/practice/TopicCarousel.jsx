@@ -423,28 +423,31 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
       <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
         <DialogContent className="max-w-sm max-h-[80vh]" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="text-center text-lg font-bold">בחר סט</DialogTitle>
+            <DialogTitle className="text-center text-lg font-bold">
+              בחר סט ({vocabularySets.length} סטים)
+            </DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto max-h-[60vh] py-2">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {vocabularySets.map(set => (
                 <button
                   key={set.id}
                   onClick={() => {
                     setShowVocabSetSelector(false);
-                    navigate(createPageUrl(`VocabularyTraining?set=${set.set_number}`));
+                    navigate(createPageUrl(`VocabularyFlashcards?setId=${set.set_number}&start=${set.startIndex}&end=${set.endIndex}`));
                   }}
-                  className="w-full p-3 rounded-xl border-2 flex items-center justify-between transition-all border-gray-100 hover:border-blue-300 bg-white"
+                  className="w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all border-gray-100 hover:border-blue-300 bg-white"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold bg-blue-100 text-blue-600">
-                      {set.set_number}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-gray-900">סט {set.set_number}</div>
-                      <div className="text-sm text-blue-600">מילים {(set.set_number - 1) * 10 + 1} - {set.set_number * 10}</div>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold bg-blue-100 text-blue-600">
+                    {set.set_number}
+                  </div>
+                  <div className="text-right flex-1">
+                    <div className="font-bold text-gray-900 text-sm">סט {set.set_number}</div>
+                    <div className="text-xs text-gray-500">
+                      {set.words?.length || 10} מילים
                     </div>
                   </div>
+                  <ChevronLeft className="w-4 h-4 text-gray-400" />
                 </button>
               ))}
             </div>
