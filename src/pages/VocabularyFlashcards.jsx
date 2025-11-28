@@ -334,7 +334,7 @@ export default function VocabularyFlashcardsPage() {
 
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-100 shadow-lg flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-100 shadow-lg flex flex-col items-center justify-center p-6"
                 style={{ backfaceVisibility: 'hidden' }}>
 
                 {/* Part of Speech Tag */}
@@ -344,13 +344,24 @@ export default function VocabularyFlashcardsPage() {
                   </span>
                 )}
 
-                <div className="text-3xl font-bold text-gray-900 mb-2 text-center" dir="ltr">
+                {/* Image */}
+                {currentWord.image_url && (
+                  <div className="w-24 h-24 rounded-xl overflow-hidden mb-3 shadow-md">
+                    <img 
+                      src={currentWord.image_url} 
+                      alt={currentWord.english_answer}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <div className="text-3xl font-bold text-gray-900 mb-1 text-center" dir="ltr">
                   {currentWord.english_answer}
                 </div>
 
                 {/* Phonetic */}
                 {currentWord.phonetic && (
-                  <div className="text-sm text-gray-400 mb-3" dir="ltr">/{currentWord.phonetic}/</div>
+                  <div className="text-sm text-gray-400 mb-2" dir="ltr">/{currentWord.phonetic}/</div>
                 )}
 
                 {/* Audio Button */}
@@ -361,7 +372,7 @@ export default function VocabularyFlashcardsPage() {
                       const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
                       audio.play();
                     }}
-                    className="mb-4 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
+                    className="mb-3 p-3 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -379,7 +390,7 @@ export default function VocabularyFlashcardsPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-6 overflow-y-auto"
+                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-5 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
 
                 {/* Part of Speech Tag */}
@@ -389,14 +400,59 @@ export default function VocabularyFlashcardsPage() {
                   </span>
                 )}
 
+                {/* Image on back too */}
+                {currentWord.image_url && (
+                  <div className="w-20 h-20 rounded-xl overflow-hidden mb-2 shadow-md">
+                    <img 
+                      src={currentWord.image_url} 
+                      alt={currentWord.english_answer}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
                 <div className="text-2xl font-bold text-gray-900 mb-1 text-center">
                   {currentWord.hebrew_word}
                 </div>
-                <div className="text-lg text-blue-600 text-center mb-3" dir="ltr">
+                <div className="text-lg text-blue-600 text-center mb-2" dir="ltr">
                   {currentWord.english_answer}
                 </div>
 
-                {/* Example Sentence */}
+                {/* Audio buttons for both word and sentence */}
+                <div className="flex gap-2 mb-3">
+                  {(currentWord.audio?.english_audio_url || currentWord.audio_url) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const audio = new Audio(currentWord.audio?.english_audio_url || currentWord.audio_url);
+                        audio.play();
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors text-xs text-blue-700 font-medium"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                      מילה
+                    </button>
+                  )}
+                  {currentWord.audio?.hebrew_audio_url && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const audio = new Audio(currentWord.audio.hebrew_audio_url);
+                        audio.play();
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 hover:bg-green-200 transition-colors text-xs text-green-700 font-medium"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                      עברית
+                    </button>
+                  )}
+                </div>
+
+                {/* Example Sentence with audio */}
                 {currentWord.example_sentence && (
                   <div className="text-sm text-gray-600 text-center p-2 bg-white/70 rounded-xl max-w-xs mb-2" dir="ltr">
                     "{currentWord.example_sentence}"
