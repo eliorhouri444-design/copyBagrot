@@ -211,6 +211,33 @@ export default function VocabularySetsPage() {
     }
   };
 
+  // Export all words as clean JSON
+  const exportWordsAsJSON = () => {
+    const cleanWords = words.map(w => ({
+      hebrew_word: w.hebrew_word,
+      english_answer: w.english_answer,
+      example_sentence: w.example_sentence || '',
+      example_sentence_he: w.example_sentence_he || '',
+      part_of_speech: w.part_of_speech || '',
+      image_url: w.image_url || '',
+      audio: {
+        english_audio_url: w.audio?.english_audio_url || '',
+        hebrew_audio_url: w.audio?.hebrew_audio_url || ''
+      }
+    }));
+    
+    const jsonString = JSON.stringify(cleanWords, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vocabulary_${displaySubject}_${displayUnits}_units.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleBulkAdd = async () => {
     if (!bulkText.trim()) {
       alert('יש להזין מילים');
@@ -232,14 +259,32 @@ export default function VocabularySetsPage() {
         parsedData = [parsedData];
       }
 
-      const wordsToAdd = parsedData.map((item, idx) => {
+      // Build existing words lookup for duplicate detection
+      const existingEnglish = new Set(words.map(w => w.english_answer.toLowerCase().trim()));
+      const existingHebrew = new Set(words.map(w => w.hebrew_word.trim()));
+
+      let duplicatesSkipped = 0;
+      let currentOrder = words.length;
+
+      const wordsToAdd = parsedData.map((item) => {
         // Support multiple key formats
-        const hebrewWord = item.hebrew_word || item.hebrew || item.heb;
-        const englishAnswer = item.english_answer || item.english || item.eng || item.word || item.answer;
+        const hebrewWord = (item.hebrew_word || item.hebrew || item.heb || '').trim();
+        const englishAnswer = (item.english_answer || item.english || item.eng || item.word || item.answer || '').trim();
 
         if (!hebrewWord || !englishAnswer) return null;
 
-        return {
+        // Check for duplicates
+        const englishLower = englishAnswer.toLowerCase();
+        if (existingEnglish.has(englishLower) || existingHebrew.has(hebrewWord)) {
+          duplicatesSkipped++;
+          return null;
+        }
+
+        // Add to lookup to prevent duplicates within the same upload
+        existingEnglish.add(englishLower);
+        existingHebrew.add(hebrewWord);
+
+        const newWord = {
           subject_id: displaySubject,
           unit_level: displayUnits,
           hebrew_word: hebrewWord,
@@ -254,18 +299,24 @@ export default function VocabularySetsPage() {
           difficulty: typeof item.difficulty === 'number' ? item.difficulty : (item.level || 1),
           cefr_level: item.cefr_level || item.cefr || '',
           phonetic: item.phonetic || '',
-          audio: item.audio || (item.audio_url ? { english_audio_url: item.audio_url } : {}),
+          audio: item.audio || (item.audio_url ? { english_audio_url: item.audio_url } : { english_audio_url: '', hebrew_audio_url: '' }),
           image_url: item.image_url || '',
           collocations: item.collocations || [],
           context_sentences: item.context_sentences || [],
           tags: item.tags || [],
           is_active: true,
-          order: words.length + idx
+          order: currentOrder++
         };
+
+        return newWord;
       }).filter(w => w !== null);
 
       if (wordsToAdd.length === 0) {
-        alert('לא נמצאו מילים תקינות. וודא שכל אובייקט מכיל hebrew_word ו-english_answer');
+        if (duplicatesSkipped > 0) {
+          alert(`❌ כל ${duplicatesSkipped} המילים כבר קיימות במאגר.`);
+        } else {
+          alert('לא נמצאו מילים תקינות. וודא שכל אובייקט מכיל hebrew_word ו-english_answer');
+        }
         setIsSaving(false);
         return;
       }
@@ -282,12 +333,17 @@ export default function VocabularySetsPage() {
       }
 
       // Calculate how many sets were created
-      const newSetsCount = Math.ceil(wordsToAdd.length / 10);
+      const newSetsCount = Math.ceil(totalAdded / 10);
 
       setShowBulkAddDialog(false);
       setBulkText('');
       loadData();
-      alert(`✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`);
+      
+      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`;
+      if (duplicatesSkipped > 0) {
+        message += `\n\n⚠️ ${duplicatesSkipped} מילים כפולות לא נוספו`;
+      }
+      alert(message);
     } catch (error) {
       console.error("Error bulk adding words:", error);
       alert('שגיאה בהוספת המילים: ' + error.message);
