@@ -442,10 +442,6 @@ export default function VocabularyQuickPracticePage() {
               )}
               
               <h2 className="text-xl font-bold text-gray-900 text-center">{question.question}</h2>
-              
-              {question.hint && (
-                <div className="text-lg text-blue-400 font-mono mt-4 text-center" dir="ltr">{question.hint}</div>
-              )}
             </div>
 
             {!showResult ? (
