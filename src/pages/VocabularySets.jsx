@@ -412,21 +412,30 @@ export default function VocabularySetsPage() {
 
         {/* Admin Buttons */}
         {user?.role === 'admin' && (
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowBulkAddDialog(true)}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                הוסף מילים
+              </Button>
+              <Button
+                onClick={openManageDialog}
+                variant="outline"
+                className="flex-1 border-2 border-purple-300 text-purple-600 h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+              >
+                <Edit className="w-5 h-5" />
+                סדר מילים
+              </Button>
+            </div>
             <Button
-              onClick={() => setShowBulkAddDialog(true)}
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold rounded-xl flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              הוסף מילים
-            </Button>
-            <Button
-              onClick={openManageDialog}
+              onClick={exportWordsAsJSON}
               variant="outline"
-              className="flex-1 border-2 border-purple-300 text-purple-600 h-12 font-bold rounded-xl flex items-center justify-center gap-2"
+              className="w-full border-2 border-green-300 text-green-600 h-10 font-bold rounded-xl flex items-center justify-center gap-2"
             >
-              <Edit className="w-5 h-5" />
-              סדר מילים
+              📥 ייצא רשימת מילים (JSON)
             </Button>
           </div>
         )}
