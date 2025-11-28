@@ -31,11 +31,16 @@ export default function VocabularyStrengthenPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Get weak words from progress
+      const subject = currentUser.selected_subject || 'אנגלית';
+      const units = currentUser.selected_units || 3;
+
+      // Get weak words from progress - filter by subject AND unit_level
       const weakProgress = await base44.entities.VocabularyProgress.filter({
         user_email: currentUser.email,
+        subject_id: subject,
+        unit_level: units,
         is_weak: true
-      }, '-updated_date', 50);
+      }, '-updated_date', 100);
 
       if (weakProgress.length === 0) {
         setWeakWords([]);
@@ -46,10 +51,10 @@ export default function VocabularyStrengthenPage() {
       // Get the actual word data
       const wordIds = weakProgress.map(p => p.word_id);
       const allWords = await base44.entities.VocabularyQuestion.filter({
-        subject_id: currentUser.selected_subject || 'אנגלית',
-        unit_level: currentUser.selected_units || 3,
+        subject_id: subject,
+        unit_level: units,
         is_active: true
-      }, null, 500);
+      }, null, 2000);
 
       const weakWordData = allWords.filter(w => wordIds.includes(w.id));
       
