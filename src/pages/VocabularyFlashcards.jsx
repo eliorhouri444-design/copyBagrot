@@ -53,17 +53,18 @@ export default function VocabularyFlashcardsPage() {
       
       // Base style rules for all levels
       const baseStyle = `
-STYLE RULES:
+CRITICAL STYLE RULES:
+- ABSOLUTELY NO TEXT, NO WORDS, NO LETTERS, NO NUMBERS, NO WRITING OF ANY KIND.
 - Clean educational flat illustration (VECTOR style).
 - Soft pastel colors only (light blue, yellow, green, gray).
 - White or light-blue solid background.
-- No text, no words, no letters.
 - No realistic photos or real people.
 - No busy background, no extra objects.
 - Thin outline (1-2px), rounded corners.
 - Single object/action in center.
 - 1:1 square image, 10-15% padding.
-- Must be instantly clear to a language learner.`;
+- Must be instantly clear to a language learner.
+- REMINDER: DO NOT include any text, labels, captions, or letters anywhere in the image.`;
 
       let levelPrompt = '';
       
