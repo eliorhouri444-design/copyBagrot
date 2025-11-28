@@ -298,11 +298,17 @@ export default function VocabularyQuickPracticePage() {
 
       if (existingProgress.length > 0) {
         const p = existingProgress[0];
+        const newStreak = correct ? (p.streak || 0) + 1 : 0;
+        // Remove from weak if answered correctly twice in a row
+        const shouldRemoveWeak = correct && newStreak >= 2;
+        
         await base44.entities.VocabularyProgress.update(p.id, {
           times_seen: (p.times_seen || 0) + 1,
           times_correct: (p.times_correct || 0) + (correct ? 1 : 0),
           times_incorrect: (p.times_incorrect || 0) + (correct ? 0 : 1),
-          is_weak: !correct ? true : p.is_weak,
+          streak: newStreak,
+          is_weak: !correct ? true : (shouldRemoveWeak ? false : p.is_weak),
+          is_known: newStreak >= 4 ? true : p.is_known,
           last_practiced: new Date().toISOString(),
           mastery_level: Math.min(100, Math.max(0, (p.mastery_level || 0) + (correct ? 15 : -10)))
         });
@@ -317,7 +323,9 @@ export default function VocabularyQuickPracticePage() {
           times_seen: 1,
           times_correct: correct ? 1 : 0,
           times_incorrect: correct ? 0 : 1,
+          streak: correct ? 1 : 0,
           is_weak: !correct,
+          is_known: false,
           last_practiced: new Date().toISOString(),
           mastery_level: correct ? 25 : 0
         });
