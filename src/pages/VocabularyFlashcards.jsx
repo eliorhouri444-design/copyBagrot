@@ -447,7 +447,7 @@ ${baseStyle}`;
 
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-100 shadow-lg flex flex-col items-center justify-center p-6"
+                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-6"
                 style={{ backfaceVisibility: 'hidden' }}>
 
                 {/* Part of Speech Tag */}
@@ -507,7 +507,7 @@ ${baseStyle}`;
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center p-5 overflow-y-auto"
+                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-5 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
 
                 {/* Part of Speech Tag */}
@@ -614,7 +614,7 @@ ${baseStyle}`;
           <div className="flex gap-4 mt-8">
             <button
               onClick={() => handleAnswerWithFlip(true)}
-              className="flex-1 h-14 bg-green-500 hover:bg-green-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+              className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
               <Check className="w-6 h-6" />
               <span className="font-bold text-lg">ידעתי</span>
@@ -622,7 +622,7 @@ ${baseStyle}`;
             
             <button
               onClick={() => handleAnswerWithFlip(false)}
-              className="flex-1 h-14 bg-red-500 hover:bg-red-600 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
+              className="flex-1 h-14 bg-blue-400 hover:bg-blue-500 rounded-2xl flex items-center justify-center gap-2 text-white shadow-lg transition-all"
             >
               <X className="w-6 h-6" />
               <span className="font-bold text-lg">לא ידעתי</span>
