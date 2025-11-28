@@ -215,22 +215,11 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   </div>
                   <p className="text-white/80 text-sm">
                     {vocabStats 
-                      ? `${vocabStats.masteredWords} מתוך ${vocabStats.totalWords} מילים בשליטה מלאה`
+                      ? `${vocabStats.learnedWords} מתוך ${vocabStats.totalWords} שאלות נענו`
                       : `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
-                  {vocabStats && (
-                    <div className="flex gap-3 mt-2">
-                      <div className="bg-white/20 rounded-lg px-2 py-1">
-                        <span className="text-white/90 text-xs">דיוק: </span>
-                        <span className="text-white font-bold text-sm">{vocabStats.accuracy}%</span>
-                      </div>
-                      <div className="bg-white/20 rounded-lg px-2 py-1">
-                        <span className="text-white/90 text-xs">לחיזוק: </span>
-                        <span className="text-white font-bold text-sm">{vocabStats.weakWords}</span>
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             </div>
@@ -258,8 +247,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נלמדו</div>
-                  <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.learnedWords}</div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לחזק</div>
+                  <div className="text-lg font-bold text-orange-600">{vocabStats.weakWords}</div>
                   <div className="text-[9px] text-[#6E6E6E]">מילים</div>
                 </div>
               </div>
