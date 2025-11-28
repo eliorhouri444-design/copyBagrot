@@ -148,7 +148,7 @@ ${baseStyle}`;
         subject_id: subject,
         unit_level: units,
         is_active: true
-      }, 'order', 500);
+      }, 'order', 2000);
 
       let wordsForPractice = [];
       if (isMultiSet) {
