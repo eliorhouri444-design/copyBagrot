@@ -65,8 +65,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           
           const masteredWords = validProgress.filter(p => p.streak >= 4 || p.is_known).length;
           const weakWords = validProgress.filter(p => p.is_weak).length;
-          const totalCorrect = userProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
-          const totalSeen = userProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
+          const totalCorrect = validProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
+          const totalSeen = validProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
           const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
           
           // Calculate mastery progress - percentage of words user truly knows
@@ -76,7 +76,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           
           setVocabStats({
             totalWords: allWords.length,
-            learnedWords: userProgress.length,
+            learnedWords: validProgress.length,
             masteredWords,
             weakWords,
             accuracy,
