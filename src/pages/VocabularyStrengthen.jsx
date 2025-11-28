@@ -135,10 +135,10 @@ export default function VocabularyStrengthenPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">מצוין!</h2>
           <p className="text-gray-600 mb-6">אין לך מילים לחיזוק כרגע. כל המילים נשלטות!</p>
           <Button
-            onClick={() => navigate(createPageUrl("VocabularySets"))}
+            onClick={() => navigate(createPageUrl("Practice"))}
             className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold rounded-xl"
           >
-            חזור לסטים
+            חזור לתרגול
           </Button>
         </motion.div>
       </div>
