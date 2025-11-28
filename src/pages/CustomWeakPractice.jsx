@@ -272,7 +272,7 @@ Return JSON:`,
           <div className="space-y-2">
             <Button 
               onClick={() => navigate(createPageUrl("Practice"))} 
-              className="w-full bg-[#2086b1] hover:bg-blue-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               המשך לתרגול חדש
             </Button>

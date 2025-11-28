@@ -948,7 +948,7 @@ export default function TopicPracticeNewPage() {
           <p className="text-gray-700 mb-6">{loadError}</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-[#2086b1] hover:bg-blue-700">
+            className="w-full bg-blue-600 hover:bg-blue-700">
 
             <ChevronRight className="w-5 h-5 ml-2" />
             חזור לתרגול
@@ -967,7 +967,7 @@ export default function TopicPracticeNewPage() {
           <p className="text-gray-600 mb-6">לא נמצאו שאלות עבור נושא זה</p>
           <Button
             onClick={() => navigate(createPageUrl("Practice"))}
-            className="w-full bg-[#2086b1] hover:bg-blue-700">
+            className="w-full bg-blue-600 hover:bg-blue-700">
 
             חזור לתרגול
           </Button>
@@ -1016,7 +1016,7 @@ export default function TopicPracticeNewPage() {
 
                     <div className="flex items-start gap-3">
                       {q.question_type === "writing" ?
-                      <div className="w-12 h-12 bg-[#2086b1] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           {Math.round(result?.percentage || 0)}
                         </div> :
                       result?.isCorrect ?
@@ -1132,7 +1132,7 @@ export default function TopicPracticeNewPage() {
 
             <div className="flex flex-col gap-2">
               {hasNextSet ?
-              <Button onClick={handleContinueToNextSet} className="w-full bg-[#2086b1] hover:bg-blue-700">
+              <Button onClick={handleContinueToNextSet} className="w-full bg-blue-600 hover:bg-blue-700">
                   המשך לסט הבא
                   <ChevronLeft className="w-5 h-5 mr-2" />
                 </Button> :
@@ -1276,7 +1276,7 @@ export default function TopicPracticeNewPage() {
 
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-5 border-b-2 border-blue-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#2086b1] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
@@ -1304,7 +1304,7 @@ export default function TopicPracticeNewPage() {
             <div className="p-4 sm:p-5 pt-0">
               <Button
                 onClick={() => setShowReadingText(false)}
-                className="w-full h-12 sm:h-14 bg-[#2086b1] hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-md">
+                className="w-full h-12 sm:h-14 bg-blue-600 hover:bg-blue-700 text-base sm:text-lg font-bold rounded-xl shadow-md">
 
                 יאללה לקרוא - המשך לשאלות
                 <ChevronLeft className="w-5 h-5 mr-2" />
@@ -1476,7 +1476,7 @@ export default function TopicPracticeNewPage() {
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                         isSelected ?
-                        'border-blue-600 bg-[#2086b1]' :
+                        'border-blue-600 bg-blue-600' :
                         'border-gray-400'}`
                         }>
                         {isSelected &&
@@ -1552,7 +1552,7 @@ export default function TopicPracticeNewPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-[#2086b1] hover:bg-blue-700">
+            <Button onClick={() => setShowStoryDialog(false)} className="w-full bg-blue-600 hover:bg-blue-700">
               סגור
             </Button>
           </DialogFooter>
@@ -2083,7 +2083,7 @@ export default function TopicPracticeNewPage() {
                   setShowSummary(true);
                 }
               }}
-              className="w-full bg-[#2086b1] hover:bg-blue-700 h-12 text-lg font-bold">
+              className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold">
 
               {currentQuestionIndex < currentSetQuestions.length - 1 ? 'המשך לשאלה הבאה' : 'סיים וראה סיכום'}
               <ChevronLeft className="w-5 h-5 mr-2" />

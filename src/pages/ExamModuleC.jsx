@@ -746,7 +746,7 @@ export default function ExamModuleCPage() {
                 <div key={questionIndex} className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-blue-900">שאלה {questionItem.question_number}</span>
-                    <span className="text-sm bg-[#2086b1] text-white px-2 py-1 rounded">{questionItem.points} נק'</span>
+                    <span className="text-sm bg-blue-600 text-white px-2 py-1 rounded">{questionItem.points} נק'</span>
                   </div>
                   <p className="text-gray-700 text-sm mb-2" dir="ltr">{questionItem.question_text}</p>
                   {questionItem.options && questionItem.options.length > 0 && (
@@ -807,7 +807,7 @@ export default function ExamModuleCPage() {
             </Button>
             <Button
               onClick={handleResumeProgress}
-              className="flex-1 bg-[#2086b1] hover:bg-blue-700 text-white"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
             >
               המשך מאיפה שעצרתי
             </Button>
@@ -839,7 +839,7 @@ export default function ExamModuleCPage() {
               className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all text-right shadow-lg"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-[#2086b1] rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-right">
@@ -1384,7 +1384,7 @@ export default function ExamModuleCPage() {
                           <Button
                             onClick={handleNextQuestion}
                             disabled={isSubmitting}
-                            className="flex-1 h-11 sm:h-12 bg-[#2086b1] text-sm sm:text-base disabled:opacity-50"
+                            className="flex-1 h-11 sm:h-12 bg-blue-600 text-sm sm:text-base disabled:opacity-50"
                           >
                             הבא
                             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

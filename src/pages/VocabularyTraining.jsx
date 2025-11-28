@@ -220,7 +220,7 @@ export default function VocabularyTrainingPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-[#2086b1] px-5 py-4 rounded-b-2xl">
+      <div className="bg-blue-600 px-5 py-4 rounded-b-2xl">
         <div className="flex items-center justify-between">
           <button
             onClick={() => mode === PRACTICE_MODES.DASHBOARD ? navigate(createPageUrl("Practice")) : setMode(PRACTICE_MODES.DASHBOARD)}

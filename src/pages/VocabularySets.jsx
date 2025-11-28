@@ -399,7 +399,7 @@ export default function VocabularySetsPage() {
   return (
     <div className="min-h-screen bg-blue-50 pb-24">
       {/* Header */}
-      <div className="bg-[#2086b1] px-5 py-4 rounded-b-2xl">
+      <div className="bg-blue-600 px-5 py-4 rounded-b-2xl">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(createPageUrl("Practice"))}
@@ -542,7 +542,7 @@ export default function VocabularySetsPage() {
               <Button
                 onClick={startSelectedSetsPractice}
                 size="sm"
-                className="bg-[#2086b1] hover:bg-[#1a6d91]"
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 התחל תרגול
               </Button>
@@ -593,7 +593,7 @@ export default function VocabularySetsPage() {
                   {/* Selection checkbox or Set Number */}
                   {selectionMode && !isLocked ? (
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isSelected ? 'bg-[#2086b1]' : 'bg-gray-100'
+                      isSelected ? 'bg-blue-600' : 'bg-gray-100'
                     }`}>
                       {isSelected ? (
                         <CheckSquare className="w-6 h-6 text-white" />
@@ -607,7 +607,7 @@ export default function VocabularySetsPage() {
                         ? 'bg-gray-100' 
                         : status === 'completed' 
                           ? 'bg-green-500' 
-                          : 'bg-[#2086b1]'
+                          : 'bg-blue-600'
                     }`}>
                       {isLocked ? (
                         <Lock className="w-6 h-6 text-gray-400" />

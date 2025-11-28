@@ -676,7 +676,7 @@ export default function ExamModuleAPage() {
 
           <DialogFooter className="flex gap-2">
             <Button onClick={handleStartFresh} variant="outline" className="flex-1 h-12">התחל מחדש</Button>
-            <Button onClick={handleResumeProgress} className="flex-1 h-12 bg-[#2086b1]">המשך</Button>
+            <Button onClick={handleResumeProgress} className="flex-1 h-12 bg-blue-600">המשך</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -720,7 +720,7 @@ export default function ExamModuleAPage() {
               onClick={() => handleModeSelect('exam')}
               className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-300"
             >
-              <div className="w-16 h-16 bg-[#2086b1] rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">מצב רגיל</h3>
@@ -868,7 +868,7 @@ export default function ExamModuleAPage() {
           )}
 
           <div className="flex gap-4">
-            <Button onClick={() => navigate(createPageUrl("Exams"))} className="flex-1 h-14 bg-[#2086b1]">חזרה</Button>
+            <Button onClick={() => navigate(createPageUrl("Exams"))} className="flex-1 h-14 bg-blue-600">חזרה</Button>
             <Button onClick={() => window.location.reload()} variant="outline" className="flex-1 h-14">נסה שוב</Button>
           </div>
         </div>
@@ -921,7 +921,7 @@ export default function ExamModuleAPage() {
             <Button 
               onClick={handleFinishExam} 
               disabled={isSubmitting}
-              className="w-full h-14 bg-[#2086b1] disabled:opacity-50"
+              className="w-full h-14 bg-blue-600 disabled:opacity-50"
             >
               סיים מבחן
             </Button>
@@ -1060,7 +1060,7 @@ export default function ExamModuleAPage() {
               <Button 
                 onClick={() => setCurrentSection('listening')} 
                 disabled={isSubmitting}
-                className="w-full h-14 bg-[#2086b1] mt-6 disabled:opacity-50"
+                className="w-full h-14 bg-blue-600 mt-6 disabled:opacity-50"
               >
                 המשך להאזנה
               </Button>

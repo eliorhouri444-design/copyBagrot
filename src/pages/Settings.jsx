@@ -490,10 +490,10 @@ export default function SettingsPage() {
     }
   };
 
-  const SettingItem = ({ icon: Icon, title, subtitle, onClick, rightElement, color = "#2086b1" }) => (
+  const SettingItem = ({ icon: Icon, title, subtitle, onClick, rightElement, color = "#3B82F6" }) => (
     <button
       onClick={onClick}
-      className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] hover:border-[#2086b1] transition-colors text-right active:bg-gray-50"
+      className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF] hover:border-[#3B82F6] transition-colors text-right active:bg-gray-50"
     >
       <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" style={{ color }} />
@@ -506,7 +506,7 @@ export default function SettingsPage() {
     </button>
   );
 
-  const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#2086b1", loading = false }) => (
+  const SettingToggle = ({ icon: Icon, title, subtitle, checked, onChange, color = "#3B82F6", loading = false }) => (
     <div className="w-full bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E9F0FF]">
       <div className="w-10 h-10 bg-[#E9F0FF] rounded-full flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" style={{ color }} />
@@ -523,7 +523,7 @@ export default function SettingsPage() {
         ) : (
           <button
             onClick={() => onChange(!checked)}
-            className={`w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-[#2086b1]' : 'bg-gray-300'}`}
+            className={`w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-[#3B82F6]' : 'bg-gray-300'}`}
           >
             <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${checked ? 'translate-x-[-22px]' : 'translate-x-[-2px]'}`} />
           </button>
@@ -532,7 +532,7 @@ export default function SettingsPage() {
     </div>
   );
 
-  const SectionTitle = ({ icon: Icon, title, color = "#2086b1" }) => (
+  const SectionTitle = ({ icon: Icon, title, color = "#3B82F6" }) => (
     <div className="flex items-center gap-2 mb-3 mt-6 first:mt-0">
       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
         <Icon className="w-4 h-4" style={{ color }} />
@@ -576,7 +576,7 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2086b1]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3B82F6]" />
       </div>
     );
   }
@@ -584,7 +584,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24">
       {/* Header */}
-      <div className="bg-[#2086b1] px-5 py-4 flex items-center justify-between">
+      <div className="bg-[#3B82F6] px-5 py-4 flex items-center justify-between">
         <button onClick={() => navigate(createPageUrl("Profile"))} className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
           <ChevronRight className="w-5 h-5 text-white" />
         </button>
@@ -650,7 +650,7 @@ export default function SettingsPage() {
             subtitle="תזכורת ללמידה בשעה 18:00" 
             checked={settings.daily_reminders} 
             onChange={(v) => handleToggleSetting('daily_reminders', v)} 
-            color="#2086b1"
+            color="#3B82F6"
             loading={loadingSettings.daily_reminders}
           />
           <SettingToggle 
@@ -760,14 +760,14 @@ export default function SettingsPage() {
             {/* Profile Image */}
             <div className="flex flex-col items-center">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-[#E9F0FF] flex items-center justify-center overflow-hidden border-4 border-[#2086b1]">
+                <div className="w-24 h-24 rounded-full bg-[#E9F0FF] flex items-center justify-center overflow-hidden border-4 border-[#3B82F6]">
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <User className="w-10 h-10 text-[#2086b1]" />
+                    <User className="w-10 h-10 text-[#3B82F6]" />
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#2086b1] rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
+                <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#3B82F6] rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -791,7 +791,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditProfile(false)}>ביטול</Button>
-            <Button onClick={handleSaveProfile} className="bg-[#2086b1]">שמור</Button>
+            <Button onClick={handleSaveProfile} className="bg-[#3B82F6]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -836,7 +836,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowChangePassword(false); setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setPasswordError(''); }}>ביטול</Button>
-            <Button onClick={handleChangePassword} className="bg-[#2086b1]" disabled={changingPassword}>
+            <Button onClick={handleChangePassword} className="bg-[#3B82F6]" disabled={changingPassword}>
               {changingPassword ? 'משנה...' : 'שנה סיסמה'}
             </Button>
           </DialogFooter>
@@ -862,7 +862,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowUpdateContact(false)}>ביטול</Button>
-            <Button onClick={handleSaveContact} className="bg-[#2086b1]">שמור</Button>
+            <Button onClick={handleSaveContact} className="bg-[#3B82F6]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -906,7 +906,7 @@ export default function SettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowPersonalPlan(false)}>ביטול</Button>
-            <Button onClick={handleSavePlan} className="bg-[#2086b1]">שמור</Button>
+            <Button onClick={handleSavePlan} className="bg-[#3B82F6]">שמור</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -945,12 +945,12 @@ export default function SettingsPage() {
               value={feedbackText}
               onChange={(e) => setFeedbackText(e.target.value)}
               placeholder="מה אתה חושב על האפליקציה? יש לך רעיונות לשיפור?"
-              className="w-full h-32 p-3 border border-[#E9F0FF] rounded-xl text-[14px] resize-none focus:outline-none focus:border-[#2086b1]"
+              className="w-full h-32 p-3 border border-[#E9F0FF] rounded-xl text-[14px] resize-none focus:outline-none focus:border-[#3B82F6]"
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowFeedback(false)}>ביטול</Button>
-            <Button onClick={handleSendFeedback} className="bg-[#2086b1]">שלח</Button>
+            <Button onClick={handleSendFeedback} className="bg-[#3B82F6]">שלח</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1021,7 +1021,7 @@ export default function SettingsPage() {
               <Button variant="outline" onClick={() => setShowRating(false)}>ביטול</Button>
               <Button 
                 onClick={handleRatingSubmit} 
-                className={`${rating === 5 ? 'bg-green-600 hover:bg-green-700' : 'bg-[#2086b1]'}`}
+                className={`${rating === 5 ? 'bg-green-600 hover:bg-green-700' : 'bg-[#3B82F6]'}`}
                 disabled={rating === 0}
               >
                 {rating === 5 ? 'דרג בחנות' : 'שלח'}

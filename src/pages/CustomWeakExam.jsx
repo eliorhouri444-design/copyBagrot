@@ -316,7 +316,7 @@ Return JSON:`,
           </p>
           <Button
             onClick={() => navigate(createPageUrl("Exams"))}
-            className="w-full h-12 bg-blue-500 hover:bg-[#2086b1]">
+            className="w-full h-12 bg-blue-500 hover:bg-blue-600">
 
             חזרה לבגרויות
           </Button>
@@ -386,7 +386,7 @@ Return JSON:`,
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => window.location.reload()}
-              className="w-full h-14 bg-blue-500 hover:bg-[#2086b1] text-lg font-bold shadow-lg">
+              className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg">
 
               <Zap className="w-5 h-5 ml-2" />
               נסה שוב
@@ -510,7 +510,7 @@ Return JSON:`,
                   </div>
                   <Button
                   onClick={handleAudioPlay}
-                  className="bg-[#2086b1] hover:bg-blue-700"
+                  className="bg-blue-600 hover:bg-blue-700"
                   disabled={audioPlayed}>
 
                     {audioPlayed ? 'הושמע' : 'השמע'}
@@ -543,7 +543,7 @@ Return JSON:`,
                   <Button
                   onClick={checkAnswer}
                   disabled={!userAnswer.trim() || isChecking || !canAnswer}
-                  className="flex-1 h-14 bg-blue-500 hover:bg-[#2086b1] text-lg font-bold shadow-lg disabled:opacity-50">
+                  className="flex-1 h-14 bg-blue-500 hover:bg-blue-600 text-lg font-bold shadow-lg disabled:opacity-50">
 
                     {isChecking ? 'בודק...' : 'בדוק'}
                     <CheckCircle className="w-5 h-5 mr-2" />

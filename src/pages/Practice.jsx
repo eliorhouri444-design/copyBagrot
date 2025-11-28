@@ -35,7 +35,7 @@ export default function PracticePage() {
   const displayUnits = parseInt(user?.selected_units || cachedUnits);
 
   const subjectColors = {
-    "אנגלית": "bg-[#2086b1]",
+    "אנגלית": "bg-blue-600",
     "מתמטיקה": "bg-purple-600",
     "פיזיקה": "bg-green-600",
     "ספרות": "bg-pink-600",
@@ -43,7 +43,7 @@ export default function PracticePage() {
     "גאוגרפיה": "bg-cyan-600"
   };
 
-  const headerColor = subjectColors[displaySubject] || "bg-[#2086b1]";
+  const headerColor = subjectColors[displaySubject] || "bg-blue-600";
 
   useEffect(() => {
     const loadData = async () => {
@@ -313,7 +313,7 @@ export default function PracticePage() {
 
   return (
     <div className="bg-blue-100 pt-0 pb-20 min-h-screen">
-      <div className="bg-[#2086b1] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity">
@@ -376,7 +376,7 @@ export default function PracticePage() {
           transition={{ delay: 0.2 }}>
 
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="bg-[#2086b1] p-4">
+            <div className="bg-[#3B82F6] p-4">
               <div className="flex items-center gap-3 text-white">
                 <div className="flex-1 text-right">
                   <h3 className="text-base font-bold">תרגול פרימיום מותאם אישית</h3>
@@ -412,7 +412,7 @@ export default function PracticePage() {
 
 
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#2086b1] rounded-lg flex-shrink-0 w-10 h-10 from-orange-600 to-red-600 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-lg flex-shrink-0 w-10 h-10 from-orange-600 to-red-600 flex items-center justify-center">
                       <Target className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
@@ -445,7 +445,7 @@ export default function PracticePage() {
 
 
                   <div className="flex items-center gap-3">
-                    <div className="bg-[#2086b1] rounded-lg w-10 h-10 from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <div className="bg-blue-600 rounded-lg w-10 h-10 from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
                       <Settings className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
@@ -463,7 +463,7 @@ export default function PracticePage() {
               <div className="mt-4 text-center">
                   <Button
                   onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-[#2086b1] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8">
+                  className="bg-[#3B82F6] hover:bg-blue-700 text-white h-11 text-[13px] font-bold rounded-[14px] px-8">
 
                     <Crown className="w-4 h-4 ml-2" />
                     שדרג לפרימיום
@@ -489,7 +489,7 @@ export default function PracticePage() {
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminQuestionBank"))}
-                className="bg-[#2086b1] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <Upload className="w-4 h-4 mr-2" />
                   נהל
@@ -505,7 +505,7 @@ export default function PracticePage() {
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminTopics"))}
-                className="bg-[#2086b1] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <BookOpen className="w-4 h-4 mr-2" />
                   נהל
@@ -665,7 +665,7 @@ export default function PracticePage() {
               <Trash2 className="w-4 h-4 mr-2" />
               הסתר נושא
             </Button>
-            <Button onClick={handleSaveTopicEdit} className="bg-[#2086b1] hover:bg-blue-700">
+            <Button onClick={handleSaveTopicEdit} className="bg-blue-600 hover:bg-blue-700">
               <Save className="w-4 h-4 mr-2" />
               שמור שינויים
             </Button>

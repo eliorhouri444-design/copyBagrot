@@ -89,7 +89,7 @@ export default function PremiumPage() {
     name: "מנוי חודשי",
     price: 49.99,
     period: "לחודש",
-    color: "bg-[#2086b1]",
+    color: "bg-[#3B82F6]",
     features: [
     "כל התכונות של פרימיום",
     "ביטול בכל עת",
@@ -104,7 +104,7 @@ export default function PremiumPage() {
     originalPrice: 599.88,
     discount: 50,
     period: "לשנה",
-    color: "bg-[#2086b1]",
+    color: "bg-[#3B82F6]",
     badge: "הכי משתלם",
     savingsText: "חסוך 300₪ לשנה!",
     features: [
@@ -124,7 +124,7 @@ export default function PremiumPage() {
     description: "גישה מלאה למאגר עצום של שאלות, תרגולים ופתרונות בכל מקצועות הבגרות.",
     free: "עד 100 שאלות בלבד",
     premium: "גישה מלאה ללא הגבלה",
-    gradient: "bg-[#2086b1]"
+    gradient: "bg-[#3B82F6]"
   },
   {
     icon: Target,
@@ -132,7 +132,7 @@ export default function PremiumPage() {
     description: "תרגול לפי נושא, לפי רמה, מבחני סימולציה מדויקים כמו בבגרות.",
     free: "עשרות בחנים בלבד",
     premium: "מאות בחנים מלאים",
-    gradient: "bg-[#2086b1]"
+    gradient: "bg-[#3B82F6]"
   },
   {
     icon: Shield,
@@ -140,7 +140,7 @@ export default function PremiumPage() {
     description: "כל הלמידה נקייה, מהירה וללא הסחות דעת.",
     free: "פרסומות במבחנים",
     premium: "ללא פרסומות כלל",
-    gradient: "bg-[#2086b1]"
+    gradient: "bg-[#3B82F6]"
   },
   {
     icon: Brain,
@@ -148,7 +148,7 @@ export default function PremiumPage() {
     description: "המערכת מזהה את הטעויות שלך ובונה לך תרגול אישי שמתמקד בדיוק בנקודות החלשות.",
     free: "אין אפשרות",
     premium: "תרגול חכם על כל הטעויות שלך",
-    gradient: "bg-[#2086b1]"
+    gradient: "bg-[#3B82F6]"
   },
   {
     icon: FileCheck,
@@ -156,7 +156,7 @@ export default function PremiumPage() {
     description: "מבחני בגרות מותאמים אישית שמתמקדים בדיוק בנושאים שאתה צריך לשפר.",
     free: "אין אפשרות",
     premium: "מבחנים ממוקדים לפי החולשות שלך",
-    gradient: "from-[#2086b1] to-indigo-600"
+    gradient: "from-[#3B82F6] to-indigo-600"
   },
   {
     icon: TrendingUp,
@@ -164,7 +164,7 @@ export default function PremiumPage() {
     description: "תוכנית למידה מותאמת אישית שלוקחת בחשבון את הזמן עד הבגרות, הרמה שלך והיעדים.",
     free: "אין אפשרות",
     premium: "תוכנית אישית מלאה עם מעקב התקדמות",
-    gradient: "bg-[#2086b1]"
+    gradient: "bg-[#3B82F6]"
   }];
 
 
@@ -203,7 +203,7 @@ export default function PremiumPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2086b1] mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3B82F6] mx-auto mb-4" />
           <p className="text-gray-600">טוען...</p>
         </div>
       </div>);
@@ -290,7 +290,7 @@ export default function PremiumPage() {
             className="bg-white rounded-2xl shadow-lg p-6">
 
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-[#2086b1]" />
+                <Sparkles className="w-6 h-6 text-[#3B82F6]" />
                 מה עכשיו?
               </h3>
               <p className="text-gray-700 mb-4">
@@ -312,7 +312,7 @@ export default function PremiumPage() {
               </ul>
               <Button
               onClick={() => navigate(createPageUrl("Home"))}
-              className="mt-6 w-full bg-[#2086b1] hover:bg-[#1a6d91] text-white py-3 text-lg font-bold rounded-xl">
+              className="mt-6 w-full bg-[#3B82F6] hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl">
 
                 חזור לדף הבית
               </Button>
@@ -328,7 +328,7 @@ export default function PremiumPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6">
 
-                  <div className="inline-flex items-center gap-2 bg-[#2086b1] text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
+                  <div className="inline-flex items-center gap-2 bg-[#3B82F6] text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
                     <Sparkles className="w-6 h-6" />
                     בחר את המסלול שלך
                   </div>
@@ -388,7 +388,7 @@ export default function PremiumPage() {
 
                     <Button
                   onClick={() => handleSelectPlan(plan)}
-                  className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-[#2086b1] hover:bg-[#1a6d91] text-white' : 'bg-[#2086b1] hover:bg-[#1a6d91] text-white'}`}>
+                  className={`mt-auto w-full py-3 h-auto text-lg font-bold rounded-xl ${plan.id === 'yearly' ? 'bg-[#3B82F6] hover:bg-blue-700 text-white' : 'bg-[#3B82F6] hover:bg-blue-700 text-white'}`}>
                       בחר מסלול
                     </Button>
                   </motion.div>
@@ -423,7 +423,7 @@ export default function PremiumPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6">
 
-                  <div className="inline-flex items-center gap-2 bg-[#2086b1] text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
+                  <div className="inline-flex items-center gap-2 bg-[#3B82F6] text-white px-8 py-4 rounded-2xl font-bold text-xl mb-3 shadow-lg">
                     <Target className="w-6 h-6" />
                     מה מקבלים בפרימיום?
                   </div>
@@ -442,7 +442,7 @@ export default function PremiumPage() {
                     transition={{ delay: 0.7 + idx * 0.05 }}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
 
-                      <div className="bg-[#2086b1] p-5">
+                      <div className="bg-[#3B82F6] p-5">
                         <div className="flex items-center gap-4 text-white">
                           <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
                             <Icon className="w-7 h-7" />
@@ -483,7 +483,7 @@ export default function PremiumPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.3 }}
-            className="bg-[#2086b1] rounded-3xl p-12 text-center text-white shadow-2xl">
+            className="bg-[#3B82F6] rounded-3xl p-12 text-center text-white shadow-2xl">
 
               <Crown className="w-24 h-24 mx-auto mb-6" />
               <h2 className="text-4xl font-bold mb-4">מוכן לקפוץ לרמה הבאה?</h2>
@@ -557,7 +557,7 @@ export default function PremiumPage() {
             <Button
               onClick={() => handleSelectPlan(selectedPlan)}
               disabled={!selectedPlan}
-              className="w-full bg-[#2086b1] hover:bg-[#1a6d91] text-white py-3 text-lg font-bold rounded-xl">
+              className="w-full bg-[#3B82F6] hover:bg-blue-700 text-white py-3 text-lg font-bold rounded-xl">
 
               המשך לתשלום
             </Button>

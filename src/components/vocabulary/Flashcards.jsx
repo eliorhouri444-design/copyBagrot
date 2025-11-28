@@ -52,7 +52,7 @@ export default function Flashcards({ words, onComplete, onUpdateWord }) {
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5">
         <div 
-          className="bg-[#2086b1] h-2.5 rounded-full transition-all duration-300" 
+          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
           style={{ width: `${progress}%` }} 
         />
       </div>

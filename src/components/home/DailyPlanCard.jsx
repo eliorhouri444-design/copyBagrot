@@ -579,19 +579,19 @@ export default function DailyPlanCard({
                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                   isCompleted
                     ? 'bg-green-50 border-green-200'
-                    : 'bg-white border-[#E9F0FF] hover:border-[#2086b1] cursor-pointer'
+                    : 'bg-white border-[#E9F0FF] hover:border-[#3B82F6] cursor-pointer'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                   isCompleted 
                     ? 'bg-green-500 border-green-500' 
-                    : 'border-[#2086b1]'
+                    : 'border-[#3B82F6]'
                 }`}>
                   {isCompleted && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
                 
                 <Icon className={`w-4 h-4 flex-shrink-0 ${
-                  isCompleted ? 'text-green-600' : 'text-[#2086b1]'
+                  isCompleted ? 'text-green-600' : 'text-[#3B82F6]'
                 }`} />
                 
                 <div className="flex-1">
@@ -606,7 +606,7 @@ export default function DailyPlanCard({
                     <div className="mt-1.5">
                       <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-[#2086b1] rounded-full transition-all"
+                          className="h-full bg-[#3B82F6] rounded-full transition-all"
                           style={{ width: `${progressPct}%` }}
                         />
                       </div>
@@ -614,7 +614,7 @@ export default function DailyPlanCard({
                   )}
                 </div>
 
-                {!isCompleted && <Play className="w-4 h-4 text-[#2086b1]" />}
+                {!isCompleted && <Play className="w-4 h-4 text-[#3B82F6]" />}
                 {task.duration && !isCompleted && (
                   <span className="text-[10px] text-[#6E6E6E] ml-2">{task.duration} דק'</span>
                 )}
@@ -636,7 +636,7 @@ export default function DailyPlanCard({
 
         <Button
           onClick={handleStartTasks}
-          className="w-full h-11 bg-[#2086b1] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[14px]"
+          className="w-full h-11 bg-[#3B82F6] hover:bg-blue-700 text-white font-bold rounded-[14px] text-[14px]"
         >
           <Play className="w-4 h-4 ml-2" />
           התחל משימות היום
@@ -648,11 +648,11 @@ export default function DailyPlanCard({
         <CardSimple delay={0.2}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#2086b1]" />
+              <BookOpen className="w-4 h-4 text-[#3B82F6]" />
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">נושאים לתרגול</h3>
             </div>
             <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF] flex items-center gap-1">
-              <span className="text-[13px] font-bold text-[#2086b1]">{topicOverallStats.mastery}%</span>
+              <span className="text-[13px] font-bold text-[#3B82F6]">{topicOverallStats.mastery}%</span>
               <span className="text-[10px] text-[#6E6E6E]">בקיאות</span>
             </div>
           </div>
@@ -665,7 +665,7 @@ export default function DailyPlanCard({
                 <button
                   key={topic.topic_id}
                   onClick={() => handleTopicClick(topic)}
-                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#2086b1] hover:shadow-md"
+                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md"
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
@@ -678,7 +678,7 @@ export default function DailyPlanCard({
                       </span>
                     </div>
                   </div>
-                  <Play className="w-4 h-4 text-[#2086b1]" />
+                  <Play className="w-4 h-4 text-[#3B82F6]" />
                 </button>
               );
             })}
@@ -691,11 +691,11 @@ export default function DailyPlanCard({
         <CardSimple delay={0.25}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-[#2086b1]" />
+              <FileCheck className="w-4 h-4 text-[#3B82F6]" />
               <h3 className="text-[14px] font-bold text-[#2B2B2B]">שאלונים לבגרות</h3>
             </div>
             <div className="bg-[#F5F8FF] px-3 py-1 rounded-full border border-[#E9F0FF] flex items-center gap-1">
-              <span className="text-[13px] font-bold text-[#2086b1]">{examOverallStats.mastery}%</span>
+              <span className="text-[13px] font-bold text-[#3B82F6]">{examOverallStats.mastery}%</span>
               <span className="text-[10px] text-[#6E6E6E]">בקיאות</span>
             </div>
           </div>
@@ -708,7 +708,7 @@ export default function DailyPlanCard({
                 <button
                   key={module.id}
                   onClick={() => handleExamClick(module)}
-                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#2086b1] hover:shadow-md"
+                  className="w-full bg-white rounded-xl p-3 border transition-all text-right flex items-center justify-between border-[#E9F0FF] hover:border-[#3B82F6] hover:shadow-md"
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <div className={`w-8 h-8 bg-gradient-to-r ${module.color || 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center text-white text-[11px] font-bold`}>
@@ -721,7 +721,7 @@ export default function DailyPlanCard({
                       </span>
                     </div>
                   </div>
-                  <Play className="w-4 h-4 text-[#2086b1]" />
+                  <Play className="w-4 h-4 text-[#3B82F6]" />
                 </button>
               );
             })}

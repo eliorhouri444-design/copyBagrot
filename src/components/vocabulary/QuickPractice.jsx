@@ -138,7 +138,7 @@ export default function QuickPractice({ words, questionsCount = 10, onComplete, 
         <span>{Math.round(progress)}%</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-1.5">
-        <div className="bg-[#2086b1] h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
+        <div className="bg-blue-600 h-1.5 rounded-full transition-all" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Question */}
@@ -208,14 +208,14 @@ export default function QuickPractice({ words, questionsCount = 10, onComplete, 
         <Button
           onClick={checkAnswer}
           disabled={currentQuestion.type === 'fill_blank' ? !userAnswer.trim() : !selectedOption}
-          className="w-full h-12 bg-[#2086b1] hover:bg-blue-700 text-white"
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
         >
           בדוק תשובה
         </Button>
       ) : (
         <Button
           onClick={goToNext}
-          className="w-full h-12 bg-[#2086b1] hover:bg-blue-700 text-white"
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
         >
           {currentIndex < questions.length - 1 ? 'הבא' : 'סיים'}
           <ChevronLeft className="w-5 h-5 mr-2" />

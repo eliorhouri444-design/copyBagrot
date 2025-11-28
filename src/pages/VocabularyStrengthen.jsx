@@ -136,7 +136,7 @@ export default function VocabularyStrengthenPage() {
           <p className="text-gray-600 mb-6">אין לך מילים לחיזוק כרגע. כל המילים נשלטות!</p>
           <Button
             onClick={() => navigate(createPageUrl("VocabularySets"))}
-            className="w-full bg-[#2086b1] hover:bg-blue-700 h-12 text-lg font-bold rounded-xl"
+            className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg font-bold rounded-xl"
           >
             חזור לסטים
           </Button>

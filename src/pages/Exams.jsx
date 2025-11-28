@@ -53,7 +53,7 @@ export default function ExamsPage() {
   const displayUnits = parseInt(examsData?.units || cachedUnits);
 
   const subjectColors = {
-    "אנגלית": "bg-[#2086b1]",
+    "אנגלית": "bg-blue-600",
     "מתמטיקה": "bg-purple-600",
     "פיזיקה": "bg-green-600",
     "ספרות": "bg-pink-600",
@@ -682,7 +682,7 @@ export default function ExamsPage() {
 
   return (
     <div className="bg-indigo-50 pb-4 min-h-screen">
-      <div className="bg-[#2086b1] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
+      <div className="bg-[#3B82F6] mb-6 px-5 py-3 rounded-[4px_4px_14px_14px] from-blue-500 to-indigo-500 flex items-center justify-between">
         <button
           onClick={() => navigate(createPageUrl("SubjectSelection"))}
           className="text-right flex-1 hover:opacity-90 transition-opacity">
@@ -827,7 +827,7 @@ export default function ExamsPage() {
                                 sessionStorage.setItem('mistakesExamAttemptId', attempt.id);
                                 sessionStorage.setItem('mistakesExamId', attempt.exam_id);
                                 navigate(createPageUrl("ExamMistakesPractice"));
-                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2086b1] from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
+                              }} className="bg-blue-500 text-[11px] px-4 py-2 font-bold rounded-[14px] whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-blue-600 from-blue-500 to-blue-600 hover:from-orange-600 hover:to-red-700 w-full h-9 flex items-center justify-center gap-2">
 
                                 תקן {wrongCount} טעויות
                               </Button>
@@ -843,7 +843,7 @@ export default function ExamsPage() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                   onClick={() => setShowAllExams(true)}
-                  className="bg-[#2086b1] text-white text-[13px] mt-2 px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+                  className="bg-[#3B82F6] text-white text-[13px] mt-2 px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
                       צפה בכל הבגרויות ({examAttempts.length})
                     </Button>
@@ -870,7 +870,7 @@ export default function ExamsPage() {
           className="bg-indigo-50 rounded-2xl p-4">
 
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#2086b1] rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-[#3B82F6] rounded-full flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
@@ -881,7 +881,7 @@ export default function ExamsPage() {
               </div>
               <Button
               onClick={() => navigate(createPageUrl("Premium"))}
-              className="bg-[#2086b1] hover:bg-blue-700 text-white h-9 text-[12px] font-bold rounded-[14px]">
+              className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] font-bold rounded-[14px]">
 
                 <Crown className="w-4 h-4 mr-1" />
                 <span className="font-bold">שדרג</span>
@@ -905,7 +905,7 @@ export default function ExamsPage() {
                 </div>
                 <Button
                 onClick={handleAddNewModule}
-                className="bg-[#2086b1] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <span>הוסף</span>
                   <BookCheck className="w-4 h-4 mr-2" />
@@ -921,7 +921,7 @@ export default function ExamsPage() {
                 </div>
                 <Button
                 onClick={() => navigate(createPageUrl("AdminExams"))}
-                className="bg-[#2086b1] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
+                className="bg-[#3B82F6] hover:bg-blue-700 text-white h-9 text-[12px] rounded-[14px]">
 
                   <span>נהל</span>
                   <Upload className="w-4 h-4 mr-2" />
@@ -979,7 +979,7 @@ export default function ExamsPage() {
               <span className="text-sm font-medium text-gray-700">ניגודיות גבוהה</span>
               <button
                 onClick={() => setHighContrast(!highContrast)}
-                className={`w-12 h-6 rounded-full transition-colors ${highContrast ? 'bg-[#2086b1]' : 'bg-gray-300'} relative`}>
+                className={`w-12 h-6 rounded-full transition-colors ${highContrast ? 'bg-blue-600' : 'bg-gray-300'} relative`}>
 
                 <div
                   className={`dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${highContrast ? 'translate-x-6' : ''}`} />
@@ -992,7 +992,7 @@ export default function ExamsPage() {
             <Button variant="outline" onClick={() => setShowAccessibilityDialog(false)}>
               ביטול
             </Button>
-            <Button onClick={handleSaveAccessibility} className="bg-[#2086b1] hover:bg-blue-700">
+            <Button onClick={handleSaveAccessibility} className="bg-blue-600 hover:bg-blue-700">
               שמור
             </Button>
           </DialogFooter>
@@ -1487,7 +1487,7 @@ export default function ExamsPage() {
             <Button variant="outline" onClick={() => setShowModuleOrderDialog(false)}>
               ביטול
             </Button>
-            <Button onClick={handleSaveModuleOrder} className="bg-[#2086b1] hover:bg-blue-700">
+            <Button onClick={handleSaveModuleOrder} className="bg-blue-600 hover:bg-blue-700">
               שמור סדר
             </Button>
           </DialogFooter>
@@ -1793,7 +1793,7 @@ export default function ExamsPage() {
               <Trash2 className="w-4 h-4 mr-2" />
               מחק מודול
             </Button>
-            <Button onClick={handleSaveModuleEdit} className="bg-[#2086b1] hover:bg-blue-700">
+            <Button onClick={handleSaveModuleEdit} className="bg-blue-600 hover:bg-blue-700">
               <Save className="w-4 h-4 mr-2" />
               שמור שינויים
             </Button>
