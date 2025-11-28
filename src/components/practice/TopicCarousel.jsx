@@ -215,7 +215,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   </div>
                   <p className="text-white/80 text-sm">
                     {vocabStats 
-                      ? `${vocabStats.learnedWords} מתוך ${vocabStats.totalWords} שאלות נענו`
+                      ? `סה"כ ${vocabStats.totalWords} מילים`
                       : `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
@@ -231,9 +231,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <BookOpen className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">סה"כ</div>
-                  <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.totalWords}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">מילים</div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נלמדו</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.learnedWords}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">שאלות</div>
                 </div>
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
