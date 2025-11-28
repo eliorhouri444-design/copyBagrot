@@ -209,7 +209,7 @@ export default function VocabularyStrengthenPage() {
       {/* Header */}
       <div className="bg-orange-500 px-4 py-3 flex items-center justify-between">
         <button
-          onClick={() => navigate(createPageUrl("VocabularySets"))}
+          onClick={() => navigate(createPageUrl("Practice"))}
           className="p-2 -ml-2 text-white"
         >
           <ChevronLeft className="w-5 h-5" />
