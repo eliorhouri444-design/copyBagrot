@@ -49,11 +49,12 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               subject_id: subject,
               unit_level: units,
               is_active: true
-            }, null, 500),
+            }, null, 2000),
             base44.entities.VocabularyProgress.filter({
               user_email: user.email,
-              subject_id: subject
-            }, null, 1000)
+              subject_id: subject,
+              unit_level: units
+            }, null, 2000)
           ]);
           
           const masteredWords = userProgress.filter(p => p.streak >= 4 || p.is_known).length;
