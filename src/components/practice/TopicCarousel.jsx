@@ -18,10 +18,63 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   const [topics, setTopics] = useState(initialTopics);
   const [showVocabSetSelector, setShowVocabSetSelector] = useState(false);
   const [vocabularySets, setVocabularySets] = useState([]);
+  const [vocabStats, setVocabStats] = useState(null);
 
   useEffect(() => {
     setTopics(initialTopics);
   }, [initialTopics]);
+
+  // Load vocabulary stats when showing vocabulary topic
+  useEffect(() => {
+    const loadVocabStats = async () => {
+      const currentTopic = topics[currentIndex];
+      if (!currentTopic) return;
+      
+      const isVocab = currentTopic.isVocabulary || 
+        currentTopic.topic_id?.toLowerCase().includes('vocabulary') || 
+        currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים');
+      
+      if (isVocab) {
+        try {
+          const user = await base44.auth.me();
+          const subject = user?.selected_subject || 'אנגלית';
+          const units = user?.selected_units || 3;
+          
+          const [allWords, userProgress] = await Promise.all([
+            base44.entities.VocabularyQuestion.filter({
+              subject_id: subject,
+              unit_level: units,
+              is_active: true
+            }, null, 500),
+            base44.entities.VocabularyProgress.filter({
+              user_email: user.email,
+              subject_id: subject
+            }, null, 1000)
+          ]);
+          
+          const masteredWords = userProgress.filter(p => p.streak >= 4 || p.is_known).length;
+          const weakWords = userProgress.filter(p => p.is_weak).length;
+          const totalCorrect = userProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
+          const totalSeen = userProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
+          const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
+          
+          setVocabStats({
+            totalWords: allWords.length,
+            learnedWords: userProgress.length,
+            masteredWords,
+            weakWords,
+            accuracy
+          });
+        } catch (error) {
+          console.error("Error loading vocab stats:", error);
+        }
+      } else {
+        setVocabStats(null);
+      }
+    };
+    
+    loadVocabStats();
+  }, [currentIndex, topics]);
 
   useEffect(() => {
     if (topics.length > 0) {
@@ -153,33 +206,58 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-blue-50 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <Target className="w-4 h-4 text-white" />
+            {/* Stats Cards - Different for Vocabulary */}
+            {vocabStats ? (
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                <div className="bg-blue-50 p-2.5 text-center rounded-xl">
+                  <div className="text-[10px] text-[#6E6E6E] font-medium mb-0.5">סה"כ</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.totalWords}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">מילים</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.excellentSets || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
-              </div>
-              <div className="bg-blue-50 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <BookOpen className="w-4 h-4 text-white" />
+                <div className="bg-green-50 p-2.5 text-center rounded-xl">
+                  <div className="text-[10px] text-green-700 font-medium mb-0.5">בקיאות</div>
+                  <div className="text-lg font-bold text-green-600">{vocabStats.masteredWords}</div>
+                  <div className="text-[9px] text-green-600">4+ ברצף</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.mediumSets || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
-              </div>
-              <div className="bg-blue-50 p-3 text-center rounded-xl">
-                <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                  <Target className="w-4 h-4 text-white" />
+                <div className="bg-orange-50 p-2.5 text-center rounded-xl">
+                  <div className="text-[10px] text-orange-700 font-medium mb-0.5">לחיזוק</div>
+                  <div className="text-lg font-bold text-orange-600">{vocabStats.weakWords}</div>
+                  <div className="text-[9px] text-orange-600">מילים</div>
                 </div>
-                <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
-                <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.failedSets || 0}</div>
-                <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
+                <div className="bg-purple-50 p-2.5 text-center rounded-xl">
+                  <div className="text-[10px] text-purple-700 font-medium mb-0.5">דיוק</div>
+                  <div className="text-lg font-bold text-purple-600">{vocabStats.accuracy}%</div>
+                  <div className="text-[9px] text-purple-600">הצלחה</div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.excellentSets || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
+                </div>
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <BookOpen className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.mediumSets || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
+                </div>
+                <div className="bg-blue-50 p-3 text-center rounded-xl">
+                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
+                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.failedSets || 0}</div>
+                  <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
+                </div>
+              </div>
+            )}
 
             {/* Action buttons */}
             <motion.div
