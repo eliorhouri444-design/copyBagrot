@@ -810,6 +810,81 @@ export default function VocabularySetsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Duplicates Dialog */}
+      <Dialog open={showDuplicatesDialog} onOpenChange={setShowDuplicatesDialog}>
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              כפילויות במאגר ({existingDuplicates.length})
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 py-4 max-h-[60vh] overflow-y-auto">
+            {existingDuplicates.map((dup, idx) => (
+              <div
+                key={idx}
+                className="bg-amber-50 rounded-xl p-3 border border-amber-200 flex items-center gap-3"
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900">{dup.word.hebrew_word}</span>
+                    <span className="text-gray-400">→</span>
+                    <span className="text-blue-600" dir="ltr">{dup.word.english_answer}</span>
+                  </div>
+                  <div className="text-xs text-amber-700">
+                    כפילות ב{dup.type === 'english' ? 'אנגלית' : 'עברית'} • 
+                    מיקום מקורי: {dup.originalIndex + 1} • 
+                    מיקום כפילות: {dup.duplicateIndex + 1}
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={async () => {
+                    if (confirm(`האם למחוק את הכפילות "${dup.word.english_answer}"?`)) {
+                      await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                      setExistingDuplicates(prev => prev.filter((_, i) => i !== idx));
+                      loadData();
+                    }
+                  }}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowDuplicatesDialog(false)}>
+              סגור
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (confirm(`האם למחוק את כל ${existingDuplicates.length} הכפילויות?`)) {
+                  setIsSaving(true);
+                  for (const dup of existingDuplicates) {
+                    await base44.entities.VocabularyQuestion.delete(dup.word.id);
+                  }
+                  setExistingDuplicates([]);
+                  setShowDuplicatesDialog(false);
+                  loadData();
+                  setIsSaving(false);
+                  alert('כל הכפילויות נמחקו!');
+                }
+              }}
+              disabled={isSaving}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              מחק את כל הכפילויות
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk Add Dialog */}
       <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
         <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
