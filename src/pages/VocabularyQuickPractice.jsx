@@ -33,10 +33,30 @@ export default function VocabularyQuickPracticePage() {
   const setsParam = urlParams.get('sets');
   const startIndex = parseInt(urlParams.get('start') || '0');
   const endIndex = parseInt(urlParams.get('end') || '10');
+  const resumeIndex = parseInt(urlParams.get('resumeIndex') || '0');
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Update bookmark when current question changes
+  useEffect(() => {
+    if (user && !isMultiSet && setId && questions.length > 0) {
+       // Don't update if we are just reviewing
+       if (!showResult && !showSummary) {
+          const currentQIndex = currentIndex;
+          // Update user bookmark
+          base44.auth.updateMe({
+            last_vocabulary_position: {
+              set_id: parseInt(setId),
+              question_index: currentQIndex,
+              word_id: questions[currentQIndex]?.word?.id,
+              timestamp: new Date().toISOString()
+            }
+          }).catch(e => console.error("Error saving bookmark:", e));
+       }
+    }
+  }, [currentIndex, user, isMultiSet, setId, questions.length, showResult, showSummary]);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -83,6 +103,11 @@ export default function VocabularyQuickPracticePage() {
       // Generate questions
       const generatedQuestions = generateQuestions(wordsForPractice, allWords);
       setQuestions(generatedQuestions);
+      
+      // If resuming, set current index
+      if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
+        setCurrentIndex(resumeIndex);
+      }
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
@@ -350,20 +375,30 @@ export default function VocabularyQuickPracticePage() {
     return parseInt(setId) + 1;
   };
 
-  const goToNextSet = () => {
+  const goToNextSet = async () => {
     const nextSetId = getNextSetId();
+    
+    // Check if we reached the end of all words
+    if (endIndex >= allWordsData.length) {
+       alert("🎉 מזל טוב! סיימת את כל המילים במאגר!");
+       // Reset bookmark?
+       await base44.auth.updateMe({ last_vocabulary_position: null });
+       navigate(createPageUrl("VocabularySets"));
+       return;
+    }
+
     if (nextSetId) {
       const nextStart = endIndex;
       const nextEnd = nextStart + 10;
       
-      // Save progress for next time
-      localStorage.setItem('vocabSetProgress', JSON.stringify({
-        currentSet: nextSetId,
-        startIndex: nextStart,
-        endIndex: nextEnd,
-        lastCompleted: parseInt(setId) || 0,
-        completedAt: new Date().toISOString()
-      }));
+      // Reset bookmark to start of next set
+      await base44.auth.updateMe({
+        last_vocabulary_position: {
+          set_id: nextSetId,
+          question_index: 0,
+          timestamp: new Date().toISOString()
+        }
+      });
       
       navigate(createPageUrl(`VocabularyFlashcards?setId=${nextSetId}&start=${nextStart}&end=${nextEnd}`));
     }
@@ -508,7 +543,8 @@ export default function VocabularyQuickPracticePage() {
                   }
                 }}
                 variant="outline"
-                className="w-full h-12 text-base font-bold border-2 border-orange-400 text-orange-600 rounded-2xl hover:bg-orange-50"
+                className="w-full h-12 text-base font-bold border-2 border-blue-500 text-blue-600 rounded-2xl hover:bg-blue-50"
+                disabled={!user?.is_premium}
               >
                 {!user?.is_premium && <Crown className="w-4 h-4 ml-2 text-amber-500" />}
                 תרגול טעויות

@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
   BookOpen, ChevronLeft, Loader2, Check, Lock, Plus, Save, Crown, CheckSquare, Square,
-  ArrowUp, ArrowDown, Trash2, Edit, GripVertical, AlertTriangle, Upload, FileSpreadsheet
+  ArrowUp, ArrowDown, Trash2, Edit, GripVertical, AlertTriangle, Upload, FileSpreadsheet,
+  PlayCircle, RotateCcw
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,8 +47,40 @@ export default function VocabularySetsPage() {
   const displaySubject = user?.selected_subject || 'אנגלית';
   const displayUnits = user?.selected_units || 3;
 
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [resumeData, setResumeData] = useState(null);
+
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    // Check for resume possibility on mount
+    const checkResume = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        if (currentUser?.last_vocabulary_position) {
+          const { set_id, question_index, timestamp } = currentUser.last_vocabulary_position;
+          
+          // Verify if we have completed all words (simple check: if last position is valid)
+          // We'll do a more robust check in loadData or here
+          
+          if (set_id && question_index !== undefined) {
+             setResumeData(currentUser.last_vocabulary_position);
+             // Show dialog only if explicit action or maybe just a banner?
+             // The requirement: "Once he clicks on the vocabulary topic again... remind him"
+             // We will trigger this check when user clicks "Start Practice" or similar global entry if exists.
+             // Or we can show it immediately if this page IS the entry point.
+             // For now, we'll handle it in `handleGlobalStart` if we add one, or just check on load.
+             setShowResumeDialog(true); 
+          }
+        }
+      } catch (e) {
+        console.error("Error checking resume:", e);
+      }
+    };
+    // Only check if not already in a specific flow
+    // checkResume(); 
   }, []);
 
   const loadData = async () => {
@@ -162,17 +195,74 @@ export default function VocabularySetsPage() {
     
     // Get all words from selected sets
     const selectedSetObjects = sets.filter(s => selectedSets.includes(s.id));
-    const allStartIndices = selectedSetObjects.map(s => s.startIndex);
-    const allEndIndices = selectedSetObjects.map(s => s.endIndex);
-    
-    const minStart = Math.min(...allStartIndices);
-    const maxEnd = Math.max(...allEndIndices);
     
     // Store selected sets in session for multi-set practice
     sessionStorage.setItem('selectedVocabSets', JSON.stringify(selectedSets));
     sessionStorage.setItem('vocabSetsData', JSON.stringify(selectedSetObjects));
     
     navigate(createPageUrl(`VocabularyFlashcards?multiSet=true&sets=${selectedSets.join(',')}`));
+  };
+
+  const handleGlobalStart = async () => {
+    // Check if user has a saved position
+    if (user?.last_vocabulary_position) {
+      setResumeData(user.last_vocabulary_position);
+      setShowResumeDialog(true);
+    } else {
+      // Start from beginning
+      startFromSet(1);
+    }
+  };
+
+  const startFromSet = (setNum, questionIndex = 0) => {
+    const set = sets.find(s => s.id === setNum);
+    if (!set) {
+      // If no set found, maybe finished?
+      if (sets.length > 0 && setNum > sets.length) {
+        alert("כל הכבוד! סיימת את כל המילים! 🎉");
+        return;
+      }
+      // Fallback to first
+      const first = sets[0];
+      if (first) navigate(createPageUrl(`VocabularyFlashcards?setId=${first.id}&start=${first.startIndex}&end=${first.endIndex}`));
+      return;
+    }
+    
+    // If starting mid-set (questionIndex > 0), we need to pass that to Flashcards/QuickPractice
+    // But Flashcards usually starts from beginning of set. 
+    // If questionIndex > 0, maybe skip flashcards and go to QuickPractice? 
+    // The user said "Continue from where he left off". 
+    // If he was at question 105 (index 5 in set 11), he likely wants the Question view.
+    
+    if (questionIndex > 0) {
+       // Go directly to QuickPractice
+       navigate(createPageUrl(`VocabularyQuickPractice?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}&resumeIndex=${questionIndex}`));
+    } else {
+       navigate(createPageUrl(`VocabularyFlashcards?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`));
+    }
+  };
+
+  const handleResume = () => {
+    if (resumeData) {
+      startFromSet(resumeData.set_id, resumeData.question_index);
+    }
+    setShowResumeDialog(false);
+  };
+
+  const handleRestartSet = () => {
+    if (resumeData) {
+      startFromSet(resumeData.set_id, 0);
+    }
+    setShowResumeDialog(false);
+  };
+
+  const handleRestartAll = () => {
+    if (confirm("האם אתה בטוח שברצונך להתחיל הכל מההתחלה?")) {
+       // Clear bookmark
+       base44.auth.updateMe({ last_vocabulary_position: null });
+       startFromSet(1, 0);
+    }
+    setShowResumeDialog(false);
   };
 
   const openManageDialog = () => {
@@ -675,10 +765,26 @@ export default function VocabularySetsPage() {
           </div>
         )}
 
+        {/* Global Start Button */}
+        <div className="mb-6">
+          <Button 
+            onClick={handleGlobalStart}
+            className="w-full h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl shadow-lg flex items-center justify-center gap-3 text-lg font-bold"
+          >
+            <PlayCircle className="w-8 h-8" />
+            התחל תרגול (לפי הסדר)
+          </Button>
+          {user?.last_vocabulary_position && (
+             <div className="text-center mt-2 text-sm text-gray-500">
+               שמור: סט {user.last_vocabulary_position.set_id}, שאלה {user.last_vocabulary_position.question_index + 1}
+             </div>
+          )}
+        </div>
+
         {/* Sets List */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-gray-900">בחר תרגול לתרגול</h3>
+            <h3 className="font-bold text-gray-900">בחר תרגול ספציפי</h3>
             <div className="flex gap-2">
               {selectionMode ? (
                 <>
@@ -1180,6 +1286,35 @@ export default function VocabularySetsPage() {
               התחל ייבוא
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Resume Dialog */}
+      <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <RotateCcw className="w-6 h-6 text-blue-600" />
+              המשך מאיפה שעצרת
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 text-gray-700">
+            <p className="mb-2 font-medium">עצרת בסט {resumeData?.set_id}, שאלה {resumeData ? resumeData.question_index + 1 : 1}.</p>
+            <p className="text-sm">מה תרצה לעשות?</p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button onClick={handleResume} className="bg-blue-600 hover:bg-blue-700 w-full h-12 text-lg">
+              המשך מאותה שאלה
+            </Button>
+            <Button onClick={handleRestartSet} variant="outline" className="w-full border-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+              התחל את הסט מההתחלה
+            </Button>
+            <Button onClick={handleRestartAll} variant="ghost" className="w-full text-gray-500 hover:bg-gray-100 hover:text-red-600">
+              התחל הכל מההתחלה (איפוס רצף)
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
