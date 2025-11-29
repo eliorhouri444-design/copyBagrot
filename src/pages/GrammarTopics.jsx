@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  BookOpen, ChevronLeft, Loader2, Check, Lock, Crown, Zap, Target, CheckCircle, AlertCircle
+  BookOpen, ChevronLeft, Loader2, Check, Lock, Crown, Zap, Target, CheckCircle, AlertCircle, PlayCircle
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -111,6 +111,23 @@ export default function GrammarTopicsPage() {
     };
   };
 
+  const handleStartPractice = () => {
+    const accessibleTopics = user?.is_premium 
+      ? GRAMMAR_TOPICS 
+      : GRAMMAR_TOPICS.slice(0, 4);
+      
+    // Try to find a topic with low progress
+    const weakTopics = accessibleTopics.filter(t => {
+        const stats = getTopicStats(t.id);
+        return stats.progressPercent < 100;
+    });
+    
+    const pool = weakTopics.length > 0 ? weakTopics : accessibleTopics;
+    const randomTopic = pool[Math.floor(Math.random() * pool.length)];
+    
+    navigate(createPageUrl(`GrammarPracticeNew?topic=${randomTopic.id}`));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
@@ -140,7 +157,16 @@ export default function GrammarTopicsPage() {
         </div>
       </div>
 
-      <div className="px-5 py-4 space-y-4">
+      <div className="px-5 py-4 space-y-6">
+        {/* Start Button */}
+        <Button 
+          onClick={handleStartPractice}
+          className="w-full h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl shadow-lg flex items-center justify-center gap-3 text-lg font-bold transform transition-all hover:scale-[1.02]"
+        >
+          <PlayCircle className="w-8 h-8" />
+          התחל תרגול דקדוק
+        </Button>
+
         {/* Stats Card */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-blue-100">
           <div className="flex items-center justify-between mb-3">
@@ -167,9 +193,10 @@ export default function GrammarTopicsPage() {
           </div>
         </div>
 
-        {/* Subtitle */}
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-gray-900">בחר נושא לתרגול</h3>
+        {/* Divider & Subtitle */}
+        <div className="text-center pb-2">
+          <p className="text-gray-500 font-medium mb-4">או בחר נושא לתרגול</p>
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
         </div>
 
         {/* Topics Grid */}
