@@ -336,14 +336,9 @@ export default function ExamGenericPage() {
         }
 
         let displayExplanation = questionItem.explanation || '';
-        if (aiResult && exam.subject === 'אנגלית') {
-          if (unitLevel === 3) {
-            displayExplanation = aiResult.explanation_hebrew || '';
-          } else if (unitLevel === 4) {
-            displayExplanation = (aiResult.explanation_hebrew || '') + '\n' + (aiResult.explanation_english || '');
-          } else if (unitLevel === 5) {
-            displayExplanation = aiResult.explanation || aiResult.explanation_english || '';
-          }
+        if (aiResult) {
+          // Always prefer Hebrew explanation for the review
+          displayExplanation = aiResult.explanation_hebrew || aiResult.explanation || '';
         }
 
         results.push({
