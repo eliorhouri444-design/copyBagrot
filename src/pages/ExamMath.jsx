@@ -1356,24 +1356,88 @@ export default function ExamMathPage() {
               <input
                 type="file"
                 accept="image/*"
-                capture="user"
-                onChange={handleCameraCapture}
-                ref={cameraInputRef}
-                className="hidden"
-                id="camera-input"
-              />
-              <input
-                type="file"
-                accept="image/*"
                 onChange={handleCameraCapture}
                 className="hidden"
                 id="gallery-input"
               />
               <Button
-                onClick={() => {
-                  if (cameraInputRef.current) {
-                    cameraInputRef.current.setAttribute('capture', 'environment');
-                    cameraInputRef.current.click();
+                onClick={async () => {
+                  // Check if we're on mobile or have camera access
+                  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                  
+                  if (isMobile) {
+                    // On mobile - create a temporary input with capture
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.capture = 'environment';
+                    input.onchange = handleCameraCapture;
+                    input.click();
+                  } else {
+                    // On desktop - try to use MediaDevices API
+                    try {
+                      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                      
+                      // Create video element to capture
+                      const video = document.createElement('video');
+                      video.srcObject = stream;
+                      video.autoplay = true;
+                      video.playsInline = true;
+                      
+                      // Create overlay for camera preview
+                      const overlay = document.createElement('div');
+                      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:black;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+                      
+                      video.style.cssText = 'max-width:100%;max-height:80vh;';
+                      overlay.appendChild(video);
+                      
+                      // Capture button
+                      const captureBtn = document.createElement('button');
+                      captureBtn.innerText = '📸 צלם';
+                      captureBtn.style.cssText = 'margin-top:20px;padding:15px 40px;font-size:18px;background:#10b981;color:white;border:none;border-radius:12px;cursor:pointer;';
+                      
+                      // Cancel button
+                      const cancelBtn = document.createElement('button');
+                      cancelBtn.innerText = 'ביטול';
+                      cancelBtn.style.cssText = 'margin-top:10px;padding:10px 30px;font-size:16px;background:#ef4444;color:white;border:none;border-radius:12px;cursor:pointer;';
+                      
+                      const btnContainer = document.createElement('div');
+                      btnContainer.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+                      btnContainer.appendChild(captureBtn);
+                      btnContainer.appendChild(cancelBtn);
+                      overlay.appendChild(btnContainer);
+                      
+                      document.body.appendChild(overlay);
+                      
+                      captureBtn.onclick = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        
+                        canvas.toBlob(async (blob) => {
+                          stream.getTracks().forEach(track => track.stop());
+                          document.body.removeChild(overlay);
+                          
+                          const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+                          const fakeEvent = { target: { files: [file] } };
+                          handleCameraCapture(fakeEvent);
+                        }, 'image/jpeg', 0.9);
+                      };
+                      
+                      cancelBtn.onclick = () => {
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(overlay);
+                      };
+                      
+                    } catch (err) {
+                      // Fallback to file input if camera not available
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = handleCameraCapture;
+                      input.click();
+                    }
                   }
                 }}
                 variant="outline"
