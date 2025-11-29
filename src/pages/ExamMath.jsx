@@ -61,6 +61,11 @@ export default function ExamMathPage() {
   const [cameraFeedback, setCameraFeedback] = useState(null);
   const cameraInputRef = useRef(null);
 
+  // Wolfram Alpha State
+  const [wolframSolution, setWolframSolution] = useState(null);
+  const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
+  const [showWolframInReview, setShowWolframInReview] = useState(null);
+
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
   const mode = urlParams.get('mode') || 'practice';
@@ -665,6 +670,28 @@ export default function ExamMathPage() {
     }
   };
 
+  const handleSolveWithWolfram = async (questionText, resultIndex = null) => {
+    setIsLoadingWolfram(true);
+    setWolframSolution(null);
+    if (resultIndex !== null) setShowWolframInReview(resultIndex);
+    
+    try {
+        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
+        const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
+        
+        if (data.success) {
+            setWolframSolution(data.pods);
+        } else {
+            alert("לא הצלחנו לפתור את השאלה הזו אוטומטית.");
+        }
+    } catch (error) {
+        console.error("Wolfram error:", error);
+        alert("שגיאה בחיבור ל-Wolfram Alpha");
+    } finally {
+        setIsLoadingWolfram(false);
+    }
+  };
+
   // Add report handler
   const handleReportQuestion = async () => {
     if (!reportText.trim()) {
@@ -996,6 +1023,38 @@ export default function ExamMathPage() {
                         </ol>
                       </div>
                     )}
+
+                    {/* Wolfram Alpha Button */}
+                    <div className="mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-purple-600 hover:bg-purple-50 p-0 h-auto"
+                          onClick={() => handleSolveWithWolfram(question.question_text, resultIndex)}
+                        >
+                          <Calculator className="w-4 h-4 mr-1" />
+                          הצג פתרון מלא (Wolfram Alpha)
+                        </Button>
+                        
+                        {wolframSolution && showWolframInReview === resultIndex && (
+                          <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4 overflow-hidden relative">
+                              <Button variant="ghost" size="sm" className="absolute top-2 left-2" onClick={() => { setWolframSolution(null); setShowWolframInReview(null); }}><X className="w-4 h-4" /></Button>
+                              <h3 className="font-bold text-purple-900 mb-2 text-center">פתרון Wolfram Alpha</h3>
+                              <div className="space-y-4 max-h-64 overflow-y-auto" dir="ltr">
+                                  {wolframSolution.map((pod, i) => (
+                                      <div key={i} className="bg-white p-3 rounded-lg shadow-sm">
+                                          <div className="text-xs font-bold text-gray-500 mb-1 uppercase">{pod.title}</div>
+                                          {pod.content.map((sub, j) => (
+                                              <div key={j}>
+                                                  <img src={sub.image} alt={pod.title} className="max-w-full" />
+                                              </div>
+                                          ))}
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                        )}
+                    </div>
 
                     {/* Display saved draft if available for review */}
                     {draftPapers[question.question_number] && (
