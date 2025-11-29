@@ -35,7 +35,22 @@ Deno.serve(async (req) => {
 
         // Process pods to extract relevant info (Input, Result, Steps/Solution)
         const pods = data.queryresult.pods || [];
-        const relevantPods = pods.map(pod => ({
+        
+        // Filter for result/solution pods
+        // Look for primary=true or specific titles
+        const resultPods = pods.filter(pod => 
+            pod.primary || 
+            pod.title === 'Result' || 
+            pod.title === 'Decimal approximation' ||
+            pod.title === 'Solution' || 
+            pod.title === 'Exact result'
+        );
+        
+        // If we found result pods, use them. Otherwise, fallback to the first few pods (input + result usually)
+        // but since user asked for "final answer only", we prefer strictly resultPods if available.
+        const targetPods = resultPods.length > 0 ? resultPods : pods.slice(0, 2);
+
+        const relevantPods = targetPods.map(pod => ({
             title: pod.title,
             content: pod.subpods.map(sub => ({
                 text: sub.plaintext,
