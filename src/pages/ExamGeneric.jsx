@@ -810,6 +810,11 @@ export default function ExamGenericPage() {
                       <strong className="text-blue-600">הסבר:</strong> {resultItem.explanation}
                     </div>
                 }
+                  {!resultItem.explanation && !resultItem.is_correct &&
+                <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
+                      <strong className="text-blue-600">הסבר:</strong> התשובה הנכונה היא: {resultItem.correct_answer}
+                    </div>
+                }
                 </div>
               )}
             </div>
