@@ -147,7 +147,8 @@ ${baseStyle}`;
 
   // Update bookmark when current index changes
   useEffect(() => {
-    if (user && !isMultiSet && setId && words.length > 0 && !showSummary) {
+    // Only update if not loading to prevent overwriting bookmark with 0 on initial load
+    if (!isLoading && user && !isMultiSet && setId && words.length > 0 && !showSummary) {
        base44.auth.updateMe({
          last_vocabulary_position: {
            set_id: parseInt(setId),
@@ -157,7 +158,7 @@ ${baseStyle}`;
          }
        }).catch(e => console.error("Error saving bookmark:", e));
     }
-  }, [currentIndex, user, isMultiSet, setId, words.length, showSummary]);
+  }, [currentIndex, user, isMultiSet, setId, words.length, showSummary, isLoading]);
 
   const handleExit = () => {
     const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";

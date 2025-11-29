@@ -50,7 +50,8 @@ export default function VocabularyQuickPracticePage() {
 
   // Update bookmark when current question changes
   useEffect(() => {
-    if (user && !isMultiSet && setId && questions.length > 0) {
+    // Only update if not loading to prevent overwriting bookmark with 0 on initial load
+    if (!isLoading && user && !isMultiSet && setId && questions.length > 0) {
        // Don't update if we are just reviewing
        if (!showResult && !showSummary) {
           const currentQIndex = currentIndex;
@@ -65,7 +66,7 @@ export default function VocabularyQuickPracticePage() {
           }).catch(e => console.error("Error saving bookmark:", e));
        }
     }
-  }, [currentIndex, user, isMultiSet, setId, questions.length, showResult, showSummary]);
+  }, [currentIndex, user, isMultiSet, setId, questions.length, showResult, showSummary, isLoading]);
 
   const handleExit = () => {
     const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";
