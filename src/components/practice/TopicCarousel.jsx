@@ -539,7 +539,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           
           <div className="py-4 text-center">
             <div className="bg-blue-50 rounded-xl p-4 mb-4">
-              <div className="text-3xl font-bold text-blue-600 mb-1">סט {savedProgress?.currentSet}</div>
+              <div className="text-3xl font-bold text-blue-600 mb-1">תרגול {savedProgress?.currentSet}</div>
               <div className="text-sm text-gray-600">מילים {savedProgress?.startIndex + 1} - {savedProgress?.endIndex}</div>
             </div>
             <p className="text-gray-600 text-sm">נשמר התקדמות מהפעם הקודמת</p>
@@ -553,7 +553,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 
-              המשך מסט {savedProgress?.currentSet}
+              המשך מתרגול {savedProgress?.currentSet}
             </Button>
             <Button
               onClick={() => {
@@ -564,7 +564,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               variant="outline"
               className="w-full h-12 border-2 border-gray-300 text-gray-700 font-bold rounded-xl">
 
-              התחל מחדש מסט 1
+              התחל מחדש מתרגול 1
             </Button>
           </div>
         </DialogContent>
@@ -598,7 +598,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 
               <RotateCcw className="w-4 h-4 ml-2" />
-              תרגול מחדש מסט 1
+              תרגול מחדש מתרגול 1
             </Button>
             <Button
               onClick={() => setShowCompletedDialog(false)}
@@ -626,7 +626,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             <div className="flex items-center justify-between">
               <div className="text-center flex-1">
                 <div className="text-2xl font-bold text-blue-600">{vocabularySets.length}</div>
-                <div className="text-xs text-gray-600">סטים</div>
+                <div className="text-xs text-gray-600">תרגולים</div>
               </div>
               <div className="w-px h-8 bg-blue-200" />
               <div className="text-center flex-1">
@@ -651,7 +651,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     {set.set_number}
                   </div>
                   <div className="text-right flex-1">
-                    <div className="font-bold text-gray-900">סט {set.set_number}</div>
+                    <div className="font-bold text-gray-900">תרגול {set.set_number}</div>
                     <div className="text-sm text-blue-600">
                       מילים {set.startIndex + 1} - {set.endIndex}
                     </div>
