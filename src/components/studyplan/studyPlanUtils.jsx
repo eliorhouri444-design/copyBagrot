@@ -91,8 +91,39 @@ export const calculateStudyPlan = ({
         }
     }
     
-    // Priority 2: Weak Topics
-    if (weakTopics.length > 0 && usedTime < daily_availability_minutes) {
+    // Priority 2: Curriculum Topics (Structured Path)
+    // Find the first "Active" topic in the roadmap (not completed)
+    // We assume 'allTopics' are passed in order of the curriculum
+    let nextCurriculumTopic = null;
+    if (allTopics && allTopics.length > 0) {
+        // Find first non-mastered topic
+        nextCurriculumTopic = allTopics.find(t => {
+            const stats = topicStats[t.topic_id];
+            const mastery = stats ? (stats.correct / stats.total) : 0;
+            const total = stats ? stats.total : 0;
+            return !(mastery >= 0.85 && total >= 5); // Return true if NOT mastered
+        });
+    }
+
+    if (nextCurriculumTopic && usedTime < daily_availability_minutes) {
+        const timeForTopic = Math.min(20, daily_availability_minutes - usedTime);
+        if (timeForTopic >= 10) {
+            tasks.push({
+                type: 'topic',
+                title: nextCurriculumTopic.name || 'נושא לימוד הבא',
+                description: 'התקדמות לפי תוכנית הלימודים המובנית',
+                duration: timeForTopic,
+                count: 1,
+                route: `TopicPracticePage?topicId=${nextCurriculumTopic.topic_id}`,
+                priority: 'high',
+                icon: nextCurriculumTopic.icon
+            });
+            usedTime += timeForTopic;
+        }
+    }
+
+    // Priority 2.5: Weak Topics (Old logic - keep as secondary)
+    if (weakTopics.length > 0 && usedTime < daily_availability_minutes && !nextCurriculumTopic) {
         const timeForTopic = Math.min(20, daily_availability_minutes - usedTime);
         if (timeForTopic >= 10) {
             tasks.push({
