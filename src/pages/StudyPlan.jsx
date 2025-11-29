@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import PlanSettingsDialog from "@/components/studyplan/PlanSettingsDialog";
-import { calculateStudyPlan } from "@/utils/studyPlanUtils";
+import { calculateStudyPlan } from "@/components/studyplan/studyPlanUtils";
 
 // ============================================
 // 🧠 READINESS MODEL - 4 PILLARS OF SUCCESS
