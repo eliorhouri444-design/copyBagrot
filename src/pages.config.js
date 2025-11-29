@@ -69,6 +69,12 @@ import VocabularySetMode from './pages/VocabularySetMode';
 import Grammar from './pages/Grammar';
 import GrammarPractice from './pages/GrammarPractice';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
+import VocabularyTraining from './pages/VocabularyTraining';
+import VocabularySets from './pages/VocabularySets';
+import VocabularyFlashcards from './pages/VocabularyFlashcards';
+import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
+import VocabularyStrengthen from './pages/VocabularyStrengthen';
+import GrammarTopics from './pages/GrammarTopics';
 import __Layout from './Layout.jsx';
 
 
@@ -144,6 +150,12 @@ export const PAGES = {
     "Grammar": Grammar,
     "GrammarPractice": GrammarPractice,
     "GrammarTopicsSelection": GrammarTopicsSelection,
+    "VocabularyTraining": VocabularyTraining,
+    "VocabularySets": VocabularySets,
+    "VocabularyFlashcards": VocabularyFlashcards,
+    "VocabularyQuickPractice": VocabularyQuickPractice,
+    "VocabularyStrengthen": VocabularyStrengthen,
+    "GrammarTopics": GrammarTopics,
 }
 
 export const pagesConfig = {
