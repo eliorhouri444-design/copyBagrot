@@ -1213,7 +1213,10 @@ export default function TopicPracticeNewPage() {
   const progress = (currentQuestionIndex + 1) / currentSetQuestions.length * 100;
   const hasAnswered = !!answers[currentQuestion.question_id];
   const displayUnits = user?.selected_units || 3;
-  const isMathSubject = currentQuestion?.subject_id === 'מתמטיקה';
+  // Fix: Determine if subject is math based on topic ID or data
+  const isMathSubject = (currentQuestion?.subject_id === 'מתמטיקה') || 
+                        (topicId && (topicId.includes('math') || topicId.includes('מתמטיקה')));
+                        
   const isListeningTopic = topicId?.toLowerCase().includes('listening') ||
   topicId?.toLowerCase().includes('האזנה');
 
@@ -1493,16 +1496,18 @@ export default function TopicPracticeNewPage() {
                     {currentQuestion.question_text}
                     </p>
                     
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="mr-2 text-purple-600 hover:bg-purple-50 flex-shrink-0"
-                        title="פתרון Wolfram Alpha"
-                        onClick={handleSolveWithWolfram}
-                        disabled={isLoadingWolfram}
-                    >
-                        {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
-                    </Button>
+                    {isMathSubject && (
+                      <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="mr-2 text-purple-600 hover:bg-purple-50 flex-shrink-0"
+                          title="פתרון Wolfram Alpha"
+                          onClick={handleSolveWithWolfram}
+                          disabled={isLoadingWolfram}
+                      >
+                          {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
+                      </Button>
+                    )}
                 </div>
               </div>
             </div>

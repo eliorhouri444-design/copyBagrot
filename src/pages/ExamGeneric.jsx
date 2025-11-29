@@ -32,6 +32,7 @@ export default function ExamGenericPage() {
   const [score, setScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [showWolframInReview, setShowWolframInReview] = useState(null); // Stores question index for wolfram in review
 
   const [displayMode, setDisplayMode] = useState('carousel');
   const [showModeDialog, setShowModeDialog] = useState(false);
@@ -229,9 +230,11 @@ export default function ExamGenericPage() {
     }));
   };
 
-  const handleSolveWithWolfram = async (questionText) => {
+  const handleSolveWithWolfram = async (questionText, resultIndex = null) => {
     setIsLoadingWolfram(true);
     setWolframSolution(null);
+    if (resultIndex !== null) setShowWolframInReview(resultIndex);
+    
     try {
         const cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
         const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
@@ -844,6 +847,39 @@ export default function ExamGenericPage() {
                       <strong className="text-blue-600">הסבר:</strong> התשובה הנכונה היא: {resultItem.correct_answer}
                     </div>
                 }
+
+                {exam.subject === 'מתמטיקה' && (
+                  <div className="mt-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-purple-600 hover:bg-purple-50 p-0 h-auto"
+                      onClick={() => handleSolveWithWolfram(exam.questions[resultIndex].question_text, resultIndex)}
+                    >
+                      <Calculator className="w-4 h-4 mr-1" />
+                      הצג פתרון מלא (Wolfram Alpha)
+                    </Button>
+                    
+                    {wolframSolution && showWolframInReview === resultIndex && (
+                      <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4 overflow-hidden relative">
+                          <Button variant="ghost" size="sm" className="absolute top-2 left-2" onClick={() => { setWolframSolution(null); setShowWolframInReview(null); }}><X className="w-4 h-4" /></Button>
+                          <h3 className="font-bold text-purple-900 mb-2 text-center">פתרון Wolfram Alpha</h3>
+                          <div className="space-y-4 max-h-64 overflow-y-auto" dir="ltr">
+                              {wolframSolution.map((pod, i) => (
+                                  <div key={i} className="bg-white p-3 rounded-lg shadow-sm">
+                                      <div className="text-xs font-bold text-gray-500 mb-1 uppercase">{pod.title}</div>
+                                      {pod.content.map((sub, j) => (
+                                          <div key={j}>
+                                              <img src={sub.image} alt={pod.title} className="max-w-full" />
+                                          </div>
+                                      ))}
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 </div>
               )}
             </div>
@@ -1001,16 +1037,18 @@ export default function ExamGenericPage() {
                     {question.points} נק'
                   </span>
                   
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="mr-2 text-purple-600 hover:bg-purple-50"
-                    title="פתרון Wolfram Alpha"
-                    onClick={() => handleSolveWithWolfram(question.question_text)}
-                    disabled={isLoadingWolfram}
-                  >
-                     {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
-                  </Button>
+                  {exam.subject === 'מתמטיקה' && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="mr-2 text-purple-600 hover:bg-purple-50"
+                      title="פתרון Wolfram Alpha"
+                      onClick={() => handleSolveWithWolfram(question.question_text)}
+                      disabled={isLoadingWolfram}
+                    >
+                       {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
+                    </Button>
+                  )}
                 </div>
 
                 {wolframSolution && (
