@@ -834,18 +834,15 @@ export default function ExamGenericPage() {
 
                 חזרה למבחנים
               </Button>
-              {user?.subscription_status === 'premium' ?
+              {user?.is_premium ?
               <Button
                 onClick={() => window.location.reload()}
                 className="flex-1 bg-blue-600 hover:bg-blue-700">
-
                   נסה שוב
                 </Button> :
-
               <Button
                 onClick={() => setShowRetryAd(true)}
                 className="flex-1 bg-blue-600 hover:bg-blue-700">
-
                   נסה שוב
                 </Button>
               }
