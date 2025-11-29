@@ -664,7 +664,7 @@ export default function VocabularyQuickPracticePage() {
             className="w-full max-w-sm"
           >
             {/* Question Card */}
-            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 border border-blue-100">
+            <div className="bg-white rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-6 mb-5 border border-blue-100">
               {/* Question Type Badge */}
               <div className="flex justify-center mb-4">
                 <span className="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full">

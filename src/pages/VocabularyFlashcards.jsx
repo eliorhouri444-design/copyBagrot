@@ -503,7 +503,7 @@ ${baseStyle}`;
 
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-[28px] border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-6"
+                className="absolute inset-0 bg-white rounded-3xl border border-blue-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center p-6"
                 style={{ backfaceVisibility: 'hidden' }}>
 
                 {/* Part of Speech Tag */}
@@ -555,7 +555,7 @@ ${baseStyle}`;
 
                 <button
                   onClick={(e) => {e.stopPropagation();setIsFlipped(true);}}
-                  className="px-6 py-2.5 rounded-2xl border-2 border-blue-400 text-blue-600 font-medium bg-transparent hover:bg-blue-50 transition-colors">
+                  className="px-6 py-2.5 rounded-2xl border border-blue-200 text-blue-600 font-medium bg-blue-50/50 hover:bg-blue-100 transition-colors">
 
                   הפוך כרטיס
                 </button>
@@ -563,7 +563,7 @@ ${baseStyle}`;
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white rounded-[28px] border-2 border-blue-400 shadow-lg flex flex-col items-center justify-center p-5 overflow-y-auto"
+                className="absolute inset-0 bg-white rounded-3xl border border-blue-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center p-5 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
 
                 {/* Part of Speech Tag */}

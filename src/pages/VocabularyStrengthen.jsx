@@ -311,7 +311,7 @@ export default function VocabularyStrengthenPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 bg-white rounded-2xl border border-blue-100 shadow-sm flex flex-col items-center justify-center p-8"
+                className="absolute inset-0 bg-white rounded-3xl border border-blue-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center p-8"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 {/* Weak indicator */}
@@ -351,7 +351,7 @@ export default function VocabularyStrengthenPage() {
 
                 <button
                   onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
-                  className="px-6 py-2.5 rounded-[14px] border-2 border-[#3B82F6] text-[#3B82F6] font-bold bg-transparent hover:bg-blue-50 transition-colors"
+                  className="px-6 py-2.5 rounded-2xl border border-blue-200 text-blue-600 font-bold bg-blue-50/50 hover:bg-blue-100 transition-colors"
                 >
                   הפוך כרטיס
                 </button>
@@ -359,7 +359,7 @@ export default function VocabularyStrengthenPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 bg-white rounded-2xl border border-blue-100 shadow-sm flex flex-col items-center justify-center p-6 overflow-y-auto"
+                className="absolute inset-0 bg-white rounded-3xl border border-blue-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center p-6 overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 {currentWord.part_of_speech && (
