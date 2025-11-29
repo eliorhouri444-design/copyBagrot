@@ -239,49 +239,36 @@ export default function ExamGenericPage() {
 
       const checkAnswerWithAI = async (userAnswer, correctAnswer, questionText) => {
         try {
-          // Always write explanations in Hebrew for the user
-          const explanationLanguageInstruction = 'IMPORTANT: Write ALL explanations ONLY in Hebrew (explanation_hebrew field). The explanation must be in Hebrew regardless of the subject.';
-
           const response = await base44.integrations.Core.InvokeLLM({
-            prompt: `INSTRUCTIONS FOR CHECKING ANSWERS:
+            prompt: `אתה בודק תשובות במבחן. בדוק את תשובת התלמיד והחזר משוב בעברית בלבד.
 
-      1. Check semantic meaning, not exact wording.
-      2. Compare student answer to the correct answer and consider multiple accepted variations.
-      3. Use key required words to confirm core meaning.
-      4. Allow synonyms and paraphrasing.
-      5. Ignore capitalization, punctuation, and minor spelling errors.
-      6. Reject answers that change facts, subject, time, or purpose.
-      7. Score answers on a scale:
-      - similarity_score 100 = fully correct
-      - similarity_score 70-90 = correct meaning but missing detail
-      - similarity_score 40-60 = related but incorrect
-      - similarity_score 0-30 = wrong
-      8. Provide helpful feedback explaining mistakes or missing information.
-      ${explanationLanguageInstruction}
+הוראות לבדיקה:
+1. בדוק את המשמעות הסמנטית, לא ניסוח מדויק.
+2. השווה את תשובת התלמיד לתשובה הנכונה וקבל וריאציות מקובלות.
+3. התעלם מרישיות, פיסוק ושגיאות כתיב קלות.
+4. דחה תשובות שמשנות עובדות, נושא, זמן או מטרה.
+5. דרג תשובות בסקאלה:
+   - similarity_score 100 = נכון לחלוטין
+   - similarity_score 70-90 = משמעות נכונה אך חסרים פרטים
+   - similarity_score 40-60 = קשור אך לא נכון
+   - similarity_score 0-30 = שגוי
 
-      Subject: ${exam.subject} ${unitLevel} units
-      Question: ${questionText}
-      Correct Answer: ${correctAnswer}
-      Student Answer: ${userAnswer}
+מקצוע: ${exam.subject} ${unitLevel} יחידות
+שאלה: ${questionText}
+תשובה נכונה: ${correctAnswer}
+תשובת התלמיד: ${userAnswer}
 
-      If content is correct but has spelling errors, set has_spelling_error=true and deduct up to 20%.
-      If the answer expresses the same idea even if phrased differently, mark as correct.
-      Focus on meaning, purpose, cause, and key details - not exact wording.
-
-      JSON response:`,
+חשוב מאוד: כתוב את כל ההסברים בעברית בלבד בשדה explanation_hebrew!`,
             response_json_schema: {
               type: "object",
               properties: {
-                is_correct: { type: "boolean" },
-                has_spelling_error: { type: "boolean" },
-                similarity_score: { type: "number" },
-                points_deduction_percent: { type: "number" },
-                explanation: { type: "string" },
-                explanation_hebrew: { type: "string" },
-                explanation_english: { type: "string" },
-                missing_details: { type: "string" }
+                is_correct: { type: "boolean", description: "האם התשובה נכונה" },
+                has_spelling_error: { type: "boolean", description: "האם יש שגיאות כתיב" },
+                similarity_score: { type: "number", description: "ציון דמיון 0-100" },
+                points_deduction_percent: { type: "number", description: "אחוז הורדה בגלל שגיאות" },
+                explanation_hebrew: { type: "string", description: "הסבר מפורט בעברית - למה התשובה נכונה או שגויה" }
               },
-              required: ["is_correct", "similarity_score"]
+              required: ["is_correct", "similarity_score", "explanation_hebrew"]
             }
           });
 
@@ -294,7 +281,7 @@ export default function ExamGenericPage() {
             has_spelling_error: false,
             similarity_score: isMatch ? 100 : 0,
             points_deduction_percent: 0,
-            explanation_hebrew: isMatch ? "נכון" : "שגוי"
+            explanation_hebrew: isMatch ? "תשובה נכונה!" : "התשובה שגויה. התשובה הנכונה היא: " + correctAnswer
           };
         }
       };
