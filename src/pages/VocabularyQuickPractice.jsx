@@ -131,15 +131,21 @@ export default function VocabularyQuickPracticePage() {
       setQuestions(generatedQuestions);
       
       // Resume logic
-      if (resumeWordId) {
+      let targetIndex = 0;
+
+      if (resumeWordId && resumeWordId !== 'undefined' && resumeWordId !== 'null') {
         const foundIndex = generatedQuestions.findIndex(q => q.word.id === resumeWordId);
         if (foundIndex !== -1) {
-          setCurrentIndex(foundIndex);
-        } else if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
-          setCurrentIndex(resumeIndex);
+          targetIndex = foundIndex;
         }
-      } else if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
-        setCurrentIndex(resumeIndex);
+      }
+      
+      if (targetIndex === 0 && resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
+        targetIndex = resumeIndex;
+      }
+
+      if (targetIndex > 0) {
+        setCurrentIndex(targetIndex);
       }
 
     } catch (error) {

@@ -203,16 +203,22 @@ ${baseStyle}`;
 
       setWords(wordsForPractice);
 
-      // Try to resume by Word ID first (more robust), then by Index
-      if (resumeWordId) {
+      // Resume logic
+      let targetIndex = 0;
+      
+      if (resumeWordId && resumeWordId !== 'undefined' && resumeWordId !== 'null') {
         const foundIndex = wordsForPractice.findIndex(w => w.id === resumeWordId);
         if (foundIndex !== -1) {
-          setCurrentIndex(foundIndex);
-        } else if (resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
-          setCurrentIndex(resumeIndex);
+          targetIndex = foundIndex;
         }
-      } else if (resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
-        setCurrentIndex(resumeIndex);
+      } 
+      
+      if (targetIndex === 0 && resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
+        targetIndex = resumeIndex;
+      }
+
+      if (targetIndex > 0) {
+        setCurrentIndex(targetIndex);
       }
 
     } catch (error) {

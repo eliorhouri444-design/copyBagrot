@@ -562,7 +562,11 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               onClick={() => {
                 setShowContinueDialog(false);
                 const targetPage = savedProgress.mode === 'practice' ? 'VocabularyQuickPractice' : 'VocabularyFlashcards';
-                navigate(createPageUrl(`${targetPage}?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}&resumeWordId=${savedProgress.resumeWordId}`));
+                let url = `${targetPage}?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}`;
+                if (savedProgress.resumeWordId) {
+                    url += `&resumeWordId=${savedProgress.resumeWordId}`;
+                }
+                navigate(createPageUrl(url));
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 
