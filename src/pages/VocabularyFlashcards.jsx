@@ -41,6 +41,7 @@ export default function VocabularyFlashcardsPage() {
   const [generatedImages, setGeneratedImages] = useState({});
   const [generatingImage, setGeneratingImage] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const initialResumeDone = useRef(false);
 
   // Text-to-Speech function
   const speakWord = (text, lang = 'en-US') => {
@@ -148,8 +149,8 @@ ${baseStyle}`;
 
   // Update bookmark when current index changes
   useEffect(() => {
-    // Only update if not loading to prevent overwriting bookmark with 0 on initial load
-    if (!isLoading && user && !isMultiSet && setId && words.length > 0 && !showSummary) {
+    // Only update if not loading AND we have finished initial resume logic
+    if (!isLoading && initialResumeDone.current && user && !isMultiSet && setId && words.length > 0 && !showSummary) {
        base44.auth.updateMe({
          last_vocabulary_position: {
            set_id: parseInt(setId),
@@ -206,6 +207,7 @@ ${baseStyle}`;
       // Resume logic
       let targetIndex = 0;
       
+      // 1. Try to find by ID
       if (resumeWordId && resumeWordId !== 'undefined' && resumeWordId !== 'null') {
         const foundIndex = wordsForPractice.findIndex(w => w.id === resumeWordId);
         if (foundIndex !== -1) {
@@ -213,13 +215,18 @@ ${baseStyle}`;
         }
       } 
       
+      // 2. Fallback to index if ID failed or wasn't provided, but ONLY if index > 0
+      // Note: If targetIndex is already set by ID, we keep it.
       if (targetIndex === 0 && resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
         targetIndex = resumeIndex;
       }
 
-      if (targetIndex > 0) {
-        setCurrentIndex(targetIndex);
-      }
+      setCurrentIndex(targetIndex);
+      
+      // Mark resume as done so we can start saving progress
+      setTimeout(() => {
+        initialResumeDone.current = true;
+      }, 500);
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);

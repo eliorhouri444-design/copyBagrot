@@ -35,6 +35,7 @@ export default function VocabularyQuickPracticePage() {
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const initialResumeDone = useRef(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const setId = urlParams.get('setId');
@@ -51,8 +52,8 @@ export default function VocabularyQuickPracticePage() {
 
   // Update bookmark when current question changes
   useEffect(() => {
-    // Only update if not loading to prevent overwriting bookmark with 0 on initial load
-    if (!isLoading && user && !isMultiSet && setId && questions.length > 0) {
+    // Only update if not loading AND resume is done
+    if (!isLoading && initialResumeDone.current && user && !isMultiSet && setId && questions.length > 0) {
        // Don't update if we are just reviewing
        if (!showResult && !showSummary) {
           const currentQIndex = currentIndex;
@@ -144,9 +145,11 @@ export default function VocabularyQuickPracticePage() {
         targetIndex = resumeIndex;
       }
 
-      if (targetIndex > 0) {
-        setCurrentIndex(targetIndex);
-      }
+      setCurrentIndex(targetIndex);
+      
+      setTimeout(() => {
+        initialResumeDone.current = true;
+      }, 500);
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
