@@ -258,7 +258,10 @@ export default function ExamGenericPage() {
 תשובה נכונה: ${correctAnswer}
 תשובת התלמיד: ${userAnswer}
 
-חשוב מאוד: כתוב את כל ההסברים בעברית בלבד בשדה explanation_hebrew!`,
+חשוב מאוד מאוד: 
+- כתוב את כל ההסברים בעברית בלבד! 
+- גם אם המבחן באנגלית, ההסבר חייב להיות בעברית!
+- השדה explanation_hebrew חייב להיות בעברית מלאה!`,
             response_json_schema: {
               type: "object",
               properties: {
