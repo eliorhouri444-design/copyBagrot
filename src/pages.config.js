@@ -65,20 +65,10 @@ import Settings from './pages/Settings';
 import ExamMistakesPractice from './pages/ExamMistakesPractice';
 import StudyPlan from './pages/StudyPlan';
 import CustomPracticeSession from './pages/CustomPracticeSession';
-import VocabularyTraining from './pages/VocabularyTraining';
-import VocabularySets from './pages/VocabularySets';
 import VocabularySetMode from './pages/VocabularySetMode';
-import VocabularyFlashcards from './pages/VocabularyFlashcards';
-import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
-import VocabularyStrengthen from './pages/VocabularyStrengthen';
 import Grammar from './pages/Grammar';
 import GrammarPractice from './pages/GrammarPractice';
-import GrammarTopics from './pages/GrammarTopics';
-import GrammarPracticeNew from './pages/GrammarPracticeNew';
-import GrammarStrengthen from './pages/GrammarStrengthen';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
-import ReadingComprehension from './pages/ReadingComprehension';
-import ReadingPractice from './pages/ReadingPractice';
 import __Layout from './Layout.jsx';
 
 
@@ -150,20 +140,10 @@ export const PAGES = {
     "ExamMistakesPractice": ExamMistakesPractice,
     "StudyPlan": StudyPlan,
     "CustomPracticeSession": CustomPracticeSession,
-    "VocabularyTraining": VocabularyTraining,
-    "VocabularySets": VocabularySets,
     "VocabularySetMode": VocabularySetMode,
-    "VocabularyFlashcards": VocabularyFlashcards,
-    "VocabularyQuickPractice": VocabularyQuickPractice,
-    "VocabularyStrengthen": VocabularyStrengthen,
     "Grammar": Grammar,
     "GrammarPractice": GrammarPractice,
-    "GrammarTopics": GrammarTopics,
-    "GrammarPracticeNew": GrammarPracticeNew,
-    "GrammarStrengthen": GrammarStrengthen,
     "GrammarTopicsSelection": GrammarTopicsSelection,
-    "ReadingComprehension": ReadingComprehension,
-    "ReadingPractice": ReadingPractice,
 }
 
 export const pagesConfig = {
