@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, RotateCcw, Check, X, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Check, X, ArrowRight, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -65,6 +65,23 @@ export default function VocabularyFlashcards() {
     setCurrentIndex(0);
     setIsFlipped(false);
     loadWords(); // Reshuffle
+  };
+
+  const speak = (text, lang = 'en-US') => {
+    if (!text) return;
+    // Cancel current speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.9; // Slightly slower
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleCardClick = (e) => {
+    // Don't flip if clicking audio button
+    if (e.target.closest('.audio-btn')) return;
+    handleFlip();
   };
 
   if (loading) {
@@ -136,7 +153,7 @@ export default function VocabularyFlashcards() {
       <div className="flex-1 flex flex-col items-center justify-center p-4 pb-20">
         <div 
           className="relative w-full max-w-md aspect-[3/4] sm:aspect-[4/3] cursor-pointer perspective-1000"
-          onClick={handleFlip}
+          onClick={handleCardClick}
         >
           <motion.div
             className="w-full h-full relative preserve-3d transition-all duration-500"
@@ -145,26 +162,60 @@ export default function VocabularyFlashcards() {
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Front */}
-            <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 border-2 border-blue-50">
-              <span className="text-sm text-blue-500 font-bold uppercase tracking-wider mb-4">אנגלית</span>
-              <h2 className="text-4xl font-black text-gray-800 text-center break-words max-w-full">
+            <div className="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 border-2 border-blue-50 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="audio-btn absolute top-4 right-4 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full w-10 h-10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  speak(currentWord.english_answer || currentWord.english_word);
+                }}
+              >
+                <Volume2 className="w-6 h-6" />
+              </Button>
+
+              <span className="text-sm text-blue-500 font-bold uppercase tracking-wider mb-8">אנגלית</span>
+              
+              <h2 className="text-5xl font-black text-gray-800 text-center break-words max-w-full leading-tight">
                 {currentWord.english_answer || currentWord.english_word}
               </h2>
-              <p className="mt-8 text-gray-400 text-sm animate-pulse">לחץ להיפוך</p>
+              
+              <div className="mt-auto pt-8 text-gray-300 text-sm flex items-center gap-2">
+                <RotateCcw className="w-4 h-4" />
+                <span>לחץ להיפוך</span>
+              </div>
             </div>
 
             {/* Back */}
             <div 
-              className="absolute inset-0 backface-hidden bg-blue-600 text-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8"
+              className="absolute inset-0 backface-hidden bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 relative overflow-hidden"
               style={{ transform: "rotateY(180deg)" }}
             >
-              <span className="text-sm text-blue-200 font-bold uppercase tracking-wider mb-4">תרגום</span>
-              <h2 className="text-4xl font-bold text-center break-words max-w-full">
+              <div className="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none"></div>
+              
+              <span className="text-sm text-blue-200 font-bold uppercase tracking-wider mb-6">תרגום</span>
+              
+              <h2 className="text-4xl font-bold text-center break-words max-w-full mb-6">
                 {currentWord.hebrew_word}
               </h2>
+              
               {currentWord.example_sentence && (
-                <div className="mt-6 p-4 bg-white/10 rounded-xl text-sm text-center w-full">
-                  <p className="italic opacity-90">"{currentWord.example_sentence}"</p>
+                <div className="mt-2 p-4 bg-white/10 backdrop-blur-sm rounded-xl text-lg text-center w-full border border-white/10">
+                  <p className="italic opacity-90 font-medium">"{currentWord.example_sentence}"</p>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="audio-btn mt-2 text-white/80 hover:text-white hover:bg-white/20 h-8 w-8"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speak(currentWord.example_sentence);
+                    }}
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </Button>
                 </div>
               )}
             </div>
