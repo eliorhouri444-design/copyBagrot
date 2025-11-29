@@ -66,6 +66,8 @@ export default function TopicPracticeNewPage() {
   const [showVocabularyHelp, setShowVocabularyHelp] = useState(false);
   const [adSettings, setAdSettings] = useState(null);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [wolframSolution, setWolframSolution] = useState(null);
+  const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
 
   const hasNextSet = useMemo(() => {
     if (!allQuestions || allQuestions.length === 0) return false;
@@ -211,6 +213,29 @@ export default function TopicPracticeNewPage() {
       console.error("Error loading questions:", error);
       setLoadError("שגיאה בטעינת התרגול");
       setIsLoading(false);
+    }
+  };
+
+  const handleSolveWithWolfram = async () => {
+    const currentQuestion = currentSetQuestions[currentQuestionIndex];
+    if (!currentQuestion) return;
+    
+    setIsLoadingWolfram(true);
+    setWolframSolution(null);
+    try {
+        const cleanQuery = currentQuestion.question_text.replace(/<[^>]*>?/gm, '');
+        const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
+        
+        if (data.success) {
+            setWolframSolution(data.pods);
+        } else {
+            alert("לא הצלחנו לפתור את השאלה הזו אוטומטית.");
+        }
+    } catch (error) {
+        console.error("Wolfram error:", error);
+        alert("שגיאה בחיבור ל-Wolfram Alpha");
+    } finally {
+        setIsLoadingWolfram(false);
     }
   };
 
@@ -1425,14 +1450,48 @@ export default function TopicPracticeNewPage() {
               <div className="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 shadow-md">
                 <span className="font-bold text-white text-lg">{currentQuestionIndex + 1}</span>
               </div>
-              <p
-                    className="flex-1 text-base sm:text-lg text-gray-900 leading-[1.7] whitespace-pre-wrap pt-1"
-                    dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
-                    style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                    <p
+                        className="text-base sm:text-lg text-gray-900 leading-[1.7] whitespace-pre-wrap pt-1"
+                        dir={currentQuestion.question_text.match(/[א-ת]/) ? "rtl" : "ltr"}
+                        style={{ fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif" }}>
 
-                {currentQuestion.question_text}
-              </p>
+                    {currentQuestion.question_text}
+                    </p>
+                    
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="mr-2 text-purple-600 hover:bg-purple-50 flex-shrink-0"
+                        title="פתרון Wolfram Alpha"
+                        onClick={handleSolveWithWolfram}
+                        disabled={isLoadingWolfram}
+                    >
+                        {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
+                    </Button>
+                </div>
+              </div>
             </div>
+
+            {wolframSolution && (
+                <div className="mb-6 bg-purple-50 border border-purple-200 rounded-xl p-4 overflow-hidden relative mx-4">
+                    <Button variant="ghost" size="sm" className="absolute top-2 left-2" onClick={() => setWolframSolution(null)}><X className="w-4 h-4" /></Button>
+                    <h3 className="font-bold text-purple-900 mb-2 text-center">פתרון Wolfram Alpha</h3>
+                    <div className="space-y-4 max-h-96 overflow-y-auto" dir="ltr">
+                        {wolframSolution.map((pod, i) => (
+                            <div key={i} className="bg-white p-3 rounded-lg shadow-sm">
+                                <div className="text-xs font-bold text-gray-500 mb-1 uppercase">{pod.title}</div>
+                                {pod.content.map((sub, j) => (
+                                    <div key={j}>
+                                        <img src={sub.image} alt={pod.title} className="max-w-full" />
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
             
             {currentQuestion.question_image_url &&
                 <img
