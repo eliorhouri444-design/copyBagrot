@@ -385,7 +385,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                           currentSet: pos.set_id,
                           startIndex: start,
                           endIndex: end,
-                          resumeIndex: pos.question_index
+                          resumeIndex: pos.question_index,
+                          resumeWordId: pos.word_id
                         });
                         setShowContinueDialog(true);
                         return;
@@ -559,7 +560,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             <Button
               onClick={() => {
                 setShowContinueDialog(false);
-                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}`));
+                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}&resumeWordId=${savedProgress.resumeWordId}`));
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 

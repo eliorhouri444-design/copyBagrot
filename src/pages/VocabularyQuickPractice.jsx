@@ -43,6 +43,7 @@ export default function VocabularyQuickPracticePage() {
   const startIndex = parseInt(urlParams.get('start') || '0');
   const endIndex = parseInt(urlParams.get('end') || '10');
   const resumeIndex = parseInt(urlParams.get('resumeIndex') || '0');
+  const resumeWordId = urlParams.get('resumeWordId');
 
   useEffect(() => {
     loadData();
@@ -128,8 +129,15 @@ export default function VocabularyQuickPracticePage() {
       const generatedQuestions = generateQuestions(wordsForPractice, allWords);
       setQuestions(generatedQuestions);
       
-      // If resuming, set current index
-      if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
+      // Resume logic
+      if (resumeWordId) {
+        const foundIndex = generatedQuestions.findIndex(q => q.word.id === resumeWordId);
+        if (foundIndex !== -1) {
+          setCurrentIndex(foundIndex);
+        } else if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
+          setCurrentIndex(resumeIndex);
+        }
+      } else if (resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
         setCurrentIndex(resumeIndex);
       }
 
@@ -310,7 +318,7 @@ export default function VocabularyQuickPracticePage() {
       }
     });
 
-    return questions.sort(() => Math.random() - 0.5);
+    return questions;
   };
 
   const checkAnswer = (answer) => {
