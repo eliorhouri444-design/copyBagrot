@@ -73,6 +73,9 @@ import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
 import VocabularyStrengthen from './pages/VocabularyStrengthen';
 import Grammar from './pages/Grammar';
 import GrammarPractice from './pages/GrammarPractice';
+import GrammarTopics from './pages/GrammarTopics';
+import GrammarPracticeNew from './pages/GrammarPracticeNew';
+import GrammarStrengthen from './pages/GrammarStrengthen';
 import __Layout from './Layout.jsx';
 
 
@@ -152,6 +155,9 @@ export const PAGES = {
     "VocabularyStrengthen": VocabularyStrengthen,
     "Grammar": Grammar,
     "GrammarPractice": GrammarPractice,
+    "GrammarTopics": GrammarTopics,
+    "GrammarPracticeNew": GrammarPracticeNew,
+    "GrammarStrengthen": GrammarStrengthen,
 }
 
 export const pagesConfig = {
