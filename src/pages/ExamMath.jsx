@@ -1356,7 +1356,7 @@ export default function ExamMathPage() {
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
+                capture="user"
                 onChange={handleCameraCapture}
                 ref={cameraInputRef}
                 className="hidden"
@@ -1370,7 +1370,12 @@ export default function ExamMathPage() {
                 id="gallery-input"
               />
               <Button
-                onClick={() => cameraInputRef.current?.click()}
+                onClick={() => {
+                  if (cameraInputRef.current) {
+                    cameraInputRef.current.setAttribute('capture', 'environment');
+                    cameraInputRef.current.click();
+                  }
+                }}
                 variant="outline"
                 className="flex-1 border-2 border-emerald-400 text-emerald-700 hover:bg-emerald-50"
               >
