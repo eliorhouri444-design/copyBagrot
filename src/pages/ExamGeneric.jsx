@@ -316,8 +316,7 @@ export default function ExamGenericPage() {
 
         let displayExplanation = questionItem.explanation || '';
         if (aiResult) {
-          // Always prefer Hebrew explanation for the review
-          displayExplanation = aiResult.explanation_hebrew || aiResult.explanation || '';
+          displayExplanation = aiResult.explanation_hebrew || '';
         }
 
         results.push({
