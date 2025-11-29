@@ -1090,7 +1090,7 @@ export default function ExamGenericPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700">
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-900">
 
                       {isSubmitting ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" />שומר...</> : 'סיים מבחן'}
                     </Button> :
