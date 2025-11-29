@@ -223,7 +223,7 @@ export default function TopicPracticeNewPage() {
     setIsLoadingWolfram(true);
     setWolframSolution(null);
     try {
-        const cleanQuery = currentQuestion.question_text.replace(/<[^>]*>?/gm, '');
+        const cleanQuery = currentQuestion.question_text.replace(/<[^>]*>?/gm, '').trim();
         const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
         
         if (data.success) {

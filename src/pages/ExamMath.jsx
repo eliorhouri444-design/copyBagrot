@@ -676,13 +676,8 @@ export default function ExamMathPage() {
     if (resultIndex !== null) setShowWolframInReview(resultIndex);
     
     try {
-        // Clean query: remove HTML tags and Hebrew characters (Wolfram handles Math/English best)
-        let cleanQuery = questionText.replace(/<[^>]*>?/gm, '').replace(/[\u0590-\u05FF]/g, '').trim();
-        
-        // If cleaning removed everything (only Hebrew text), try original text as fallback
-        if (!cleanQuery || cleanQuery.length < 2) {
-            cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
-        }
+        // Clean query: remove HTML tags only. Keep Hebrew for server-side translation.
+        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '').trim();
 
         const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
         

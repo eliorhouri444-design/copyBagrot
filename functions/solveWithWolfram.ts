@@ -20,8 +20,36 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Query is required' }, { status: 400 });
         }
 
-        // Use Wolfram Alpha Full Results API (v2) to get steps and images
-        const url = `https://api.wolframalpha.com/v2/query?appid=${appId}&input=${encodeURIComponent(query)}&output=json&format=image,plaintext`;
+        // Step 1: Translate Hebrew to English Math Syntax (if Hebrew is present)
+        let translatedQuery = query;
+        if (/[א-ת]/.test(query)) {
+            try {
+                const llmResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `You are a math translator. 
+Goal: Convert this Hebrew math question into a precise Wolfram Alpha query string (English).
+Input: "${query}"
+
+Instructions:
+1. Identify the math problem (Equation, Derivative, Integral, Plot, etc.).
+2. Convert to English terminology (e.g., 'נגזרת' -> 'derivative', 'אינטגרל' -> 'integrate').
+3. Format specifically for Wolfram Alpha (e.g., "solve x^2=4", "derivative of x^2", "plot sin(x)").
+4. ONLY output the query string. No extra words.
+
+Query:`,
+                });
+                // InvokeLLM returns a string when no schema is provided.
+                // Clean up any potential quotes or whitespace.
+                translatedQuery = llmResponse.trim().replace(/^"|"$/g, '');
+            } catch (e) {
+                console.error("LLM Translation failed:", e);
+                // Fallback to original query if translation fails
+            }
+        }
+
+        console.log(`Wolfram Query: Original="${query}" -> Translated="${translatedQuery}"`);
+
+        // Step 2: Query Wolfram Alpha
+        const url = `https://api.wolframalpha.com/v2/query?appid=${appId}&input=${encodeURIComponent(translatedQuery)}&output=json&format=image,plaintext`;
         
         const response = await fetch(url);
         const data = await response.json();
@@ -29,29 +57,49 @@ Deno.serve(async (req) => {
         if (data.queryresult.success === false) {
              return Response.json({ 
                 success: false,
-                error: "Wolfram Alpha could not understand the query"
+                error: "Wolfram Alpha could not understand the query",
+                debug_query: translatedQuery
             });
         }
 
-        // Process pods to extract relevant info (Input, Result, Steps/Solution)
+        // Step 3: Process and Filter Pods
         const pods = data.queryresult.pods || [];
         
-        // Filter for result/solution pods
-        // Look for primary=true or specific titles
+        // Prioritize result/solution pods
         const resultPods = pods.filter(pod => 
             pod.primary || 
             pod.title === 'Result' || 
             pod.title === 'Decimal approximation' ||
             pod.title === 'Solution' || 
-            pod.title === 'Exact result'
+            pod.title === 'Exact result' ||
+            pod.title === 'Complex solution' ||
+            pod.title === 'Real solution' ||
+            pod.title === 'Plot' ||
+            pod.title === 'Graphs'
         );
         
-        // If we found result pods, use them. Otherwise, fallback to the first few pods (input + result usually)
-        // but since user asked for "final answer only", we prefer strictly resultPods if available.
-        const targetPods = resultPods.length > 0 ? resultPods : pods.slice(0, 2);
+        const targetPods = resultPods.length > 0 ? resultPods : pods.slice(0, 3);
+
+        // Dictionary for title translation
+        const titleTranslation = {
+            "Result": "תוצאה",
+            "Solution": "פתרון",
+            "Decimal approximation": "קירוב עשרוני",
+            "Exact result": "תוצאה מדויקת",
+            "Complex solution": "פתרון מרוכב",
+            "Real solution": "פתרון ממשי",
+            "Plot": "גרף",
+            "Graphs": "גרפים",
+            "Derivative": "נגזרת",
+            "Indefinite integral": "אינטגרל לא מסוים",
+            "Definite integral": "אינטגרל מסוים",
+            "Geometric figure": "צורה גאומטרית",
+            "Input": "קלט",
+            "Input interpretation": "פרשנות קלט"
+        };
 
         const relevantPods = targetPods.map(pod => ({
-            title: pod.title,
+            title: titleTranslation[pod.title] || pod.title,
             content: pod.subpods.map(sub => ({
                 text: sub.plaintext,
                 image: sub.img.src
@@ -60,7 +108,8 @@ Deno.serve(async (req) => {
 
         return Response.json({ 
             success: true,
-            pods: relevantPods
+            pods: relevantPods,
+            translated_query: translatedQuery
         });
 
     } catch (error) {

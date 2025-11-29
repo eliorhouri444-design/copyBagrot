@@ -236,7 +236,7 @@ export default function ExamGenericPage() {
     if (resultIndex !== null) setShowWolframInReview(resultIndex);
     
     try {
-        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
+        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '').trim();
         const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
         
         if (data.success) {
