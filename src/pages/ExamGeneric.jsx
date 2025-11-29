@@ -317,9 +317,12 @@ export default function ExamGenericPage() {
           earnedScore += pointsAwarded;
         }
 
-        let displayExplanation = questionItem.explanation || '';
-        if (aiResult) {
-          displayExplanation = aiResult.explanation_hebrew || '';
+        let displayExplanation = '';
+        if (aiResult && aiResult.explanation_hebrew) {
+          displayExplanation = aiResult.explanation_hebrew;
+        } else if (questionItem.explanation) {
+          // Translate existing explanation if not in Hebrew
+          displayExplanation = questionItem.explanation;
         }
 
         results.push({
