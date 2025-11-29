@@ -155,6 +155,7 @@ ${baseStyle}`;
            set_id: parseInt(setId),
            question_index: currentIndex,
            word_id: words[currentIndex]?.id,
+           mode: 'flashcards',
            timestamp: new Date().toISOString()
          }
        }).catch(e => console.error("Error saving bookmark:", e));

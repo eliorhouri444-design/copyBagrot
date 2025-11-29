@@ -219,7 +219,7 @@ export default function VocabularySetsPage() {
     }
   };
 
-  const startFromSet = (setNum, questionIndex = 0) => {
+  const startFromSet = (setNum, questionIndex = 0, resumeWordId = null, mode = 'flashcards') => {
     const set = sets.find(s => s.id === setNum);
     if (!set) {
       // If no set found, maybe finished?
@@ -233,23 +233,25 @@ export default function VocabularySetsPage() {
       return;
     }
     
-    // If starting mid-set (questionIndex > 0), we need to pass that to Flashcards/QuickPractice
-    // But Flashcards usually starts from beginning of set. 
-    // If questionIndex > 0, maybe skip flashcards and go to QuickPractice? 
-    // The user said "Continue from where he left off". 
-    // If he was at question 105 (index 5 in set 11), he likely wants the Question view.
-    
-    if (questionIndex > 0) {
-       // Go directly to QuickPractice
-       navigate(createPageUrl(`VocabularyQuickPractice?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}&resumeIndex=${questionIndex}`));
-    } else {
-       navigate(createPageUrl(`VocabularyFlashcards?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`));
+    // Determine target page based on mode or fallback logic
+    let targetPage = 'VocabularyFlashcards';
+    if (mode === 'practice') {
+        targetPage = 'VocabularyQuickPractice';
+    } else if (questionIndex > 0 && !mode) {
+        // Legacy fallback if no mode is saved
+        targetPage = 'VocabularyQuickPractice'; 
     }
+
+    let url = `${targetPage}?setId=${set.id}&start=${set.startIndex}&end=${set.endIndex}`;
+    if (questionIndex > 0) url += `&resumeIndex=${questionIndex}`;
+    if (resumeWordId) url += `&resumeWordId=${resumeWordId}`;
+    
+    navigate(createPageUrl(url));
   };
 
   const handleResume = () => {
     if (resumeData) {
-      startFromSet(resumeData.set_id, resumeData.question_index);
+      startFromSet(resumeData.set_id, resumeData.question_index, resumeData.word_id, resumeData.mode);
     }
     setShowResumeDialog(false);
   };

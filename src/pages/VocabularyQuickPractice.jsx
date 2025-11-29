@@ -62,6 +62,7 @@ export default function VocabularyQuickPracticePage() {
               set_id: parseInt(setId),
               question_index: currentQIndex,
               word_id: questions[currentQIndex]?.word?.id,
+              mode: 'practice',
               timestamp: new Date().toISOString()
             }
           }).catch(e => console.error("Error saving bookmark:", e));

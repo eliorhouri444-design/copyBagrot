@@ -386,7 +386,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                           startIndex: start,
                           endIndex: end,
                           resumeIndex: pos.question_index,
-                          resumeWordId: pos.word_id
+                          resumeWordId: pos.word_id,
+                          mode: pos.mode || 'flashcards'
                         });
                         setShowContinueDialog(true);
                         return;
@@ -560,7 +561,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             <Button
               onClick={() => {
                 setShowContinueDialog(false);
-                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}&resumeWordId=${savedProgress.resumeWordId}`));
+                const targetPage = savedProgress.mode === 'practice' ? 'VocabularyQuickPractice' : 'VocabularyFlashcards';
+                navigate(createPageUrl(`${targetPage}?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}&resumeWordId=${savedProgress.resumeWordId}`));
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 
