@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
         }
 
         // Use Wolfram Alpha Full Results API (v2) to get steps and images
-        const url = `http://api.wolframalpha.com/v2/query?appid=${appId}&input=${encodeURIComponent(query)}&output=json&format=image,plaintext`;
+        const url = `https://api.wolframalpha.com/v2/query?appid=${appId}&input=${encodeURIComponent(query)}&output=json&format=image,plaintext`;
         
         const response = await fetch(url);
         const data = await response.json();

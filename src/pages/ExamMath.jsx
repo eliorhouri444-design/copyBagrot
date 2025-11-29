@@ -676,13 +676,21 @@ export default function ExamMathPage() {
     if (resultIndex !== null) setShowWolframInReview(resultIndex);
     
     try {
-        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
+        // Clean query: remove HTML tags and Hebrew characters (Wolfram handles Math/English best)
+        let cleanQuery = questionText.replace(/<[^>]*>?/gm, '').replace(/[\u0590-\u05FF]/g, '').trim();
+        
+        // If cleaning removed everything (only Hebrew text), try original text as fallback
+        if (!cleanQuery || cleanQuery.length < 2) {
+            cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
+        }
+
         const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
         
         if (data.success) {
             setWolframSolution(data.pods);
         } else {
-            alert("לא הצלחנו לפתור את השאלה הזו אוטומטית.");
+            console.error("Wolfram Error:", data.error);
+            alert(data.error && typeof data.error === 'string' ? `שגיאה: ${data.error}` : "לא הצלחנו לפתור את השאלה הזו אוטומטית. נסה שוב מאוחר יותר.");
         }
     } catch (error) {
         console.error("Wolfram error:", error);
