@@ -28,7 +28,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     setTopics(initialTopics);
   }, [initialTopics]);
 
-  // Load vocabulary stats when showing vocabulary topic
+  // Load vocabulary/grammar stats when showing vocabulary or grammar topic
   useEffect(() => {
     const loadVocabStats = async () => {
       const currentTopic = topics[currentIndex];
@@ -37,6 +37,52 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
       const isVocab = currentTopic.isVocabulary || 
         currentTopic.topic_id?.toLowerCase().includes('vocabulary') || 
         currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים');
+      
+      const isGrammar = currentTopic.isGrammar || 
+        currentTopic.topic_id?.toLowerCase().includes('grammar') || 
+        currentTopic.topic_id?.toLowerCase().includes('דקדוק');
+      
+      if (isGrammar) {
+        try {
+          const user = await base44.auth.me();
+          const subject = user?.selected_subject || 'אנגלית';
+          const units = user?.selected_units || 3;
+          
+          const [allQuestions, userProgress] = await Promise.all([
+            base44.entities.GrammarQuestion.filter({
+              subject_id: subject,
+              unit_level: units,
+              is_active: true
+            }, null, 2000),
+            base44.entities.GrammarProgress.filter({
+              user_email: user.email,
+              subject_id: subject
+            }, null, 2000)
+          ]);
+          
+          const validQuestionIds = new Set(allQuestions.map(q => q.id));
+          const validProgress = userProgress.filter(p => validQuestionIds.has(p.question_id));
+          
+          const masteredQuestions = validProgress.filter(p => p.is_mastered || p.times_correct >= 3).length;
+          const weakQuestions = validProgress.filter(p => p.is_weak).length;
+          const masteryProgress = allQuestions.length > 0 
+            ? Math.round((masteredQuestions / allQuestions.length) * 100) 
+            : 0;
+          
+          setVocabStats({
+            totalWords: allQuestions.length,
+            learnedWords: validProgress.length,
+            masteredWords: masteredQuestions,
+            weakWords: weakQuestions,
+            accuracy: 0,
+            masteryProgress,
+            isGrammar: true
+          });
+        } catch (error) {
+          console.error("Error loading grammar stats:", error);
+        }
+        return;
+      }
       
       if (isVocab) {
         try {
@@ -123,6 +169,11 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
     if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
       navigate(createPageUrl(`VocabularyTraining`));
+      return;
+    }
+
+    if (topic.isGrammar || topic.topic_id?.toLowerCase().includes('grammar') || topic.topic_id?.toLowerCase().includes('דקדוק')) {
+      navigate(createPageUrl(`GrammarTopics`));
       return;
     }
 
@@ -222,7 +273,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   </div>
                   <p className="text-white/80 text-sm">
                     {vocabStats 
-                      ? `סה"כ ${vocabStats.totalWords} מילים`
+                      ? `סה"כ ${vocabStats.totalWords} ${vocabStats.isGrammar ? 'שאלות' : 'מילים'}`
                       : `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
@@ -231,14 +282,14 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               </div>
             </div>
 
-            {/* Stats Cards - Different for Vocabulary */}
+            {/* Stats Cards - Different for Vocabulary and Grammar */}
             {vocabStats ? (
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <BookOpen className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נלמדו</div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">{vocabStats.isGrammar ? 'למדת' : 'נלמדו'}</div>
                   <div className="text-lg font-bold text-[#2B2B2B]">{vocabStats.learnedWords}</div>
                   <div className="text-[9px] text-[#6E6E6E]">שאלות</div>
                 </div>
@@ -248,15 +299,15 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   </div>
                   <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בשליטה</div>
                   <div className="text-lg font-bold text-green-600">{vocabStats.masteredWords}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">נכון 4+ פעמים</div>
+                  <div className="text-[9px] text-[#6E6E6E]">{vocabStats.isGrammar ? 'נכון 3+ פעמים' : 'נכון 4+ פעמים'}</div>
                 </div>
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
                   </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">לחיזוק</div>
+                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">חיזוק</div>
                   <div className="text-lg font-bold text-orange-600">{vocabStats.weakWords}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">מילים חלשות</div>
+                  <div className="text-[9px] text-[#6E6E6E]">{vocabStats.isGrammar ? 'שאלות חלשות' : 'מילים חלשות'}</div>
                 </div>
               </div>
             ) : (
@@ -298,6 +349,13 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               <Button
               onClick={async () => {
                 const topic = topics[currentIndex];
+                
+                // Grammar topic
+                if (topic.isGrammar || topic.topic_id?.toLowerCase().includes('grammar') || topic.topic_id?.toLowerCase().includes('דקדוק')) {
+                  navigate(createPageUrl(`GrammarTopics`));
+                  return;
+                }
+                
                 if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
                   // Check saved progress
                   const saved = localStorage.getItem('vocabSetProgress');
@@ -344,7 +402,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <Button
                   onClick={() => {
                     const topic = topics[currentIndex];
-                    if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+                    if (topic.isGrammar || topic.topic_id?.toLowerCase().includes('grammar') || topic.topic_id?.toLowerCase().includes('דקדוק')) {
+                      navigate(createPageUrl("GrammarStrengthen"));
+                    } else if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
                       navigate(createPageUrl("VocabularyStrengthen"));
                     } else {
                       sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
@@ -352,10 +412,14 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     }
                   }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
                     <Target className="w-4 h-4 ml-2" />
-                    {vocabStats ? 'תרגול מילים חלשות' : 'תרגול טעויות בנושא זה'}
+                    {vocabStats ? (vocabStats.isGrammar ? 'תרגול שאלות חלשות' : 'תרגול מילים חלשות') : 'תרגול טעויות בנושא זה'}
                   </Button>
                   <Button
                   onClick={async () => {
+                    if (currentTopic.isGrammar || currentTopic.topic_id?.toLowerCase().includes('grammar') || currentTopic.topic_id?.toLowerCase().includes('דקדוק')) {
+                      navigate(createPageUrl("GrammarTopics"));
+                      return;
+                    }
                     if (currentTopic.isVocabulary || currentTopic.topic_id?.toLowerCase().includes('vocabulary') || currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
                       // Load vocabulary words and create sets of 10
                       try {
