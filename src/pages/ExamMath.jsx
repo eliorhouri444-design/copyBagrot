@@ -1351,8 +1351,8 @@ export default function ExamMathPage() {
               )}
             </div>
 
-            {/* Camera Check Button */}
-            <div className="mt-4">
+            {/* Camera Check Buttons */}
+            <div className="mt-4 flex gap-2">
               <input
                 type="file"
                 accept="image/*"
@@ -1362,13 +1362,28 @@ export default function ExamMathPage() {
                 className="hidden"
                 id="camera-input"
               />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleCameraCapture}
+                className="hidden"
+                id="gallery-input"
+              />
               <Button
                 onClick={() => cameraInputRef.current?.click()}
                 variant="outline"
-                className="w-full border-2 border-emerald-400 text-emerald-700 hover:bg-emerald-50"
+                className="flex-1 border-2 border-emerald-400 text-emerald-700 hover:bg-emerald-50"
               >
-                <Camera className="w-5 h-5 ml-2" />
-                צלם פתרון לבדיקה
+                <Camera className="w-5 h-5 ml-1" />
+                צלם
+              </Button>
+              <Button
+                onClick={() => document.getElementById('gallery-input')?.click()}
+                variant="outline"
+                className="flex-1 border-2 border-blue-400 text-blue-700 hover:bg-blue-50"
+              >
+                <BookOpen className="w-5 h-5 ml-1" />
+                גלריה
               </Button>
             </div>
 
