@@ -221,7 +221,7 @@ export default function VocabularySetsPage() {
   };
 
   const deleteSet = async (set) => {
-    if (!confirm(`האם למחוק את סט ${set.id}? (${set.words.length} מילים)`)) return;
+    if (!confirm(`האם למחוק את תרגול ${set.id}? (${set.words.length} מילים)`)) return;
     
     setIsSaving(true);
     try {
@@ -230,10 +230,10 @@ export default function VocabularySetsPage() {
         await base44.entities.VocabularyQuestion.delete(word.id);
       }
       loadData();
-      alert(`סט ${set.id} נמחק בהצלחה!`);
+      alert(`תרגול ${set.id} נמחק בהצלחה!`);
     } catch (error) {
       console.error("Error deleting set:", error);
-      alert('שגיאה במחיקת הסט');
+      alert('שגיאה במחיקת התרגול');
     } finally {
       setIsSaving(false);
     }
@@ -379,7 +379,7 @@ export default function VocabularySetsPage() {
       setBulkText('');
       loadData();
       
-      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`;
+      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} תרגולים חדשים (כל תרגול = 10 מילים)`;
       if (duplicatesSkipped > 0) {
         message += `\n\n⚠️ ${duplicatesSkipped} מילים כפולות לא נוספו`;
       }
@@ -546,7 +546,7 @@ export default function VocabularySetsPage() {
       setImportProgress({ current: 0, total: 0, status: '' });
       loadData();
 
-      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} סטים חדשים (כל סט = 10 מילים)`;
+      let message = `✅ ${totalAdded} מילים נוספו בהצלחה!\n\n📚 נוצרו ${newSetsCount} תרגולים חדשים (כל תרגול = 10 מילים)`;
       if (duplicatesSkipped > 0) {
         message += `\n\n⚠️ ${duplicatesSkipped} מילים כפולות לא נוספו`;
       }
@@ -631,7 +631,7 @@ export default function VocabularySetsPage() {
               <div className="text-2xl font-bold text-blue-600">
                 {sets.length}
               </div>
-              <div className="text-xs text-blue-700">סטים</div>
+              <div className="text-xs text-blue-700">תרגולים</div>
             </div>
           </div>
         </div>
@@ -678,7 +678,7 @@ export default function VocabularySetsPage() {
         {/* Sets List */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-gray-900">בחר סט לתרגול</h3>
+            <h3 className="font-bold text-gray-900">בחר תרגול לתרגול</h3>
             <div className="flex gap-2">
               {selectionMode ? (
                 <>
@@ -709,7 +709,7 @@ export default function VocabularySetsPage() {
                   onClick={() => setSelectionMode(true)}
                   className="text-blue-600 text-xs"
                 >
-                  בחר מספר סטים
+                  בחר מספר תרגולים
                 </Button>
               )}
             </div>
@@ -719,7 +719,7 @@ export default function VocabularySetsPage() {
           {selectionMode && selectedSets.length > 0 && (
             <div className="bg-blue-50 rounded-xl p-3 border border-blue-200 flex items-center justify-between">
               <span className="text-sm font-semibold text-blue-800">
-                {selectedSets.length} סטים נבחרו ({selectedSets.length * 10} מילים)
+                {selectedSets.length} תרגולים נבחרו ({selectedSets.length * 10} מילים)
               </span>
               <Button
                 onClick={startSelectedSetsPractice}
@@ -804,7 +804,7 @@ export default function VocabularySetsPage() {
                   {/* Set Info */}
                   <div className="flex-1 text-right">
                     <div className="font-bold text-gray-900 mb-1">
-                      סט {set.id}
+                      תרגול {set.id}
                       {isLocked && <Crown className="w-4 h-4 text-amber-500 inline mr-2" />}
                     </div>
                     <div className="text-sm text-gray-600 mb-2">
@@ -862,7 +862,7 @@ export default function VocabularySetsPage() {
               <Crown className="w-8 h-8" />
               <div className="flex-1">
                 <h4 className="font-bold">שדרג לפרימיום</h4>
-                <p className="text-sm opacity-90">גישה לכל {sets.length} הסטים</p>
+                <p className="text-sm opacity-90">גישה לכל {sets.length} התרגולים</p>
               </div>
               <Button
                 onClick={() => navigate(createPageUrl("Premium"))}
@@ -1106,7 +1106,7 @@ export default function VocabularySetsPage() {
                 <li>✓ מזהה ומדלגת על כפילויות אוטומטית</li>
                 <li>✓ תומכת ב-100 עד 5,000+ מילים</li>
                 <li>✓ יוצרת שאלות לכל סוגי התרגול (בחירה, כתיבה, הפוך)</li>
-                <li>✓ ממיינת לסטים של 10 מילים</li>
+                <li>✓ ממיינת לתרגולים של 10 מילים</li>
                 <li>✓ תומכת ב-3, 4, 5 יחידות</li>
               </ul>
             </div>
