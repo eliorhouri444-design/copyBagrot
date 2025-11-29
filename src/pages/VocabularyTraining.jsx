@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
   BookOpen, ChevronLeft, Layers, Target, AlertTriangle, 
-  RotateCcw, Loader2, Filter 
+  RotateCcw, Loader2, Filter, Settings
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -232,9 +232,18 @@ export default function VocabularyTrainingPage() {
             <h1 className="text-lg font-bold text-white">אוצר מילים</h1>
             <p className="text-sm text-white/80">{displaySubject} • {displayUnits} יחידות</p>
           </div>
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-white" />
-          </div>
+          {user?.role === 'admin' ? (
+            <button 
+              onClick={() => navigate(createPageUrl("VocabularySets"))}
+              className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+            >
+              <Settings className="w-5 h-5 text-white" />
+            </button>
+          ) : (
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-white" />
+            </div>
+          )}
         </div>
       </div>
 

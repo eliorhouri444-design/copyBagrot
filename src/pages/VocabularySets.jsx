@@ -656,7 +656,7 @@ export default function VocabularySetsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || user?.role !== 'admin') {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
