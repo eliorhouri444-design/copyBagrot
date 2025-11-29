@@ -1106,7 +1106,7 @@ export default function ExamGenericPage() {
                     }
                   }}
                   disabled={!userAnswers[question.question_number]?.trim()}
-                  className="flex-1 h-12 bg-blue-600">
+                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700">
 
                       הבא
                       <ChevronLeft className="w-5 h-5 mr-2" />
