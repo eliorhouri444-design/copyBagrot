@@ -334,6 +334,11 @@ export default function GrammarPracticeNewPage() {
                   <div key={idx} className="bg-red-50 rounded-xl p-3 text-sm">
                     <div className="text-gray-800 mb-1" dir="ltr">{q.question}</div>
                     <div className="text-green-700 font-medium" dir="ltr">תשובה: {q.answer}</div>
+                    {q.explanation && (
+                      <div className="text-gray-600 mt-2 text-xs border-t border-red-200 pt-2">
+                        <strong>הסבר:</strong> {q.explanation}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
