@@ -68,15 +68,17 @@ export default function VocabularyQuickPracticePage() {
   }, [currentIndex, user, isMultiSet, setId, questions.length, showResult, showSummary]);
 
   const handleExit = () => {
+    const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";
     if (showSummary || questions.length === 0) {
-      navigate(createPageUrl("VocabularySets"));
+      navigate(createPageUrl(targetPage));
       return;
     }
     setShowExitDialog(true);
   };
 
   const confirmExit = () => {
-    navigate(createPageUrl("VocabularySets"));
+    const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";
+    navigate(createPageUrl(targetPage));
   };
 
   const loadData = async () => {

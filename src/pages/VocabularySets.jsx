@@ -89,6 +89,11 @@ export default function VocabularySetsPage() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      if (currentUser?.role !== 'admin') {
+        navigate(createPageUrl("VocabularyTraining"));
+        return;
+      }
+
       const subject = currentUser?.selected_subject || 'אנגלית';
       const units = currentUser?.selected_units || 3;
 

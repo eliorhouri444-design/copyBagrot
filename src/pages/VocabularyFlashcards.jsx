@@ -159,15 +159,17 @@ ${baseStyle}`;
   }, [currentIndex, user, isMultiSet, setId, words.length, showSummary]);
 
   const handleExit = () => {
+    const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";
     if (showSummary || words.length === 0) {
-      navigate(createPageUrl("VocabularySets"));
+      navigate(createPageUrl(targetPage));
       return;
     }
     setShowExitDialog(true);
   };
 
   const confirmExit = () => {
-    navigate(createPageUrl("VocabularySets"));
+    const targetPage = user?.role === 'admin' ? "VocabularySets" : "VocabularyTraining";
+    navigate(createPageUrl(targetPage));
   };
 
   const loadData = async () => {
