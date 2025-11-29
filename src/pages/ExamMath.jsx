@@ -1364,33 +1364,96 @@ export default function ExamMathPage() {
 
       {/* Calculator Dialog */}
       <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
-        <DialogContent dir="rtl" className="sm:max-w-md">
+        <DialogContent dir="rtl" className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Calculator className="w-6 h-6 text-blue-600" />
-              מחשבון
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calculator className="w-6 h-6 text-blue-600" />
+                מחשבון מדעי
+              </div>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant={calcMode === 'basic' ? 'default' : 'outline'}
+                  onClick={() => setCalcMode('basic')}
+                  className="text-xs h-7"
+                >
+                  בסיסי
+                </Button>
+                <Button
+                  size="sm"
+                  variant={calcMode === 'scientific' ? 'default' : 'outline'}
+                  onClick={() => setCalcMode('scientific')}
+                  className="text-xs h-7"
+                >
+                  מדעי
+                </Button>
+              </div>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="bg-slate-900 rounded-xl p-4 mb-4">
-            <div className="text-right text-3xl font-mono text-emerald-400 h-12">
+          {/* Display */}
+          <div className="bg-slate-900 rounded-xl p-4 mb-3">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-slate-500">
+                {calcMemory !== 0 && <span className="text-amber-400 mr-2">M</span>}
+                {isDegrees ? 'DEG' : 'RAD'}
+              </span>
+            </div>
+            <div className="text-right text-3xl font-mono text-emerald-400 overflow-x-auto whitespace-nowrap" dir="ltr">
               {calculatorDisplay}
             </div>
           </div>
 
-          <div className="grid gap-2">
-            {calculatorButtons.map((row, rowIndex) => (
-              <div key={rowIndex} className="grid grid-cols-4 gap-2">
+          {/* Scientific buttons (when in scientific mode) */}
+          {calcMode === 'scientific' && (
+            <div className="grid gap-1.5 mb-2">
+              {scientificButtons.map((row, rowIndex) => (
+                <div key={rowIndex} className="grid grid-cols-4 gap-1.5">
+                  {row.map((buttonValue) => (
+                    <Button
+                      key={buttonValue}
+                      onClick={() => handleCalculator(buttonValue)}
+                      className={`h-10 text-xs font-bold ${
+                        buttonValue === 'DEG' && isDegrees ? 'bg-blue-600 text-white' :
+                        buttonValue === 'RAD' && !isDegrees ? 'bg-blue-600 text-white' :
+                        ['sin', 'cos', 'tan', 'sin⁻¹', 'cos⁻¹', 'tan⁻¹'].includes(buttonValue)
+                          ? 'bg-purple-100 hover:bg-purple-200 text-purple-800'
+                        : ['ln', 'log', '10ˣ', 'eˣ'].includes(buttonValue)
+                          ? 'bg-teal-100 hover:bg-teal-200 text-teal-800'
+                        : ['x²', 'x³', 'xʸ', '√', '³√', '1/x', 'n!', '|x|'].includes(buttonValue)
+                          ? 'bg-amber-100 hover:bg-amber-200 text-amber-800'
+                        : ['MC', 'MR', 'M+', 'M-'].includes(buttonValue)
+                          ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                      }`}
+                    >
+                      {buttonValue}
+                    </Button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Basic buttons */}
+          <div className="grid gap-1.5">
+            {basicButtons.map((row, rowIndex) => (
+              <div key={rowIndex} className="grid grid-cols-4 gap-1.5">
                 {row.map((buttonValue) => (
                   <Button
                     key={buttonValue}
                     onClick={() => handleCalculator(buttonValue)}
-                    className={`h-14 text-xl font-bold ${
-                      ['=', 'C', '←', '√', '^'].includes(buttonValue)
+                    className={`h-12 text-xl font-bold ${
+                      buttonValue === '=' 
                         ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : ['+', '-', '×', '÷'].includes(buttonValue)
+                      : buttonValue === 'C'
+                        ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                      : buttonValue === '←'
+                        ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                      : ['+', '-', '×', '÷', '%'].includes(buttonValue)
                         ? 'bg-indigo-500 hover:bg-indigo-600 text-white'
-                        : 'bg-slate-200 hover:bg-slate-300 text-slate-900'
+                      : 'bg-slate-200 hover:bg-slate-300 text-slate-900'
                     }`}
                   >
                     {buttonValue}
