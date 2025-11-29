@@ -953,7 +953,7 @@ export default function ExamGenericPage() {
       <div className="px-4 pb-6 flex flex-col" style={{ height: 'calc(100vh - 150px)' }}>
           {exam.reading_text &&
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-3" style={{ height: '30%', minHeight: '200px' }}>
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2.5">
+              <div className="bg-blue-500 p-2.5 from-blue-600 to-indigo-600">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <BookOpen className="w-4 h-4" />
                   {exam.subject === 'אנגלית' ? 'Reading Text' : 'טקסט הקריאה'}
