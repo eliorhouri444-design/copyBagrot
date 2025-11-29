@@ -357,13 +357,14 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   }
 
                   if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-                    // Check saved progress
-                    const saved = localStorage.getItem('vocabSetProgress');
-                    if (saved) {
-                      const progress = JSON.parse(saved);
-                      // Load total sets to check if completed
-                      try {
-                        const user = await base44.auth.me();
+                    // Check saved progress from user entity
+                    try {
+                      const user = await base44.auth.me();
+                      if (user?.last_vocabulary_position) {
+                        const pos = user.last_vocabulary_position;
+                        // Check if completed (simple check if set_id is very high or via flag, but for now assume valid position)
+
+                        // Load total sets to check if completed
                         const allWords = await base44.entities.VocabularyQuestion.filter({
                           subject_id: user?.selected_subject || 'אנגלית',
                           unit_level: user?.selected_units || 3,
@@ -372,21 +373,29 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                         const totalSetsCount = Math.ceil(allWords.length / 10);
                         setTotalSets(totalSetsCount);
 
-                        if (progress.currentSet > totalSetsCount) {
-                          // User completed all sets!
-                          setShowCompletedDialog(true);
-                          return;
+                        if (pos.set_id > totalSetsCount) {
+                           setShowCompletedDialog(true);
+                           return;
                         }
 
-                        setSavedProgress(progress);
+                        const start = (pos.set_id - 1) * 10;
+                        const end = start + 10;
+
+                        setSavedProgress({
+                          currentSet: pos.set_id,
+                          startIndex: start,
+                          endIndex: end,
+                          resumeIndex: pos.question_index
+                        });
                         setShowContinueDialog(true);
-                      } catch (error) {
-                        // If error, just start from beginning
-                        navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                        return;
                       }
-                    } else {
-                      navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                    } catch (e) {
+                      console.error("Error checking vocabulary progress:", e);
                     }
+
+                    // Fallback to localStorage if no user progress (or clean start)
+                    navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
                   } else {
                     handleStartPractice();
                   }
@@ -540,6 +549,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           <div className="py-4 text-center">
             <div className="bg-blue-50 rounded-xl p-4 mb-4">
               <div className="text-3xl font-bold text-blue-600 mb-1">תרגול {savedProgress?.currentSet}</div>
+              <div className="text-lg font-semibold text-blue-800 mb-1">כרטיס {(savedProgress?.resumeIndex || 0) + 1}</div>
               <div className="text-sm text-gray-600">מילים {savedProgress?.startIndex + 1} - {savedProgress?.endIndex}</div>
             </div>
             <p className="text-gray-600 text-sm">נשמר התקדמות מהפעם הקודמת</p>
@@ -549,15 +559,17 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             <Button
               onClick={() => {
                 setShowContinueDialog(false);
-                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}`));
+                navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}&resumeIndex=${savedProgress.resumeIndex}`));
               }}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
 
-              המשך מתרגול {savedProgress?.currentSet}
+              המשך מתרגול {savedProgress?.currentSet} (כרטיס {(savedProgress?.resumeIndex || 0) + 1})
             </Button>
             <Button
-              onClick={() => {
-                localStorage.removeItem('vocabSetProgress');
+              onClick={async () => {
+                try {
+                  await base44.auth.updateMe({ last_vocabulary_position: null });
+                } catch (e) { console.error(e); }
                 setShowContinueDialog(false);
                 navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
               }}

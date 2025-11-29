@@ -27,6 +27,7 @@ export default function VocabularyFlashcardsPage() {
   const setsParam = urlParams.get('sets');
   const startIndex = parseInt(urlParams.get('start') || '0');
   const endIndex = parseInt(urlParams.get('end') || '10');
+  const resumeIndex = parseInt(urlParams.get('resumeIndex') || '0');
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -230,6 +231,10 @@ ${baseStyle}`;
       });
 
       setWords(wordsForPractice);
+
+      if (resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
+        setCurrentIndex(resumeIndex);
+      }
 
     } catch (error) {
       console.error("Error loading vocabulary data:", error);
