@@ -239,16 +239,8 @@ export default function ExamGenericPage() {
 
       const checkAnswerWithAI = async (userAnswer, correctAnswer, questionText) => {
         try {
-          let explanationLanguageInstruction = '';
-          if (exam.subject === 'אנגלית') {
-            if (unitLevel === 3) {
-              explanationLanguageInstruction = 'Write ALL explanations ONLY in Hebrew (explanation_hebrew)';
-            } else if (unitLevel === 4) {
-              explanationLanguageInstruction = 'Write explanations in BOTH Hebrew (explanation_hebrew) and English (explanation_english)';
-            } else if (unitLevel === 5) {
-              explanationLanguageInstruction = 'Write ALL explanations ONLY in English (explanation)';
-            }
-          }
+          // Always write explanations in Hebrew for the user
+          const explanationLanguageInstruction = 'IMPORTANT: Write ALL explanations ONLY in Hebrew (explanation_hebrew field). The explanation must be in Hebrew regardless of the subject.';
 
           const response = await base44.integrations.Core.InvokeLLM({
             prompt: `INSTRUCTIONS FOR CHECKING ANSWERS:
