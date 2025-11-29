@@ -34,8 +34,8 @@ export default function GrammarPracticeNewPage() {
   
   const urlParams = new URLSearchParams(window.location.search);
   const topicId = urlParams.get('topic');
-  const practiceMode = urlParams.get('mode') || 'select'; // 'select' or 'practice'
-  const questionType = urlParams.get('type') || 'multiple_choice'; // 'multiple_choice' or 'free_write'
+  const practiceMode = urlParams.get('mode') || 'select'; // 'select' or 'practice' or 'auto' or 'weak'
+  const questionType = urlParams.get('type') || 'multiple_choice';
 
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,28 +64,90 @@ export default function GrammarPracticeNewPage() {
       const subject = currentUser?.selected_subject || 'אנגלית';
       const units = currentUser?.selected_units || 3;
 
-      // Load questions for this topic
-      const filter = {
-        subject_id: subject,
-        unit_level: units,
-        is_active: true
-      };
-      
-      if (topicId) {
-        filter.topic = topicId;
+      // Fetch all questions and progress
+      const [allQuestions, userProgress] = await Promise.all([
+        base44.entities.GrammarQuestion.filter({
+          subject_id: subject,
+          unit_level: units,
+          is_active: true
+        }, 'order', 2000),
+        base44.entities.GrammarProgress.filter({
+          user_email: currentUser.email,
+          subject_id: subject
+        }, null, 2000)
+      ]);
+
+      const progressMap = {};
+      userProgress.forEach(p => progressMap[p.question_id] = p);
+
+      let finalQuestions = [];
+
+      if (mode === 'weak') {
+        // Get only weak questions
+        finalQuestions = allQuestions.filter(q => progressMap[q.id]?.is_weak);
+        if (finalQuestions.length === 0) {
+          // Fallback if no weak questions
+          finalQuestions = allQuestions.slice(0, 10);
+        }
+      } else if (mode === 'auto') {
+        // Smart Algorithm: Weak -> New -> Review every 5
+        const weak = allQuestions.filter(q => progressMap[q.id]?.is_weak);
+        const newQs = allQuestions.filter(q => !progressMap[q.id]);
+        const review = allQuestions.filter(q => progressMap[q.id] && !progressMap[q.id].is_weak); // Mastered or just seen
+
+        let queue = [];
+        
+        // Add weak questions first
+        queue.push(...weak);
+        
+        // Add new questions
+        queue.push(...newQs);
+        
+        // If we have fewer than 5 questions total, fill with review
+        if (queue.length < 5 && review.length > 0) {
+          queue.push(...review.sort(() => Math.random() - 0.5).slice(0, 5 - queue.length));
+        }
+
+        // Inject review questions every 5th spot (index 4, 9, 14...)
+        const mixedQueue = [];
+        let reviewIndex = 0;
+        
+        // Shuffle the review questions for variety
+        const shuffledReview = review.sort(() => Math.random() - 0.5);
+
+        let qIndex = 0;
+        while (qIndex < queue.length) {
+          // Add 4 questions from the main queue (Weak/New)
+          for (let i = 0; i < 4 && qIndex < queue.length; i++) {
+            mixedQueue.push(queue[qIndex]);
+            qIndex++;
+          }
+          
+          // Add 1 review question if available
+          if (shuffledReview.length > reviewIndex) {
+            mixedQueue.push(shuffledReview[reviewIndex]);
+            reviewIndex++;
+          }
+        }
+        
+        // Limit to reasonable session size (e.g., 20)
+        finalQuestions = mixedQueue.slice(0, 20);
+      } else {
+        // Regular topic mode
+        let topicQs = allQuestions;
+        if (topicId) {
+          topicQs = allQuestions.filter(q => q.topic === topicId);
+        }
+        if (questionType !== 'all' && mode === 'practice') {
+          topicQs = topicQs.filter(q => q.question_type === questionType);
+        }
+        finalQuestions = topicQs.sort(() => Math.random() - 0.5).slice(0, 10);
       }
 
-      const allQuestions = await base44.entities.GrammarQuestion.filter(filter, 'order', 100);
-      
-      // Filter by question type if in practice mode
-      let filteredQuestions = allQuestions;
-      if (mode === 'practice' && questionType !== 'all') {
-        filteredQuestions = allQuestions.filter(q => q.question_type === questionType);
+      setQuestions(finalQuestions);
+      if (finalQuestions.length > 0) {
+        setMode('practice'); // Force practice mode if we loaded questions
       }
-
-      // Take first 10 questions and shuffle
-      const practiceQuestions = filteredQuestions.slice(0, 10).sort(() => Math.random() - 0.5);
-      setQuestions(practiceQuestions);
 
     } catch (error) {
       console.error("Error loading grammar data:", error);
@@ -492,7 +554,7 @@ export default function GrammarPracticeNewPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {question.question_type === 'free_write' ? (
+                    {question.question_type === 'free_write' && (
                       <Textarea
                         value={userAnswer}
                         onChange={(e) => setUserAnswer(e.target.value)}
@@ -501,20 +563,29 @@ export default function GrammarPracticeNewPage() {
                         dir="ltr"
                         autoFocus
                       />
-                    ) : (
-                      <Input
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        placeholder="הקלד את התשובה..."
-                        className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-500 bg-white shadow-sm"
-                        dir="ltr"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && userAnswer.trim()) {
-                            handleSubmit();
-                          }
-                        }}
-                      />
+                    )}
+                    
+                    {(question.question_type === 'fill_blank' || !question.question_type) && (
+                       <div className="space-y-2">
+                         {question.question_type === 'fill_blank' && (
+                           <div className="text-center text-lg font-medium text-gray-700 bg-gray-50 p-3 rounded-xl mb-2" dir="ltr">
+                             {question.question.replace('___', '_______')}
+                           </div>
+                         )}
+                         <Input
+                          value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          placeholder="הקלד את התשובה..."
+                          className="h-14 text-lg text-center rounded-2xl border-2 border-gray-200 focus:border-blue-500 bg-white shadow-sm"
+                          dir="ltr"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && userAnswer.trim()) {
+                              handleSubmit();
+                            }
+                          }}
+                        />
+                       </div>
                     )}
 
                     <Button
