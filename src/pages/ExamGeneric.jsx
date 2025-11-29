@@ -1016,7 +1016,7 @@ export default function ExamGenericPage() {
                 {wolframSolution && (
                     <div className="mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4 overflow-hidden relative">
                         <Button variant="ghost" size="sm" className="absolute top-2 left-2" onClick={() => setWolframSolution(null)}><X className="w-4 h-4" /></Button>
-                        <h3 className="font-bold text-purple-900 mb-2 text-center">פתרון Wolfram Alpha</h3>
+                        <h3 className="font-bold text-purple-900 mb-2 text-center">תשובה סופית (Wolfram Alpha)</h3>
                         <div className="space-y-4 max-h-64 overflow-y-auto" dir="ltr">
                             {wolframSolution.map((pod, i) => (
                                 <div key={i} className="bg-white p-3 rounded-lg shadow-sm">
