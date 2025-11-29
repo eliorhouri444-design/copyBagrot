@@ -1824,17 +1824,7 @@ export default function ExamMathPage() {
                 </div>
               )}
 
-              {/* Errors */}
-              {cameraFeedback.errors?.length > 0 && (
-                <div className="bg-rose-50 rounded-xl p-4">
-                  <div className="font-semibold text-rose-900 mb-2">✗ טעויות:</div>
-                  <ul className="list-disc list-inside text-sm text-rose-800 space-y-1">
-                    {cameraFeedback.errors.map((error, i) => (
-                      <li key={i}>{error}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+
 
               <div className="flex gap-3">
                 <Button
