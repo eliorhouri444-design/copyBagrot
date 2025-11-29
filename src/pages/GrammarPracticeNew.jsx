@@ -409,7 +409,7 @@ export default function GrammarPracticeNewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-50 flex flex-col">
+    <div className="h-screen bg-blue-50 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
@@ -436,17 +436,17 @@ export default function GrammarPracticeNewPage() {
       </div>
 
       {/* Question */}
-      <div className="flex-1 flex flex-col items-center justify-center p-5">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 w-full overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full max-w-sm"
+            className="w-full max-w-sm flex flex-col h-full justify-center"
           >
             {/* Question Card */}
-            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 border border-blue-100">
+            <div className="bg-white rounded-3xl shadow-lg p-5 mb-4 border border-blue-100 shrink-0">
               {/* Question Type Badge */}
               <div className="flex justify-center mb-4">
                 <span className="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full">
