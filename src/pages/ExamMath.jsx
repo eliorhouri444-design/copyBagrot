@@ -248,36 +248,175 @@ export default function ExamMathPage() {
     navigate(createPageUrl("Exams"));
   };
 
-  const calculatorButtons = [
-    ['7', '8', '9', '÷'],
-    ['4', '5', '6', '×'],
-    ['1', '2', '3', '-'],
-    ['0', '.', '=', '+'],
-    ['C', '←', '√', '^']
+  const [calcMode, setCalcMode] = useState('basic'); // 'basic' or 'scientific'
+  const [calcMemory, setCalcMemory] = useState(0);
+  const [isDegrees, setIsDegrees] = useState(true); // true = degrees, false = radians
+
+  const basicButtons = [
+    ['C', '←', '%', '÷'],
+    ['7', '8', '9', '×'],
+    ['4', '5', '6', '-'],
+    ['1', '2', '3', '+'],
+    ['±', '0', '.', '=']
+  ];
+
+  const scientificButtons = [
+    ['sin', 'cos', 'tan', 'π'],
+    ['sin⁻¹', 'cos⁻¹', 'tan⁻¹', 'e'],
+    ['ln', 'log', '10ˣ', 'eˣ'],
+    ['x²', 'x³', 'xʸ', '√'],
+    ['³√', '1/x', 'n!', '|x|'],
+    ['(', ')', 'MC', 'MR'],
+    ['M+', 'M-', 'DEG', 'RAD']
   ];
 
   const handleCalculator = (value) => {
+    // Clear
     if (value === 'C') {
       setCalculatorDisplay('0');
-    } else if (value === '←') {
-      setCalculatorDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
-    } else if (value === '=') {
-      try {
-        const result = eval(calculatorDisplay.replace(/÷/g, '/').replace(/×/g, '*').replace(/\^/g, '**'));
-        setCalculatorDisplay(result.toString());
-      } catch {
-        setCalculatorDisplay('Error');
-      }
-    } else if (value === '√') {
-      try {
-        const result = Math.sqrt(parseFloat(calculatorDisplay));
-        setCalculatorDisplay(result.toString());
-      } catch {
-        setCalculatorDisplay('Error');
-      }
-    } else {
-      setCalculatorDisplay(prev => prev === '0' && !['.', '+', '-', '×', '÷'].includes(value) ? value : prev + value);
+      return;
     }
+    
+    // Backspace
+    if (value === '←') {
+      setCalculatorDisplay(prev => prev.length > 1 ? prev.slice(0, -1) : '0');
+      return;
+    }
+
+    // Toggle sign
+    if (value === '±') {
+      setCalculatorDisplay(prev => {
+        if (prev.startsWith('-')) return prev.slice(1);
+        if (prev !== '0') return '-' + prev;
+        return prev;
+      });
+      return;
+    }
+
+    // Memory operations
+    if (value === 'MC') { setCalcMemory(0); return; }
+    if (value === 'MR') { setCalculatorDisplay(calcMemory.toString()); return; }
+    if (value === 'M+') { 
+      try { setCalcMemory(prev => prev + parseFloat(calculatorDisplay)); } catch {}
+      return;
+    }
+    if (value === 'M-') { 
+      try { setCalcMemory(prev => prev - parseFloat(calculatorDisplay)); } catch {}
+      return;
+    }
+
+    // Angle mode toggle
+    if (value === 'DEG') { setIsDegrees(true); return; }
+    if (value === 'RAD') { setIsDegrees(false); return; }
+
+    // Constants
+    if (value === 'π') {
+      setCalculatorDisplay(prev => prev === '0' ? Math.PI.toString() : prev + '*' + Math.PI.toString());
+      return;
+    }
+    if (value === 'e') {
+      setCalculatorDisplay(prev => prev === '0' ? Math.E.toString() : prev + '*' + Math.E.toString());
+      return;
+    }
+
+    // Equals - calculate result
+    if (value === '=') {
+      try {
+        let expr = calculatorDisplay
+          .replace(/÷/g, '/')
+          .replace(/×/g, '*')
+          .replace(/\^/g, '**');
+        const result = eval(expr);
+        setCalculatorDisplay(isNaN(result) || !isFinite(result) ? 'Error' : result.toString());
+      } catch {
+        setCalculatorDisplay('Error');
+      }
+      return;
+    }
+
+    // Scientific functions
+    const toRad = (deg) => deg * Math.PI / 180;
+    const toDeg = (rad) => rad * 180 / Math.PI;
+    const num = parseFloat(calculatorDisplay);
+
+    try {
+      switch (value) {
+        case 'sin':
+          setCalculatorDisplay(Math.sin(isDegrees ? toRad(num) : num).toString());
+          return;
+        case 'cos':
+          setCalculatorDisplay(Math.cos(isDegrees ? toRad(num) : num).toString());
+          return;
+        case 'tan':
+          setCalculatorDisplay(Math.tan(isDegrees ? toRad(num) : num).toString());
+          return;
+        case 'sin⁻¹':
+          const asinResult = Math.asin(num);
+          setCalculatorDisplay((isDegrees ? toDeg(asinResult) : asinResult).toString());
+          return;
+        case 'cos⁻¹':
+          const acosResult = Math.acos(num);
+          setCalculatorDisplay((isDegrees ? toDeg(acosResult) : acosResult).toString());
+          return;
+        case 'tan⁻¹':
+          const atanResult = Math.atan(num);
+          setCalculatorDisplay((isDegrees ? toDeg(atanResult) : atanResult).toString());
+          return;
+        case 'ln':
+          setCalculatorDisplay(Math.log(num).toString());
+          return;
+        case 'log':
+          setCalculatorDisplay(Math.log10(num).toString());
+          return;
+        case '10ˣ':
+          setCalculatorDisplay(Math.pow(10, num).toString());
+          return;
+        case 'eˣ':
+          setCalculatorDisplay(Math.exp(num).toString());
+          return;
+        case 'x²':
+          setCalculatorDisplay((num * num).toString());
+          return;
+        case 'x³':
+          setCalculatorDisplay((num * num * num).toString());
+          return;
+        case 'xʸ':
+          setCalculatorDisplay(prev => prev + '^');
+          return;
+        case '√':
+          setCalculatorDisplay(Math.sqrt(num).toString());
+          return;
+        case '³√':
+          setCalculatorDisplay(Math.cbrt(num).toString());
+          return;
+        case '1/x':
+          setCalculatorDisplay((1 / num).toString());
+          return;
+        case 'n!':
+          const factorial = (n) => n <= 1 ? 1 : n * factorial(n - 1);
+          setCalculatorDisplay(factorial(Math.round(num)).toString());
+          return;
+        case '|x|':
+          setCalculatorDisplay(Math.abs(num).toString());
+          return;
+        case '%':
+          setCalculatorDisplay((num / 100).toString());
+          return;
+        default:
+          break;
+      }
+    } catch {
+      setCalculatorDisplay('Error');
+      return;
+    }
+
+    // Regular input (numbers, operators, parentheses)
+    setCalculatorDisplay(prev => {
+      if (prev === '0' && !['.', '+', '-', '×', '÷', '(', ')'].includes(value)) {
+        return value;
+      }
+      return prev + value;
+    });
   };
 
   const formulas = [
