@@ -9,8 +9,8 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DialogTitle } from
+"@/components/ui/dialog";
 
 export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic, isPremium }) {
   const navigate = useNavigate();
@@ -33,42 +33,42 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     const loadVocabStats = async () => {
       const currentTopic = topics[currentIndex];
       if (!currentTopic) return;
-      
-      const isVocab = currentTopic.isVocabulary || 
-        currentTopic.topic_id?.toLowerCase().includes('vocabulary') || 
-        currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים');
-      
-      const isGrammar = currentTopic.isGrammar || 
-        currentTopic.topic_id?.toLowerCase().includes('grammar') || 
-        currentTopic.topic_id?.toLowerCase().includes('דקדוק');
-      
+
+      const isVocab = currentTopic.isVocabulary ||
+      currentTopic.topic_id?.toLowerCase().includes('vocabulary') ||
+      currentTopic.topic_id?.toLowerCase().includes('אוצר_מילים');
+
+      const isGrammar = currentTopic.isGrammar ||
+      currentTopic.topic_id?.toLowerCase().includes('grammar') ||
+      currentTopic.topic_id?.toLowerCase().includes('דקדוק');
+
       if (isGrammar) {
         try {
           const user = await base44.auth.me();
           const subject = user?.selected_subject || 'אנגלית';
           const units = user?.selected_units || 3;
-          
+
           const [allQuestions, userProgress] = await Promise.all([
-            base44.entities.GrammarQuestion.filter({
-              subject_id: subject,
-              unit_level: units,
-              is_active: true
-            }, null, 2000),
-            base44.entities.GrammarProgress.filter({
-              user_email: user.email,
-              subject_id: subject
-            }, null, 2000)
-          ]);
-          
-          const validQuestionIds = new Set(allQuestions.map(q => q.id));
-          const validProgress = userProgress.filter(p => validQuestionIds.has(p.question_id));
-          
-          const masteredQuestions = validProgress.filter(p => p.is_mastered || p.times_correct >= 3).length;
-          const weakQuestions = validProgress.filter(p => p.is_weak).length;
-          const masteryProgress = allQuestions.length > 0 
-            ? Math.round((masteredQuestions / allQuestions.length) * 100) 
-            : 0;
-          
+          base44.entities.GrammarQuestion.filter({
+            subject_id: subject,
+            unit_level: units,
+            is_active: true
+          }, null, 2000),
+          base44.entities.GrammarProgress.filter({
+            user_email: user.email,
+            subject_id: subject
+          }, null, 2000)]
+          );
+
+          const validQuestionIds = new Set(allQuestions.map((q) => q.id));
+          const validProgress = userProgress.filter((p) => validQuestionIds.has(p.question_id));
+
+          const masteredQuestions = validProgress.filter((p) => p.is_mastered || p.times_correct >= 3).length;
+          const weakQuestions = validProgress.filter((p) => p.is_weak).length;
+          const masteryProgress = allQuestions.length > 0 ?
+          Math.round(masteredQuestions / allQuestions.length * 100) :
+          0;
+
           setVocabStats({
             totalWords: allQuestions.length,
             learnedWords: validProgress.length,
@@ -83,43 +83,43 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
         }
         return;
       }
-      
+
       if (isVocab) {
         try {
           const user = await base44.auth.me();
           const subject = user?.selected_subject || 'אנגלית';
           const units = user?.selected_units || 3;
-          
+
           const [allWords, userProgress] = await Promise.all([
-            base44.entities.VocabularyQuestion.filter({
-              subject_id: subject,
-              unit_level: units,
-              is_active: true
-            }, null, 2000),
-            base44.entities.VocabularyProgress.filter({
-              user_email: user.email,
-              subject_id: subject,
-              unit_level: units
-            }, null, 2000)
-          ]);
-          
+          base44.entities.VocabularyQuestion.filter({
+            subject_id: subject,
+            unit_level: units,
+            is_active: true
+          }, null, 2000),
+          base44.entities.VocabularyProgress.filter({
+            user_email: user.email,
+            subject_id: subject,
+            unit_level: units
+          }, null, 2000)]
+          );
+
           // Get word IDs that actually exist in VocabularyQuestion
-          const validWordIds = new Set(allWords.map(w => w.id));
-          
+          const validWordIds = new Set(allWords.map((w) => w.id));
+
           // Filter progress to only include words that exist in VocabularyQuestion
-          const validProgress = userProgress.filter(p => validWordIds.has(p.word_id));
-          
-          const masteredWords = validProgress.filter(p => p.streak >= 4 || p.is_known).length;
-          const weakWords = validProgress.filter(p => p.is_weak).length;
+          const validProgress = userProgress.filter((p) => validWordIds.has(p.word_id));
+
+          const masteredWords = validProgress.filter((p) => p.streak >= 4 || p.is_known).length;
+          const weakWords = validProgress.filter((p) => p.is_weak).length;
           const totalCorrect = validProgress.reduce((sum, p) => sum + (p.times_correct || 0), 0);
           const totalSeen = validProgress.reduce((sum, p) => sum + (p.times_seen || 0), 0);
-          const accuracy = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
-          
+          const accuracy = totalSeen > 0 ? Math.round(totalCorrect / totalSeen * 100) : 0;
+
           // Calculate mastery progress - percentage of words user truly knows
-          const masteryProgress = allWords.length > 0 
-            ? Math.round((masteredWords / allWords.length) * 100) 
-            : 0;
-          
+          const masteryProgress = allWords.length > 0 ?
+          Math.round(masteredWords / allWords.length * 100) :
+          0;
+
           setVocabStats({
             totalWords: allWords.length,
             learnedWords: validProgress.length,
@@ -135,7 +135,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
         setVocabStats(null);
       }
     };
-    
+
     loadVocabStats();
   }, [currentIndex, topics]);
 
@@ -272,9 +272,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     {vocabStats ? vocabStats.masteryProgress : progress}%
                   </div>
                   <p className="text-white/80 text-sm">
-                    {vocabStats 
-                      ? `סה"כ ${vocabStats.totalWords} ${vocabStats.isGrammar ? 'שאלות' : 'מילים'}`
-                      : `${totalPractices} תרגולים בוצעו`
+                    {vocabStats ?
+                    `סה"כ ${vocabStats.totalWords} ${vocabStats.isGrammar ? 'שאלות' : 'מילים'}` :
+                    `${totalPractices} תרגולים בוצעו`
                     }
                   </p>
 
@@ -283,8 +283,8 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             </div>
 
             {/* Stats Cards - Different for Vocabulary and Grammar */}
-            {vocabStats ? (
-              <div className="grid grid-cols-3 gap-2 mb-3">
+            {vocabStats ?
+            <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <BookOpen className="w-4 h-4 text-white" />
@@ -309,9 +309,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="text-lg font-bold text-orange-600">{vocabStats.weakWords}</div>
                   <div className="text-[9px] text-[#6E6E6E]">{vocabStats.isGrammar ? 'שאלות חלשות' : 'מילים חלשות'}</div>
                 </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-3 gap-2 mb-3">
+              </div> :
+
+            <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-blue-50 p-3 text-center rounded-xl">
                   <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
                     <Target className="w-4 h-4 text-white" />
@@ -337,7 +337,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                   <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
                 </div>
               </div>
-            )}
+            }
 
             {/* Action buttons */}
             <motion.div
@@ -347,51 +347,51 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               className="space-y-2">
 
               <Button
-              onClick={async () => {
-                const topic = topics[currentIndex];
-                
-                // Grammar topic
-                if (topic.isGrammar || topic.topic_id?.toLowerCase().includes('grammar') || topic.topic_id?.toLowerCase().includes('דקדוק')) {
-                  navigate(createPageUrl(`GrammarTopics`));
-                  return;
-                }
-                
-                if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
-                  // Check saved progress
-                  const saved = localStorage.getItem('vocabSetProgress');
-                  if (saved) {
-                    const progress = JSON.parse(saved);
-                    // Load total sets to check if completed
-                    try {
-                      const user = await base44.auth.me();
-                      const allWords = await base44.entities.VocabularyQuestion.filter({
-                        subject_id: user?.selected_subject || 'אנגלית',
-                        unit_level: user?.selected_units || 3,
-                        is_active: true
-                      }, null, 2000);
-                      const totalSetsCount = Math.ceil(allWords.length / 10);
-                      setTotalSets(totalSetsCount);
-                      
-                      if (progress.currentSet > totalSetsCount) {
-                        // User completed all sets!
-                        setShowCompletedDialog(true);
-                        return;
+                onClick={async () => {
+                  const topic = topics[currentIndex];
+
+                  // Grammar topic
+                  if (topic.isGrammar || topic.topic_id?.toLowerCase().includes('grammar') || topic.topic_id?.toLowerCase().includes('דקדוק')) {
+                    navigate(createPageUrl(`GrammarTopics`));
+                    return;
+                  }
+
+                  if (topic.isVocabulary || topic.topic_id?.toLowerCase().includes('vocabulary') || topic.topic_id?.toLowerCase().includes('אוצר_מילים')) {
+                    // Check saved progress
+                    const saved = localStorage.getItem('vocabSetProgress');
+                    if (saved) {
+                      const progress = JSON.parse(saved);
+                      // Load total sets to check if completed
+                      try {
+                        const user = await base44.auth.me();
+                        const allWords = await base44.entities.VocabularyQuestion.filter({
+                          subject_id: user?.selected_subject || 'אנגלית',
+                          unit_level: user?.selected_units || 3,
+                          is_active: true
+                        }, null, 2000);
+                        const totalSetsCount = Math.ceil(allWords.length / 10);
+                        setTotalSets(totalSetsCount);
+
+                        if (progress.currentSet > totalSetsCount) {
+                          // User completed all sets!
+                          setShowCompletedDialog(true);
+                          return;
+                        }
+
+                        setSavedProgress(progress);
+                        setShowContinueDialog(true);
+                      } catch (error) {
+                        // If error, just start from beginning
+                        navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
                       }
-                      
-                      setSavedProgress(progress);
-                      setShowContinueDialog(true);
-                    } catch (error) {
-                      // If error, just start from beginning
+                    } else {
                       navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
                     }
                   } else {
-                    navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
+                    handleStartPractice();
                   }
-                } else {
-                  handleStartPractice();
-                }
-              }}
-              className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
+                }}
+                className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-11 hover:bg-[#2563EB] active:bg-[#1E40AF]">
 
               <Play className="w-4 h-4 ml-2" />
               התחל תרגול
@@ -412,7 +412,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                     }
                   }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
                     <Target className="w-4 h-4 ml-2" />
-                    {vocabStats ? (vocabStats.isGrammar ? 'תרגול שאלות חלשות' : 'תרגול מילים חלשות') : 'תרגול טעויות בנושא זה'}
+                    {vocabStats ? vocabStats.isGrammar ? 'תרגול שאלות חלשות' : 'תרגול מילים חלשות' : 'תרגול טעויות בנושא זה'}
                   </Button>
                   <Button
                   onClick={async () => {
@@ -429,7 +429,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                           unit_level: user?.selected_units || 3,
                           is_active: true
                         }, 'order', 2000);
-                        
+
                         // Create sets of 10 words each
                         const generatedSets = [];
                         for (let i = 0; i < allWords.length; i += 10) {
@@ -539,7 +539,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
           
           <div className="py-4 text-center">
             <div className="bg-blue-50 rounded-xl p-4 mb-4">
-              <div className="text-3xl font-bold text-blue-600 mb-1">תרגול {savedProgress?.currentSet}</div>
+              <div className="text-3xl font-bold text-blue-600 mb-1">סט {savedProgress?.currentSet}</div>
               <div className="text-sm text-gray-600">מילים {savedProgress?.startIndex + 1} - {savedProgress?.endIndex}</div>
             </div>
             <p className="text-gray-600 text-sm">נשמר התקדמות מהפעם הקודמת</p>
@@ -551,9 +551,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                 setShowContinueDialog(false);
                 navigate(createPageUrl(`VocabularyFlashcards?setId=${savedProgress.currentSet}&start=${savedProgress.startIndex}&end=${savedProgress.endIndex}`));
               }}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
-            >
-              המשך מתרגול {savedProgress?.currentSet}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
+
+              המשך מסט {savedProgress?.currentSet}
             </Button>
             <Button
               onClick={() => {
@@ -562,9 +562,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                 navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
               }}
               variant="outline"
-              className="w-full h-12 border-2 border-gray-300 text-gray-700 font-bold rounded-xl"
-            >
-              התחל מחדש מתרגול 1
+              className="w-full h-12 border-2 border-gray-300 text-gray-700 font-bold rounded-xl">
+
+              התחל מחדש מסט 1
             </Button>
           </div>
         </DialogContent>
@@ -595,16 +595,16 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
                 setShowCompletedDialog(false);
                 navigate(createPageUrl(`VocabularyFlashcards`) + '?setId=1&start=0&end=10');
               }}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
-            >
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl">
+
               <RotateCcw className="w-4 h-4 ml-2" />
-              תרגול מחדש מתרגול 1
+              תרגול מחדש מסט 1
             </Button>
             <Button
               onClick={() => setShowCompletedDialog(false)}
               variant="ghost"
-              className="w-full h-10 text-gray-500"
-            >
+              className="w-full h-10 text-gray-500">
+
               סגור
             </Button>
           </div>
@@ -615,9 +615,9 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
       <Dialog open={showVocabSetSelector} onOpenChange={setShowVocabSetSelector}>
         <DialogContent className="w-full h-full max-w-none max-h-none m-0 rounded-none" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-center flex items-center justify-center gap-2">
-              <BookOpen className="w-6 h-6 text-blue-600" />
-              בחר תרגול לתרגול
+            <DialogTitle className="tracking-tight text-xl font-bold text-center flex items-center justify-center gap-2">בחר תרגול
+
+
             </DialogTitle>
           </DialogHeader>
           
@@ -626,7 +626,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
             <div className="flex items-center justify-between">
               <div className="text-center flex-1">
                 <div className="text-2xl font-bold text-blue-600">{vocabularySets.length}</div>
-                <div className="text-xs text-gray-600">תרגולים</div>
+                <div className="text-xs text-gray-600">סטים</div>
               </div>
               <div className="w-px h-8 bg-blue-200" />
               <div className="text-center flex-1">
@@ -638,34 +638,34 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
 
           <div className="overflow-y-auto max-h-[50vh] py-2">
             <div className="space-y-2">
-              {vocabularySets.map(set => (
-                <button
-                  key={set.id}
-                  onClick={() => {
-                    setShowVocabSetSelector(false);
-                    navigate(createPageUrl(`VocabularyFlashcards?setId=${set.set_number}&start=${set.startIndex}&end=${set.endIndex}`));
-                  }}
-                  className="w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all border-gray-200 hover:border-blue-400 hover:bg-blue-50 bg-white"
-                >
+              {vocabularySets.map((set) =>
+              <button
+                key={set.id}
+                onClick={() => {
+                  setShowVocabSetSelector(false);
+                  navigate(createPageUrl(`VocabularyFlashcards?setId=${set.set_number}&start=${set.startIndex}&end=${set.endIndex}`));
+                }}
+                className="w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all border-gray-200 hover:border-blue-400 hover:bg-blue-50 bg-white">
+
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold bg-blue-100 text-blue-600">
                     {set.set_number}
                   </div>
                   <div className="text-right flex-1">
-                    <div className="font-bold text-gray-900">תרגול {set.set_number}</div>
+                    <div className="font-bold text-gray-900">סט {set.set_number}</div>
                     <div className="text-sm text-blue-600">
                       מילים {set.startIndex + 1} - {set.endIndex}
                     </div>
                   </div>
                   <ChevronLeft className="w-5 h-5 text-blue-400" />
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
           <Button
             onClick={() => setShowVocabSetSelector(false)}
-            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl mt-2"
-          >
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl mt-2">
+
             סגור
           </Button>
         </DialogContent>
