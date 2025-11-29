@@ -403,12 +403,23 @@ export default function TopicPracticeNewPage() {
 
       // Check if this is a writing question
       if (currentQuestion.question_type === "writing") {
-        console.log("🎯 Starting writing evaluation...");
-        // Use AI to evaluate writing
+        console.log("🎯 Starting writing submission (Background evaluation)...");
         const wordCount = userAnswer.trim().split(/\s+/).filter((w) => w).length;
 
-        console.log("📝 Sending to AI for evaluation...");
-        const evaluation = await base44.integrations.Core.InvokeLLM({
+        // Set initial pending result
+        setResults((prev) => ({
+          ...prev,
+          [currentQuestion.question_id]: {
+            status: "pending",
+            correctAnswer: "",
+            userAnswer,
+            writingEvaluation: null,
+            percentage: 0
+          }
+        }));
+
+        // Perform AI evaluation in BACKGROUND
+        base44.integrations.Core.InvokeLLM({
           prompt: `אתה בודק אנגלית קפדני לבגרות ישראלית. בדוק בדיוק כמו בוחן אמיתי של משרד החינוך.
 
         🎯 משימת הכתיבה: ${currentQuestion.question_text}
@@ -570,53 +581,51 @@ export default function TopicPracticeNewPage() {
               }
             }
           }
+        }).then(evaluation => {
+            console.log("✅ Background evaluation finished:", evaluation);
+            const totalScore = evaluation.total_score || 0;
+            const percentage = totalScore;
+
+            // Update results state with evaluation
+            setResults(prev => ({
+                ...prev,
+                [currentQuestion.question_id]: {
+                    isCorrect: percentage >= 70,
+                    status: percentage >= 70 ? "correct" : percentage >= 50 ? "partial" : "incorrect",
+                    correctAnswer: "",
+                    userAnswer,
+                    writingEvaluation: evaluation,
+                    percentage
+                }
+            }));
+
+            // Save to DB
+            saveAttemptInBackground({
+                question_id: currentQuestion.question_id,
+                subject_id: currentQuestion.subject_id,
+                topic_id: topicId,
+                session_id: sessionId,
+                user_answer_text: userAnswer,
+                score: totalScore,
+                max_score: 100,
+                percentage: percentage,
+                status: percentage >= 70 ? "correct" : percentage >= 50 ? "partial" : "incorrect",
+                detailed_feedback: JSON.stringify(evaluation),
+                time_spent_seconds: 0
+            });
+        }).catch(err => {
+            console.error("Background evaluation failed:", err);
         });
 
-        console.log("✅ Got evaluation from AI:", evaluation);
-
-        const totalScore = evaluation.total_score || 0;
-        const percentage = totalScore;
-
-        console.log("💾 Saving attempt to database...");
-        // שמירה ברקע - לא מחכים
-        saveAttemptInBackground({
-          question_id: currentQuestion.question_id,
-          subject_id: currentQuestion.subject_id,
-          topic_id: topicId,
-          session_id: sessionId,
-          user_answer_text: userAnswer,
-          score: totalScore,
-          max_score: 100,
-          percentage: percentage,
-          status: percentage >= 70 ? "correct" : percentage >= 50 ? "partial" : "incorrect",
-          detailed_feedback: JSON.stringify(evaluation),
-          time_spent_seconds: 0
-        });
-
-        setResults((prev) => ({
-          ...prev,
-          [currentQuestion.question_id]: {
-            isCorrect: percentage >= 70,
-            status: percentage >= 70 ? "correct" : "partial",
-            correctAnswer: "",
-            userAnswer,
-            writingEvaluation: evaluation,
-            percentage
-          }
-        }));
-
-        // Show feedback dialog for writing
-        console.log("🎉 Opening feedback dialog...");
-        setWritingFeedbackData({
-          evaluation,
-          percentage,
-          wordCount,
-          displayUnits // Pass displayUnits to feedback data
-        });
-        setShowWritingFeedback(true);
+        // Immediate advance
         setIsSubmitting(false);
-        console.log("✅ Feedback dialog should be open now");
-        return; // Stop here, don't auto-advance
+        if (currentQuestionIndex < currentSetQuestions.length - 1) {
+          setCurrentQuestionIndex((prev) => prev + 1);
+        } else {
+          saveWeakTopicsStats();
+          setShowSummary(true);
+        }
+        return;
       } else {
         // Regular question handling - בדיקה מהירה קודם
         let isCorrect = false;
@@ -1061,8 +1070,32 @@ export default function TopicPracticeNewPage() {
                           </div>
                         </div>
 
-                        {q.question_type === "writing" && result?.writingEvaluation ?
+                        {q.question_type === "writing" && result?.status === "pending" ? (
+                            <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 flex items-center gap-3">
+                                <Loader2 className="w-5 h-5 animate-spin text-yellow-600" />
+                                <div>
+                                    <div className="font-bold text-yellow-800">בודק את התשובה...</div>
+                                    <div className="text-xs text-yellow-700">הבינה המלאכותית עוברת על הטקסט שלך</div>
+                                </div>
+                            </div>
+                        ) : q.question_type === "writing" && result?.writingEvaluation ?
                         <div className="space-y-2">
+                            <Button 
+                                size="sm" 
+                                className="w-full mb-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                                onClick={() => {
+                                    setWritingFeedbackData({
+                                        evaluation: result.writingEvaluation,
+                                        percentage: result.percentage,
+                                        wordCount: result.userAnswer?.split(/\s+/).length || 0,
+                                        displayUnits
+                                    });
+                                    setShowWritingFeedback(true);
+                                }}
+                            >
+                                <BookOpen className="w-4 h-4 mr-2" />
+                                צפה במשוב מלא וניתוח
+                            </Button>
                             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-500">
                               <div className="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
                                 <span className="text-xl">📊</span>
