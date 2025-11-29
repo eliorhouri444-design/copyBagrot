@@ -205,7 +205,7 @@ ${baseStyle}`;
       setWords(wordsForPractice);
 
       // Resume logic
-      let targetIndex = 0;
+      let targetIndex = -1;
       
       // 1. Try to find by ID
       if (resumeWordId && resumeWordId !== 'undefined' && resumeWordId !== 'null') {
@@ -215,10 +215,14 @@ ${baseStyle}`;
         }
       } 
       
-      // 2. Fallback to index if ID failed or wasn't provided, but ONLY if index > 0
-      // Note: If targetIndex is already set by ID, we keep it.
-      if (targetIndex === 0 && resumeIndex > 0 && resumeIndex < wordsForPractice.length) {
+      // 2. Fallback to index if ID failed (targetIndex still -1)
+      if (targetIndex === -1 && resumeIndex >= 0 && resumeIndex < wordsForPractice.length) {
         targetIndex = resumeIndex;
+      }
+
+      // 3. Default to 0 if all else fails
+      if (targetIndex === -1) {
+        targetIndex = 0;
       }
 
       setCurrentIndex(targetIndex);

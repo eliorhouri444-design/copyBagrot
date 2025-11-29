@@ -132,7 +132,7 @@ export default function VocabularyQuickPracticePage() {
       setQuestions(generatedQuestions);
       
       // Resume logic
-      let targetIndex = 0;
+      let targetIndex = -1;
 
       if (resumeWordId && resumeWordId !== 'undefined' && resumeWordId !== 'null') {
         const foundIndex = generatedQuestions.findIndex(q => q.word.id === resumeWordId);
@@ -141,8 +141,12 @@ export default function VocabularyQuickPracticePage() {
         }
       }
       
-      if (targetIndex === 0 && resumeIndex > 0 && resumeIndex < generatedQuestions.length) {
+      if (targetIndex === -1 && resumeIndex >= 0 && resumeIndex < generatedQuestions.length) {
         targetIndex = resumeIndex;
+      }
+
+      if (targetIndex === -1) {
+        targetIndex = 0;
       }
 
       setCurrentIndex(targetIndex);
