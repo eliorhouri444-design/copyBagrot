@@ -332,6 +332,7 @@ export default function ExamGenericPage() {
           is_correct: isCorrect,
           points_awarded: Math.round(pointsAwarded),
           explanation: displayExplanation,
+          explanation_hebrew: displayExplanation,
           has_spelling_error: aiResult?.has_spelling_error || false
         });
       }
