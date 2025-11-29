@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import {
   ArrowLeft, Clock, Calculator, ChevronRight, ChevronLeft,
   CheckCircle, X, AlertCircle, Loader2, Flag, Lightbulb,
-  Grid3x3, BookOpen, Pencil, Eraser
+  Grid3x3, BookOpen, Pencil, Eraser, Camera
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +53,13 @@ export default function ExamMathPage() {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportText, setReportText] = useState("");
   const [reportingQuestion, setReportingQuestion] = useState(null);
+
+  // Camera check state
+  const [showCameraDialog, setShowCameraDialog] = useState(false);
+  const [cameraImage, setCameraImage] = useState(null);
+  const [isCheckingAnswer, setIsCheckingAnswer] = useState(false);
+  const [cameraFeedback, setCameraFeedback] = useState(null);
+  const cameraInputRef = useRef(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
@@ -576,6 +583,85 @@ export default function ExamMathPage() {
       });
 
       setExamFinished(true);
+    }
+  };
+
+  // Camera check handler
+  const handleCameraCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // Upload image
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setCameraImage(file_url);
+      setShowCameraDialog(true);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("שגיאה בהעלאת התמונה");
+    }
+  };
+
+  const handleCheckCameraAnswer = async () => {
+    if (!cameraImage) return;
+
+    setIsCheckingAnswer(true);
+    setCameraFeedback(null);
+
+    try {
+      const question = exam.questions[currentQuestion];
+      
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `אתה מורה למתמטיקה. בדוק את הפתרון הכתוב בתמונה.
+
+השאלה: ${question.question_text}
+התשובה הנכונה: ${question.correct_answer}
+
+נתח את הפתרון בתמונה ובדוק:
+1. האם התשובה הסופית נכונה?
+2. האם דרך הפתרון נכונה?
+3. אם יש טעויות - הסבר איפה הטעות והראה את הפתרון הנכון
+
+השב בעברית בלבד.`,
+        file_urls: [cameraImage],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            is_correct: { type: "boolean", description: "האם התשובה נכונה" },
+            partial_credit: { type: "boolean", description: "האם יש ניקוד חלקי על הדרך" },
+            detected_answer: { type: "string", description: "התשובה שזוהתה בתמונה" },
+            feedback: { type: "string", description: "משוב מפורט בעברית" },
+            errors: { type: "array", items: { type: "string" }, description: "רשימת טעויות שנמצאו" },
+            correct_steps: { type: "array", items: { type: "string" }, description: "צעדים נכונים שבוצעו" }
+          },
+          required: ["is_correct", "feedback"]
+        }
+      });
+
+      setCameraFeedback(response);
+
+      // Auto-fill answer if detected
+      if (response.detected_answer) {
+        handleAnswerChange(question.question_number, response.detected_answer);
+      }
+
+    } catch (error) {
+      console.error("Error checking answer:", error);
+      setCameraFeedback({ 
+        is_correct: false, 
+        feedback: "שגיאה בבדיקת התשובה. נסה שוב." 
+      });
+    } finally {
+      setIsCheckingAnswer(false);
+    }
+  };
+
+  const closeCameraDialog = () => {
+    setShowCameraDialog(false);
+    setCameraImage(null);
+    setCameraFeedback(null);
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
     }
   };
 
@@ -1265,8 +1351,29 @@ export default function ExamMathPage() {
               )}
             </div>
 
+            {/* Camera Check Button */}
+            <div className="mt-4">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleCameraCapture}
+                ref={cameraInputRef}
+                className="hidden"
+                id="camera-input"
+              />
+              <Button
+                onClick={() => cameraInputRef.current?.click()}
+                variant="outline"
+                className="w-full border-2 border-emerald-400 text-emerald-700 hover:bg-emerald-50"
+              >
+                <Camera className="w-5 h-5 ml-2" />
+                צלם פתרון לבדיקה
+              </Button>
+            </div>
+
             {/* Draft Paper Toggle Button - NEW UI ELEMENT */}
-            <div className="mt-6">
+            <div className="mt-4">
               <Button
                 onClick={() => toggleDraftForQuestion(question.question_number)}
                 variant="outline"
@@ -1545,6 +1652,126 @@ export default function ExamMathPage() {
               שלח דיווח
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Camera Check Dialog */}
+      <Dialog open={showCameraDialog} onOpenChange={closeCameraDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5 text-emerald-600" />
+              בדיקת פתרון - שאלה {exam?.questions[currentQuestion]?.question_number}
+            </DialogTitle>
+          </DialogHeader>
+
+          {cameraImage && (
+            <div className="rounded-xl overflow-hidden border-2 border-slate-200 mb-4">
+              <img src={cameraImage} alt="פתרון" className="w-full h-auto" />
+            </div>
+          )}
+
+          {!cameraFeedback && !isCheckingAnswer && (
+            <Button
+              onClick={handleCheckCameraAnswer}
+              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700"
+            >
+              בדוק את הפתרון
+            </Button>
+          )}
+
+          {isCheckingAnswer && (
+            <div className="text-center py-8">
+              <Loader2 className="w-10 h-10 animate-spin text-emerald-600 mx-auto mb-3" />
+              <p className="text-slate-600">בודק את הפתרון שלך...</p>
+            </div>
+          )}
+
+          {cameraFeedback && (
+            <div className="space-y-4">
+              {/* Result Header */}
+              <div className={`rounded-xl p-4 ${
+                cameraFeedback.is_correct 
+                  ? 'bg-emerald-50 border-2 border-emerald-300'
+                  : cameraFeedback.partial_credit
+                    ? 'bg-amber-50 border-2 border-amber-300'
+                    : 'bg-rose-50 border-2 border-rose-300'
+              }`}>
+                <div className="flex items-center gap-3">
+                  {cameraFeedback.is_correct ? (
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                  ) : cameraFeedback.partial_credit ? (
+                    <AlertCircle className="w-8 h-8 text-amber-600" />
+                  ) : (
+                    <X className="w-8 h-8 text-rose-600" />
+                  )}
+                  <div>
+                    <div className={`text-xl font-bold ${
+                      cameraFeedback.is_correct ? 'text-emerald-700' :
+                      cameraFeedback.partial_credit ? 'text-amber-700' : 'text-rose-700'
+                    }`}>
+                      {cameraFeedback.is_correct ? 'תשובה נכונה! 🎉' :
+                       cameraFeedback.partial_credit ? 'חלקית נכון' : 'לא נכון'}
+                    </div>
+                    {cameraFeedback.detected_answer && (
+                      <div className="text-sm text-slate-600">
+                        זיהינו: {cameraFeedback.detected_answer}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Feedback */}
+              <div className="bg-blue-50 rounded-xl p-4 border-l-4 border-blue-500">
+                <div className="font-semibold text-blue-900 mb-2">💡 משוב:</div>
+                <p className="text-slate-700 leading-relaxed">{cameraFeedback.feedback}</p>
+              </div>
+
+              {/* Correct Steps */}
+              {cameraFeedback.correct_steps?.length > 0 && (
+                <div className="bg-emerald-50 rounded-xl p-4">
+                  <div className="font-semibold text-emerald-900 mb-2">✓ צעדים נכונים:</div>
+                  <ul className="list-disc list-inside text-sm text-emerald-800 space-y-1">
+                    {cameraFeedback.correct_steps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Errors */}
+              {cameraFeedback.errors?.length > 0 && (
+                <div className="bg-rose-50 rounded-xl p-4">
+                  <div className="font-semibold text-rose-900 mb-2">✗ טעויות:</div>
+                  <ul className="list-disc list-inside text-sm text-rose-800 space-y-1">
+                    {cameraFeedback.errors.map((error, i) => (
+                      <li key={i}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={closeCameraDialog}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  סגור
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeCameraDialog();
+                    cameraInputRef.current?.click();
+                  }}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                >
+                  צלם שוב
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
