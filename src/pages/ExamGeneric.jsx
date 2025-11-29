@@ -808,12 +808,12 @@ export default function ExamGenericPage() {
                     </div>
                 }
 
-                  {resultItem.explanation &&
+                  {resultItem.explanation_hebrew &&
                 <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
-                      <strong className="text-blue-600">הסבר:</strong> {resultItem.explanation}
+                      <strong className="text-blue-600">הסבר:</strong> {resultItem.explanation_hebrew}
                     </div>
                 }
-                  {!resultItem.explanation && !resultItem.is_correct &&
+                  {!resultItem.explanation_hebrew && !resultItem.is_correct &&
                 <div className="bg-white p-3 rounded-lg text-sm text-gray-700 mt-2" dir="rtl">
                       <strong className="text-blue-600">הסבר:</strong> התשובה הנכונה היא: {resultItem.correct_answer}
                     </div>
