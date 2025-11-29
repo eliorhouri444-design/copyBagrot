@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus, Lock, BookOpen, Crown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Target, Edit2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle } from
-"@/components/ui/dialog";
 
-export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic, isPremium }) {
+export default function TopicCarousel({ topics: initialTopics = [], onEditTopic, onAddTopic }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [topics, setTopics] = useState(initialTopics);
@@ -31,12 +25,7 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
   const handleStartPractice = () => {
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
-
-    if (topic.isExtendedReading) {
-      navigate(createPageUrl(`ExtendedReading?topicid=${topicIdParam}`));
-    } else {
-      navigate(createPageUrl(`TopicPracticeNew?topicid=${topicIdParam}&set=1`));
-    }
+    navigate(createPageUrl(`TopicPracticeNew?topicid=${topicIdParam}&set=1`));
   };
 
   if (topics.length === 0) {
@@ -132,33 +121,6 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 mb-3">
-                <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                    <Target className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">מצוין</div>
-                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.excellentSets || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">ציון: 100–86</div>
-                </div>
-                <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                    <BookOpen className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">בינוני</div>
-                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.mediumSets || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">ציון: 85–56</div>
-                </div>
-                <div className="bg-blue-50 p-3 text-center rounded-xl">
-                  <div className="w-8 h-8 bg-[#3B82F6] rounded-lg flex items-center justify-center mx-auto mb-1">
-                    <Target className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="text-[11px] text-[#6E6E6E] font-medium mb-0.5">נמוך</div>
-                  <div className="text-lg font-bold text-[#2B2B2B]">{currentTopic.stats?.failedSets || 0}</div>
-                  <div className="text-[9px] text-[#6E6E6E]">ציון: 55–0</div>
-                </div>
-              </div>
-
             {/* Action buttons */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -173,54 +135,6 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
               <Play className="w-4 h-4 ml-2" />
               התחל תרגול
               </Button>
-
-              {isPremium ?
-              <>
-                  <Button
-                  onClick={() => {
-                      sessionStorage.setItem('weakPracticeTopic', currentTopic.topic_id);
-                      navigate(createPageUrl("CustomWeakPractice"));
-                  }} className="bg-blue-500 text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow hover:bg-[#2563EB] active:bg-[#1E40AF] w-full h-10">
-                    <Target className="w-4 h-4 ml-2" />
-                    תרגול טעויות בנושא זה
-                  </Button>
-                  <Button
-                  onClick={() => {
-                      sessionStorage.setItem('selectedTopicForPractice', currentTopic.topic_id);
-                      navigate(`${createPageUrl("TopicPracticeNew")}?topicId=${encodeURIComponent(currentTopic.topic_id)}&selectSet=true`);
-                  }}
-                  className="bg-[#3B82F6] text-white text-[13px] px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
-                    בחר תרגול ספציפי (מעל 500 שאלות)
-                  </Button>
-                </> :
-
-              <>
-                  <Button
-                  onClick={() => navigate(createPageUrl("Premium"))}
-                  className="bg-[#3B82F6] text-white px-4 py-2 font-bold rounded-[14px] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow w-full h-10 hover:bg-[#2563EB] active:bg-[#1E40AF]">
-                    <Lock className="w-4 h-4 ml-2" />
-                    תרגול טעויות
-                  </Button>
-                  <div className="bg-[#ffffff] p-2.5 rounded-lg border border-[#E9F0FF]">
-                    <div className="text-center mb-2">
-                      <h4 className="text-[11px] font-bold text-[#2B2B2B] mb-0.5">מוגבל ל-10 תרגולים</h4>
-                      <p className="text-[9px] text-[#6E6E6E]">מוגבל ל-10 התרגולים הראשונים בנושא</p>
-                    </div>
-                    <Button
-                    onClick={handleStartPractice}
-                    variant="outline"
-                    className="w-full h-9 text-[11px] font-semibold border border-[#E9F0FF] text-[#3B82F6] hover:bg-[#F5F8FF] rounded-[14px] mb-1.5">
-                      בחר תרגול (מוגבל ל-10)
-                    </Button>
-                    <Button
-                    onClick={() => navigate(createPageUrl("Premium"))}
-                    className="w-full h-9 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white text-[11px] font-bold flex items-center justify-center gap-2 rounded-[14px]">
-                      <Crown className="w-3.5 h-3.5" />
-                      לגישה מלאה 500+ תרגולים
-                    </Button>
-                  </div>
-                </>
-              }
             </motion.div>
           </div>
         </motion.div>
