@@ -27,6 +27,11 @@ export default function TopicCarousel({ topics: initialTopics = [], onEditTopic,
     const topic = topics[currentIndex];
     const topicIdParam = encodeURIComponent(topic.topic_id);
 
+    if (topic.topic_id.includes('vocab') || topic.isVocabulary) {
+        navigate(createPageUrl(`VocabularyFlashcards`));
+        return;
+    }
+
     // Generic practice navigation
     navigate(createPageUrl(`TopicPracticeNew?topicid=${topicIdParam}&set=1`));
   };
