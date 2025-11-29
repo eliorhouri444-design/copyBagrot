@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { triggerExamComplete } from "@/components/mastery/useMasteryData";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Clock, Award, CheckCircle, X, AlertCircle, Loader2, ChevronRight, ChevronLeft, BookOpen, AlertTriangle, Zap, FileText } from "lucide-react";
+import { ArrowLeft, Clock, Award, CheckCircle, X, AlertCircle, Loader2, ChevronRight, ChevronLeft, BookOpen, AlertTriangle, Zap, FileText, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,8 @@ export default function ExamGenericPage() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [savedProgress, setSavedProgress] = useState(null);
   const [showRetryAd, setShowRetryAd] = useState(false);
+  const [wolframSolution, setWolframSolution] = useState(null);
+  const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
@@ -225,6 +227,26 @@ export default function ExamGenericPage() {
       ...prev,
       [questionNumber]: answer
     }));
+  };
+
+  const handleSolveWithWolfram = async (questionText) => {
+    setIsLoadingWolfram(true);
+    setWolframSolution(null);
+    try {
+        const cleanQuery = questionText.replace(/<[^>]*>?/gm, '');
+        const { data } = await base44.functions.invoke('solveWithWolfram', { query: cleanQuery });
+        
+        if (data.success) {
+            setWolframSolution(data.pods);
+        } else {
+            alert("לא הצלחנו לפתור את השאלה הזו אוטומטית.");
+        }
+    } catch (error) {
+        console.error("Wolfram error:", error);
+        alert("שגיאה בחיבור ל-Wolfram Alpha");
+    } finally {
+        setIsLoadingWolfram(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -978,7 +1000,37 @@ export default function ExamGenericPage() {
                   <span className="bg-blue-100 px-3 py-1 rounded-full text-sm font-bold text-blue-600">
                     {question.points} נק'
                   </span>
+                  
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="mr-2 text-purple-600 hover:bg-purple-50"
+                    title="פתרון Wolfram Alpha"
+                    onClick={() => handleSolveWithWolfram(question.question_text)}
+                    disabled={isLoadingWolfram}
+                  >
+                     {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
+                  </Button>
                 </div>
+
+                {wolframSolution && (
+                    <div className="mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4 overflow-hidden relative">
+                        <Button variant="ghost" size="sm" className="absolute top-2 left-2" onClick={() => setWolframSolution(null)}><X className="w-4 h-4" /></Button>
+                        <h3 className="font-bold text-purple-900 mb-2 text-center">פתרון Wolfram Alpha</h3>
+                        <div className="space-y-4 max-h-64 overflow-y-auto" dir="ltr">
+                            {wolframSolution.map((pod, i) => (
+                                <div key={i} className="bg-white p-3 rounded-lg shadow-sm">
+                                    <div className="text-xs font-bold text-gray-500 mb-1 uppercase">{pod.title}</div>
+                                    {pod.content.map((sub, j) => (
+                                        <div key={j}>
+                                            <img src={sub.image} alt={pod.title} className="max-w-full" />
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex-1 overflow-y-auto mb-4">
                   {(() => {
