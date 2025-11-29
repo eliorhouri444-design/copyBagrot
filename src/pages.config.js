@@ -77,6 +77,7 @@ import GrammarTopics from './pages/GrammarTopics';
 import GrammarPracticeNew from './pages/GrammarPracticeNew';
 import GrammarStrengthen from './pages/GrammarStrengthen';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
+import ReadingComprehension from './pages/ReadingComprehension';
 import __Layout from './Layout.jsx';
 
 
@@ -160,6 +161,7 @@ export const PAGES = {
     "GrammarPracticeNew": GrammarPracticeNew,
     "GrammarStrengthen": GrammarStrengthen,
     "GrammarTopicsSelection": GrammarTopicsSelection,
+    "ReadingComprehension": ReadingComprehension,
 }
 
 export const pagesConfig = {
