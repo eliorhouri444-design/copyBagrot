@@ -3,11 +3,19 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft, Volume2, BookOpen, Target, Trophy } from
+  ChevronLeft, RotateCcw, Check, X, Loader2, Crown, ArrowLeft, Volume2, BookOpen, Target, Trophy, AlertTriangle } from
 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 // מצב 2 - מבחן אוצר מילים - בחירה מרובה, השלמה, כתיבה חופשית
 
@@ -26,6 +34,7 @@ export default function VocabularyQuickPracticePage() {
   const [results, setResults] = useState({ correct: 0, incorrect: 0 });
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const setId = urlParams.get('setId');
@@ -57,6 +66,18 @@ export default function VocabularyQuickPracticePage() {
        }
     }
   }, [currentIndex, user, isMultiSet, setId, questions.length, showResult, showSummary]);
+
+  const handleExit = () => {
+    if (showSummary || questions.length === 0) {
+      navigate(createPageUrl("VocabularySets"));
+      return;
+    }
+    setShowExitDialog(true);
+  };
+
+  const confirmExit = () => {
+    navigate(createPageUrl("VocabularySets"));
+  };
 
   const loadData = async () => {
     setIsLoading(true);
@@ -606,7 +627,7 @@ export default function VocabularyQuickPracticePage() {
       {/* Header */}
       <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
-          onClick={() => navigate(createPageUrl("Practice"))}
+          onClick={handleExit}
           className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -838,6 +859,28 @@ export default function VocabularyQuickPracticePage() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <AlertTriangle className="w-6 h-6 text-amber-500" />
+              האם אתה בטוח שברצונך לצאת?
+            </DialogTitle>
+            <DialogDescription>
+              המיקום שלך יישמר ותוכל להמשיך בדיוק מאותה נקודה בפעם הבאה.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row-reverse">
+            <Button onClick={() => setShowExitDialog(false)} variant="outline" className="flex-1">
+              המשך במבחן
+            </Button>
+            <Button onClick={confirmExit} className="flex-1 bg-red-600 hover:bg-red-700">
+              שמור וצא
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

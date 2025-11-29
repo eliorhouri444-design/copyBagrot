@@ -3,11 +3,19 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
-  ChevronLeft, Check, X, Loader2, Volume2, Image as ImageIcon } from
+  ChevronLeft, Check, X, Loader2, Volume2, Image as ImageIcon, AlertTriangle } from
 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 // מצב 1 - FLASHCARDS בלבד - לימוד נקי ללא שאלות
 
@@ -30,6 +38,7 @@ export default function VocabularyFlashcardsPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [generatedImages, setGeneratedImages] = useState({});
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
   // Text-to-Speech function
   const speakWord = (text, lang = 'en-US') => {
@@ -134,6 +143,32 @@ ${baseStyle}`;
       generateImageForWord(currentWord);
     }
   }, [currentIndex, words]);
+
+  // Update bookmark when current index changes
+  useEffect(() => {
+    if (user && !isMultiSet && setId && words.length > 0 && !showSummary) {
+       base44.auth.updateMe({
+         last_vocabulary_position: {
+           set_id: parseInt(setId),
+           question_index: currentIndex,
+           word_id: words[currentIndex]?.id,
+           timestamp: new Date().toISOString()
+         }
+       }).catch(e => console.error("Error saving bookmark:", e));
+    }
+  }, [currentIndex, user, isMultiSet, setId, words.length, showSummary]);
+
+  const handleExit = () => {
+    if (showSummary || words.length === 0) {
+      navigate(createPageUrl("VocabularySets"));
+      return;
+    }
+    setShowExitDialog(true);
+  };
+
+  const confirmExit = () => {
+    navigate(createPageUrl("VocabularySets"));
+  };
 
   const loadData = async () => {
     setIsLoading(true);
@@ -417,7 +452,7 @@ ${baseStyle}`;
       {/* Header */}
       <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
         <button
-          onClick={() => navigate(createPageUrl("VocabularySets"))}
+          onClick={handleExit}
           className="p-2 -ml-2 text-white hover:bg-white/10 rounded-lg"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -644,6 +679,28 @@ ${baseStyle}`;
           </div>
         </motion.div>
       </div>
+
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent dir="rtl" className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <AlertTriangle className="w-6 h-6 text-amber-500" />
+              האם אתה בטוח שברצונך לצאת?
+            </DialogTitle>
+            <DialogDescription>
+              המיקום שלך יישמר ותוכל להמשיך בדיוק מאותה נקודה בפעם הבאה.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row-reverse">
+            <Button onClick={() => setShowExitDialog(false)} variant="outline" className="flex-1">
+              המשך בתרגול
+            </Button>
+            <Button onClick={confirmExit} className="flex-1 bg-red-600 hover:bg-red-700">
+              שמור וצא
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>);
 
 }
