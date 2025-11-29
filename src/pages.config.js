@@ -75,6 +75,9 @@ import VocabularyFlashcards from './pages/VocabularyFlashcards';
 import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
 import VocabularyStrengthen from './pages/VocabularyStrengthen';
 import GrammarTopics from './pages/GrammarTopics';
+import ReadingComprehension from './pages/ReadingComprehension';
+import ReadingPractice from './pages/ReadingPractice';
+import GrammarPracticeNew from './pages/GrammarPracticeNew';
 import __Layout from './Layout.jsx';
 
 
@@ -156,6 +159,9 @@ export const PAGES = {
     "VocabularyQuickPractice": VocabularyQuickPractice,
     "VocabularyStrengthen": VocabularyStrengthen,
     "GrammarTopics": GrammarTopics,
+    "ReadingComprehension": ReadingComprehension,
+    "ReadingPractice": ReadingPractice,
+    "GrammarPracticeNew": GrammarPracticeNew,
 }
 
 export const pagesConfig = {
