@@ -71,8 +71,20 @@ export default function RecentPracticeSessions({ subject, units, userEmail, isPr
   });
 
   const getTopicName = (topicId) => {
+    if (!topicId) return 'תרגול';
+    
+    // Try to find from topics
     const topic = allTopics.find((t) => t.topic_id === topicId);
-    return topic?.name || topicId;
+    if (topic) return topic.name;
+    
+    // Friendly names for special topics
+    if (topicId.includes('vocab')) return 'אוצר מילים';
+    if (topicId.includes('grammar')) return 'דקדוק';
+    
+    // Fallback to formatting
+    const parts = topicId.split('_');
+    if (parts.length >= 3) return parts.slice(2).join(' ');
+    return topicId;
   };
 
   if (!practiceSessions || practiceSessions.length === 0) {
