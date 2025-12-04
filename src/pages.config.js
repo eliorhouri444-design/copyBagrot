@@ -70,6 +70,7 @@ import Grammar from './pages/Grammar';
 import GrammarPractice from './pages/GrammarPractice';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
 import VocabularyFlashcards from './pages/VocabularyFlashcards';
+import AdminBagrutManager from './pages/AdminBagrutManager';
 import __Layout from './Layout.jsx';
 
 
@@ -146,6 +147,7 @@ export const PAGES = {
     "GrammarPractice": GrammarPractice,
     "GrammarTopicsSelection": GrammarTopicsSelection,
     "VocabularyFlashcards": VocabularyFlashcards,
+    "AdminBagrutManager": AdminBagrutManager,
 }
 
 export const pagesConfig = {
