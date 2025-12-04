@@ -199,13 +199,27 @@ function buildExamModules(customModules, subject, units) {
 }
 
 function calculateModuleStats(modules, examAttempts, exams) {
+  // פונקציית עזר להתאמה גמישה של מודולים (זהה לזו ב-Exams.js)
+  const matchesModule = (moduleId, targetModuleId) => {
+    if (!moduleId) return false;
+    const id = moduleId.trim().toUpperCase();
+    const target = targetModuleId.toUpperCase();
+    // התאמה מדויקת, עם קידומת Module, או סיומת אות/מספר
+    return id === target || 
+           id === `MODULE ${target}` || 
+           id === `SHALON ${target}` ||
+           (target.length === 1 && id.endsWith(` ${target}`));
+  };
+
   return modules.map(module => {
-    // מצא בגרויות של המודול
+    // מצא בגרויות של המודול (נסיונות)
     const moduleAttempts = examAttempts.filter(attempt => {
       if (module.entity === 'ModuleAExam' && attempt.exam_type === 'module_a') return true;
       if (module.entity === 'ModuleBExam' && attempt.exam_type === 'module_b') return true;
       if (module.entity === 'ModuleCExam' && attempt.exam_type === 'module_c') return true;
-      if (module.entity === 'GenericExam' && attempt.module_id === module.id) return true;
+      
+      // שימוש בהתאמה גמישה עבור GenericExam
+      if (module.entity === 'GenericExam' && matchesModule(attempt.module_id, module.id)) return true;
       return false;
     });
     
@@ -223,12 +237,17 @@ function calculateModuleStats(modules, examAttempts, exams) {
     }).length;
     const failedAttempts = moduleAttempts.filter(a => (a.score_percent || 0) < 56).length;
     
-    // ספירת בגרויות זמינות למודול
+    // ספירת בגרויות זמינות למודול (כולל התאמה גמישה)
     let availableExams = 0;
-    if (module.id === 'A') availableExams = exams.moduleAExams.length;
-    else if (module.id === 'B') availableExams = exams.moduleBExams.length;
-    else if (module.id === 'C') availableExams = exams.moduleCExams.length;
-    else availableExams = exams.genericExams.filter(e => e.module_id === module.id).length;
+    if (module.id === 'A') {
+      availableExams = exams.moduleAExams.length + exams.genericExams.filter(e => matchesModule(e.module_id, 'A')).length;
+    } else if (module.id === 'B') {
+      availableExams = exams.moduleBExams.length + exams.genericExams.filter(e => matchesModule(e.module_id, 'B')).length;
+    } else if (module.id === 'C') {
+      availableExams = exams.moduleCExams.length + exams.genericExams.filter(e => matchesModule(e.module_id, 'C')).length;
+    } else {
+      availableExams = exams.genericExams.filter(e => matchesModule(e.module_id, module.id)).length;
+    }
     
     return {
       ...module,

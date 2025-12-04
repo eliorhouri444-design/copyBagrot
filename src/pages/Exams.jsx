@@ -429,6 +429,17 @@ export default function ExamsPage() {
     console.log(`📋 Module ${moduleId} exams found:`, exams.length, exams.map((e) => ({ id: e.id, title: e.title, type: e.exam_type })));
 
     exams.sort((a, b) => {
+      // תעדוף מבחנים שנוצרו ע"י AI (חדשים יותר)
+      const isGeneratedA = a.is_generated || false;
+      const isGeneratedB = b.is_generated || false;
+      if (isGeneratedA !== isGeneratedB) return isGeneratedA ? -1 : 1;
+
+      // מיון לפי תאריך יצירה (חדש לישן) אם קיים
+      const dateA = new Date(a.created_at || a.created_date || 0);
+      const dateB = new Date(b.created_at || b.created_date || 0);
+      if (dateA.getTime() !== dateB.getTime()) return dateB.getTime() - dateA.getTime();
+
+      // מיון משני לפי כותרת
       const titleA = a.title || '';
       const titleB = b.title || '';
       const numA = parseInt(titleA.match(/\d+/)) || 0;
