@@ -21,7 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, CheckCircle, FileText, ArrowRight, Trash2, Upload, Eye } from "lucide-react";
+import { Loader2, CheckCircle, FileText, ArrowRight, Trash2, Upload, Eye, Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -41,7 +42,7 @@ export default function AdminAIExams() {
     duration_minutes: 90,
   });
 
-  // Fetch generated exams
+  // Fetch generated exams (drafts)
   const { data: generatedExams, isLoading } = useQuery({
     queryKey: ["generated-exams"],
     queryFn: async () => {
@@ -50,12 +51,33 @@ export default function AdminAIExams() {
     },
   });
 
-  // Delete mutation
+  // Fetch published AI exams (GenericExam with is_generated = true)
+  const { data: publishedExams, isLoading: isLoadingPublished } = useQuery({
+    queryKey: ["published-ai-exams"],
+    queryFn: async () => {
+      const data = await base44.entities.GenericExam.filter({ is_generated: true });
+      return data.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    },
+  });
+
+  // Delete draft mutation
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.GeneratedExam.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["generated-exams"]);
     },
+  });
+
+  // Delete published exam mutation
+  const deletePublishedMutation = useMutation({
+    mutationFn: (id) => base44.entities.GenericExam.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["published-ai-exams"]);
+      alert("המבחן נמחק בהצלחה");
+    },
+    onError: (err) => {
+      alert("שגיאה במחיקת המבחן: " + err.message);
+    }
   });
 
   // Publish mutation (Create GenericExam)
@@ -144,6 +166,92 @@ export default function AdminAIExams() {
 
         </div>
 
+        <Tabs defaultValue="published" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="published">מבחנים מפורסמים ({publishedExams?.length || 0})</TabsTrigger>
+            <TabsTrigger value="drafts">טיוטות ({generatedExams?.length || 0})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="published">
+            <Card>
+              <CardHeader>
+                <CardTitle>מבחנים שנוצרו ופורסמו</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingPublished ? (
+                  <div className="flex justify-center p-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                  </div>
+                ) : publishedExams?.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    אין מבחנים מפורסמים שנוצרו ע"י AI
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">כותרת</TableHead>
+                        <TableHead className="text-right">מקצוע</TableHead>
+                        <TableHead className="text-right">יחידות</TableHead>
+                        <TableHead className="text-right">מודול</TableHead>
+                        <TableHead className="text-right">שאלות</TableHead>
+                        <TableHead className="text-right">תאריך</TableHead>
+                        <TableHead className="text-right">פעולות</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {publishedExams.map((exam) => (
+                        <TableRow key={exam.id}>
+                          <TableCell className="font-medium">{exam.title}</TableCell>
+                          <TableCell>{exam.subject}</TableCell>
+                          <TableCell>{exam.unit_level}</TableCell>
+                          <TableCell>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                              {exam.module_id}
+                            </span>
+                          </TableCell>
+                          <TableCell>{exam.questions?.length || 0}</TableCell>
+                          <TableCell>
+                            {new Date(exam.created_date).toLocaleDateString('he-IL')}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate(createPageUrl("AdminExamEditor") + `?examId=${exam.id}&type=generic`)}
+                              >
+                                <Eye className="w-4 h-4 ml-1" />
+                                ערוך
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={deletePublishedMutation.isPending}
+                                onClick={() => {
+                                  if (confirm(`האם למחוק את המבחן "${exam.title}"?\nפעולה זו בלתי הפיכה!`)) {
+                                    deletePublishedMutation.mutate(exam.id);
+                                  }
+                                }}
+                              >
+                                {deletePublishedMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="drafts">
         <Card>
           <CardHeader>
             <CardTitle>מבחנים ממתינים לפרסום</CardTitle>
@@ -255,6 +363,8 @@ export default function AdminAIExams() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* View Dialog */}
