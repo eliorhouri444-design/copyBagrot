@@ -161,7 +161,60 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'AI Generation failed JSON format' }, { status: 500 });
         }
 
-        // 4. Save
+        // 4. Convert to GenericExam Format and Publish
+        const questions = (examJson.questions || []).map((q, idx) => {
+            // Determine question type based on structure
+            let qType = 'Open-ended';
+            if (q.sub_questions && q.sub_questions.length > 0) {
+                qType = 'Sectioned';
+            } else if (q.options && q.options.length > 0) {
+                qType = 'Multiple Choice';
+            }
+
+            return {
+                question_number: idx + 1,
+                question_text: q.question_text,
+                question_type: qType,
+                options: q.options || [],
+                correct_answer: q.final_answer || q.solution_steps,
+                explanation: q.solution_steps,
+                points: Math.floor(100 / (examJson.questions.length || 1)),
+                topic: q.topic || 'General',
+                parts: (q.sub_questions || []).map((subText, subIdx) => ({
+                    part_id: String.fromCharCode(1488 + subIdx), // Aleph, Bet, Gimel...
+                    text: subText
+                }))
+            };
+        });
+
+        // Fetch module ID from original exam if available
+        let moduleId = "";
+        if (original_exam_id) {
+             const exams = await base44.entities.BagrutExam.filter({ id: original_exam_id });
+             if (exams && exams.length > 0) {
+                 moduleId = exams[0].module_symbol || "";
+             }
+        }
+
+        const genericExamData = {
+              title: examTitle,
+              subject: subject,
+              unit_level: parseInt(unit),
+              module_id: moduleId || "General", // Fallback if no module symbol
+              description: "מבחן מקביל שנוצר ע\"י AI",
+              duration_minutes: 120, // Default
+              total_points: 100,
+              passing_grade: 56,
+              questions: questions,
+              is_generated: true,
+              is_copyright_free: true,
+              generated_from_id: original_exam_id || null
+        };
+
+        // Create the PUBLISHED exam directly
+        const publishedExam = await base44.entities.GenericExam.create(genericExamData);
+
+        // Also keep a record in GeneratedExam for logs/history (optional, but good for debugging)
         const generatedExam = await base44.entities.GeneratedExam.create({
             original_exam_id: original_exam_id || null,
             title: examTitle,
@@ -172,7 +225,7 @@ Deno.serve(async (req) => {
             created_at: new Date().toISOString()
         });
 
-        return Response.json({ success: true, data: generatedExam });
+        return Response.json({ success: true, data: publishedExam });
 
     } catch (error) {
         console.error("❌ Error:", error);
