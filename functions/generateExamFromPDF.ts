@@ -29,11 +29,19 @@ Create a new exam that is **100% parallel** to the original in structure, diffic
         *   CHANGE the numbers/functions/variables.
         *   *CRITICAL*: Ensure the new numbers yield **CLEAN, SOLVABLE RESULTS** (integers or simple fractions, unless the topic dictates otherwise).
         *   *Example*: If original is "Min/Max of f(x) = x^3 - 3x", New is "Min/Max of g(x) = 2x^3 - 24x".
-    *   **Humanities/Social Studies**:
-        *   Ask about the *same concept* but applied to a different case study or a parallel aspect.
-        *   If the original asks to "Analyze the protagonist's motive in Chapter 3", the new question should "Analyze the antagonist's reaction in Chapter 3" or "Analyze the protagonist's motive in Chapter 4" (if relevant).
+    *   **History / Civics (Social Studies)**:
+        *   Focus on the *same historical period or civics concept* but require a different angle of analysis.
+        *   *History Example*: If original asks about "Political causes of the 1948 War", ask about "Social/Military consequences" or compare with a different event in the same era.
+        *   *Civics Example*: If original asks about "Freedom of Speech", ask about "Freedom of Religion" or a conflict between two different rights, ensuring the *complexity* (5-unit level) remains high.
+    *   **Literature / Bible**:
+        *   Since these subjects rely on specific *required texts* (Syllabus), you cannot change the story completely if it's a mandatory text.
+        *   Instead, ask about a **different aspect** of the *same* text.
+        *   *Example*: If original asks about "The tragic hero's flaw", ask about "The role of the secondary character" or "The use of irony" in the same work.
+    *   **Hebrew Language (Lashon)**:
+        *   **Reading Comprehension**: Generate a **NEW** non-fiction text (300-400 words) on a similar academic topic.
+        *   **Syntax/Morphology (Tachbir/Hage):** Create **NEW sentences** that feature the *exact same* grammatical structures/patterns (Gzarot, Binyanim) as the original, but with different vocabulary.
     *   **English**:
-        *   Generate a **NEW TEXT** (350 words) on a similar topic (e.g., if original was about "Space Travel", write about "Deep Sea Exploration").
+        *   Generate a **NEW TEXT** (350-450 words for 5 units) on a similar genre (e.g., if original was about "Space Travel", write about "Deep Sea Exploration").
         *   Create questions that mirror the original types (MC, Open) but refer to the new text.
 
 3.  **SELF-CORRECTION & VERIFICATION**:
