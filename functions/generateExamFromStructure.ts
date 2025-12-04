@@ -99,7 +99,47 @@ Deno.serve(async (req) => {
     let specificRequirements = '';
     if (isEnglishExam) {
       if (examStructure.unit_level === 3) {
-        specificRequirements = `
+        // Check if this is Module B
+        if (examStructure.module_id === 'B') {
+          specificRequirements = `
+    🎯 **דרישות מיוחדות לאנגלית 3 יחידות - שאלון B:**
+    
+    ⚠️ **סה"כ ניקוד: 60-70 נקודות בלבד! חלק את הנקודות בהתאם.**
+    
+    **SECTION A - Reading Comprehension (25-30 נקודות):**
+    - טקסט קצר באנגלית (150-200 מילים)
+    - 4-5 שאלות על הטקסט
+    - **חובה: לפחות שאלה אחת Multiple Choice עם 4 אפשרויות (A, B, C, D)**
+    - שאלות נוספות: True/False, Wh-questions, Complete the sentence
+    
+    **SECTION B - Vocabulary (15-20 נקודות):**
+    - 5-6 שאלות אוצר מילים בסיסי
+    - השלמת משפטים עם מילים מתוך רשימה
+    - בחירת מילה נכונה
+    
+    **SECTION C - Grammar (10-15 נקודות):**
+    - Present Simple, Present Progressive, Past Simple, Future
+    - 4-5 שאלות מילוי / תיקון / בחירה
+    
+    **SECTION D - Writing (10-15 נקודות):**
+    - משימת כתיבה אחת
+    - **חובה לכתוב בהוראות: "Write 60-80 words"**
+    - נושא פשוט: מכתב לחבר, תיאור יום, תחביב וכו'
+    
+    📝 **דוגמה לשאלת Multiple Choice:**
+    "According to the text, what does John like to do on weekends?
+    A) Watch TV
+    B) Play soccer
+    C) Read books
+    D) Visit friends"
+    
+    📝 **דוגמה להוראת כתיבה:**
+    "Write a short paragraph about your favorite hobby. Write 60-80 words."
+    
+    חובה ליצור reading_text באנגלית (150-200 מילים).
+    חובה שסה"כ הניקוד יהיה בין 60-70 נקודות!`;
+        } else {
+          specificRequirements = `
     🎯 **דרישות מיוחדות לאנגלית 3 יחידות:**
     
     **Vocabulary (5-10 שאלות):**
@@ -117,6 +157,7 @@ Deno.serve(async (req) => {
     - 5 משפטים להשלמה
     
     חובה ליצור טקסט קריאה קצר באנגלית (reading_text) של 150-200 מילים.`;
+        }
       } else if (examStructure.unit_level === 4) {
         if (examStructure.module_id === 'C') {
           specificRequirements = `
