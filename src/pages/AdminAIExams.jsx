@@ -141,10 +141,7 @@ export default function AdminAIExams() {
               כאן ניתן לצפות במבחנים שנוצרו ע"י המערכת, ולשייך אותם לקרוסלות המתאימות באפליקציה.
             </p>
           </div>
-          <Button variant="outline" onClick={() => navigate(createPageUrl('AdminBagrutManager'))}>
-            <Upload className="w-4 h-4 ml-2" />
-            העלאת בגרות חדשה
-          </Button>
+
         </div>
 
         <Card>

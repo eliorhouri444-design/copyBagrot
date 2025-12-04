@@ -283,13 +283,7 @@ export default function HomePage() {
                  >
                    מבחני AI
                  </Button>
-                 <Button 
-                   size="sm" 
-                   onClick={() => navigate(createPageUrl('AdminBagrutManager'))}
-                   className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 rounded-lg"
-                 >
-                   ניהול בגרויות
-                 </Button>
+
                </div>
             </div>
           </motion.div>
