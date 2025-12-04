@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useExamsData } from "@/components/cache/useExamsData";
 import { DataCache } from "@/components/cache/DataCache";
 import { createPageUrl } from "@/utils";
-import { BookOpen, CheckCircle, Award, Clock, Play, Crown, X, Upload, Settings, Trophy, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Accessibility, Shield, TrendingDown, Lock, Target, TrendingUp, Edit2, Trash2, Loader2, BookCheck, FileCheck, Save } from "lucide-react";
+import { BookOpen, CheckCircle, Award, Clock, Play, Crown, X, Upload, Settings, Trophy, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Accessibility, Shield, TrendingDown, Lock, Target, TrendingUp, Edit2, Trash2, Loader2, BookCheck, FileCheck, Save, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
