@@ -99,51 +99,43 @@ Deno.serve(async (req) => {
       }).join('\n');
       
       const generationPrompt = `
-צור מבחן בגרות ישראלי מלא ומדויק.
+You are an expert academic examiner for the Israeli Bagrut exams.
+Your task is to generate a high-quality, error-free exam that perfectly matches the difficulty and style of the provided examples.
 
-**פרטי המבחן:**
-- מקצוע: ${examStructure.subject}
-- רמה: ${examStructure.unit_level} יחידות  
-- שאלון: ${examStructure.module_id}
-- משך: ${durationMinutes} דקות
-- סה"כ נקודות: ${totalPoints}
-- מספר שאלות נדרש: בדיוק ${requiredQuestionCount} שאלות
+**EXAM DETAILS:**
+- Subject: ${examStructure.subject}
+- Level: ${examStructure.unit_level} Units
+- Module: ${examStructure.module_id}
+- Duration: ${durationMinutes} minutes
+- Total Points: ${totalPoints}
+- Required Questions: EXACTLY ${requiredQuestionCount}
 
 ${specificRequirements}
 
-**דוגמאות לסגנון השאלות מהמקור:**
+**REFERENCE QUESTIONS (STYLE & DIFFICULTY):**
 ${exampleQuestions}
 
-⚠️ **כללים קריטיים - חובה לקיים:**
+**CRITICAL INSTRUCTIONS FOR MATHEMATICAL ACCURACY:**
+1. **SOLVE BEFORE YOU WRITE:** For every math question, you must verify the solution steps internally before outputting the question.
+2. **CLEAN NUMBERS:** Ensure the numbers used in the problems lead to reasonable answers (e.g., integer or simple fraction results for standard problems, unless specifically advanced).
+3. **NO HALLUCINATIONS:** Do not invent theorems or properties. Use standard high-school curriculum math.
+4. **FULL TEXT:** The 'question_text' field must contain the COMPLETE question, including all sub-sections (א, ב, ג) and any necessary context (functions, geometric shapes, given values).
+   - Example Math: "נתונה הפונקציה f(x) = x³ - 3x. א. מצא את נקודות הקיצון. ב. מצא את תחומי העלייה והירידה."
+   - Example Geometry: "במשולש ABC, הצלע AB שווה ל-10..."
 
-1. **כל שאלה חייבת לכלול question_text מלא!**
-   - זה השדה הכי חשוב - טקסט השאלה המלא
-   - אסור להשאיר ריק או null
-   - השאלה חייבת להיות ברורה ומפורטת
-
-2. **דוגמאות לפורמט נכון:**
-   
-   מתמטיקה:
-   "question_text": "נתונה הפונקציה f(x) = x³ - 12x + 5. א. מצא את נקודות הקיצון של הפונקציה. ב. קבע את תחומי העלייה והירידה. ג. שרטט סקיצה של הגרף."
-   
-   אנגלית:
-   "question_text": "According to the text, what is the main reason why many young people prefer to shop online? Give TWO details from the text to support your answer."
-   
-   היסטוריה:
-   "question_text": "הסבר שלושה גורמים מרכזיים שהובילו לפרוץ מלחמת העולם הראשונה ב-1914. התייחס לגורמים פוליטיים, כלכליים וחברתיים."
-
-3. **correct_answer חייב להכיל את התשובה המלאה**
-
-4. **points חייב להיות מספר שלם**
-
-5. **solution_steps - מערך של שלבי פתרון מפורטים**
+**OUTPUT REQUIREMENTS:**
+1. 'question_text': MUST be non-empty and detailed.
+2. 'correct_answer': MUST be the final, verified answer.
+3. 'solution_steps': MUST be a detailed, step-by-step derivation of the answer.
+4. 'points': Must be an integer.
 
 ${isEnglishExam ? `
-6. **reading_text - טקסט קריאה באנגלית (300-500 מילים)**
-   צור טקסט מעניין ומקורי על נושא רלוונטי לגיל התיכון.
+**ENGLISH EXAM SPECIAL INSTRUCTIONS:**
+- Generate a high-quality reading text (300-500 words) suitable for high school level.
+- Ensure questions directly relate to the text.
 ` : ''}
 
-צור את המבחן עכשיו עם בדיוק ${requiredQuestionCount} שאלות מלאות.`;
+Generate the exam now with exactly ${requiredQuestionCount} questions.`;
 
       console.log(`🤖 Step 5 (${i + 1}/${count}): Generating exam with AI...`);
       
