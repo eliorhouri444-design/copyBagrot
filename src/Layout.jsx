@@ -55,9 +55,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }
   ];
 
-  const adminNavItems = user?.role === 'admin' ? [
-    { name: "AdminAIExams", icon: Settings, path: createPageUrl("AdminAIExams"), label: "AI ניהול", color: "#EF4444" }
-  ] : [];
+  const adminNavItems = user?.role === 'admin' ? [] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];
 
