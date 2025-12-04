@@ -29,6 +29,11 @@ Create a new exam that is **100% parallel** to the original in structure, diffic
         *   CHANGE the numbers/functions/variables.
         *   *CRITICAL*: Ensure the new numbers yield **CLEAN, SOLVABLE RESULTS** (integers or simple fractions, unless the topic dictates otherwise).
         *   *Example*: If original is "Min/Max of f(x) = x^3 - 3x", New is "Min/Max of g(x) = 2x^3 - 24x".
+        *   **DIAGRAMS & GRAPHS**: Since we cannot generate images, you must **DESCRIBE** the new visual elements precisely in the text.
+            *   *Geometry*: "Given a triangle ABC where AB=AC..."
+            *   *Functions*: "The graph of f(x) intersects the x-axis at..."
+            *   *Physics*: "A block of mass m sits on an incline of 30 degrees..."
+            *   Make sure the textual description is sufficient to solve the problem without seeing a drawing.
     *   **History / Civics (Social Studies)**:
         *   Focus on the *same historical period or civics concept* but require a different angle of analysis.
         *   *History Example*: If original asks about "Political causes of the 1948 War", ask about "Social/Military consequences" or compare with a different event in the same era.
@@ -81,16 +86,29 @@ Deno.serve(async (req) => {
 
         let { pdf_url, subject, unit, original_exam_id } = body;
 
+        let examTitle = "";
         // If PDF URL is missing but we have ID, fetch it from DB
-        if (!pdf_url && original_exam_id) {
+        if (original_exam_id) {
             console.log(`Fetching PDF URL for Exam ID: ${original_exam_id}`);
             const exams = await base44.entities.BagrutExam.filter({ id: original_exam_id });
             if (exams && exams.length > 0) {
-                pdf_url = exams[0].exam_file_url;
+                const ex = exams[0];
+                pdf_url = ex.exam_file_url;
                 // Also fill subject/unit if missing
-                if (!subject) subject = exams[0].subject_id;
-                if (!unit) unit = exams[0].unit_level;
+                if (!subject) subject = ex.subject_id;
+                if (!unit) unit = ex.unit_level;
+                
+                // Generate a smart title based on metadata
+                const termStr = ex.term === 'a' ? "א'" : "ב'";
+                const seasonStr = ex.season === 'winter' ? "חורף" : "קיץ";
+                examTitle = `מקביל: ${ex.subject_id} ${ex.unit_level} יח"ל - ${seasonStr} ${ex.year} מועד ${termStr}`;
             }
+        }
+
+        // Fallback title if we couldn't construct one from DB
+        if (!examTitle) {
+            const dateStr = new Date().toLocaleDateString('he-IL');
+            examTitle = `מבחן מקביל - ${subject || 'כללי'} ${unit || 0} יח"ל (${dateStr})`;
         }
 
         if (!pdf_url) return Response.json({ error: 'Missing PDF URL' }, { status: 400 });
@@ -146,6 +164,7 @@ Deno.serve(async (req) => {
         // 4. Save
         const generatedExam = await base44.entities.GeneratedExam.create({
             original_exam_id: original_exam_id || null,
+            title: examTitle,
             subject: subject,
             unit: parseInt(unit),
             exam_json: examJson,

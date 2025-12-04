@@ -161,17 +161,20 @@ export default function AdminAIExams() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">תאריך יצירה</TableHead>
-                    <TableHead className="text-right">מקצוע</TableHead>
+                    <TableHead className="text-right">כותרת המבחן</TableHead>
+                    <TableHead className="text-right">תאריך</TableHead>
                     <TableHead className="text-right">יחידות</TableHead>
                     <TableHead className="text-right">סטטוס</TableHead>
                     <TableHead className="text-right">שאלות</TableHead>
                     <TableHead className="text-right">פעולות</TableHead>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
+                  </TableHeader>
+                  <TableBody>
                   {generatedExams.map((exam) => (
                     <TableRow key={exam.id}>
+                       <TableCell className="font-medium">
+                          {exam.title || `${exam.subject} - מבחן כללי`}
+                      </TableCell>
                       <TableCell>
                         {new Date(exam.created_at || exam.created_date).toLocaleDateString('he-IL')}
                         <br />
@@ -179,7 +182,6 @@ export default function AdminAIExams() {
                           {new Date(exam.created_at || exam.created_date).toLocaleTimeString('he-IL')}
                         </span>
                       </TableCell>
-                      <TableCell className="font-medium">{exam.subject}</TableCell>
                       <TableCell>{exam.unit}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs ${
