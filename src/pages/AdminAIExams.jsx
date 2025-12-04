@@ -21,7 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, CheckCircle, FileText, ArrowRight, Trash2, Upload } from "lucide-react";
+import { Loader2, CheckCircle, FileText, ArrowRight, Trash2, Upload, Eye } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -30,6 +31,7 @@ export default function AdminAIExams() {
   const queryClient = useQueryClient();
   const [selectedExam, setSelectedExam] = useState(null);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [publishData, setPublishData] = useState({
     title: "",
     module_id: "",
@@ -113,6 +115,11 @@ export default function AdminAIExams() {
     setPublishDialogOpen(true);
   };
 
+  const handleViewClick = (exam) => {
+    setSelectedExam(exam);
+    setViewDialogOpen(true);
+  };
+
   const handlePublishSubmit = () => {
     if (!publishData.module_id || !publishData.title) {
       alert("אנא מלא את כל שדות החובה");
@@ -192,12 +199,22 @@ export default function AdminAIExams() {
                         <div className="flex gap-2">
                           <Button 
                             size="sm" 
+                            variant="outline"
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                            onClick={() => handleViewClick(exam)}
+                            disabled={exam.status !== 'completed'}
+                          >
+                            <Eye className="w-4 h-4 ml-2" />
+                            צפה
+                          </Button>
+                          <Button 
+                            size="sm" 
                             className="bg-blue-600 hover:bg-blue-700 text-white"
                             onClick={() => handlePublishClick(exam)}
                             disabled={exam.status !== 'completed'}
                           >
                             <CheckCircle className="w-4 h-4 ml-2" />
-                            פרסם לאפליקציה
+                            פרסם
                           </Button>
                           <Button 
                             size="sm" 
@@ -218,6 +235,80 @@ export default function AdminAIExams() {
           </CardContent>
         </Card>
       </div>
+
+      {/* View Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="max-w-4xl h-[80vh]" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>צפייה במבחן שנוצר</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-full pl-4">
+            {selectedExam?.exam_json?.questions ? (
+              <div className="space-y-6 py-4">
+                <div className="flex gap-4 text-sm text-gray-500 border-b pb-4">
+                  <div>מקצוע: <span className="font-bold text-gray-900">{selectedExam.subject}</span></div>
+                  <div>יחידות: <span className="font-bold text-gray-900">{selectedExam.unit}</span></div>
+                  <div>שאלות: <span className="font-bold text-gray-900">{selectedExam.exam_json.questions.length}</span></div>
+                </div>
+                
+                {selectedExam.exam_json.questions.map((q, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 bg-white shadow-sm">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-bold text-blue-700">שאלה {idx + 1}</h3>
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">{q.topic}</span>
+                    </div>
+                    
+                    <div className="mb-4 whitespace-pre-wrap text-gray-800 font-medium">
+                      {q.question_text}
+                    </div>
+
+                    {q.sub_questions && q.sub_questions.length > 0 && (
+                      <div className="mr-4 mb-4 space-y-2 border-r-2 border-gray-200 pr-4">
+                        {q.sub_questions.map((sub, sIdx) => (
+                          <div key={sIdx} className="text-sm">
+                            <span className="font-bold ml-1">({String.fromCharCode(1488 + sIdx)})</span>
+                            {sub}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="bg-green-50 p-3 rounded border border-green-100 mt-4">
+                      <div className="text-xs font-bold text-green-700 mb-1">פתרון מלא:</div>
+                      <div className="whitespace-pre-wrap text-sm text-gray-700">
+                        {q.solution_steps}
+                      </div>
+                      {q.final_answer && (
+                        <div className="mt-2 pt-2 border-t border-green-200 font-bold text-green-800 text-sm">
+                          תשובה סופית: {q.final_answer}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <Loader2 className="w-8 h-8 mb-2 animate-spin" />
+                <p>טוען תוכן מבחן...</p>
+              </div>
+            )}
+          </ScrollArea>
+          <DialogFooter>
+            <Button onClick={() => setViewDialogOpen(false)}>סגור</Button>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => {
+                setViewDialogOpen(false);
+                handlePublishClick(selectedExam);
+              }}
+            >
+              <CheckCircle className="w-4 h-4 ml-2" />
+              עבור לפרסום
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Publish Dialog */}
       <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
