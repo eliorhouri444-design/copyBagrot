@@ -649,11 +649,19 @@ Deno.serve(async (req) => {
 
     console.log(`💾 Step 6 (${i + 1}/${count}): Saving exam to database...`);
     
+    // וודא שה-module_id תואם בדיוק למודול קיים (ללא יצירת מודול חדש בקרוסלה)
+    // נרמול module_id - רק אות אחת גדולה עבור אנגלית, או מספר עבור מקצועות אחרים
+    let normalizedModuleId = examStructure.module_id;
+    if (examStructure.subject === 'אנגלית') {
+      // עבור אנגלית - רק אות אחת גדולה (A, B, C, D, E, F, G)
+      normalizedModuleId = examStructure.module_id.replace(/[^A-Ga-g]/g, '').toUpperCase().charAt(0) || examStructure.module_id;
+    }
+    
     const examData = {
       title: generatedExam.title || `${examStructure.subject} - מבחן מחולל ${i + 1}`,
       subject: examStructure.subject,
       unit_level: examStructure.unit_level,
-      module_id: examStructure.module_id,
+      module_id: normalizedModuleId,
       description: generatedExam.description || '',
       duration_minutes: durationMinutes,
       total_points: totalPoints,

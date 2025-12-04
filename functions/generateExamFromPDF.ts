@@ -303,14 +303,19 @@ Deno.serve(async (req) => {
         });
 
         // Fetch module ID from original exam if available
+        // חשוב: module_id חייב להתאים בדיוק למודולים הקיימים בקרוסלה
         let moduleId = "";
         if (original_exam_id) {
              const exams = await base44.entities.BagrutExam.filter({ id: original_exam_id });
              if (exams && exams.length > 0) {
                  moduleId = exams[0].module_symbol || "";
-                 // Normalize English modules (remove "Module " prefix, uppercase)
+                 // Normalize English modules - רק אות אחת גדולה (A, B, C, D, E, F, G)
                  if (subject === 'אנגלית') {
-                     moduleId = moduleId.replace(/module\s*/i, '').trim().toUpperCase();
+                     moduleId = moduleId.replace(/module\s*/i, '').replace(/[^A-Ga-g]/g, '').trim().toUpperCase();
+                     // וודא שזו רק אות אחת
+                     if (moduleId.length > 1) {
+                         moduleId = moduleId.charAt(0);
+                     }
                  }
              }
         }
