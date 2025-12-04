@@ -9,32 +9,47 @@ const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const STRICT_CREATIVE_PROMPT = `You are an expert exam creator for Israeli Bagrut exams.
-Your task is to analyze the STRUCTURE and TOPICS of the provided exam, and then generate a BRAND NEW EXAM.
+const HIGH_FIDELITY_PROMPT = `You are a Senior Chief Examiner for the Israeli Ministry of Education (Misrad HaChinuch).
+Your goal is to create a "Moed B" (Make-up Exam) based on the provided "Moed A" exam text.
 
-CRITICAL RULES - READ CAREFULLY:
-1. **ZERO PLAGIARISM**: You MUST NOT copy the questions from the input.
-2. **NEW NUMBERS**: For Math/Physics/Chemistry - You must change EVERY SINGLE number and function. The logic should be similar, but the answer MUST be different.
-3. **NEW TEXTS**: For English/Hebrew/Literature - Do NOT use the same text. Write a NEW text of the same genre and difficulty (e.g., if original is about global warming, write about renewable energy).
-4. **SAME STRUCTURE**: Keep the same number of questions, points, and sections.
-5. **FULL SOLUTIONS**: Provide step-by-step solutions for the NEW questions.
+**THE GOLDEN RULE:**
+A "Moed B" exam must be IDENTICAL in structure, topics, and difficulty level to "Moed A", but with DIFFERENT content.
+It must look and feel exactly like a real Bagrut exam.
 
-You must output a JSON object with this structure:
+**INSTRUCTIONS FOR EACH QUESTION:**
+1. **ANALYZE**: Identify the exact topic, sub-topic, cognitive skill, and difficulty level of the original question.
+2. **CLONE STRUCTURE**: Create a new question that tests the *exact same* skill but changes the specific numbers, functions, or text.
+   - **Math/Science**: If original Q1 asks to find min/max of f(x)=x^3-3x, New Q1 must ask for min/max of a SIMILAR function (e.g., g(x)=2x^3-6x) that yields clean, solvable results suitable for a high-school exam. DO NOT generate unsolvable problems.
+   - **Humanities (Bible/Lit/History)**: If original asks about a specific motif in a story, ask about a *different* motif in the *same* story/chapter, or a parallel theme in the required syllabus.
+   - **English**: Write a NEW reading comprehension text (300-400 words) on a similar genre (e.g., Science/Social) with the SAME vocabulary level (Band III/IV). Generate questions that parallel the original types (Multiple choice, Open-ended).
+
+3. **VERIFY SOLUTION**:
+   - You MUST solve the question yourself internally.
+   - Ensure the final answer is clean and reasonable (e.g., no complex decimals unless typical for the subject).
+   - Provide a detailed, step-by-step solution in Hebrew (except for English exams).
+
+**OUTPUT FORMAT (JSON ONLY):**
 {
-  "exam_version": "v2_creative_recreation",
+  "exam_version": "high_fidelity_moed_b",
   "subject": "...",
   "unit": "...",
   "questions": [
     {
       "question_number": 1,
-      "topic": "Extracted topic...",
-      "question_text": "THE NEW GENERATED QUESTION TEXT...",
-      "sub_questions": ["a. New sub question...", "b. ..."],
-      "solution_steps": "Full solution for the new question...",
-      "final_answer": "The new final answer"
+      "topic": "Specific Topic (e.g., Differential Calculus - Rational Functions)",
+      "difficulty": "Hard",
+      "question_text": "The new question text...",
+      "sub_questions": ["א. ...", "ב. ..."],
+      "solution_steps": "1. ...\n2. ...",
+      "final_answer": "x=4, y=2"
     }
   ]
 }
+
+**CRITICAL:**
+- OUTPUT MUST BE VALID JSON.
+- LANGUAGE: Hebrew (unless subject is English).
+- DO NOT COPY ORIGINAL CONTENT. PARALLEL IT.
 `;
 
 Deno.serve(async (req) => {
@@ -48,7 +63,7 @@ Deno.serve(async (req) => {
         try { body = await req.json(); } catch { return Response.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
         const { pdf_url, subject, unit, original_exam_id } = body;
-        console.log(`🚀 Processing Exam: ${subject} (${unit})`);
+        console.log(`🚀 Generating High-Fidelity Exam: ${subject} (${unit})`);
 
         if (!pdf_url) return Response.json({ error: 'Missing PDF URL' }, { status: 400 });
 
@@ -66,26 +81,31 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Failed to parse PDF' }, { status: 500 });
         }
 
-        // Handle Scanned PDFs (Empty Text)
-        if (!extractedText || extractedText.trim().length < 50) {
-            console.warn("⚠️ Scanned PDF detected. Fallback to Topic-Based Generation.");
-            extractedText = `(SCANNED PDF - TEXT UNAVAILABLE). Please generate a generic Bagrut exam for ${subject} ${unit} units, suitable for the summer term.`;
+        // Fallback for Scanned PDFs
+        if (!extractedText || extractedText.trim().length < 100) {
+             // If scanned, we rely on the Subject/Unit to generate a "Standard" exam
+             extractedText = `[SCANNED DOC] Please generate a STANDARD ${unit}-unit Bagrut exam for ${subject}. Structure it according to the official 2024 curriculum.`;
         }
 
-        // 2. Generate with High Creativity
-        console.log("🤖 Generating NEW content...");
+        // 2. Generate with GPT-4o (Best Logic)
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: "gpt-4o", // Using the smartest model available
             messages: [
-                { role: "system", content: STRICT_CREATIVE_PROMPT },
-                { role: "user", content: `Here is the original exam text to analyze structure from:\n\n${extractedText.slice(0, 20000)}\n\nREMEMBER: DO NOT COPY. CREATE NEW QUESTIONS.` }
+                { role: "system", content: HIGH_FIDELITY_PROMPT },
+                { role: "user", content: `Original Exam Content:\n\n${extractedText.slice(0, 30000)}` }
             ],
             response_format: { type: "json_object" },
-            temperature: 0.85, // Higher temperature for creativity
+            temperature: 0.5, // Lower temperature for precision and correctness (less random hallucination)
         });
 
         const content = completion.choices[0].message.content;
-        const examJson = JSON.parse(content);
+        let examJson;
+        try {
+            examJson = JSON.parse(content);
+        } catch (e) {
+            console.error("JSON Parse Error", e);
+            return Response.json({ error: 'AI Generation failed format check' }, { status: 500 });
+        }
 
         // 3. Save
         const generatedExam = await base44.entities.GeneratedExam.create({
