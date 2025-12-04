@@ -222,8 +222,13 @@ Deno.serve(async (req) => {
       }
     }
 
+    // חישוב מספר השאלות הנדרש מהמבנה
+    const requiredQuestionCount = questionStructure.length || 9;
+    
     const generationPrompt = `
-    אתה מומחה ליצירת מבחני בגרות. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא:
+    אתה מומחה ליצירת מבחני בגרות ישראליים. צור מבחן חדש לחלוטין בהתבסס על המבנה הבא.
+
+    ⚠️ **חובה ליצור בדיוק ${requiredQuestionCount} שאלות! לא פחות ולא יותר!**
 
     📋 **מידע כללי:**
     - מקצוע: ${examStructure.subject}
@@ -231,40 +236,54 @@ Deno.serve(async (req) => {
     - שאלון: ${examStructure.module_id}
     - משך: ${durationMinutes} דקות
     - נקודות: ${totalPoints}
+    - **מספר שאלות נדרש: ${requiredQuestionCount}**
 
-    📝 **מבנה המבחן:**
-    ${JSON.stringify(questionStructure, null, 2)}
+    📝 **מבנה המבחן המקורי (${requiredQuestionCount} שאלות):**
+    ${JSON.stringify(questionStructure.map((q, idx) => ({
+      question_number: idx + 1,
+      topic: q.topic,
+      question_type: q.question_type,
+      points: q.points,
+      difficulty_level: q.difficulty_level,
+      has_parts: q.parts?.length > 0
+    })), null, 2)}
     
     ${specificRequirements}
 
-    🎯 **דרישות:**
+    🎯 **דרישות קריטיות:**
 
-    1. **תוכן חדש לגמרי:**
+    1. **כמות שאלות - חובה!**
+    - צור בדיוק ${requiredQuestionCount} שאלות
+    - מספר כל שאלה מ-1 עד ${requiredQuestionCount}
+    - סה"כ הנקודות חייב להיות ${totalPoints}
+
+    2. **תוכן חדש לגמרי:**
     - אל תעתיק שום שאלה מהמבחן המקורי
     - צור תוכן מקורי ומגוון
-    - שמור על רמת קושי זהה
-    - שמור על אותו מבנה בדיוק
+    - שמור על רמת קושי זהה לכל שאלה
+    - שמור על אותו מבנה בדיוק (נושאים, סוגי שאלות)
 
-    2. **לכל שאלה:**
+    3. **לכל שאלה:**
     - טקסט השאלה המלא ${isEnglishExam ? '(באנגלית!)' : ''}
-    - אם צריך דיאגרמה - תאר אותה בפירוט
-    - אם יש סעיפים - צור את כולם
-    - תשובות נכונות
-    - הסבר מפורט
-    - רובריקת ניקוד
+    - אם יש סעיפים במקור - צור סעיפים גם בשאלה החדשה
+    - תשובה נכונה מפורטת
+    - הסבר מלא לתשובה
+    - ניקוד לפי המבנה המקורי
 
-    3. **שמירה על סטנדרטים:**
+    4. **שמירה על סטנדרטים:**
     - שפה ברורה ומדויקת
     ${isEnglishExam ? '- אנגלית תקנית ברמה גבוהה' : '- עברית תקנית'}
     - מושגים מקצועיים נכונים
-    - התאמה לתכנית הלימודים
+    - התאמה לתכנית הלימודים של משרד החינוך
 
-    4. **איכות:**
+    5. **איכות:**
     - שאלות מאתגרות אך הוגנות
-    - מגוון נושאים
+    - מגוון נושאים כמו במבחן המקורי
     - קשר למציאות (אם רלוונטי)
 
-    החזר JSON עם המבחן המלא${isEnglishExam ? ' כולל reading_text באנגלית' : ''}.
+    🚨 **תזכורת: המבחן חייב להכיל בדיוק ${requiredQuestionCount} שאלות!**
+
+    החזר JSON עם המבחן המלא${isEnglishExam ? ' כולל reading_text באנגלית (300-500 מילים)' : ''}.
     ${i > 0 ? `\n⚠️ זה מבחן ${i + 1} מתוך ${count} - ודא שהתוכן שונה לגמרי ממבחנים קודמים!` : ''}
     `;
 
@@ -341,12 +360,18 @@ Deno.serve(async (req) => {
           response_json_schema: examSchema
         });
         
-        // ולידציה - בדוק שיש לפחות שאלה אחת
+        // ולידציה - בדוק שיש מספיק שאלות
         if (!generatedExam || !generatedExam.questions || generatedExam.questions.length === 0) {
           throw new Error('AI החזיר מבחן ריק');
         }
         
-        console.log(`✅ AI generation complete (${generatedExam.questions.length} questions)`);
+        // בדיקה שמספר השאלות תואם
+        if (generatedExam.questions.length < requiredQuestionCount * 0.7) {
+          console.warn(`⚠️ AI created only ${generatedExam.questions.length} questions, expected ${requiredQuestionCount}. Retrying...`);
+          throw new Error(`מספר שאלות לא מספיק: ${generatedExam.questions.length} במקום ${requiredQuestionCount}`);
+        }
+        
+        console.log(`✅ AI generation complete (${generatedExam.questions.length}/${requiredQuestionCount} questions)`);
         break;
         
       } catch (aiError) {
