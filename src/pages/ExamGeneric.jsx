@@ -1071,16 +1071,26 @@ export default function ExamGenericPage() {
                 )}
 
                 <div className="flex-1 overflow-y-auto mb-4">
+                  {/* Always show question text first */}
+                  {question.question_text && (
+                    <p className="text-gray-800 text-base leading-relaxed mb-4 whitespace-pre-wrap" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
+                      {question.question_text}
+                    </p>
+                  )}
+                  
+                  {/* If no question_text, show a fallback */}
+                  {!question.question_text && (
+                    <p className="text-red-500 text-base mb-4">
+                      [טקסט השאלה חסר]
+                    </p>
+                  )}
+                  
                   {(() => {
                   const extracted = extractAmericanOptions(question.question_text);
                   if (extracted && extracted.hasOptions) {
                     return (
-                      <>
-                          <p className="text-gray-800 text-base leading-relaxed mb-4" dir="ltr">
-                            {extracted.mainQuestion}
-                          </p>
-                          <div className="space-y-2">
-                            {extracted.options.map((optionValue, optionIndex) =>
+                      <div className="space-y-2">
+                        {extracted.options.map((optionValue, optionIndex) =>
                           <button
                             key={optionIndex}
                             onClick={() => handleAnswerChange(question.question_number, optionValue)}
@@ -1090,19 +1100,12 @@ export default function ExamGenericPage() {
                             'bg-white border-blue-500 hover:border-blue-500'}`
                             }
                             dir="ltr">
-
                                 {optionValue}
                               </button>
                           )}
-                          </div>
-                        </>);
-
+                      </div>);
                   }
-                  return (
-                    <p className="text-gray-800 text-base leading-relaxed mb-4" dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'}>
-                        {question.question_text}
-                      </p>);
-
+                  return null;
                 })()}
 
                   {question.question_type === 'multiple_choice' && question.options && question.options.length > 0 && !extractAmericanOptions(question.question_text)?.hasOptions &&
