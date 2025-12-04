@@ -499,7 +499,18 @@ Deno.serve(async (req) => {
     - אותם סוגי שאלות (MC, Open, T/F)
     - אותה רמת אוצר מילים
 
-    ## 3. פתרונות מדויקים שלב-אחר-שלב
+    ## 3. טקסט שאלה מלא (קריטי!)
+    ⚠️ **כל שאלה חייבת לכלול question_text מלא ומפורט!**
+    - **question_text**: הטקסט המלא של השאלה - מה בדיוק התלמיד צריך לעשות
+    - אסור להשאיר question_text ריק או null!
+    - השאלה חייבת להיות ברורה ומובנת בפני עצמה
+    
+    דוגמאות טובות:
+    - מתמטיקה: "נתונה הפונקציה f(x) = 2x³ - 6x + 1. מצא את נקודות הקיצון של הפונקציה."
+    - אנגלית: "According to the text, what is the main reason people prefer online shopping?"
+    - היסטוריה: "הסבר שלושה גורמים שהובילו לפרוץ מלחמת העולם הראשונה."
+    
+    ## 4. פתרונות מדויקים שלב-אחר-שלב
     לכל שאלה חובה לספק:
     - **solution_steps**: מערך של צעדים מפורטים
     - **correct_answer**: התשובה הסופית המדויקת
@@ -517,10 +528,11 @@ Deno.serve(async (req) => {
 
     🚨 **בדיקה עצמית לפני הגשה:**
     1. ספרתי ${requiredQuestionCount} שאלות? ✓
-    2. כל שאלה באותה רמת קושי כמו המקור? ✓
-    3. פתרתי כל שאלה ווידאתי תשובה נכונה? ✓
-    4. הניקוד מסתכם ל-${totalPoints}? ✓
-    5. אין העתקה מהמקור? ✓
+    2. **לכל שאלה יש question_text מלא ולא ריק?** ✓ (קריטי!)
+    3. כל שאלה באותה רמת קושי כמו המקור? ✓
+    4. פתרתי כל שאלה ווידאתי תשובה נכונה? ✓
+    5. הניקוד מסתכם ל-${totalPoints}? ✓
+    6. אין העתקה מהמקור? ✓
 
     החזר JSON עם המבחן המלא${isEnglishExam ? ' כולל reading_text באנגלית (300-500 מילים)' : ''}.
     ${i > 0 ? `\n⚠️ זה מבחן ${i + 1} מתוך ${count} - ודא שהתוכן שונה לגמרי ממבחנים קודמים!` : ''}
@@ -608,6 +620,13 @@ Deno.serve(async (req) => {
         if (generatedExam.questions.length < requiredQuestionCount * 0.7) {
           console.warn(`⚠️ AI created only ${generatedExam.questions.length} questions, expected ${requiredQuestionCount}. Retrying...`);
           throw new Error(`מספר שאלות לא מספיק: ${generatedExam.questions.length} במקום ${requiredQuestionCount}`);
+        }
+        
+        // ולידציה קריטית: בדוק שלכל שאלה יש question_text
+        const questionsWithoutText = generatedExam.questions.filter(q => !q.question_text || q.question_text.trim() === '');
+        if (questionsWithoutText.length > 0) {
+          console.warn(`⚠️ ${questionsWithoutText.length} questions missing question_text! Retrying...`);
+          throw new Error(`${questionsWithoutText.length} שאלות ללא טקסט שאלה`);
         }
         
         console.log(`✅ AI generation complete (${generatedExam.questions.length}/${requiredQuestionCount} questions)`);
