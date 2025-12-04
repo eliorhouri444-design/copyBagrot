@@ -361,14 +361,25 @@ export default function ExamsPage() {
     // Helper function for loose module matching
     const matchesModule = (exam, targetModuleId) => {
       if (!exam.module_id) return false;
-      const id = String(exam.module_id).trim().toUpperCase();
+      const examModuleId = String(exam.module_id).trim().toUpperCase();
       const target = String(targetModuleId).trim().toUpperCase();
-      // Match exact, with "Module" prefix, "General", or simple letter matching
-      return id === target || 
-             id === `MODULE ${target}` || 
-             id === `SHALON ${target}` ||
-             id === 'GENERAL' ||
-             (target.length === 1 && id.endsWith(` ${target}`));
+
+      // Exact match
+      if (examModuleId === target) return true;
+
+      // Match with "Module" prefix
+      if (examModuleId === `MODULE ${target}`) return true;
+      if (examModuleId === `MODULE${target}`) return true;
+
+      // Match numeric modules (e.g., "804" matches "804")
+      if (examModuleId.replace(/^0+/, '') === target.replace(/^0+/, '')) return true;
+
+      // For English - single letter matching
+      if (target.length === 1 && examModuleId.length === 1) {
+        return examModuleId === target;
+      }
+
+      return false;
     };
 
     if (displaySubject === 'אנגלית') {
