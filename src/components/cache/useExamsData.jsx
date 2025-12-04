@@ -202,13 +202,24 @@ function calculateModuleStats(modules, examAttempts, exams) {
   // פונקציית עזר להתאמה גמישה של מודולים (זהה לזו ב-Exams.js)
   const matchesModule = (moduleId, targetModuleId) => {
     if (!moduleId) return false;
-    const id = moduleId.trim().toUpperCase();
-    const target = targetModuleId.toUpperCase();
-    // התאמה מדויקת, עם קידומת Module, או סיומת אות/מספר
-    return id === target || 
-           id === `MODULE ${target}` || 
-           id === `SHALON ${target}` ||
-           (target.length === 1 && id.endsWith(` ${target}`));
+    const id = String(moduleId).trim().toUpperCase();
+    const target = String(targetModuleId).trim().toUpperCase();
+    
+    // התאמה מדויקת
+    if (id === target) return true;
+    
+    // התאמה עם קידומת
+    if (id === `MODULE ${target}`) return true;
+    if (id === `MODULE${target}`) return true;
+    if (id === `SHALON ${target}`) return true;
+    
+    // התאמה נומרית (התעלמות מאפסים מובילים: 035804 == 804)
+    if (id.replace(/^0+/, '') === target.replace(/^0+/, '')) return true;
+    
+    // אנגלית - סיומת אות בודדת (למשל "MODULE E" תואם ל-"E")
+    if (target.length === 1 && (id.endsWith(` ${target}`) || id === target)) return true;
+    
+    return false;
   };
 
   return modules.map(module => {
