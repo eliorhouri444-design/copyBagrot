@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, BookOpen, FileCheck, User, TrendingUp } from "lucide-react";
+import { Home, BookOpen, FileCheck, User, TrendingUp, Settings } from "lucide-react";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
@@ -55,7 +55,9 @@ function LayoutContent({ children, currentPageName }) {
     { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }
   ];
 
-  const adminNavItems = [];
+  const adminNavItems = user?.role === 'admin' ? [
+    { name: "AdminBagrutManager", icon: Settings, path: createPageUrl("AdminBagrutManager"), label: "ניהול", color: "#EF4444" }
+  ] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];
 

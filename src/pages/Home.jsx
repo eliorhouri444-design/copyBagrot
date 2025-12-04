@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Target, BookOpen, PlayCircle, CheckCircle, User, Loader2 } from "lucide-react";
+import { Target, BookOpen, PlayCircle, CheckCircle, User, Loader2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CardSimple, CardTitle } from "@/components/ui/card-simple";
@@ -259,6 +259,33 @@ export default function HomePage() {
       </div>
 
       <div className="px-5 space-y-4">
+        {user?.role === 'admin' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl p-4 shadow-sm border border-purple-100"
+          >
+            <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                 <div className="bg-purple-100 p-2 rounded-full">
+                   <Settings className="w-5 h-5 text-purple-600" />
+                 </div>
+                 <div>
+                   <h3 className="font-bold text-gray-900 text-sm">ניהול מערכת</h3>
+                   <p className="text-xs text-gray-500">קיצורי דרך למנהל</p>
+                 </div>
+               </div>
+               <Button 
+                 size="sm" 
+                 onClick={() => navigate(createPageUrl('AdminBagrutManager'))}
+                 className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 rounded-lg"
+               >
+                 ניהול בגרויות
+               </Button>
+            </div>
+          </motion.div>
+        )}
+
         {/* מוכנות כללית - כרטיס מאוחד */}
         <OverallMasteryCard
           overallMastery={overallMastery}
