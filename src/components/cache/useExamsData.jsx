@@ -34,7 +34,8 @@ export function useExamsData(subject, units) {
       // קריאה מקבילית אחת לכל הנתונים
       const [
         moduleDefinitions,
-        genericExams,
+        genericExamsGlobal,
+        userGenericExams,
         moduleAExams,
         moduleBExams,
         moduleCExams,
@@ -49,6 +50,11 @@ export function useExamsData(subject, units) {
           { subject: subject, unit_level: parseInt(units) },
           "-created_date",
           100
+        ),
+        base44.entities.GenericExam.filter(
+          { subject: subject, unit_level: parseInt(units), created_by: user.email },
+          "-created_date",
+          50
         ),
         subject === 'אנגלית' ? base44.entities.ModuleAExam.filter(
           { subject: subject, unit_level: parseInt(units) },
@@ -71,6 +77,12 @@ export function useExamsData(subject, units) {
           100
         )
       ]);
+
+      // מיזוג מבחנים גנריים (גלובליים + של המשתמש)
+      const genericExamsMap = new Map();
+      genericExamsGlobal.forEach(e => genericExamsMap.set(e.id, e));
+      userGenericExams.forEach(e => genericExamsMap.set(e.id, e));
+      const genericExams = Array.from(genericExamsMap.values());
       
       // בניית מודולים עם defaults
       const modules = buildExamModules(moduleDefinitions, subject, units);
