@@ -213,7 +213,16 @@ function calculateModuleStats(modules, examAttempts, exams) {
     if (id === `MODULE${target}`) return true;
     if (id === `SHALON ${target}`) return true;
     
-    // התאמה נומרית (התעלמות מאפסים מובילים: 035804 == 804)
+    // התאמה נומרית אגרסיבית (חילוץ מספרים)
+    const idNum = id.replace(/\D/g, '');
+    const targetNum = target.replace(/\D/g, '');
+    if (idNum && targetNum) {
+      // התאמה מלאה או סיומת (035804 תואם ל-804)
+      if (parseInt(idNum) === parseInt(targetNum)) return true;
+      if (idNum.endsWith(targetNum) || targetNum.endsWith(idNum)) return true;
+    }
+    
+    // התאמה רגילה להסרת אפסים מובילים (למקרה שאין מספרים אחרים)
     if (id.replace(/^0+/, '') === target.replace(/^0+/, '')) return true;
     
     // אנגלית - סיומת אות בודדת (למשל "MODULE E" תואם ל-"E")

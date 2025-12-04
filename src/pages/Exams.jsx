@@ -372,7 +372,16 @@ export default function ExamsPage() {
     if (examModuleId === `MODULE${target}`) return true;
     if (examModuleId === `SHALON ${target}`) return true;
 
-    // Match numeric modules (e.g., "035804" matches "804")
+    // Match numeric modules (Aggressive)
+    const examNum = examModuleId.replace(/\D/g, '');
+    const targetNum = target.replace(/\D/g, '');
+    if (examNum && targetNum) {
+      // Exact match or suffix match (e.g. 035804 matches 804)
+      if (parseInt(examNum) === parseInt(targetNum)) return true;
+      if (examNum.endsWith(targetNum) || targetNum.endsWith(examNum)) return true;
+    }
+
+    // Fallback numeric match (remove leading zeros)
     if (examModuleId.replace(/^0+/, '') === target.replace(/^0+/, '')) return true;
 
     // For English - single letter matching or suffix
