@@ -358,28 +358,40 @@ export default function ExamsPage() {
   const getModuleExams = (moduleId) => {
     let exams = [];
 
+    // Helper function for loose module matching
+    const matchesModule = (exam, targetModuleId) => {
+      if (!exam.module_id) return false;
+      const id = exam.module_id.trim().toUpperCase();
+      const target = targetModuleId.toUpperCase();
+      // Match exact, with "Module" prefix, or simple letter matching
+      return id === target || 
+             id === `MODULE ${target}` || 
+             id === `SHALON ${target}` ||
+             (target.length === 1 && id.endsWith(` ${target}`));
+    };
+
     if (displaySubject === 'אנגלית') {
       if (moduleId === "A") {
         const moduleAExams = allModuleAExams.filter((e) =>
-        e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
+          e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
         ).map((e) => ({ ...e, exam_type: "module_a" }));
 
         const genericExamsA = allGenericExams.filter((e) =>
-        e.subject === displaySubject &&
-        parseInt(e.unit_level) === parseInt(displayUnits) &&
-        e.module_id === moduleId
+          e.subject === displaySubject &&
+          parseInt(e.unit_level) === parseInt(displayUnits) &&
+          matchesModule(e, moduleId)
         ).map((e) => ({ ...e, exam_type: "generic" }));
 
         exams = [...moduleAExams, ...genericExamsA];
       } else if (moduleId === "B") {
         const moduleBExams = allModuleBExams.filter((e) =>
-        e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
+          e.subject === displaySubject && parseInt(e.unit_level) === parseInt(displayUnits)
         ).map((e) => ({ ...e, exam_type: "module_b" }));
 
         const genericExamsB = allGenericExams.filter((e) =>
-        e.subject === displaySubject &&
-        parseInt(e.unit_level) === parseInt(displayUnits) &&
-        e.module_id === moduleId
+          e.subject === displaySubject &&
+          parseInt(e.unit_level) === parseInt(displayUnits) &&
+          matchesModule(e, moduleId)
         ).map((e) => ({ ...e, exam_type: "generic" }));
 
         exams = [...moduleBExams, ...genericExamsB];
@@ -390,25 +402,27 @@ export default function ExamsPage() {
         }).map((e) => ({ ...e, exam_type: "module_c" }));
 
         const genericExamsC = allGenericExams.filter((e) =>
-        e.subject === displaySubject &&
-        parseInt(e.unit_level) === parseInt(displayUnits) &&
-        e.module_id === moduleId
+          e.subject === displaySubject &&
+          parseInt(e.unit_level) === parseInt(displayUnits) &&
+          matchesModule(e, moduleId)
         ).map((e) => ({ ...e, exam_type: "generic" }));
 
         exams = [...moduleCExams, ...genericExamsC];
       } else {
         // עבור מודולים אחרים באנגלית (G, D, E, F וכו')
         exams = allGenericExams.filter((e) =>
-        e.subject === displaySubject &&
-        parseInt(e.unit_level) === parseInt(displayUnits) &&
-        e.module_id === moduleId
+          e.subject === displaySubject &&
+          parseInt(e.unit_level) === parseInt(displayUnits) &&
+          matchesModule(e, moduleId)
         ).map((e) => ({ ...e, exam_type: "generic" }));
       }
     } else {
+      // For non-English subjects, allow loose matching on numbers (e.g. 0581 vs 581)
       exams = allGenericExams.filter((e) =>
-      e.subject === displaySubject &&
-      parseInt(e.unit_level) === parseInt(displayUnits) &&
-      e.module_id === moduleId
+        e.subject === displaySubject &&
+        parseInt(e.unit_level) === parseInt(displayUnits) &&
+        (e.module_id === moduleId || 
+         (e.module_id && e.module_id.replace(/^0+/, '') === moduleId.replace(/^0+/, '')))
       ).map((e) => ({ ...e, exam_type: "generic" }));
     }
 

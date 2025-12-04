@@ -193,6 +193,10 @@ Deno.serve(async (req) => {
              const exams = await base44.entities.BagrutExam.filter({ id: original_exam_id });
              if (exams && exams.length > 0) {
                  moduleId = exams[0].module_symbol || "";
+                 // Normalize English modules (remove "Module " prefix, uppercase)
+                 if (subject === 'אנגלית') {
+                     moduleId = moduleId.replace(/module\s*/i, '').trim().toUpperCase();
+                 }
              }
         }
 
