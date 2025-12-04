@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ModuleCarousel from "@/components/exams/ModuleCarousel";
+import BagrutCarousel from "@/components/exams/BagrutCarousel";
 import { differenceInDays } from "date-fns";
 import { calculateCurrentProgress, calculateRecommendedGoals } from "@/components/tracking/GoalsTracker";
 import GoalsDisplay from "@/components/tracking/GoalsDisplay";
@@ -697,6 +698,37 @@ export default function ExamsPage() {
 
       <div className="bg-indigo-50 pb-6 px-6 space-y-6">
 
+        {/* Bagrut Exams Carousel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                מאגר בגרויות ופתרונות
+              </h2>
+              <p className="text-gray-500 text-xs mt-0.5">
+                צפייה בטפסי בחינה מקוריים ופתרונות מלאים
+              </p>
+            </div>
+            {user?.role === 'admin' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate(createPageUrl('AdminBagrutManager'))}
+                className="gap-2 h-8 text-xs"
+              >
+                <Upload className="w-3 h-3" />
+                העלאת בחינה
+              </Button>
+            )}
+          </div>
+          <BagrutCarousel subject={displaySubject} units={displayUnits} />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
