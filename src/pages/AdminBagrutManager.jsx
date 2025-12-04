@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileText, Check, Loader2, FileCheck } from "lucide-react";
+import { Upload, FileText, Check, Loader2, FileCheck, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminBagrutManager() {
@@ -22,6 +22,32 @@ export default function AdminBagrutManager() {
 
   const [examFile, setExamFile] = useState(null);
   const [solutionFile, setSolutionFile] = useState(null);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
+  const handleGenerateAI = async (bagrutExam) => {
+    if (!confirm("האם אתה רוצה לייצר מבחן חדש מבוסס על הבגרות שהועלתה? הפעולה עשויה לקחת דקה.")) return;
+    
+    setIsGeneratingAI(true);
+    try {
+      const response = await base44.functions.invoke('generateExamFromPDF', {
+        pdf_url: bagrutExam.exam_file_url,
+        subject: formData.subject_id,
+        unit: formData.unit_level,
+        original_exam_id: bagrutExam.id
+      });
+      
+      if (response.data?.success) {
+        alert("המבחן נוצר בהצלחה ונשמר במערכת!");
+      } else {
+         throw new Error(response.data?.error || "Unknown error");
+      }
+    } catch (error) {
+      console.error("AI Generation error:", error);
+      alert("שגיאה ביצירת המבחן: " + error.message);
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   const handleFileUpload = async (file) => {
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -49,7 +75,7 @@ export default function AdminBagrutManager() {
       // 3. Create Entity Record
       const title = `${formData.season === 'winter' ? 'חורף' : 'קיץ'} ${formData.year} מועד ${formData.term === 'a' ? "א'" : "ב'"}`;
 
-      await base44.entities.BagrutExam.create({
+      const newExam = await base44.entities.BagrutExam.create({
         subject_id: formData.subject_id,
         unit_level: parseInt(formData.unit_level),
         year: parseInt(formData.year),
@@ -61,7 +87,10 @@ export default function AdminBagrutManager() {
         title: title
       });
 
-      alert("הבגרות הועלתה בהצלחה!");
+      if (window.confirm("הבגרות הועלתה בהצלחה! האם תרצה לייצר אוטומטית מבחן תרגול חדש (AI) מבוסס על בגרות זו?")) {
+          await handleGenerateAI(newExam);
+      } 
+      
       // Reset files
       setExamFile(null);
       setSolutionFile(null);
@@ -88,7 +117,7 @@ export default function AdminBagrutManager() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>מקצוע</Label>
                   <Select 
@@ -118,15 +147,6 @@ export default function AdminBagrutManager() {
                       <SelectItem value="5">5 יחידות</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>סמל שאלון</Label>
-                  <Input 
-                    placeholder="לדוגמה: 581, 806"
-                    value={formData.module_symbol} 
-                    onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
-                  />
                 </div>
               </div>
 
@@ -167,7 +187,14 @@ export default function AdminBagrutManager() {
                 </div>
               </div>
 
-
+              <div className="space-y-2">
+                <Label>סמל שאלון (אופציונלי)</Label>
+                <Input 
+                  placeholder="לדוגמה: 581, 806"
+                  value={formData.module_symbol} 
+                  onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
+                />
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                 {/* Exam File Upload */}
