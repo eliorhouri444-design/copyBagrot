@@ -88,7 +88,7 @@ export default function AdminBagrutManager() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>מקצוע</Label>
                   <Select 
@@ -118,6 +118,15 @@ export default function AdminBagrutManager() {
                       <SelectItem value="5">5 יחידות</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>סמל שאלון</Label>
+                  <Input 
+                    placeholder="לדוגמה: 581, 806"
+                    value={formData.module_symbol} 
+                    onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
+                  />
                 </div>
               </div>
 
@@ -158,14 +167,7 @@ export default function AdminBagrutManager() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>סמל שאלון (אופציונלי)</Label>
-                <Input 
-                  placeholder="לדוגמה: 581, 806"
-                  value={formData.module_symbol} 
-                  onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
-                />
-              </div>
+
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                 {/* Exam File Upload */}
