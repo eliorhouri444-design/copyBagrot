@@ -212,16 +212,38 @@ export default function AdminAIExams() {
                           >
                             <CheckCircle className="w-4 h-4 ml-2" />
                             פרסם
-                          </Button>
-                          <Button 
+                            </Button>
+                            <Button 
+                            size="sm"
+                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                            title="צור מחדש עם הלוגיקה החדשה (Moed B)"
+                            onClick={async () => {
+                              if (!confirm("האם ליצור מחדש את המבחן הזה עם הלוגיקה המשופרת (Moed B)?")) return;
+                              try {
+                                alert("מתחיל יצירה מחדש... זה ייקח כדקה.");
+                                await base44.functions.invoke('generateExamFromPDF', {
+                                  original_exam_id: exam.original_exam_id,
+                                  subject: exam.subject,
+                                  unit: exam.unit
+                                });
+                                queryClient.invalidateQueries(["generated-exams"]);
+                                alert("המבחן נוצר מחדש בהצלחה! 🚀");
+                              } catch (e) {
+                                alert("שגיאה: " + e.message);
+                              }
+                            }}
+                            >
+                            <Sparkles className="w-4 h-4" />
+                            </Button>
+                            <Button 
                             size="sm" 
                             variant="destructive"
                             onClick={() => {
                               if(confirm("האם למחוק את המבחן?")) deleteMutation.mutate(exam.id);
                             }}
-                          >
+                            >
                             <Trash2 className="w-4 h-4" />
-                          </Button>
+                            </Button>
                         </div>
                       </TableCell>
                     </TableRow>

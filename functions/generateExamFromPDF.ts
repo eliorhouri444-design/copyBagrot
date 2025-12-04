@@ -79,7 +79,19 @@ Deno.serve(async (req) => {
         let body;
         try { body = await req.json(); } catch { return Response.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
-        const { pdf_url, subject, unit, original_exam_id } = body;
+        let { pdf_url, subject, unit, original_exam_id } = body;
+
+        // If PDF URL is missing but we have ID, fetch it from DB
+        if (!pdf_url && original_exam_id) {
+            console.log(`Fetching PDF URL for Exam ID: ${original_exam_id}`);
+            const exams = await base44.entities.BagrutExam.filter({ id: original_exam_id });
+            if (exams && exams.length > 0) {
+                pdf_url = exams[0].exam_file_url;
+                // Also fill subject/unit if missing
+                if (!subject) subject = exams[0].subject_id;
+                if (!unit) unit = exams[0].unit_level;
+            }
+        }
 
         if (!pdf_url) return Response.json({ error: 'Missing PDF URL' }, { status: 400 });
 
