@@ -95,172 +95,338 @@ Deno.serve(async (req) => {
     for (let i = 0; i < count; i++) {
       console.log(`\n🔄 Creating exam ${i + 1}/${count}...`);
       
-    // קביעת דרישות מיוחדות לפי רמה ושאלון
+    // קביעת דרישות מיוחדות לפי מקצוע, רמה ושאלון
     let specificRequirements = '';
+    
+    // ========== אנגלית ==========
     if (isEnglishExam) {
-      if (examStructure.unit_level === 3) {
-        // Check if this is Module B
-        if (examStructure.module_id === 'B') {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 3 יחידות - שאלון B:**
+      if (examStructure.module_id === 'A') {
+        specificRequirements = `
+    🎯 **שאלון A - אנגלית ${examStructure.unit_level} יחידות:**
     
-    ⚠️ **סה"כ ניקוד: 60-70 נקודות בלבד! חלק את הנקודות בהתאם.**
+    **Reading Comprehension:**
+    - שאלות הבנת הנקרא קצרות
+    - השלמת משפטים
+    - TRUE/FALSE
     
-    **SECTION A - Reading Comprehension (25-30 נקודות):**
-    - טקסט קצר באנגלית (150-200 מילים)
-    - 4-5 שאלות על הטקסט
-    - **חובה: לפחות שאלה אחת Multiple Choice עם 4 אפשרויות (A, B, C, D)**
-    - שאלות נוספות: True/False, Wh-questions, Complete the sentence
+    **Writing:**
+    - כתיבה קצרה: **"Write 30-40 words"**
     
-    **SECTION B - Vocabulary (15-20 נקודות):**
-    - 5-6 שאלות אוצר מילים בסיסי
-    - השלמת משפטים עם מילים מתוך רשימה
-    - בחירת מילה נכונה
+    חובה ליצור reading_text באנגלית (100-150 מילים).`;
+      } else if (examStructure.module_id === 'B') {
+        specificRequirements = `
+    🎯 **שאלון B - אנגלית ${examStructure.unit_level} יחידות:**
     
-    **SECTION C - Grammar (10-15 נקודות):**
-    - Present Simple, Present Progressive, Past Simple, Future
-    - 4-5 שאלות מילוי / תיקון / בחירה
+    ⚠️ **סה"כ ניקוד: 60-70 נקודות בלבד!**
     
-    **SECTION D - Writing (10-15 נקודות):**
-    - משימת כתיבה אחת
+    **Reading Comprehension:**
+    - טקסט קריאה אחד (150-200 מילים)
+    - **חובה: לפחות שאלה אחת MULTIPLE CHOICE עם 4 אפשרויות (A, B, C, D)**
+    - השלמת משפטים
+    - TRUE/FALSE
+    
+    **Writing:**
     - **חובה לכתוב בהוראות: "Write 60-80 words"**
-    - נושא פשוט: מכתב לחבר, תיאור יום, תחביב וכו'
     
-    📝 **דוגמה לשאלת Multiple Choice:**
-    "According to the text, what does John like to do on weekends?
-    A) Watch TV
-    B) Play soccer
-    C) Read books
-    D) Visit friends"
-    
-    📝 **דוגמה להוראת כתיבה:**
-    "Write a short paragraph about your favorite hobby. Write 60-80 words."
+    📝 דוגמה ל-MC:
+    "What is the main idea of the text?
+    A) Animals in the zoo
+    B) A trip to the beach
+    C) School activities
+    D) Family traditions"
     
     חובה ליצור reading_text באנגלית (150-200 מילים).
-    חובה שסה"כ הניקוד יהיה בין 60-70 נקודות!`;
-        } else {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 3 יחידות:**
+    סה"כ ניקוד: 60-70 נקודות!`;
+      } else if (examStructure.module_id === 'C') {
+        specificRequirements = `
+    🎯 **שאלון C - אנגלית ${examStructure.unit_level} יחידות:**
     
-    **Vocabulary (5-10 שאלות):**
-    - מילים בסיסיות מרשימת 3 יח"ל
-    - השלמת משפטים, בחירת מילה נכונה
+    **Reading Comprehension:**
+    - טקסטים ארוכים (250-400 מילים)
+    - שאלות אמריקאיות (Multiple Choice)
+    - שאלות פתוחות
+    - שאלות עיון בטקסט
     
-    **Basic Grammar:**
-    - Present Simple, Present Progressive, Past Simple, Future
-    - שאלות מילוי / תיקון משפטים
+    **Writing:**
+    - **חובה לכתוב בהוראות: "Write 100-120 words"**
     
-    **Reading Comprehension (טקסט קצר 150-200 מילים באנגלית):**
-    - 4-6 שאלות: True/False, Wh-questions, Multiple Choice
+    חובה ליצור reading_text באנגלית (250-400 מילים).`;
+      } else if (examStructure.module_id === 'D') {
+        specificRequirements = `
+    🎯 **שאלון D - אנגלית ${examStructure.unit_level} יחידות:**
     
-    **Sentence Completion:**
-    - 5 משפטים להשלמה
+    **Reading Comprehension:**
+    - 2 טקסטים (300-500 מילים כ"א)
+    - שאלות הבנה עמוקה
+    - שאלות עיון + פרשנות
+    - Inference, Compare & Contrast
     
-    חובה ליצור טקסט קריאה קצר באנגלית (reading_text) של 150-200 מילים.`;
-        }
-      } else if (examStructure.unit_level === 4) {
-        if (examStructure.module_id === 'C') {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 4 יחידות - שאלון C:**
+    **Writing:**
+    - כתיבה מורחבת: **"Write 120-150 words"**
     
-    **Vocabulary (6-10 שאלות):**
-    - מילים ברמה בינונית
-    - השלמת משפט, Word Forms (שינוי מילה)
+    חובה ליצור reading_text באנגלית (שני טקסטים או טקסט ארוך 500-700 מילים).`;
+      } else if (examStructure.module_id === 'E') {
+        specificRequirements = `
+    🎯 **שאלון E - אנגלית ${examStructure.unit_level} יחידות:**
     
-    **Grammar (חובה!):**
-    - Passive Voice
-    - Conditionals (Types 0-2)
-    - Relative Clauses
-    - Modals
-    - Reported Speech
-    - Quantifiers
-    - Gerunds & Infinitives
-    - Present Perfect + Continuous
+    **Vocabulary & Grammar:**
+    - אוצר מילים מתקדם
+    - מבני דקדוק מורכבים
+    - שאלות תחביר
+    - שימוש נכון במילים (Word Forms, Collocations)
     
-    צורה: בחירה, השלמה, תיקון, שכתוב משפט
+    **Language Tasks:**
+    - Sentence completion
+    - Error correction
+    - Word transformation
+    - Rewriting sentences
     
-    **Reading Comprehension (טקסט 250-350 מילים באנגלית):**
-    - Vocabulary in context
-    - True/False + Justify
-    - Wh-Questions
-    - Inference
-    - Main Idea
-    - Layout/Structure
+    אין צורך ב-reading_text - מתמקד בשפה ודקדוק.`;
+      } else if (examStructure.module_id === 'F') {
+        specificRequirements = `
+    🎯 **שאלון F - ספרות אנגלית ${examStructure.unit_level} יחידות:**
     
-    חובה ליצור טקסט קריאה באנגלית (reading_text) של 250-350 מילים.`;
-        } else if (examStructure.module_id === 'E') {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 4 יחידות - שאלון E:**
+    **Literature Questions:**
+    - ניתוח דמויות
+    - מוטיבים ותמות
+    - סמלים ודימויים
+    - שאלות HOTS (Compare, Infer, Analyze)
     
-    **Writing Task (80-120 מילים):**
-    - סוגים: Opinion Essay, Formal Letter, Informal Letter, Description, Advantages/Disadvantages
-    - קריטריונים: תוכן, ארגון, שפה
+    **Writing:**
+    - שאלה פתוחה: **"Write 80-120 words"**
     
-    **Reading Comprehension (טקסט ארוך 350-450 מילים באנגלית):**
-    - Inference
-    - Comparing information
-    - Cause & Effect
-    - Summarizing
-    - True/False + Justify
-    - Vocabulary in context מורכב
-    - Choosing a title
+    אין להעתיק ציטוטים - לכתוב תקציר/ביאור במקום.`;
+      } else if (examStructure.module_id === 'G') {
+        specificRequirements = `
+    🎯 **שאלון G - אנגלית 5 יחידות:**
     
-    חובה ליצור טקסט קריאה ארוך באנגלית (reading_text) של 350-450 מילים.`;
-        }
-      } else if (examStructure.unit_level === 5) {
-        if (examStructure.module_id === 'G') {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 5 יחידות - שאלון G:**
+    **Advanced Reading:**
+    - טקסט מתקדם (450-700 מילים)
+    - Inference מתקדם
+    - Writer's purpose & tone
+    - Connecting ideas
     
-    **Reading Comprehension (טקסט 450-700 מילים באנגלית):**
-    - פרק או שני פרקים
-    - שאלות ברמה גבוהה:
-      * Inference מתקדם
-      * Connecting ideas
-      * Purpose of paragraph
-      * Vocabulary in context advanced
-      * Identifying tone
-      * Writer's opinion
-      * Cause/Effect steps
+    **Restatement:**
+    - שכתוב משפטים עם מילה נתונה
     
-    **Restatement (4-6 משפטים):**
-    - שכתוב משפטים תוך שימוש במילה נתונה
-    - שמירה על משמעות זהה
+    **Integrated Tasks:**
+    - Matching headings
+    - Completing charts
     
-    **Reading Task נוסף / Integrated Task:**
-    - פרק נוסף + שאלות
-    - סיכום, Matching headings, Completing chart/table
-    
-    חובה ליצור טקסט קריאה מתקדם באנגלית (reading_text) של 450-700 מילים.`;
-        } else if (examStructure.module_id === 'F') {
-          specificRequirements = `
-    🎯 **דרישות מיוחדות לאנגלית 5 יחידות - שאלון F (ספרות):**
-    
-    בחר יצירה ספרותית (סיפור/שיר/מחזה) ויצור שאלות עליה.
-    
-    **5 שאלות הבנה בסיסית:**
-    - פרטי עלילה
-    - תיאור דמות
-    - מוטיב מרכזי
-    - סיבה ותוצאה
-    - הקונפליקט
-    
-    **2-3 שאלות HOTS:**
-    - Compare & contrast
-    - Inferring motives
-    - Explaining cause and effect
-    - Problem-solution
-    - Identifying patterns
-    - Uncovering motives
-    
-    **שאלה פתוחה ארוכה (80-120 מילים):**
-    - How does the story show responsibility?
-    - What choice made the biggest impact on the plot?
-    - How does one event change the character?
-    
-    אין צורך ב-reading_text נפרד - השאלות מתייחסות ליצירה הספרותית.`;
-        }
+    חובה ליצור reading_text באנגלית (450-700 מילים).`;
       }
+    }
+    
+    // ========== מתמטיקה ==========
+    else if (examStructure.subject === 'מתמטיקה') {
+      if (examStructure.unit_level === 3) {
+        specificRequirements = `
+    🎯 **מתמטיקה 3 יחידות:**
+    
+    **נושאים:**
+    - אלגברה בסיסית (משוואות, אי-שוויונות)
+    - פונקציות (לינארית, ריבועית)
+    - גיאומטריה בסיסית (משולשים, מרובעים, מעגל)
+    - סטטיסטיקה (ממוצע, חציון, שכיח, גרפים)
+    
+    **חובה:**
+    - פתרון מלא שלב-אחר-שלב
+    - בדיקה כפולה (double verification) - פתור ואז בדוק
+    - תשובות "נקיות" (מספרים שלמים או שברים פשוטים)`;
+      } else if (examStructure.unit_level === 4) {
+        specificRequirements = `
+    🎯 **מתמטיקה 4 יחידות:**
+    
+    **נושאים:**
+    - פונקציות ריבועיות ואקספוננציאליות
+    - גיאומטריה אנליטית (ישר, מעגל, פרבולה)
+    - טריגונומטריה (סינוס, קוסינוס, טנגנס)
+    - הסתברות (עץ הסתברות, התפלגות)
+    
+    **חובה:**
+    - פתרון מלא שלב-אחר-שלב
+    - בדיקה כפולה (double verification)
+    - תשובות "נקיות"`;
+      } else if (examStructure.unit_level === 5) {
+        specificRequirements = `
+    🎯 **מתמטיקה 5 יחידות:**
+    
+    **נושאים:**
+    - חדו"א: נגזרות, חקירת פונקציות, אינטגרלים
+    - קומבינטוריקה והסתברות מתקדמת
+    - גיאומטריה אנליטית מתקדמת
+    - משוואות מורכבות (טריגונומטריות, לוגריתמיות)
+    
+    **חובה:**
+    - פתרון מלא שלב-אחר-שלב
+    - בדיקה כפולה (double verification)
+    - הוכחות מלאות כשנדרש
+    - תשובות מדויקות`;
+      }
+    }
+    
+    // ========== לשון ==========
+    else if (examStructure.subject === 'לשון' || examStructure.subject === 'עברית') {
+      specificRequirements = `
+    🎯 **לשון:**
+    
+    **הבנת הנקרא:**
+    - טקסט עיוני/פובליציסטי
+    - שאלות הבנה ופרשנות
+    
+    **תחביר:**
+    - זמנים (עבר, הווה, עתיד)
+    - מבנה משפט (נושא, נשוא, מושא)
+    - פסוקיות (זמן, סיבה, תנאי)
+    - משפטים מורכבים
+    
+    **תחליפים:**
+    - הבנת מילים מהקשר
+    - מילים נרדפות
+    
+    **אוצר מילים:**
+    - מילים ברמת הבגרות
+    - שורשים ומשקלים
+    
+    חובה ליצור טקסט קריאה (reading_text) של 300-400 מילים.`;
+    }
+    
+    // ========== היסטוריה ==========
+    else if (examStructure.subject === 'היסטוריה') {
+      specificRequirements = `
+    🎯 **היסטוריה:**
+    
+    **סוגי שאלות:**
+    - שאלות ידע עובדתיות (מי, מה, מתי, איפה)
+    - שאלות עיון בטקסט היסטורי (מקור ראשוני/משני)
+    - שאלות סיבתיות (מה גרם ל...)
+    - שאלות תהליכים (תאר את ההתפתחות...)
+    
+    **חובה:**
+    - להשתמש בעובדות היסטוריות אמיתיות ומדויקות
+    - אין להעתיק ממקורות - לנסח מחדש
+    - לציין תקופות ותאריכים נכונים
+    
+    ניתן ליצור טקסט מקור (reading_text) לשאלות עיון.`;
+    }
+    
+    // ========== אזרחות ==========
+    else if (examStructure.subject === 'אזרחות') {
+      specificRequirements = `
+    🎯 **אזרחות:**
+    
+    **מושגים אזרחיים:**
+    - דמוקרטיה וסוגיה
+    - חוקה וחוקי יסוד
+    - שלוש רשויות השלטון
+    - זכויות אדם ואזרח
+    - הכרזת העצמאות
+    
+    **סוגי שאלות:**
+    - הגדרת מושגים
+    - ניתוח מצב/אירוע
+    - שאלות על ערכים ועקרונות
+    - השוואה בין גישות
+    
+    **חובה:**
+    - להשתמש רק בעובדות אמיתיות מחומר הלימוד
+    - אין להמציא חוקים או פסיקות
+    - דיוק במושגים`;
+    }
+    
+    // ========== תנ"ך ==========
+    else if (examStructure.subject === 'תנ"ך') {
+      specificRequirements = `
+    🎯 **תנ"ך:**
+    
+    **סוגי שאלות:**
+    - עיון בטקסט (ללא העתקה - לתאר/לסכם)
+    - שאלות פרשנות
+    - הבנת פרקים ועלילה
+    - ניתוח דמויות
+    - תמות ומסרים
+    
+    **חובה:**
+    - אסור להעתיק פסוקים מהתנ"ך
+    - לכתוב ביאור/תקציר במקום ציטוט
+    - לציין פרק ופסוקים לעיון
+    
+    אין צורך ב-reading_text - להפנות לפרקים מהסילבוס.`;
+    }
+    
+    // ========== ספרות ==========
+    else if (examStructure.subject === 'ספרות') {
+      specificRequirements = `
+    🎯 **ספרות:**
+    
+    **סוגי שאלות:**
+    - ניתוח טקסט ספרותי
+    - עיון ביצירות מהסילבוס
+    - שאלות הבנה + פרשנות
+    - ניתוח דמויות ומוטיבים
+    - אמצעים אמנותיים
+    
+    **חובה:**
+    - אין להעתיק ציטוטים מיצירות
+    - לכתוב תקציר/ביאור במקום ציטוט
+    - להתייחס ליצירות מוכרות מהסילבוס
+    
+    אין צורך ב-reading_text - להתייחס ליצירות מהסילבוס.`;
+    }
+    
+    // ========== פיזיקה ==========
+    else if (examStructure.subject === 'פיזיקה') {
+      specificRequirements = `
+    🎯 **פיזיקה ${examStructure.unit_level} יחידות:**
+    
+    **נושאים עיקריים:**
+    - מכניקה (קינמטיקה, דינמיקה, אנרגיה)
+    - חשמל ומגנטיות
+    - גלים ואופטיקה
+    - תרמודינמיקה
+    
+    **חובה:**
+    - פתרון מלא עם נוסחאות
+    - הצבת נתונים ויחידות
+    - בדיקה כפולה של התשובה
+    - תיאור מילולי של הבעיה (אם אין איור)`;
+    }
+    
+    // ========== כימיה ==========
+    else if (examStructure.subject === 'כימיה') {
+      specificRequirements = `
+    🎯 **כימיה ${examStructure.unit_level} יחידות:**
+    
+    **נושאים עיקריים:**
+    - מבנה האטום והקשר הכימי
+    - סטויכיומטריה
+    - תמיסות וריכוזים
+    - חומצות ובסיסים
+    - אלקטרוכימיה
+    - כימיה אורגנית
+    
+    **חובה:**
+    - איזון משוואות
+    - חישובים מדויקים
+    - יחידות נכונות`;
+    }
+    
+    // ========== ביולוגיה ==========
+    else if (examStructure.subject === 'ביולוגיה') {
+      specificRequirements = `
+    🎯 **ביולוגיה ${examStructure.unit_level} יחידות:**
+    
+    **נושאים עיקריים:**
+    - התא ומרכיביו
+    - גנטיקה ותורשה
+    - מערכות בגוף האדם
+    - אקולוגיה
+    - אבולוציה
+    
+    **חובה:**
+    - מושגים מדויקים
+    - תהליכים שלב-אחר-שלב
+    - דיאגרמות מתוארות במילים`;
     }
 
     // חישוב מספר השאלות הנדרש מהמבנה
