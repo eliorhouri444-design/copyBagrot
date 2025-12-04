@@ -47,7 +47,7 @@ export function useExamsData(subject, units) {
         ),
         base44.entities.GenericExam.filter(
           { subject: subject, unit_level: parseInt(units) },
-          null,
+          "-created_date",
           100
         ),
         subject === 'אנגלית' ? base44.entities.ModuleAExam.filter(

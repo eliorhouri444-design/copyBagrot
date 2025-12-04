@@ -433,8 +433,7 @@ export default function ExamsPage() {
       exams = allGenericExams.filter((e) =>
         e.subject === displaySubject &&
         parseInt(e.unit_level) === parseInt(displayUnits) &&
-        (e.module_id === moduleId || 
-         (e.module_id && e.module_id.replace(/^0+/, '') === moduleId.replace(/^0+/, '')))
+        matchesModule(e, moduleId)
       ).map((e) => ({ ...e, exam_type: "generic" }));
     }
 
