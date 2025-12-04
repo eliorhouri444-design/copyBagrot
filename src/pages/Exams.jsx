@@ -361,12 +361,13 @@ export default function ExamsPage() {
     // Helper function for loose module matching
     const matchesModule = (exam, targetModuleId) => {
       if (!exam.module_id) return false;
-      const id = exam.module_id.trim().toUpperCase();
-      const target = targetModuleId.toUpperCase();
-      // Match exact, with "Module" prefix, or simple letter matching
+      const id = String(exam.module_id).trim().toUpperCase();
+      const target = String(targetModuleId).trim().toUpperCase();
+      // Match exact, with "Module" prefix, "General", or simple letter matching
       return id === target || 
              id === `MODULE ${target}` || 
              id === `SHALON ${target}` ||
+             id === 'GENERAL' ||
              (target.length === 1 && id.endsWith(` ${target}`));
     };
 
