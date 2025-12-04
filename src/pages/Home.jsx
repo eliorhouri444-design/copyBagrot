@@ -275,13 +275,22 @@ export default function HomePage() {
                    <p className="text-xs text-gray-500">קיצורי דרך למנהל</p>
                  </div>
                </div>
-               <Button 
-                 size="sm" 
-                 onClick={() => navigate(createPageUrl('AdminBagrutManager'))}
-                 className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 rounded-lg"
-               >
-                 ניהול בגרויות
-               </Button>
+               <div className="flex gap-2">
+                 <Button 
+                   size="sm" 
+                   onClick={() => navigate(createPageUrl('AdminAIExams'))}
+                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 rounded-lg"
+                 >
+                   מבחני AI
+                 </Button>
+                 <Button 
+                   size="sm" 
+                   onClick={() => navigate(createPageUrl('AdminBagrutManager'))}
+                   className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 rounded-lg"
+                 >
+                   ניהול בגרויות
+                 </Button>
+               </div>
             </div>
           </motion.div>
         )}

@@ -1,0 +1,292 @@
+import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, CheckCircle, FileText, ArrowRight, Trash2, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+export default function AdminAIExams() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [publishData, setPublishData] = useState({
+    title: "",
+    module_id: "",
+    subject: "",
+    unit_level: "",
+    description: "",
+    duration_minutes: 90,
+  });
+
+  // Fetch generated exams
+  const { data: generatedExams, isLoading } = useQuery({
+    queryKey: ["generated-exams"],
+    queryFn: async () => {
+      const data = await base44.entities.GeneratedExam.list();
+      return data.sort((a, b) => new Date(b.created_at || b.created_date) - new Date(a.created_at || a.created_date));
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.GeneratedExam.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["generated-exams"]);
+    },
+  });
+
+  // Publish mutation (Create GenericExam)
+  const publishMutation = useMutation({
+    mutationFn: async (data) => {
+      // Convert GeneratedExam JSON to GenericExam format
+      const examJson = selectedExam.exam_json;
+      
+      const questions = (examJson.questions || []).map((q, idx) => ({
+        question_number: idx + 1,
+        question_text: q.question_text,
+        question_type: q.sub_questions?.length > 0 ? 'Open-ended' : 'Multiple Choice', // Basic heuristic
+        options: [], // AI JSON might need to be adapted for options if multiple choice
+        correct_answer: q.final_answer || q.solution_steps,
+        explanation: q.solution_steps,
+        points: Math.floor(100 / (examJson.questions.length || 1)),
+        topic: q.topic || 'General',
+      }));
+
+      const genericExamData = {
+        title: data.title,
+        subject: data.subject,
+        unit_level: parseInt(data.unit_level),
+        module_id: data.module_id,
+        description: data.description,
+        duration_minutes: parseInt(data.duration_minutes),
+        total_points: 100,
+        passing_grade: 56,
+        questions: questions,
+        is_generated: true,
+        is_copyright_free: true,
+        generated_from_id: selectedExam.id
+      };
+
+      return await base44.entities.GenericExam.create(genericExamData);
+    },
+    onSuccess: () => {
+      setPublishDialogOpen(false);
+      alert("המבחן פורסם בהצלחה! הוא יופיע כעת באפליקציה.");
+      // Optionally delete the draft or mark as published
+    },
+    onError: (err) => {
+      alert("שגיאה בפרסום המבחן: " + err.message);
+    },
+  });
+
+  const handlePublishClick = (exam) => {
+    setSelectedExam(exam);
+    setPublishData({
+      title: `מבחן תרגול - ${exam.subject} ${exam.unit} יח"ל`,
+      subject: exam.subject,
+      unit_level: exam.unit?.toString(),
+      module_id: "",
+      description: "מבחן שנוצר ע\"י AI",
+      duration_minutes: 90
+    });
+    setPublishDialogOpen(true);
+  };
+
+  const handlePublishSubmit = () => {
+    if (!publishData.module_id || !publishData.title) {
+      alert("אנא מלא את כל שדות החובה");
+      return;
+    }
+    publishMutation.mutate(publishData);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8" dir="rtl">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <FileText className="w-8 h-8 text-blue-600" />
+              ניהול מבחנים שנוצרו (AI)
+            </h1>
+            <p className="text-gray-500 mt-1">
+              כאן ניתן לצפות במבחנים שנוצרו ע"י המערכת, ולשייך אותם לקרוסלות המתאימות באפליקציה.
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => navigate(createPageUrl('AdminBagrutManager'))}>
+            <Upload className="w-4 h-4 ml-2" />
+            העלאת בגרות חדשה
+          </Button>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>מבחנים ממתינים לפרסום</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              </div>
+            ) : generatedExams?.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                לא נמצאו מבחנים שנוצרו. העלה בגרות וצור מבחן AI כדי לראות אותו כאן.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-right">תאריך יצירה</TableHead>
+                    <TableHead className="text-right">מקצוע</TableHead>
+                    <TableHead className="text-right">יחידות</TableHead>
+                    <TableHead className="text-right">סטטוס</TableHead>
+                    <TableHead className="text-right">שאלות</TableHead>
+                    <TableHead className="text-right">פעולות</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {generatedExams.map((exam) => (
+                    <TableRow key={exam.id}>
+                      <TableCell>
+                        {new Date(exam.created_at || exam.created_date).toLocaleDateString('he-IL')}
+                        <br />
+                        <span className="text-xs text-gray-400">
+                          {new Date(exam.created_at || exam.created_date).toLocaleTimeString('he-IL')}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">{exam.subject}</TableCell>
+                      <TableCell>{exam.unit}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          exam.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                          exam.status === 'failed' ? 'bg-red-100 text-red-800' : 
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {exam.status === 'completed' ? 'מוכן' : 
+                           exam.status === 'failed' ? 'נכשל' : 'בעיבוד'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{exam.exam_json?.questions?.length || 0}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => handlePublishClick(exam)}
+                            disabled={exam.status !== 'completed'}
+                          >
+                            <CheckCircle className="w-4 h-4 ml-2" />
+                            פרסם לאפליקציה
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => {
+                              if(confirm("האם למחוק את המבחן?")) deleteMutation.mutate(exam.id);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Publish Dialog */}
+      <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>פרסום מבחן לאפליקציה</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>כותרת המבחן</Label>
+              <Input 
+                value={publishData.title} 
+                onChange={(e) => setPublishData({...publishData, title: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>מקצוע</Label>
+                <Input 
+                  value={publishData.subject} 
+                  onChange={(e) => setPublishData({...publishData, subject: e.target.value})}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>יחידות לימוד</Label>
+                <Select 
+                  value={publishData.unit_level} 
+                  onValueChange={(val) => setPublishData({...publishData, unit_level: val})}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3">3 יחידות</SelectItem>
+                    <SelectItem value="4">4 יחידות</SelectItem>
+                    <SelectItem value="5">5 יחידות</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>שייך למודול / שאלון</Label>
+              <Input 
+                placeholder="לדוגמה: A, C, 581, 806"
+                value={publishData.module_id} 
+                onChange={(e) => setPublishData({...publishData, module_id: e.target.value})}
+              />
+              <p className="text-xs text-gray-500">
+                זה יקבע באיזה קרוסלה המבחן יופיע במסך הבגרויות.
+              </p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>תיאור (אופציונלי)</Label>
+              <Input 
+                value={publishData.description} 
+                onChange={(e) => setPublishData({...publishData, description: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPublishDialogOpen(false)}>ביטול</Button>
+            <Button onClick={handlePublishSubmit} disabled={publishMutation.isPending}>
+              {publishMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              פרסם ושמור
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

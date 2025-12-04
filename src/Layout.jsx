@@ -56,7 +56,7 @@ function LayoutContent({ children, currentPageName }) {
   ];
 
   const adminNavItems = user?.role === 'admin' ? [
-    { name: "AdminBagrutManager", icon: Settings, path: createPageUrl("AdminBagrutManager"), label: "ניהול", color: "#EF4444" }
+    { name: "AdminAIExams", icon: Settings, path: createPageUrl("AdminAIExams"), label: "AI ניהול", color: "#EF4444" }
   ] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];

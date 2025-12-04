@@ -71,6 +71,7 @@ import GrammarPractice from './pages/GrammarPractice';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
 import VocabularyFlashcards from './pages/VocabularyFlashcards';
 import AdminBagrutManager from './pages/AdminBagrutManager';
+import AdminAIExams from './pages/AdminAIExams';
 import __Layout from './Layout.jsx';
 
 
@@ -148,6 +149,7 @@ export const PAGES = {
     "GrammarTopicsSelection": GrammarTopicsSelection,
     "VocabularyFlashcards": VocabularyFlashcards,
     "AdminBagrutManager": AdminBagrutManager,
+    "AdminAIExams": AdminAIExams,
 }
 
 export const pagesConfig = {
