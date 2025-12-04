@@ -3,176 +3,136 @@ import OpenAI from 'npm:openai';
 import pdf from 'npm:pdf-parse@1.1.1';
 import { Buffer } from "node:buffer";
 
+// Polyfill for pdf-parse dependencies if needed
+if (!globalThis.process) {
+    globalThis.process = { env: {} };
+}
+
 const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const MASTER_PROMPT = `אתה מחולל רשמי של מבחני בגרות עבור כל מקצועות הליבה של משרד החינוך בישראל:
-מתמטיקה (3/4/5 יחידות), אנגלית (3/4/5), לשון, היסטוריה, אזרחות, תנ”ך, ספרות.
+const MASTER_PROMPT = `You are an official exam generator for the Israeli Ministry of Education matriculation exams (Bagrut).
+Subjects: Math, English, Hebrew, History, Civics, Bible, Literature.
 
-מטרתך: ליצור מבחן חדש לחלוטין, ללא זכויות יוצרים, אך עם מבנה, רמת קושי וסוג שאלות זהה למבחן המקורי שנשלח אליך.
+GOAL: Create a NEW exam based on the provided original exam text.
+The new exam must have the EXACT SAME STRUCTURE, DIFFICULTY, and QUESTION TYPES as the original, but with DIFFERENT CONTENT (numbers, stories, sentences).
 
-קיבלת מהמערכת JSON המכיל:
-- subject (מקצוע)
-- unit (מספר יחידות)
-- original_exam_text (טקסט המבחן המקורי)
-- mode ("generate_exam_from_pdf")
+STRICT RULES:
+1. DO NOT COPY the original questions. Create variations.
+2. Math: Change numbers/functions but keep the logic/topic identical. Verify solvability.
+3. English: Write a NEW text/story of the same length and level. Create new questions.
+4. Maintain the exact same numbering (Chapter 1, Question 1, Sections a/b/c...).
+5. Provide FULL SOLUTIONS for every question.
+6. OUTPUT MUST BE VALID JSON ONLY. No markdown, no backticks.
 
-חוקי ברזל:
-
-1. אסור להעתיק משפטים, מספרים, נתונים, שמות, טקסטים או נוסחים מהמבחן המקורי.
-2. יש ליצור שאלות חדשות לחלוטין לפי אותם נושאים וסוגי מיומנויות.
-3. יש לשמור על אותו מבנה מספרי: מספר פרקים, מספר שאלות בכל פרק, וסוגי סעיפים.
-4. יש לייצר פתרון מלא, מדויק ומוסבר לכל שאלה.
-5. חובה לבצע DOUBLE VERIFICATION:
-   (א) לפתור את השאלה שיצרת.
-   (ב) לפתור מחדש בלי לראות את הפתרון הראשון.
-   (ג) אם יש הבדל – צור שאלה חדשה.
-6. מתמטיקה: לבצע בדיקה מתמטית (הצבה, נגזרת, אינטגרל, פתרון משוואה).
-7. אנגלית: לשמור על מבני שאלוני A–E.
-8. היסטוריה/אזרחות: להשתמש בעובדות נכונות, אך לא להעתיק ממקורות.
-9. לשון: לשמור על מבני הבנת הנקרא, תחביר, תחליפים.
-10. המבחן חייב להיות ברמת בגרות, ללא פישוט יתר.
-11. התשובה חייבת להיות JSON בלבד במבנה הבא:
-
+JSON Structure:
 {
-  "exam_version": "new",
-  "subject": "",
-  "unit": "",
+  "exam_version": "new_generated",
+  "subject": "...",
+  "unit": "...",
   "questions": [
     {
-      "question_id": "Q1",
-      "topic": "",
-      "question_text": "",
-      "sub_questions": [],
-      "solution_steps": "",
-      "final_answer": "",
-      "verification_pass_1": "",
-      "verification_pass_2": "",
-      "is_verified": true
+      "question_number": 1,
+      "topic": "...",
+      "question_text": "The full text of the question...",
+      "sub_questions": ["a. ...", "b. ..."],
+      "solution_steps": "Step 1: ...\nStep 2: ...",
+      "final_answer": "x = 5"
     }
   ]
 }
-
-אין להחזיר מלל חופשי – רק JSON תקין.
-כל שאלה שלא עוברת אימות → יש לייצר מחדש עד שהיא תקינה.`;
+`;
 
 Deno.serve(async (req) => {
     try {
-        console.log("🚀 Starting generateExamFromPDF function");
+        // 1. Init & Auth
         const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
 
-        if (!user) {
-            console.error("❌ Unauthorized: No user found");
+        if (!user || user.role !== 'admin') {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        if (user.role !== 'admin') {
-             console.error("❌ Unauthorized: User is not admin", user.role);
-             return Response.json({ error: 'Unauthorized - Admin only' }, { status: 403 });
-        }
-
+        // 2. Parse Body
         let body;
         try {
             body = await req.json();
-        } catch (e) {
-            console.error("❌ Failed to parse JSON body:", e);
-            return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+        } catch {
+            return Response.json({ error: 'Invalid JSON' }, { status: 400 });
         }
 
         const { pdf_url, subject, unit, original_exam_id } = body;
+        console.log(`🚀 Generating Exam: ${subject} (${unit} units) from ${pdf_url}`);
 
-        if (!pdf_url || !subject) {
-            console.error("❌ Missing required fields:", { pdf_url, subject });
-            return Response.json({ error: 'Missing required fields' }, { status: 400 });
-        }
+        if (!pdf_url) return Response.json({ error: 'Missing PDF URL' }, { status: 400 });
 
-        // 1. Extract Text from PDF
-        console.log(`📥 Downloading PDF from: ${pdf_url}`);
+        // 3. Download PDF
+        const pdfRes = await fetch(pdf_url);
+        if (!pdfRes.ok) throw new Error(`Failed to fetch PDF: ${pdfRes.status}`);
+        const pdfBuffer = await pdfRes.arrayBuffer();
+
+        // 4. Extract Text
         let extractedText = "";
         try {
-            const pdfResponse = await fetch(pdf_url);
-            if (!pdfResponse.ok) {
-                throw new Error(`Failed to fetch PDF: ${pdfResponse.statusText}`);
-            }
-            const pdfArrayBuffer = await pdfResponse.arrayBuffer();
-            const pdfBuffer = Buffer.from(pdfArrayBuffer);
-            
-            console.log("📄 Extracting text using pdf-parse...");
-            const pdfData = await pdf(pdfBuffer);
-            extractedText = pdfData.text;
-            console.log(`✅ Text extracted successfully. Length: ${extractedText.length} characters.`);
-        } catch (pdfError) {
-            console.error("❌ PDF Extraction Error:", pdfError);
+            const data = await pdf(Buffer.from(pdfBuffer));
+            extractedText = data.text;
+        } catch (e) {
+            console.error("PDF Parse Error:", e);
+            return Response.json({ error: 'Failed to parse PDF file' }, { status: 500 });
+        }
+
+        // Check if text is empty (Scanned PDF)
+        if (!extractedText || extractedText.trim().length < 50) {
+            console.warn("⚠️ PDF seems to be an image (scanned).");
             return Response.json({ 
-                error: 'Failed to process PDF file. Please ensure it is a valid PDF.',
-                details: pdfError.message 
-            }, { status: 500 });
+                error: 'PDF contains no text (scanned image). Please convert to text-based PDF first.',
+                success: false 
+            }, { status: 200 }); // Return 200 with success:false to handle gracefully in frontend
         }
 
-        if (!extractedText || extractedText.trim().length === 0) {
-             console.error("❌ Extracted text is empty");
-             return Response.json({ error: 'Could not extract text from the PDF. It might be an image-only PDF.' }, { status: 400 });
-        }
+        console.log(`📄 Extracted ${extractedText.length} characters.`);
 
-        // 2. Call OpenAI
-        console.log("🤖 Calling OpenAI...");
+        // 5. Send to OpenAI
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: MASTER_PROMPT },
+                { role: "user", content: `Subject: ${subject}, Unit: ${unit}\n\nOriginal Exam Text (Partial):\n${extractedText.slice(0, 25000)}` }
+            ],
+            response_format: { type: "json_object" },
+            temperature: 0.7
+        });
+
+        const content = completion.choices[0].message.content;
+        if (!content) throw new Error("Empty response from AI");
+
+        let examJson;
         try {
-            const completion = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: [
-                    {
-                        role: "system",
-                        content: MASTER_PROMPT
-                    },
-                    {
-                        role: "user",
-                        content: JSON.stringify({
-                            mode: "generate_exam_from_pdf",
-                            subject: subject,
-                            unit: unit,
-                            // Limit text length to avoid token limits and reduce cost/time
-                            original_exam_text: extractedText.substring(0, 50000) 
-                        })
-                    }
-                ],
-                response_format: { type: "json_object" },
-                temperature: 0.7,
-            });
-
-            const generatedContent = completion.choices[0].message.content;
-            console.log("✅ OpenAI Response received. Length:", generatedContent.length);
-            
-            let examJson;
-            try {
-                examJson = JSON.parse(generatedContent);
-            } catch (jsonError) {
-                console.error("❌ Failed to parse OpenAI response as JSON:", jsonError);
-                return Response.json({ error: 'AI returned invalid JSON format' }, { status: 500 });
-            }
-
-            // 3. Save to Database
-            console.log("💾 Saving to GeneratedExam entity...");
-            const generatedExam = await base44.entities.GeneratedExam.create({
-                original_exam_id: original_exam_id || null,
-                subject: subject,
-                unit: parseInt(unit),
-                exam_json: examJson,
-                status: "completed",
-                created_at: new Date().toISOString()
-            });
-
-            console.log("✅ Exam saved successfully:", generatedExam.id);
-            return Response.json({ success: true, data: generatedExam });
-
-        } catch (openaiError) {
-            console.error("❌ OpenAI API Error:", openaiError);
-            return Response.json({ error: 'AI Generation failed', details: openaiError.message }, { status: 500 });
+            examJson = JSON.parse(content);
+        } catch (e) {
+            console.error("JSON Parse Error:", e);
+            // Try to clean json
+            const cleanContent = content.replace(/```json/g, '').replace(/```/g, '');
+            examJson = JSON.parse(cleanContent);
         }
+
+        // 6. Save Result
+        const generatedExam = await base44.entities.GeneratedExam.create({
+            original_exam_id: original_exam_id || null,
+            subject: subject,
+            unit: parseInt(unit),
+            exam_json: examJson,
+            status: "completed",
+            created_at: new Date().toISOString()
+        });
+
+        console.log("✅ Exam Generated & Saved:", generatedExam.id);
+
+        return Response.json({ success: true, data: generatedExam });
 
     } catch (error) {
-        console.error("❌ Unhandled Server Error:", error);
-        return Response.json({ error: error.message }, { status: 500 });
+        console.error("❌ Critical Error:", error);
+        return Response.json({ error: error.message, success: false }, { status: 500 });
     }
 });
