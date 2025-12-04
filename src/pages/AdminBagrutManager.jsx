@@ -21,7 +21,6 @@ export default function AdminBagrutManager() {
   });
 
   const [examFile, setExamFile] = useState(null);
-  const [solutionFile, setSolutionFile] = useState(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
   const handleGenerateAI = async (bagrutExam) => {
@@ -65,14 +64,8 @@ export default function AdminBagrutManager() {
     try {
       // 1. Upload Exam File
       const examUrl = await handleFileUpload(examFile);
-      
-      // 2. Upload Solution File (if exists)
-      let solutionUrl = null;
-      if (solutionFile) {
-        solutionUrl = await handleFileUpload(solutionFile);
-      }
 
-      // 3. Create Entity Record
+      // 2. Create Entity Record
       const title = `${formData.season === 'winter' ? 'חורף' : 'קיץ'} ${formData.year} מועד ${formData.term === 'a' ? "א'" : "ב'"}`;
 
       const newExam = await base44.entities.BagrutExam.create({
@@ -83,17 +76,16 @@ export default function AdminBagrutManager() {
         term: formData.term,
         module_symbol: formData.module_symbol,
         exam_file_url: examUrl,
-        solution_file_url: solutionUrl,
+        solution_file_url: null,
         title: title
       });
 
       if (window.confirm("הבגרות הועלתה בהצלחה! האם תרצה לייצר אוטומטית מבחן תרגול חדש (AI) מבוסס על בגרות זו?")) {
           await handleGenerateAI(newExam);
       } 
-      
+
       // Reset files
       setExamFile(null);
-      setSolutionFile(null);
     } catch (error) {
       console.error("Error uploading exam:", error);
       alert("שגיאה בהעלאת הבגרות: " + error.message);
@@ -196,7 +188,7 @@ export default function AdminBagrutManager() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
+              <div className="pt-4 border-t">
                 {/* Exam File Upload */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
@@ -227,35 +219,7 @@ export default function AdminBagrutManager() {
                   </div>
                 </div>
 
-                {/* Solution File Upload */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4" />
-                    קובץ פתרונות (PDF)
-                  </Label>
-                  <div className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${solutionFile ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}>
-                    <input 
-                      type="file" 
-                      accept="application/pdf"
-                      className="hidden" 
-                      id="solution-upload"
-                      onChange={(e) => setSolutionFile(e.target.files[0])}
-                    />
-                    <label htmlFor="solution-upload" className="cursor-pointer block w-full h-full">
-                      {solutionFile ? (
-                        <div className="text-blue-700 flex flex-col items-center">
-                          <Check className="w-8 h-8 mb-2" />
-                          <span className="text-sm font-bold">{solutionFile.name}</span>
-                        </div>
-                      ) : (
-                        <div className="text-gray-500 flex flex-col items-center">
-                          <Upload className="w-8 h-8 mb-2" />
-                          <span className="text-sm">לחץ להעלאת קובץ פתרונות</span>
-                        </div>
-                      )}
-                    </label>
-                  </div>
-                </div>
+
               </div>
 
               <Button type="submit" className="w-full h-12 text-lg" disabled={loading}>
