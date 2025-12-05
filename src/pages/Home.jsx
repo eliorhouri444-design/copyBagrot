@@ -259,35 +259,7 @@ export default function HomePage() {
       </div>
 
       <div className="px-5 space-y-4">
-        {user?.role === 'admin' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-4 shadow-sm border border-purple-100"
-          >
-            <div className="flex items-center justify-between">
-               <div className="flex items-center gap-2">
-                 <div className="bg-purple-100 p-2 rounded-full">
-                   <Settings className="w-5 h-5 text-purple-600" />
-                 </div>
-                 <div>
-                   <h3 className="font-bold text-gray-900 text-sm">ניהול מערכת</h3>
-                   <p className="text-xs text-gray-500">קיצורי דרך למנהל</p>
-                 </div>
-               </div>
-               <div className="flex gap-2">
-                 <Button 
-                   size="sm" 
-                   onClick={() => navigate(createPageUrl('AdminAIExams'))}
-                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 rounded-lg"
-                 >
-                   מבחני AI
-                 </Button>
-
-               </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Admin shortcuts removed */}
 
         {/* מוכנות כללית - כרטיס מאוחד */}
         <OverallMasteryCard
