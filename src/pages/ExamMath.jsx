@@ -1006,24 +1006,25 @@ export default function ExamMathPage() {
                       )}
                     </div>
 
+                    {/* Hebrew Solution Display */}
                     {result.explanation && (
-                      <div className="bg-blue-50/50 p-4 rounded-xl border-l-4 border-blue-500">
+                      <div className="bg-blue-50/50 p-4 rounded-xl border-r-4 border-blue-500 text-right" dir="rtl">
                         <div className="text-sm font-semibold mb-2 text-blue-900">💡 הסבר מלא:</div>
-                        <div className="text-slate-700 leading-relaxed">{result.explanation}</div>
+                        <div className="text-slate-700 leading-relaxed whitespace-pre-wrap"><LatexRenderer content={result.explanation} /></div>
                       </div>
                     )}
 
                     {result.solution_steps && result.solution_steps.length > 0 && (
-                      <div className="mt-3 bg-indigo-50/50 p-4 rounded-xl border-l-4 border-indigo-500">
+                      <div className="mt-3 bg-indigo-50/50 p-4 rounded-xl border-r-4 border-indigo-500 text-right" dir="rtl">
                         <div className="text-sm font-semibold mb-2 text-indigo-900">📝 שלבי פתרון:</div>
-                        <ol className="space-y-1 text-sm text-slate-700 list-decimal list-inside">
+                        <div className="space-y-2 text-slate-800">
                           {result.solution_steps.map((step, stepIndex) => (
-                            <li key={stepIndex} className="flex">
-                              <span className="font-bold text-indigo-600 mr-1">{stepIndex + 1}.</span>
-                              <span><LatexRenderer content={step} /></span>
-                            </li>
+                            <div key={stepIndex} className="flex items-start gap-2">
+                              <span className="font-bold text-indigo-600 min-w-[20px]">{stepIndex + 1}.</span>
+                              <span className="flex-1"><LatexRenderer content={step} /></span>
+                            </div>
                           ))}
-                        </ol>
+                        </div>
                       </div>
                     )}
 
@@ -1369,14 +1370,13 @@ export default function ExamMathPage() {
                     </div>
                 )}
                 
+                {/* Clean Document Layout for Parts */}
                 {question.parts && question.parts.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="mt-4 space-y-2 pr-2">
                         {question.parts.map((part, pIdx) => (
-                            <div key={pIdx} className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
-                                <div className="font-bold text-blue-600 mt-1 bg-white w-6 h-6 flex items-center justify-center rounded-full shadow-sm border border-blue-100">
-                                    {part.part_id}
-                                </div>
-                                <div className="text-lg text-slate-800 text-right flex-1" dir="auto">
+                            <div key={pIdx} className="flex items-baseline gap-2 text-lg text-slate-900">
+                                <span className="font-bold min-w-[24px] text-right">{part.part_id}.</span>
+                                <div className="flex-1 leading-relaxed whitespace-pre-wrap">
                                     <LatexRenderer content={part.text} />
                                 </div>
                             </div>
