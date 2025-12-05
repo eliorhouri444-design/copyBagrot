@@ -40,43 +40,132 @@ export default function AdminBagrutManager() {
     }
   }, [location.state]);
 
-  const AVAILABLE_MODULES = {
-    "מתמטיקה": {
-      "3": [
-        { id: "801", label: "שאלון 801 (182)" },
-        { id: "802", label: "שאלון 802 (381)" },
-        { id: "803", label: "שאלון 803 (382)" }
-      ],
-      "4": [
-        { id: "804", label: "שאלון 804 (481)" },
-        { id: "805", label: "שאלון 805 (482)" }
-      ],
-      "5": [
-        { id: "806", label: "שאלון 806 (581)" },
-        { id: "807", label: "שאלון 807 (582)" }
-      ]
-    },
+  // Fetch custom module definitions to match the carousel
+  const { data: customModules = [] } = useQuery({
+    queryKey: ['module-definitions'],
+    queryFn: () => base44.entities.ModuleDefinition.list(),
+    staleTime: 60000
+  });
+
+  const defaultModulesStructure = {
     "אנגלית": {
-      "3": [
-        { id: "A", label: "Module A" },
-        { id: "B", label: "Module B" },
-        { id: "C", label: "Module C" }
-      ],
-      "4": [
-        { id: "C", label: "Module C" },
-        { id: "D", label: "Module D" },
-        { id: "E", label: "Module E" }
-      ],
-      "5": [
-        { id: "E", label: "Module E" },
-        { id: "F", label: "Module F" },
-        { id: "G", label: "Module G" }
-      ]
+      3: [
+      { id: "C", title: "מודול C" },
+      { id: "A", title: "מודול A" },
+      { id: "B", title: "מודול B" }],
+
+      4: [
+      { id: "C", title: "מודול C" },
+      { id: "D", title: "מודול D" },
+      { id: "E", title: "מודול E" }],
+
+      5: [
+      { id: "E", title: "מודול E" },
+      { id: "F", title: "מודול F" },
+      { id: "G", title: "מודול G" }]
+
+    },
+    "מתמטיקה": {
+      3: [
+      { id: "801", title: "שאלון 801" },
+      { id: "802", title: "שאלון 802" }],
+
+      4: [
+      { id: "803", title: "שאלון 803" },
+      { id: "804", title: "שאלון 804" }],
+
+      5: [
+      { id: "805", title: "שאלון 805" },
+      { id: "806", title: "שאלון 806" }]
+
+    },
+    "פיזיקה": {
+      5: [
+      { id: "581", title: "שאלון 581" },
+      { id: "582", title: "שאלון 582" }]
+
+    },
+    "כימיה": {
+      5: [
+      { id: "043381", title: "שאלון 043381" },
+      { id: "043382", title: "שאלון 043382" },
+      { id: "043383", title: "שאלון 043383" }]
+
+    },
+    "ביולוגיה": {
+      5: [
+      { id: "054581", title: "שאלון 054581" },
+      { id: "054582", title: "שאלון 054582" },
+      { id: "054583", title: "שאלון 054583" }]
+
+    },
+    "ספרות": {
+      2: [
+      { id: "2101", title: "שאלון 2101" }],
+
+      5: [
+      { id: "2102", title: "שאלון 2102" },
+      { id: "2103", title: "שאלון 2103" }]
+
+    },
+    "היסטוריה": {
+      2: [
+      { id: "2211", title: "שאלון 2211" }],
+
+      5: [
+      { id: "2212", title: "שאלון 2212" },
+      { id: "2213", title: "שאלון 2213" }]
+
+    },
+    "גאוגרפיה": {
+      5: [
+      { id: "046511", title: "שאלון 046511" },
+      { id: "046512", title: "שאלון 046512" },
+      { id: "046581", title: "שאלון 046581" }]
+
+    },
+    "אזרחות": {
+      2: [
+      { id: "1121", title: "שאלון 1121" },
+      { id: "1122", title: "שאלון 1122" }]
+
+    },
+    "תנ\"ך": {
+      2: [
+      { id: "1211", title: "שאלון 1211" }],
+
+      5: [
+      { id: "1212", title: "שאלון 1212" },
+      { id: "1213", title: "שאלון 1213" }]
+
     }
   };
 
   const getModuleOptions = (subject, unit) => {
-    return AVAILABLE_MODULES[subject]?.[unit] || [];
+    // 1. Get default modules
+    const defaults = defaultModulesStructure[subject]?.[unit] || [];
+    
+    // 2. Get custom modules for this subject/unit
+    const custom = customModules.filter(m => 
+      m.subject === subject && 
+      parseInt(m.unit_level) === parseInt(unit)
+    ).map(m => ({
+      id: m.module_id,
+      title: m.title
+    }));
+
+    // 3. Merge unique modules (custom overrides default if same ID)
+    const merged = [...defaults];
+    custom.forEach(c => {
+      if (!merged.find(m => m.id === c.id)) {
+        merged.push(c);
+      }
+    });
+
+    return merged.map(m => ({
+      id: m.id,
+      label: `${m.title} (${m.id})`
+    }));
   };
 
   const isManualModule = (symbol, subject, unit) => {
