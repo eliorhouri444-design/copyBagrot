@@ -1362,20 +1362,20 @@ export default function ExamMathPage() {
               </Button>
             </div>
 
-            {/* Question Text & Sections - RTL Enforced */}
+            {/* Question Text & Sections - RTL Enforced - PRECISE HEBREW FORMATTING */}
             <div className="mb-6 text-right" dir="rtl">
                 {question.question_text && (
-                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed whitespace-pre-wrap">
+                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed whitespace-pre-wrap font-sans">
                         <LatexRenderer content={question.question_text} />
                     </div>
                 )}
                 
-                {/* Clean Document Layout for Parts */}
+                {/* Clean Document Layout for Parts - EXACT SOURCE MATCH */}
                 {question.parts && question.parts.length > 0 && (
-                    <div className="mt-4 space-y-3 pr-2">
+                    <div className="mt-4 space-y-4 pr-2">
                         {question.parts.map((part, pIdx) => (
-                            <div key={pIdx} className="flex items-start gap-3 text-lg text-slate-900">
-                                <span className="font-bold min-w-[24px] text-left text-blue-600 mt-1">{part.part_id}.</span>
+                            <div key={pIdx} className="flex items-baseline gap-3 text-lg text-slate-900">
+                                <span className="font-bold min-w-[24px] text-left text-blue-600">{part.part_id}.</span>
                                 <div className="flex-1 leading-relaxed whitespace-pre-wrap">
                                     <LatexRenderer content={part.text} />
                                 </div>
