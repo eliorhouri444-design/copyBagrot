@@ -190,7 +190,8 @@ export default function ExamsPage() {
       points: module.points,
       color: module.color,
       entity: module.entity,
-      order: module.order
+      order: module.order,
+      record_id: module.record_id 
     });
     setShowModuleEditDialog(true);
   };
@@ -199,8 +200,6 @@ export default function ExamsPage() {
     if (!editingModuleData) return;
 
     try {
-      const existing = customModules.find((m) => m.module_id === editingModuleData.module_id);
-
       const moduleData = {
         subject: editingModuleData.subject,
         unit_level: editingModuleData.unit_level,
@@ -216,13 +215,16 @@ export default function ExamsPage() {
         order: editingModuleData.order
       };
 
-      if (existing) {
-        await base44.entities.ModuleDefinition.update(existing.id, moduleData);
+      if (editingModuleData.record_id) {
+        await base44.entities.ModuleDefinition.update(editingModuleData.record_id, moduleData);
       } else {
         await base44.entities.ModuleDefinition.create(moduleData);
       }
-      DataCache.invalidatePattern(`exams_data_${displaySubject}_${displayUnits}`);
+      
+      DataCache.invalidatePattern(`exams_data`);
+      DataCache.invalidatePattern(`home_data`);
       queryClient.invalidateQueries(['custom-modules', displaySubject, displayUnits]);
+      window.dispatchEvent(new Event('cache-update'));
 
       alert('המודול עודכן בהצלחה! ✅');
       setShowModuleEditDialog(false);

@@ -201,9 +201,9 @@ function buildExamModules(customModules, subject, units) {
   customModules.forEach(mod => {
     const existing = modulesMap.get(mod.module_id);
     if (existing) {
-      modulesMap.set(mod.module_id, { ...existing, ...mod, id: mod.module_id });
+      modulesMap.set(mod.module_id, { ...existing, ...mod, id: mod.module_id, record_id: mod.id });
     } else {
-      modulesMap.set(mod.module_id, { ...mod, id: mod.module_id });
+      modulesMap.set(mod.module_id, { ...mod, id: mod.module_id, record_id: mod.id });
     }
   });
 
