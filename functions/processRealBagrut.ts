@@ -99,9 +99,29 @@ Deno.serve(async (req) => {
         const content = completion.choices[0].message.content;
         const parsedData = JSON.parse(content);
 
+        // 2.5 Infer Module if missing
+        let finalModuleSymbol = module_symbol;
+        if (!finalModuleSymbol && exam_pdf_url) {
+            const filename = exam_pdf_url.split('/').pop().toUpperCase();
+            
+            // English: Check for A, B, C, D, E, F, G
+            // Look for patterns like "2018A.pdf", "_A_", "Module A"
+            const engMatch = filename.match(/[_.-]?([ABCDEFG])(\.pdf|[_.-])/i);
+            if (engMatch && subject === 'אנגלית') {
+                finalModuleSymbol = engMatch[1];
+            }
+
+            // Math: Check for 801-807, 581-582, 481-482
+            // Look for patterns like "804", "581"
+            const mathMatch = filename.match(/(80[1-7]|58[1-2]|48[1-2]|38[1-2])/);
+            if (mathMatch && subject === 'מתמטיקה') {
+                finalModuleSymbol = mathMatch[1];
+            }
+        }
+
         // 3. Construct the GenericExam object
         const seasonStr = season === 'winter' ? 'חורף' : 'קיץ';
-        const title = `${subject} - שאלון ${module_symbol || 'כללי'} - ${seasonStr} ${year}`;
+        const title = `${subject} - שאלון ${finalModuleSymbol || 'כללי'} - ${seasonStr} ${year}`;
         
         // Normalize questions
         const questions = parsedData.questions.map((q, idx) => ({
@@ -122,7 +142,7 @@ Deno.serve(async (req) => {
             title: title,
             subject: subject,
             unit_level: parseInt(unit),
-            module_id: module_symbol || "General",
+            module_id: finalModuleSymbol || "General",
             description: `בגרות רשמית ${seasonStr} ${year}`,
             duration_minutes: 120, // Standard
             total_points: 100,
