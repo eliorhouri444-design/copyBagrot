@@ -33,20 +33,20 @@ Deno.serve(async (req) => {
                             properties: {
                                 question_number: { type: "integer" },
                                 page_number: { type: "integer", description: "The page number in the PDF where this question appears" },
-                                intro_text: { type: "string", description: "The main introductory text of the question in Hebrew (before sub-sections)" },
+                                intro_text: { type: "string", description: "The main introductory text of the question in HEBREW ONLY. Preserve formatting." },
                                 sections: { 
                                     type: "array", 
                                     items: { 
                                         type: "object", 
                                         properties: {
                                             section_id: { type: "string", description: "The section identifier (e.g., 'א', 'ב', '1', '2')" },
-                                            content: { type: "string", description: "The content of the specific sub-section in Hebrew" }
+                                            content: { type: "string", description: "The content of the specific sub-section in HEBREW ONLY" }
                                         }
                                     } 
                                 },
-                                topic: { type: "string", description: "The topic of the question in Hebrew" },
+                                topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
-                                explanation: { type: "string", description: "A detailed STEP-BY-STEP explanation of the solution in Hebrew. MUST be in Hebrew." },
+                                explanation: { type: "string", description: "A detailed STEP-BY-STEP explanation of the solution in HEBREW ONLY. Translate if necessary." },
                                 has_diagram: { type: "boolean", description: "Does this question include a geometric shape, graph, or function plot?" }
                             },
                             required: ["question_number", "content"]
