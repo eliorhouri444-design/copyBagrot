@@ -1232,9 +1232,9 @@ export default function ExamMathPage() {
                         המערכת זיהתה שיש כאן שרטוט או גרף. ניתן לראות אותו בקובץ הבחינה המקורי.
                     </div>
                     {exam.exam_file_url && (
-                        <Button variant="outline" onClick={() => window.open(exam.exam_file_url, '_blank')} className="mt-2">
+                        <Button variant="outline" onClick={() => window.open(`${exam.exam_file_url}#page=${question.page_number || 1}`, '_blank')} className="mt-2">
                             <BookOpen className="w-4 h-4 ml-2" />
-                            פתח טופס בחינה מקורי
+                            צפה באיור בשאלון המקורי (עמוד {question.page_number || 1})
                         </Button>
                     )}
                 </div>
@@ -1361,9 +1361,28 @@ export default function ExamMathPage() {
               </Button>
             </div>
 
-            {/* Question Text */}
-            <div className="text-xl font-medium text-slate-900 mb-6 leading-relaxed">
-              <LatexRenderer content={question.question_text} />
+            {/* Question Text & Sections */}
+            <div className="mb-6">
+                {question.question_text && (
+                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed text-right" dir="auto">
+                        <LatexRenderer content={question.question_text} />
+                    </div>
+                )}
+                
+                {question.parts && question.parts.length > 0 && (
+                    <div className="space-y-3">
+                        {question.parts.map((part, pIdx) => (
+                            <div key={pIdx} className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
+                                <div className="font-bold text-blue-600 mt-1 bg-white w-6 h-6 flex items-center justify-center rounded-full shadow-sm border border-blue-100">
+                                    {part.part_id}
+                                </div>
+                                <div className="text-lg text-slate-800 text-right flex-1" dir="auto">
+                                    <LatexRenderer content={part.text} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* SMART Dynamic Visualization - shows geometry automatically! */}

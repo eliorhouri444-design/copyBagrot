@@ -32,10 +32,21 @@ Deno.serve(async (req) => {
                             type: "object",
                             properties: {
                                 question_number: { type: "integer" },
-                                content: { type: "string", description: "The full text content of the question in Hebrew, including all sub-sections (א, ב, etc.)" },
+                                page_number: { type: "integer", description: "The page number in the PDF where this question appears" },
+                                intro_text: { type: "string", description: "The main introductory text of the question in Hebrew (before sub-sections)" },
+                                sections: { 
+                                    type: "array", 
+                                    items: { 
+                                        type: "object", 
+                                        properties: {
+                                            section_id: { type: "string", description: "The section identifier (e.g., 'א', 'ב', '1', '2')" },
+                                            content: { type: "string", description: "The content of the specific sub-section in Hebrew" }
+                                        }
+                                    } 
+                                },
                                 topic: { type: "string", description: "The topic of the question in Hebrew" },
                                 points: { type: "integer" },
-                                explanation: { type: "string", description: "A detailed explanation of the solution in Hebrew" },
+                                explanation: { type: "string", description: "A detailed STEP-BY-STEP explanation of the solution in Hebrew. MUST be in Hebrew." },
                                 has_diagram: { type: "boolean", description: "Does this question include a geometric shape, graph, or function plot?" }
                             },
                             required: ["question_number", "content"]
@@ -107,20 +118,32 @@ Deno.serve(async (req) => {
         const seasonStr = season === 'winter' ? 'חורף' : 'קיץ';
         const title = `${subject} - שאלון ${module_symbol || 'כללי'} - ${seasonStr} ${year}`;
         
-        const finalQuestions = questions.map((q, idx) => ({
-            question_number: q.question_number || idx + 1,
-            question_text: q.content || q.question_text || "Question content missing",
-            question_type: 'open_question',
-            topic: q.topic || subject,
-            points: q.points || Math.round(100 / questions.length), // Default points if missing
-            options: [],
-            correct_answer: q.correct_answer || '',
-            explanation: q.explanation || '',
-            solution_steps: q.solution_steps || [],
-            has_diagram: q.has_diagram || false,
-            question_image_url: q.has_diagram ? "pending_crop" : null, // Marker for frontend to handle
-            parts: []
-        }));
+        const finalQuestions = questions.map((q, idx) => {
+            // Construct a clean structured text if sections exist
+            let formattedText = q.intro_text || "";
+            if (q.content && !q.sections) formattedText = q.content; // Fallback
+            
+            const parts = q.sections ? q.sections.map(s => ({
+                part_id: s.section_id,
+                text: s.content
+            })) : [];
+
+            return {
+                question_number: q.question_number || idx + 1,
+                page_number: q.page_number || 1,
+                question_text: formattedText,
+                question_type: 'sectioned',
+                topic: q.topic || subject,
+                points: q.points || Math.round(100 / questions.length),
+                options: [],
+                correct_answer: q.correct_answer || '',
+                explanation: q.explanation || '',
+                solution_steps: q.solution_steps || [],
+                has_diagram: q.has_diagram || false,
+                question_image_url: q.has_diagram ? "pending_crop" : null,
+                parts: parts
+            };
+        });
 
         // 4. Save to Database
         const examData = {
