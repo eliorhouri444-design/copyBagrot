@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Plus, Trash2, FileText, Upload, Settings, BookOpen, Search, Filter, Edit, Eye, Wand2 } from "lucide-react"; // Added Edit, Eye, Wand2 icons
+import { ArrowLeft, Plus, Edit2, Trash2, FileText, Sparkles, Upload, Settings, BookOpen, Brain, Search, Filter, Edit, Eye, Wand2 } from "lucide-react"; // Added Edit, Eye, Wand2 icons
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion"; // Added motion import
 
@@ -289,19 +290,11 @@ export default function AdminExamsPage() {
 
             {/* Existing Admin panel buttons section */}
             <Button
-              onClick={() => navigate(createPageUrl("AdminExamStructure"))}
+              onClick={() => navigate(createPageUrl("AdminBagrutManager"))}
               className="h-24 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white flex flex-col items-center justify-center gap-2"
             >
               <FileText className="w-6 h-6" />
-              <span className="text-sm font-bold">סריקת מבחנים</span>
-            </Button>
-
-            <Button
-              onClick={() => navigate(createPageUrl("AdminExamGenerator"))}
-              className="h-24 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white flex flex-col items-center justify-center gap-2"
-            >
-              <Wand2 className="w-6 h-6" />
-              <span className="text-sm font-bold">יוצר מבחנים AI</span>
+              <span className="text-sm font-bold">ניהול בגרויות רשמי</span>
             </Button>
 
             <Button
@@ -471,11 +464,11 @@ export default function AdminExamsPage() {
                  `אין מבחנים עבור ${displaySubject} ${displayUnits} יחידות`}
               </p>
               <Button
-                onClick={() => navigate(createPageUrl("AdminExamStructure"))}
+                onClick={() => navigate(createPageUrl("AdminBagrutManager"))}
                 className="mt-4 bg-purple-600 hover:bg-purple-700"
               >
                 <Upload className="w-4 h-4 ml-2" />
-                הוסף מבחן חדש
+                העלה בגרות חדשה
               </Button>
             </div>
           ) : (
