@@ -34,7 +34,9 @@ Deno.serve(async (req) => {
                                 question_number: { type: "integer" },
                                 content: { type: "string", description: "The full text content of the question in Hebrew, including all sub-sections (א, ב, etc.)" },
                                 topic: { type: "string", description: "The topic of the question in Hebrew" },
-                                points: { type: "integer" }
+                                points: { type: "integer" },
+                                explanation: { type: "string", description: "A detailed explanation of the solution in Hebrew" },
+                                has_diagram: { type: "boolean", description: "Does this question include a geometric shape, graph, or function plot?" }
                             },
                             required: ["question_number", "content"]
                         }
@@ -115,6 +117,8 @@ Deno.serve(async (req) => {
             correct_answer: q.correct_answer || '',
             explanation: q.explanation || '',
             solution_steps: q.solution_steps || [],
+            has_diagram: q.has_diagram || false,
+            question_image_url: q.has_diagram ? "pending_crop" : null, // Marker for frontend to handle
             parts: []
         }));
 

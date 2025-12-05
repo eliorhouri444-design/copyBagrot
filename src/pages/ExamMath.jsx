@@ -1218,6 +1218,30 @@ export default function ExamMathPage() {
     }
 
     // Smart geometry detection - automatic
+    if (question.has_diagram || question.question_image_url === "pending_crop") {
+        return (
+            <div className="mb-6 p-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 text-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    <div className="text-slate-600 font-medium">
+                        שאלה זו כוללת איור במקור
+                    </div>
+                    <div className="text-sm text-slate-500 max-w-md">
+                        המערכת זיהתה שיש כאן שרטוט או גרף. ניתן לראות אותו בקובץ הבחינה המקורי.
+                    </div>
+                    {exam.exam_file_url && (
+                        <Button variant="outline" onClick={() => window.open(exam.exam_file_url, '_blank')} className="mt-2">
+                            <BookOpen className="w-4 h-4 ml-2" />
+                            פתח טופס בחינה מקורי
+                        </Button>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     return <SmartGeometryDetector question={question} />;
   };
 
