@@ -8,11 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, FileText, Check, Loader2, FileCheck, BookCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AdminBagrutManager() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingId, setProcessingId] = useState(null);
   
   const [formData, setFormData] = useState({
     subject_id: "מתמטיקה",
@@ -21,6 +23,13 @@ export default function AdminBagrutManager() {
     season: "summer",
     term: "a",
     module_symbol: "",
+  });
+
+  // Fetch existing Bagrut exams
+  const { data: existingBagruts, refetch } = useQuery({
+    queryKey: ['bagrut-exams'],
+    queryFn: () => base44.entities.BagrutExam.list("-created_date", 50),
+    initialData: []
   });
 
   const [examFile, setExamFile] = useState(null);
@@ -110,6 +119,34 @@ export default function AdminBagrutManager() {
       alert('שגיאה בעיבוד הבגרות: ' + error.message);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleProcessExisting = async (bagrut) => {
+    if (!confirm(`האם לעבד ולפרסם את הבגרות: ${bagrut.title}?`)) return;
+    
+    setProcessingId(bagrut.id);
+    try {
+      const response = await base44.functions.invoke('processRealBagrut', {
+         exam_pdf_url: bagrut.exam_file_url,
+         solution_pdf_url: bagrut.solution_file_url, 
+         subject: bagrut.subject_id,
+         unit: bagrut.unit_level,
+         year: bagrut.year,
+         season: bagrut.season,
+         module_symbol: bagrut.module_symbol
+      });
+
+      if (response.data.success) {
+        alert('הבגרות עובדה ופורסמה בהצלחה!');
+      } else {
+        throw new Error(response.data.error || 'Processing failed');
+      }
+    } catch (error) {
+      console.error('Error processing exam:', error);
+      alert('שגיאה בעיבוד: ' + error.message);
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -317,6 +354,45 @@ export default function AdminBagrutManager() {
             </CardContent>
           </Card>
         )}
+
+        {/* List of existing Bagrut exams */}
+        <div className="mt-12">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">בגרויות שהועלו בעבר (ממתינות לעיבוד)</h2>
+          <div className="grid gap-4">
+            {existingBagruts.map(bagrut => (
+              <Card key={bagrut.id} className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">{bagrut.title}</h3>
+                    <p className="text-sm text-gray-500">
+                      {bagrut.subject_id} • {bagrut.unit_level} יח"ל • {bagrut.year}
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => handleProcessExisting(bagrut)}
+                  disabled={processingId === bagrut.id}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  {processingId === bagrut.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <BookCheck className="w-4 h-4 mr-2" />
+                      עבד ופרסם
+                    </>
+                  )}
+                </Button>
+              </Card>
+            ))}
+            {existingBagruts.length === 0 && (
+              <p className="text-gray-500 text-center py-8">לא נמצאו בגרויות קודמות במערכת.</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
