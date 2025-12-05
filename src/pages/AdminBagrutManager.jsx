@@ -284,17 +284,39 @@ export default function AdminBagrutManager() {
       // 3. Create Metadata Entity Record
       const title = `${formData.season === 'winter' ? 'חורף' : 'קיץ'} ${formData.year} מועד ${formData.term === 'a' ? "א'" : "ב'"}`;
 
-      await base44.entities.BagrutExam.create({
-        subject_id: formData.subject_id,
-        unit_level: parseInt(formData.unit_level),
-        year: parseInt(formData.year),
-        season: formData.season,
-        term: formData.term,
-        module_symbol: formData.module_symbol,
-        exam_file_url: examUrl,
-        solution_file_url: solutionUrl,
-        title: title
-      });
+      // Check for duplicates before creating
+      const existingBagruts = await base44.entities.BagrutExam.list();
+      const duplicate = existingBagruts.find(b => 
+        b.subject_id === formData.subject_id && 
+        b.year === parseInt(formData.year) && 
+        b.season === formData.season && 
+        b.term === formData.term &&
+        b.unit_level === parseInt(formData.unit_level)
+      );
+
+      if (duplicate) {
+        if (confirm("נראה שכבר קיימת בגרות במועד זה. האם לעדכן את הקבצים שלה?")) {
+           await base44.entities.BagrutExam.update(duplicate.id, {
+             exam_file_url: examUrl,
+             solution_file_url: solutionUrl || duplicate.solution_file_url,
+             module_symbol: formData.module_symbol // Update module symbol if changed
+           });
+        } else {
+           return; // User cancelled
+        }
+      } else {
+        await base44.entities.BagrutExam.create({
+          subject_id: formData.subject_id,
+          unit_level: parseInt(formData.unit_level),
+          year: parseInt(formData.year),
+          season: formData.season,
+          term: formData.term,
+          module_symbol: formData.module_symbol,
+          exam_file_url: examUrl,
+          solution_file_url: solutionUrl,
+          title: title
+        });
+      }
 
       DataCache.invalidatePattern('exams_data');
       DataCache.invalidatePattern('home_data');
