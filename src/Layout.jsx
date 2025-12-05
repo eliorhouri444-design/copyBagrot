@@ -263,6 +263,14 @@ function LayoutContent({ children, currentPageName }) {
         {children}
       </main>
 
+      {/* Legal Disclaimer Footer */}
+      <div className="bg-slate-50 border-t border-slate-200 py-6 px-4 pb-24 text-center">
+        <p className="text-[10px] text-slate-400 max-w-md mx-auto leading-relaxed">
+          הבהרה משפטית: השאלות באפליקציה מבוססות על שאלוני בגרות שפורסמו על ידי משרד החינוך וזמינים לציבור. 
+          השימוש נעשה לצרכים חינוכיים בלבד. הפתרונות, ההסברים, והמערכת הדיגיטלית לבדיקת התשובות הם יצירה מקורית של צוות האפליקציה ואינם מהווים חומר רשמי של משרד החינוך.
+        </p>
+      </div>
+
       {!isActiveExamSession && (
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 h-16">
           <div className="flex justify-around items-center h-full max-w-screen-xl mx-auto px-4">
