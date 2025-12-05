@@ -1362,20 +1362,20 @@ export default function ExamMathPage() {
               </Button>
             </div>
 
-            {/* Question Text & Sections */}
-            <div className="mb-6">
+            {/* Question Text & Sections - RTL Enforced */}
+            <div className="mb-6 text-right" dir="rtl">
                 {question.question_text && (
-                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed text-right" dir="auto">
+                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed whitespace-pre-wrap">
                         <LatexRenderer content={question.question_text} />
                     </div>
                 )}
                 
                 {/* Clean Document Layout for Parts */}
                 {question.parts && question.parts.length > 0 && (
-                    <div className="mt-4 space-y-2 pr-2">
+                    <div className="mt-4 space-y-3 pr-2">
                         {question.parts.map((part, pIdx) => (
-                            <div key={pIdx} className="flex items-baseline gap-2 text-lg text-slate-900">
-                                <span className="font-bold min-w-[24px] text-right">{part.part_id}.</span>
+                            <div key={pIdx} className="flex items-start gap-3 text-lg text-slate-900">
+                                <span className="font-bold min-w-[24px] text-left text-blue-600 mt-1">{part.part_id}.</span>
                                 <div className="flex-1 leading-relaxed whitespace-pre-wrap">
                                     <LatexRenderer content={part.text} />
                                 </div>

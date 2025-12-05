@@ -81,8 +81,8 @@ Deno.serve(async (req) => {
                                     type: "object",
                                     properties: {
                                         question_number: { type: "integer" },
-                                        final_answer: { type: "string", description: "The final answer in HEBREW ONLY" },
-                                        steps: { type: "array", items: { type: "string", description: "Solution step in HEBREW ONLY" } }
+                                        final_answer: { type: "string", description: "The final answer in Hebrew. Translate if needed." },
+                                        steps: { type: "array", items: { type: "string", description: "Step by step solution in Hebrew. Translate if needed." } }
                                     },
                                     required: ["question_number"]
                                 }
