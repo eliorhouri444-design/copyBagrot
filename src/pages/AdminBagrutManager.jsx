@@ -7,12 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, FileText, Check, Loader2, FileCheck, BookCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export default function AdminBagrutManager() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState(null);
@@ -28,6 +30,15 @@ export default function AdminBagrutManager() {
     term: "a",
     module_symbol: "",
   });
+
+  useEffect(() => {
+    if (location.state?.prefill) {
+      setFormData(prev => ({
+        ...prev,
+        ...location.state.prefill
+      }));
+    }
+  }, [location.state]);
 
   const AVAILABLE_MODULES = {
     "מתמטיקה": {
