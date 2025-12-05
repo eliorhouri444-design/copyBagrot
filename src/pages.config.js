@@ -29,9 +29,7 @@ import AdminSmartTutor from './pages/AdminSmartTutor';
 import AdminCorrections from './pages/AdminCorrections';
 import AdminFeedback from './pages/AdminFeedback';
 import AdminCacheManager from './pages/AdminCacheManager';
-import AdminExamStructure from './pages/AdminExamStructure';
 import ExamReview from './pages/ExamReview';
-import AdminExamGenerator from './pages/AdminExamGenerator';
 import TopicPracticePage from './pages/TopicPracticePage';
 import AdminQuestionManager from './pages/AdminQuestionManager';
 import FullExamSimulation from './pages/FullExamSimulation';
@@ -71,7 +69,6 @@ import GrammarPractice from './pages/GrammarPractice';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
 import VocabularyFlashcards from './pages/VocabularyFlashcards';
 import AdminBagrutManager from './pages/AdminBagrutManager';
-import AdminAIExams from './pages/AdminAIExams';
 import __Layout from './Layout.jsx';
 
 
@@ -107,9 +104,7 @@ export const PAGES = {
     "AdminCorrections": AdminCorrections,
     "AdminFeedback": AdminFeedback,
     "AdminCacheManager": AdminCacheManager,
-    "AdminExamStructure": AdminExamStructure,
     "ExamReview": ExamReview,
-    "AdminExamGenerator": AdminExamGenerator,
     "TopicPracticePage": TopicPracticePage,
     "AdminQuestionManager": AdminQuestionManager,
     "FullExamSimulation": FullExamSimulation,
@@ -149,7 +144,6 @@ export const PAGES = {
     "GrammarTopicsSelection": GrammarTopicsSelection,
     "VocabularyFlashcards": VocabularyFlashcards,
     "AdminBagrutManager": AdminBagrutManager,
-    "AdminAIExams": AdminAIExams,
 }
 
 export const pagesConfig = {

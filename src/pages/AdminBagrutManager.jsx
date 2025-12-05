@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -392,22 +393,30 @@ export default function AdminBagrutManager() {
         {/* List of existing Bagrut exams */}
         <div className="mt-12">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">בגרויות שהועלו בעבר (ממתינות לעיבוד)</h2>
-            {existingBagruts.length > 0 && (
+            <h2 className="text-xl font-bold text-gray-800">בגרויות שהועלו בעבר</h2>
+            <div className="flex gap-2">
               <Button 
-                onClick={handleBulkProcess}
+                onClick={async () => {
+                  if (confirm("פעולה זו תמחק את כל המבחנים הקיימים בקרוסלה ותיצור אותם מחדש מתוך הסריקות. האם להמשיך?")) {
+                    setIsBulkProcessing(true);
+                    try {
+                      await base44.functions.invoke('migrateExams');
+                      alert("המערכת אופסה והבגרויות נטענו מחדש בהצלחה!");
+                      window.location.reload();
+                    } catch (e) {
+                      alert("שגיאה באיתחול המערכת");
+                    } finally {
+                      setIsBulkProcessing(false);
+                    }
+                  }
+                }}
                 disabled={isBulkProcessing}
-                variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                className="bg-red-600 hover:bg-red-700 text-white"
               >
-                {isBulkProcessing ? (
-                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
-                ) : (
-                  <Sparkles className="w-4 h-4 ml-2" />
-                )}
-                עבד את הכל ({existingBagruts.length})
+                {isBulkProcessing ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <RefreshCw className="w-4 h-4 ml-2" />}
+                אפס וטען הכל מחדש
               </Button>
-            )}
+            </div>
           </div>
           <div className="grid gap-4">
             {existingBagruts.map(bagrut => (
