@@ -9,6 +9,15 @@ const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
+function cleanText(text) {
+    if (!text) return "";
+    return text
+        .replace(/-\s*\d+\s*-.*(\r\n|\n|\r)/g, '') // Remove header lines like "- 2 - Math..."
+        .replace(/מתמטיקה,.*(\r\n|\n|\r)/g, '')
+        .replace(/\/המשך בעמוד\s*\/?\d*\/?/g, '')
+        .replace(/המשך בעמוד.*/g, '');
+}
+
 const EXTRACTION_PROMPT = `
 You are an expert data extraction specialist for complex Israeli Bagrut exams.
 You are analyzing a document that may be LONG and contain MULTIPLE PAGES.
@@ -83,26 +92,30 @@ Deno.serve(async (req) => {
         }
 
         // 1. Extract Text from both PDFs
-        const [examText, solutionText] = await Promise.all([
+        let [examText, solutionText] = await Promise.all([
             extractTextFromUrl(exam_pdf_url),
             extractTextFromUrl(solution_pdf_url)
         ]);
 
         if (!examText || examText.length < 50) {
-            return Response.json({ error: 'Failed to extract text from Exam PDF (might be scanned image)' }, { status: 400 });
+            return Response.json({ error: 'נכשל בחילוץ טקסט (ייתכן שהקובץ סרוק/תמונה). נסה להעלות קובץ דיגיטלי תקין.' }, { status: 400 });
         }
 
+        // Clean artifacts to save tokens and reduce confusion
+        examText = cleanText(examText);
+        solutionText = cleanText(solutionText);
+
         // 2. Process with LLM
-        // Increase context limit for larger exams (gpt-4o supports 128k, we take a safe chunk)
+        // Increase context limit for larger exams (gpt-4o supports 128k)
         const completion = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
                 { role: "system", content: EXTRACTION_PROMPT },
-                { role: "user", content: `EXAM TEXT:\n${examText.slice(0, 100000)}\n\nSOLUTION TEXT:\n${solutionText ? solutionText.slice(0, 30000) : "No solution text provided."}` }
+                { role: "user", content: `EXAM TEXT (Processed):\n${examText.slice(0, 120000)}\n\nSOLUTION TEXT (Processed):\n${solutionText ? solutionText.slice(0, 40000) : "No solution text provided."}` }
             ],
             response_format: { type: "json_object" },
-            temperature: 0.1, // Low temp for precision
-            max_tokens: 4096 // Allow long responses for complex exams
+            temperature: 0.1, 
+            max_tokens: 10000 // Attempt higher token limit for long Bagrut exams
         });
 
         const content = completion.choices[0].message.content;
