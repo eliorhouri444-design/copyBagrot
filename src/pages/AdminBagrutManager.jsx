@@ -11,6 +11,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { DataCache } from "@/components/cache/DataCache";
 
 export default function AdminBagrutManager() {
   const navigate = useNavigate();
@@ -195,6 +196,9 @@ export default function AdminBagrutManager() {
         title: `${editFormData.season === 'winter' ? 'חורף' : 'קיץ'} ${editFormData.year} (${editFormData.module_symbol || 'כללי'})`
       });
       setEditingId(null);
+      DataCache.invalidatePattern('exams_data');
+      DataCache.invalidatePattern('home_data');
+      window.dispatchEvent(new Event('cache-update'));
       refetch();
     } catch (e) {
       alert("שגיאה בעדכון: " + e.message);
@@ -292,6 +296,10 @@ export default function AdminBagrutManager() {
         title: title
       });
 
+      DataCache.invalidatePattern('exams_data');
+      DataCache.invalidatePattern('home_data');
+      window.dispatchEvent(new Event('cache-update'));
+
       alert("הקבצים הועלו לשרת בהצלחה! כעת לחץ על 'עבד ופרסם' כדי להפוך לבגרות פעילה.");
       
     } catch (error) {
@@ -318,6 +326,10 @@ export default function AdminBagrutManager() {
       });
 
       if (response.data.success) {
+        DataCache.invalidatePattern('exams_data');
+        DataCache.invalidatePattern('home_data');
+        window.dispatchEvent(new Event('cache-update'));
+        
         alert('הבגרות פורסמה בהצלחה למערכת! 🎉\nהשאלות והתשובות סונכרנו.');
         navigate(createPageUrl('AdminExams'));
       } else {
@@ -347,6 +359,9 @@ export default function AdminBagrutManager() {
       });
 
       if (response.data.success) {
+        DataCache.invalidatePattern('exams_data');
+        DataCache.invalidatePattern('home_data');
+        window.dispatchEvent(new Event('cache-update'));
         alert('הבגרות עובדה ופורסמה בהצלחה!');
       } else {
         throw new Error(response.data.error || 'Processing failed');
