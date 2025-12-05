@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileText, Check, Loader2, FileCheck, BookCheck } from "lucide-react";
+import { Upload, FileText, Check, Loader2, FileCheck, BookCheck, Trash2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -396,6 +396,19 @@ export default function AdminBagrutManager() {
     }
   };
 
+  const handleDeleteBagrut = async (id) => {
+    if (!confirm("האם אתה בטוח שברצונך למחוק את הבגרות הזו? הפעולה בלתי הפיכה.")) return;
+    
+    try {
+      await base44.entities.BagrutExam.delete(id);
+      refetch(); // Refresh the list
+      alert("הבגרות נמחקה בהצלחה");
+    } catch (e) {
+      console.error("Error deleting bagrut:", e);
+      alert("שגיאה במחיקה: " + e.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8" dir="rtl">
       <div className="max-w-3xl mx-auto">
@@ -760,13 +773,22 @@ export default function AdminBagrutManager() {
                             <BookCheck className="w-4 h-4 mr-2" />
                             עבד ושייך
                           </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </Card>
-            ))}
+                          )}
+                          </Button>
+                          <Button 
+                          variant="outline"
+                          size="icon"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
+                          onClick={() => handleDeleteBagrut(bagrut.id)}
+                          title="מחק בגרות"
+                          >
+                          <Trash2 className="w-5 h-5" />
+                          </Button>
+                          </div>
+                          </div>
+                          )}
+                          </Card>
+                          ))}
             {existingBagruts.length === 0 && (
               <p className="text-gray-500 text-center py-8">לא נמצאו בגרויות קודמות במערכת.</p>
             )}
