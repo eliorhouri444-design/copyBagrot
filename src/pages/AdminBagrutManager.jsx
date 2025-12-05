@@ -79,6 +79,11 @@ export default function AdminBagrutManager() {
     return AVAILABLE_MODULES[subject]?.[unit] || [];
   };
 
+  const isManualModule = (symbol, subject, unit) => {
+    const options = getModuleOptions(subject, unit);
+    return symbol && symbol !== "" && !options.some(opt => opt.id === symbol);
+  };
+
   const handleEditClick = (bagrut) => {
     setEditingId(bagrut.id);
     setEditFormData({
@@ -358,33 +363,43 @@ export default function AdminBagrutManager() {
               <div className="space-y-2">
                 <Label className="text-blue-700 font-bold">שייך לשאלון/מודול (חובה להצגה באפליקציה)</Label>
                 {getModuleOptions(formData.subject_id, formData.unit_level).length > 0 ? (
-                  <Select 
-                    value={formData.module_symbol} 
-                    onValueChange={(val) => setFormData({...formData, module_symbol: val})}
-                  >
-                    <SelectTrigger className="border-blue-300 bg-blue-50">
-                      <SelectValue placeholder="בחר לאיזה שאלון לשייך..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getModuleOptions(formData.subject_id, formData.unit_level).map(opt => (
-                        <SelectItem key={opt.id} value={opt.id}>{opt.label}</SelectItem>
-                      ))}
-                      <SelectItem value="other">אחר (הזנה ידנית)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    <Select 
+                      value={isManualModule(formData.module_symbol, formData.subject_id, formData.unit_level) ? "other" : formData.module_symbol}
+                      onValueChange={(val) => {
+                        if (val === "other") {
+                          setFormData({...formData, module_symbol: ""}); // Clear to allow manual typing
+                        } else {
+                          setFormData({...formData, module_symbol: val});
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="border-blue-300 bg-blue-50">
+                        <SelectValue placeholder="בחר לאיזה שאלון לשייך..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getModuleOptions(formData.subject_id, formData.unit_level).map(opt => (
+                          <SelectItem key={opt.id} value={opt.id}>{opt.label}</SelectItem>
+                        ))}
+                        <SelectItem value="other">אחר (הזנה ידנית)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Show input if "other" is selected or if current value is manual */}
+                    {(formData.module_symbol === "" || isManualModule(formData.module_symbol, formData.subject_id, formData.unit_level)) && (
+                      <Input 
+                        className="mt-2 border-blue-300 focus:ring-blue-500"
+                        placeholder="הזן סמל שאלון ידנית (למשל: 806, G)..."
+                        value={formData.module_symbol}
+                        onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
+                        autoFocus
+                      />
+                    )}
+                  </div>
                 ) : (
                   <Input 
                     placeholder="לדוגמה: 581, 806, G"
                     value={formData.module_symbol} 
-                    onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
-                  />
-                )}
-
-                {/* Allow manual override if "other" selected or no options */}
-                {formData.module_symbol === 'other' && (
-                  <Input 
-                    className="mt-2"
-                    placeholder="הזן סמל שאלון ידנית..."
                     onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
                   />
                 )}
