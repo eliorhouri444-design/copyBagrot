@@ -15,6 +15,7 @@ export default function AdminBagrutManager() {
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState(null);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   
   const [formData, setFormData] = useState({
     subject_id: "מתמטיקה",
@@ -31,6 +32,39 @@ export default function AdminBagrutManager() {
     queryFn: () => base44.entities.BagrutExam.list("-created_date", 50),
     initialData: []
   });
+
+  const handleBulkProcess = async () => {
+    if (!confirm(`האם לעבד את כל ${existingBagruts.length} הבגרויות ברשימה? פעולה זו עשויה לקחת זמן.`)) return;
+    
+    setIsBulkProcessing(true);
+    let successCount = 0;
+    
+    try {
+      for (const bagrut of existingBagruts) {
+        setProcessingId(bagrut.id);
+        try {
+          await base44.functions.invoke('processRealBagrut', {
+             exam_pdf_url: bagrut.exam_file_url,
+             solution_pdf_url: bagrut.solution_file_url, 
+             subject: bagrut.subject_id,
+             unit: bagrut.unit_level,
+             year: bagrut.year,
+             season: bagrut.season,
+             module_symbol: bagrut.module_symbol
+          });
+          successCount++;
+        } catch (e) {
+          console.error(`Failed to process ${bagrut.title}`, e);
+        }
+      }
+      alert(`תהליך הסתיים! ${successCount} בגרויות עובדו בהצלחה.`);
+    } catch (error) {
+      alert('שגיאה בתהליך העיבוד הקבוצתי');
+    } finally {
+      setIsBulkProcessing(false);
+      setProcessingId(null);
+    }
+  };
 
   const [examFile, setExamFile] = useState(null);
   const [solutionFile, setSolutionFile] = useState(null);
@@ -357,7 +391,24 @@ export default function AdminBagrutManager() {
 
         {/* List of existing Bagrut exams */}
         <div className="mt-12">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">בגרויות שהועלו בעבר (ממתינות לעיבוד)</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800">בגרויות שהועלו בעבר (ממתינות לעיבוד)</h2>
+            {existingBagruts.length > 0 && (
+              <Button 
+                onClick={handleBulkProcess}
+                disabled={isBulkProcessing}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                {isBulkProcessing ? (
+                  <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                ) : (
+                  <Sparkles className="w-4 h-4 ml-2" />
+                )}
+                עבד את הכל ({existingBagruts.length})
+              </Button>
+            )}
+          </div>
           <div className="grid gap-4">
             {existingBagruts.map(bagrut => (
               <Card key={bagrut.id} className="flex items-center justify-between p-4">

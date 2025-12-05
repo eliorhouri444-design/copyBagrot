@@ -69,6 +69,12 @@ Deno.serve(async (req) => {
 
         if (!exam_pdf_url) return Response.json({ error: 'Missing Exam PDF' }, { status: 400 });
 
+        // 0. Check for duplicates
+        const existing = await base44.asServiceRole.entities.GenericExam.filter({ exam_file_url: exam_pdf_url });
+        if (existing.length > 0) {
+            return Response.json({ success: true, data: existing[0], message: 'Exam already exists' });
+        }
+
         // 1. Extract Text from both PDFs
         const [examText, solutionText] = await Promise.all([
             extractTextFromUrl(exam_pdf_url),
