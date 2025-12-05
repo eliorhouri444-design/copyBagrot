@@ -10,25 +10,31 @@ const openai = new OpenAI({
 });
 
 const EXTRACTION_PROMPT = `
-You are a precise data extraction specialist for Israeli Bagrut exams.
-You have two inputs:
-1. EXAM TEXT: The actual questions asked.
-2. SOLUTION TEXT: The official answers/rubric.
+You are an expert data extraction specialist for complex Israeli Bagrut exams.
+You are analyzing a document that may be LONG and contain MULTIPLE PAGES.
+It is CRITICAL that you extract EVERY SINGLE QUESTION found in the text, from beginning to end.
 
-Your Goal: Combine them into a single JSON structure.
+You have two inputs:
+1. EXAM TEXT: The actual questions asked (often multiple pages).
+2. SOLUTION TEXT: The official answers/rubric (optional).
+
+Your Goal: Combine them into a single JSON structure representing the full exam.
 
 RULES:
-1. **Question Text**: Must be COPIED EXACTLY from the Exam Text. Do not summarize. Include sub-questions (א, ב, ג) inside the main text or split logic if needed.
-2. **Correct Answer**: Extract the final mapping answer from the Solution Text.
-3. **Solution Steps**: Break down the official solution into clear, logical steps.
-4. **Points**: Estimate points based on standard Bagrut distribution if not explicitly stated (usually 33%, 20%, etc.).
+1. **Coverage**: SCAN THE ENTIRE TEXT. Do not stop after the first few questions. Many exams have 5-8 questions spanning multiple pages.
+2. **Question Text**: Must be COPIED EXACTLY from the Exam Text. Do not summarize.
+   - If a question has sub-parts (סעיף א, סעיף ב), include the full text of all parts in the "question_text".
+   - Include any introductory text or diagrams descriptions relevant to the question.
+3. **Correct Answer**: Extract the final mapping answer from the Solution Text.
+4. **Solution Steps**: Break down the official solution into clear, logical steps.
+5. **Points**: Estimate points based on standard Bagrut distribution if not explicitly stated (usually 20-33% per question).
 
 OUTPUT JSON FORMAT:
 {
   "questions": [
     {
       "question_number": 1,
-      "question_text": "Original Hebrew text...",
+      "question_text": "Original Hebrew text including all sub-parts...",
       "points": 20,
       "correct_answer": "The final answer",
       "solution_steps": ["Step 1...", "Step 2..."],
@@ -39,8 +45,9 @@ OUTPUT JSON FORMAT:
 
 CRITICAL:
 - Do not invent questions.
-- Do not invent solutions. Use the provided text.
+- If the exam is long, take your time to process all pages.
 - If solution text is missing for a question, leave solution_steps empty but keep the question.
+- IGNORE administrative text (instructions to examinees, formulas sheet), focus on the QUESTIONS.
 `;
 
 async function extractTextFromUrl(url) {
@@ -86,14 +93,16 @@ Deno.serve(async (req) => {
         }
 
         // 2. Process with LLM
+        // Increase context limit for larger exams (gpt-4o supports 128k, we take a safe chunk)
         const completion = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
                 { role: "system", content: EXTRACTION_PROMPT },
-                { role: "user", content: `EXAM TEXT:\n${examText.slice(0, 30000)}\n\nSOLUTION TEXT:\n${solutionText ? solutionText.slice(0, 15000) : "No solution text provided."}` }
+                { role: "user", content: `EXAM TEXT:\n${examText.slice(0, 100000)}\n\nSOLUTION TEXT:\n${solutionText ? solutionText.slice(0, 30000) : "No solution text provided."}` }
             ],
             response_format: { type: "json_object" },
-            temperature: 0.1 // Low temp for precision
+            temperature: 0.1, // Low temp for precision
+            max_tokens: 4096 // Allow long responses for complex exams
         });
 
         const content = completion.choices[0].message.content;
