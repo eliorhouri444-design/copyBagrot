@@ -17,6 +17,8 @@ export default function AdminBagrutManager() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState(null);
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
   
   const [formData, setFormData] = useState({
     subject_id: "מתמטיקה",
@@ -26,6 +28,34 @@ export default function AdminBagrutManager() {
     term: "a",
     module_symbol: "",
   });
+
+  const handleEditClick = (bagrut) => {
+    setEditingId(bagrut.id);
+    setEditFormData({
+      subject_id: bagrut.subject_id,
+      unit_level: bagrut.unit_level?.toString(),
+      module_symbol: bagrut.module_symbol || "",
+      year: bagrut.year,
+      season: bagrut.season
+    });
+  };
+
+  const handleSaveEdit = async (id) => {
+    try {
+      await base44.entities.BagrutExam.update(id, {
+        subject_id: editFormData.subject_id,
+        unit_level: parseInt(editFormData.unit_level),
+        module_symbol: editFormData.module_symbol,
+        year: parseInt(editFormData.year),
+        season: editFormData.season,
+        title: `${editFormData.season === 'winter' ? 'חורף' : 'קיץ'} ${editFormData.year} (${editFormData.module_symbol || 'כללי'})`
+      });
+      setEditingId(null);
+      refetch();
+    } catch (e) {
+      alert("שגיאה בעדכון: " + e.message);
+    }
+  };
 
   // Fetch existing Bagrut exams
   const { data: existingBagruts, refetch } = useQuery({
@@ -420,32 +450,104 @@ export default function AdminBagrutManager() {
           </div>
           <div className="grid gap-4">
             {existingBagruts.map(bagrut => (
-              <Card key={bagrut.id} className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-4">
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <FileText className="w-6 h-6 text-blue-600" />
+              <Card key={bagrut.id} className="p-4">
+                {editingId === bagrut.id ? (
+                  <div className="grid gap-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label>מקצוע</Label>
+                        <Select 
+                          value={editFormData.subject_id} 
+                          onValueChange={(val) => setEditFormData({...editFormData, subject_id: val})}
+                        >
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="מתמטיקה">מתמטיקה</SelectItem>
+                            <SelectItem value="אנגלית">אנגלית</SelectItem>
+                            <SelectItem value="פיזיקה">פיזיקה</SelectItem>
+                            <SelectItem value="מדעי המחשב">מדעי המחשב</SelectItem>
+                            <SelectItem value="ספרות">ספרות</SelectItem>
+                            <SelectItem value="תנ&quot;ך">תנ"ך</SelectItem>
+                            <SelectItem value="היסטוריה">היסטוריה</SelectItem>
+                            <SelectItem value="אזרחות">אזרחות</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>יחידות</Label>
+                        <Select 
+                          value={editFormData.unit_level} 
+                          onValueChange={(val) => setEditFormData({...editFormData, unit_level: val})}
+                        >
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="2">2 יחידות</SelectItem>
+                            <SelectItem value="3">3 יחידות</SelectItem>
+                            <SelectItem value="4">4 יחידות</SelectItem>
+                            <SelectItem value="5">5 יחידות</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                       <div>
+                         <Label>שאלון/מודול</Label>
+                         <Input 
+                           value={editFormData.module_symbol} 
+                           onChange={(e) => setEditFormData({...editFormData, module_symbol: e.target.value})}
+                           placeholder="A, 804, 581..." 
+                         />
+                       </div>
+                       <div>
+                         <Label>שנה</Label>
+                         <Input 
+                           value={editFormData.year} 
+                           onChange={(e) => setEditFormData({...editFormData, year: e.target.value})}
+                         />
+                       </div>
+                       <div className="flex items-end gap-2">
+                         <Button onClick={() => handleSaveEdit(bagrut.id)} className="w-full bg-green-600 hover:bg-green-700">שמור</Button>
+                         <Button onClick={() => setEditingId(null)} variant="outline">ביטול</Button>
+                       </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold">{bagrut.title}</h3>
-                    <p className="text-sm text-gray-500">
-                      {bagrut.subject_id} • {bagrut.unit_level} יח"ל • {bagrut.year}
-                    </p>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-blue-100 p-3 rounded-full">
+                        <FileText className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold">{bagrut.title}</h3>
+                        <p className="text-sm text-gray-500">
+                          {bagrut.subject_id} • {bagrut.unit_level} יח"ל • שאלון: <span className="font-bold text-blue-600">{bagrut.module_symbol || 'לא מוגדר'}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleEditClick(bagrut)}
+                      >
+                        ערוך פרטים
+                      </Button>
+                      <Button 
+                        onClick={() => handleProcessExisting(bagrut)}
+                        disabled={processingId === bagrut.id}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                      >
+                        {processingId === bagrut.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <BookCheck className="w-4 h-4 mr-2" />
+                            עבד ושייך
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Button 
-                  onClick={() => handleProcessExisting(bagrut)}
-                  disabled={processingId === bagrut.id}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
-                  {processingId === bagrut.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <BookCheck className="w-4 h-4 mr-2" />
-                      עבד ופרסם
-                    </>
-                  )}
-                </Button>
+                )}
               </Card>
             ))}
             {existingBagruts.length === 0 && (
