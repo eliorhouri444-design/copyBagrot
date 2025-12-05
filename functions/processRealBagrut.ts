@@ -32,8 +32,8 @@ Deno.serve(async (req) => {
                             type: "object",
                             properties: {
                                 question_number: { type: "integer" },
-                                content: { type: "string", description: "The full text content of the question, including all sub-sections (א, ב, etc.)" },
-                                topic: { type: "string" },
+                                content: { type: "string", description: "The full text content of the question in Hebrew, including all sub-sections (א, ב, etc.)" },
+                                topic: { type: "string", description: "The topic of the question in Hebrew" },
                                 points: { type: "integer" }
                             },
                             required: ["question_number", "content"]
@@ -68,8 +68,8 @@ Deno.serve(async (req) => {
                                     type: "object",
                                     properties: {
                                         question_number: { type: "integer" },
-                                        final_answer: { type: "string" },
-                                        steps: { type: "array", items: { type: "string" } }
+                                        final_answer: { type: "string", description: "The final answer in Hebrew" },
+                                        steps: { type: "array", items: { type: "string", description: "Solution step in Hebrew" } }
                                     },
                                     required: ["question_number"]
                                 }
