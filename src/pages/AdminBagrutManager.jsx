@@ -29,6 +29,45 @@ export default function AdminBagrutManager() {
     module_symbol: "",
   });
 
+  const AVAILABLE_MODULES = {
+    "מתמטיקה": {
+      "3": [
+        { id: "801", label: "שאלון 801 (182)" },
+        { id: "802", label: "שאלון 802 (381)" },
+        { id: "803", label: "שאלון 803 (382)" }
+      ],
+      "4": [
+        { id: "804", label: "שאלון 804 (481)" },
+        { id: "805", label: "שאלון 805 (482)" }
+      ],
+      "5": [
+        { id: "806", label: "שאלון 806 (581)" },
+        { id: "807", label: "שאלון 807 (582)" }
+      ]
+    },
+    "אנגלית": {
+      "3": [
+        { id: "A", label: "Module A" },
+        { id: "B", label: "Module B" },
+        { id: "C", label: "Module C" }
+      ],
+      "4": [
+        { id: "C", label: "Module C" },
+        { id: "D", label: "Module D" },
+        { id: "E", label: "Module E" }
+      ],
+      "5": [
+        { id: "E", label: "Module E" },
+        { id: "F", label: "Module F" },
+        { id: "G", label: "Module G" }
+      ]
+    }
+  };
+
+  const getModuleOptions = (subject, unit) => {
+    return AVAILABLE_MODULES[subject]?.[unit] || [];
+  };
+
   const handleEditClick = (bagrut) => {
     setEditingId(bagrut.id);
     setEditFormData({
@@ -306,12 +345,38 @@ export default function AdminBagrutManager() {
               </div>
 
               <div className="space-y-2">
-                <Label>סמל שאלון (לדוגמה: 581, G)</Label>
-                <Input 
-                  placeholder="לדוגמה: 581, 806, G"
-                  value={formData.module_symbol} 
-                  onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
-                />
+                <Label className="text-blue-700 font-bold">שייך לשאלון/מודול (חובה להצגה באפליקציה)</Label>
+                {getModuleOptions(formData.subject_id, formData.unit_level).length > 0 ? (
+                  <Select 
+                    value={formData.module_symbol} 
+                    onValueChange={(val) => setFormData({...formData, module_symbol: val})}
+                  >
+                    <SelectTrigger className="border-blue-300 bg-blue-50">
+                      <SelectValue placeholder="בחר לאיזה שאלון לשייך..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getModuleOptions(formData.subject_id, formData.unit_level).map(opt => (
+                        <SelectItem key={opt.id} value={opt.id}>{opt.label}</SelectItem>
+                      ))}
+                      <SelectItem value="other">אחר (הזנה ידנית)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input 
+                    placeholder="לדוגמה: 581, 806, G"
+                    value={formData.module_symbol} 
+                    onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
+                  />
+                )}
+
+                {/* Allow manual override if "other" selected or no options */}
+                {formData.module_symbol === 'other' && (
+                  <Input 
+                    className="mt-2"
+                    placeholder="הזן סמל שאלון ידנית..."
+                    onChange={(e) => setFormData({...formData, module_symbol: e.target.value})} 
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
