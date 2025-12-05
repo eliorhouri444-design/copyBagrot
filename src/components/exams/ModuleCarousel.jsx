@@ -20,6 +20,7 @@ export default function ModuleCarousel({
   onSelectExam,
   onRandomExam,
   onEditModule,
+  onUploadExam,
   isPremium,
   onUpgrade,
   examAttempts: initialExamAttempts = [],
@@ -322,18 +323,35 @@ export default function ModuleCarousel({
           <div className="bg-[#ffffff] text-black p-4 rounded-2xl">
             {/* Header with gradient */}
             <div className="bg-[#3B82F6] text-white mb-3 p-4 rounded-xl relative">
-              {onEditModule &&
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditModule(currentModule);
-                }}
-                className="absolute top-2 left-2 text-white hover:bg-white/20">
-                  <Edit2 className="w-5 h-5" />
-                </Button>
-              }
+              <div className="absolute top-2 left-2 flex gap-1">
+                {onUploadExam && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUploadExam(currentModule);
+                    }}
+                    className="text-white hover:bg-white/20"
+                    title="העלה בחינה לשאלון זה"
+                  >
+                    <Upload className="w-5 h-5" />
+                  </Button>
+                )}
+                {onEditModule && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditModule(currentModule);
+                    }}
+                    className="text-white hover:bg-white/20"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
               
               <div className="flex items-center gap-4">
                 {/* Icon Circle */}

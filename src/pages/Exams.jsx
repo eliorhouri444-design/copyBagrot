@@ -268,6 +268,18 @@ export default function ExamsPage() {
     setShowAddModuleDialog(true);
   };
 
+  const handleUploadExam = (module) => {
+    navigate(createPageUrl("AdminBagrutManager"), { 
+      state: { 
+        prefill: {
+          subject_id: displaySubject,
+          unit_level: displayUnits.toString(),
+          module_symbol: module.id || module.module_id
+        }
+      } 
+    });
+  };
+
   const handleSaveNewModule = async () => {
     if (!editingModuleData || !editingModuleData.module_id || !editingModuleData.title) {
       alert('חובה למלא מזהה שאלון וכותרת');
@@ -756,6 +768,7 @@ export default function ExamsPage() {
             onSelectExam={(moduleId) => setShowAllExamsModule(moduleId)}
             onRandomExam={handleRandomExam}
             onEditModule={user?.role === 'admin' ? handleEditModule : null}
+            onUploadExam={user?.role === 'admin' ? handleUploadExam : null}
             isPremium={isPremium}
             onUpgrade={() => navigate(createPageUrl("Premium"))}
             examAttempts={examAttempts} />
