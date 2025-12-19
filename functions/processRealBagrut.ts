@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
                                 },
                                 topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
-                                explanation: { type: "string", description: "CRITICAL: Provide a detailed STEP-BY-STEP explanation of the solution. THIS MUST BE IN HEBREW. If the original text is English, you MUST TRANSLATE it to Hebrew. Do not output any English." },
+                                explanation: { type: "string", description: "ULTRA-CRITICAL: The output for this field MUST be in the HEBREW language. Provide a detailed step-by-step explanation. If the source material is in English, you MUST translate the entire explanation to HEBREW. NO ENGLISH is allowed in the output." },
                                 has_diagram: { type: "boolean", description: "CRITICAL: Analyze the question area. Set to 'true' if ANY non-text element like a diagram, geometric shape, coordinate system, graph, or illustration is present. Set to 'false' otherwise. This is very important." }
                             },
                             required: ["question_number", "content"]
@@ -81,8 +81,8 @@ Deno.serve(async (req) => {
                                     type: "object",
                                     properties: {
                                         question_number: { type: "integer" },
-                                        final_answer: { type: "string", description: "CRITICAL: The final answer. THIS MUST BE IN HEBREW. Translate if needed. Do not output any English." },
-                                        steps: { type: "array", items: { type: "string", description: "CRITICAL: Step-by-step solution. EACH STEP MUST BE IN HEBREW. Translate if needed. Do not output any English." } }
+                                        final_answer: { type: "string", description: "ULTRA-CRITICAL: The final answer. The output for this field MUST be in the HEBREW language. NO ENGLISH. Translate if needed." },
+                                        steps: { type: "array", items: { type: "string", description: "ULTRA-CRITICAL: A single step in the solution. The output for this field MUST be in the HEBREW language. NO ENGLISH. Translate the entire step to HEBREW if the source is in English." } }
                                     },
                                     required: ["question_number"]
                                 }
