@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
                                 },
                                 topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
-                                explanation: { type: "string", description: "A detailed STEP-BY-STEP explanation of the solution in HEBREW ONLY. Translate if necessary." },
+                                explanation: { type: "string", description: "CRITICAL: Provide a detailed STEP-BY-STEP explanation of the solution. THIS MUST BE IN HEBREW. If the original text is English, you MUST TRANSLATE it to Hebrew. Do not output any English." },
                                 has_diagram: { type: "boolean", description: "Does this question include a geometric shape, graph, or function plot?" }
                             },
                             required: ["question_number", "content"]
@@ -81,8 +81,8 @@ Deno.serve(async (req) => {
                                     type: "object",
                                     properties: {
                                         question_number: { type: "integer" },
-                                        final_answer: { type: "string", description: "The final answer in Hebrew. Translate if needed." },
-                                        steps: { type: "array", items: { type: "string", description: "Step by step solution in Hebrew. Translate if needed." } }
+                                        final_answer: { type: "string", description: "CRITICAL: The final answer. THIS MUST BE IN HEBREW. Translate if needed. Do not output any English." },
+                                        steps: { type: "array", items: { type: "string", description: "CRITICAL: Step-by-step solution. EACH STEP MUST BE IN HEBREW. Translate if needed. Do not output any English." } }
                                     },
                                     required: ["question_number"]
                                 }
