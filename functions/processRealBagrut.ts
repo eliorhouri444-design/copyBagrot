@@ -66,6 +66,32 @@ Deno.serve(async (req) => {
         let questions = examExtraction.output.questions;
         console.log(`Extracted ${questions.length} questions.`);
 
+        // 2.5 Generate diagrams for questions that need them
+        console.log("Generating diagrams for questions...");
+        const diagramPromises = questions.map(async (q) => {
+            if (q.has_diagram) {
+                try {
+                    console.log(`Generating diagram for question ${q.question_number}...`);
+                    const diagramPrompt = `Create a clean, black and white, 2D geometry diagram for a math problem. The diagram should be simple, clear, and focused on the geometric shapes and labels mentioned. Do not include the question text in the image. Only output the diagram. Based on the problem: ${q.intro_text || ''} ${q.sections ? q.sections.map(s => s.content).join(' ') : ''}`;
+
+                    const imageResponse = await base44.asServiceRole.integrations.Core.GenerateImage({
+                        prompt: diagramPrompt
+                    });
+
+                    if (imageResponse && imageResponse.url) {
+                        console.log(`Diagram generated for question ${q.question_number}: ${imageResponse.url}`);
+                        q.question_image_url_generated = imageResponse.url; // Use a new field to avoid conflicts
+                    }
+                } catch (genErr) {
+                    console.error(`Failed to generate diagram for question ${q.question_number}:`, genErr);
+                }
+            }
+            return q;
+        });
+
+        questions = await Promise.all(diagramPromises);
+        console.log("Diagram generation complete.");
+
         // 2. Extract Solutions (if provided)
         if (solution_pdf_url) {
             console.log("Extracting solutions from solution PDF...");
@@ -140,7 +166,7 @@ Deno.serve(async (req) => {
                 explanation: q.explanation || '',
                 solution_steps: q.solution_steps || [],
                 has_diagram: q.has_diagram || false,
-                question_image_url: q.has_diagram ? "pending_crop" : null,
+                question_image_url: q.question_image_url_generated || (q.has_diagram ? "pending_crop" : null),
                 parts: parts
             };
         });

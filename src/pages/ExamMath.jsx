@@ -1206,7 +1206,7 @@ export default function ExamMathPage() {
       );
     }
 
-    if (question.question_image_url) {
+    if (question.question_image_url && question.question_image_url !== "pending_crop") {
       return (
         <div className="mb-6">
           <img
@@ -1219,7 +1219,7 @@ export default function ExamMathPage() {
     }
 
     // Smart geometry detection - automatic
-    if (question.has_diagram || question.question_image_url === "pending_crop") {
+    if (question.has_diagram) {
         return (
             <div className="mb-6">
                 {exam.exam_file_url && (
