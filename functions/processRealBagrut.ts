@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
                                 topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
                                 explanation: { type: "string", description: "CRITICAL: Provide a detailed STEP-BY-STEP explanation of the solution. THIS MUST BE IN HEBREW. If the original text is English, you MUST TRANSLATE it to Hebrew. Do not output any English." },
-                                has_diagram: { type: "boolean", description: "Does this question include a geometric shape, graph, or function plot?" }
+                                has_diagram: { type: "boolean", description: "CRITICAL: Analyze the question area. Set to 'true' if ANY non-text element like a diagram, geometric shape, coordinate system, graph, or illustration is present. Set to 'false' otherwise. This is very important." }
                             },
                             required: ["question_number", "content"]
                         }
