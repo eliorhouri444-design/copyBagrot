@@ -1,149 +1,165 @@
-import Onboarding from './pages/Onboarding';
-import Practice from './pages/Practice';
-import Exams from './pages/Exams';
-import Premium from './pages/Premium';
-import Profile from './pages/Profile';
-import SubjectSelection from './pages/SubjectSelection';
-import GradeCalculator from './pages/GradeCalculator';
-import ExamModuleC from './pages/ExamModuleC';
-import AdminExams from './pages/AdminExams';
-import ExamModuleB from './pages/ExamModuleB';
-import AdminTopicDebug from './pages/AdminTopicDebug';
-import AdminModules from './pages/AdminModules';
-import AdminExamScanner from './pages/AdminExamScanner';
-import AdminCurriculum from './pages/AdminCurriculum';
-import AdminPracticeScanner from './pages/AdminPracticeScanner';
-import ExamGeneric from './pages/ExamGeneric';
-import ExamMath from './pages/ExamMath';
-import ExamPhysics from './pages/ExamPhysics';
-import ExamLiterature from './pages/ExamLiterature';
-import ExamReport from './pages/ExamReport';
-import AdminQuestionBank from './pages/AdminQuestionBank';
-import AdminPracticeTopics from './pages/AdminPracticeTopics';
-import ExamSessionNew from './pages/ExamSessionNew';
 import AdminAudioStudio from './pages/AdminAudioStudio';
-import AdminExamEditor from './pages/AdminExamEditor';
-import AdminExamViewer from './pages/AdminExamViewer';
-import ExamModuleA from './pages/ExamModuleA';
-import AdminSmartTutor from './pages/AdminSmartTutor';
-import AdminCorrections from './pages/AdminCorrections';
-import AdminFeedback from './pages/AdminFeedback';
-import AdminCacheManager from './pages/AdminCacheManager';
-import ExamReview from './pages/ExamReview';
-import TopicPracticePage from './pages/TopicPracticePage';
-import AdminQuestionManager from './pages/AdminQuestionManager';
-import FullExamSimulation from './pages/FullExamSimulation';
-import ErrorAnalysisPage from './pages/ErrorAnalysisPage';
-import AdminQuestionList from './pages/AdminQuestionList';
+import AdminBagrutManager from './pages/AdminBagrutManager';
 import AdminBulkImport from './pages/AdminBulkImport';
-import TopicPracticeNew from './pages/TopicPracticeNew';
-import AdminPracticeEditor from './pages/AdminPracticeEditor';
-import WeakTopics from './pages/WeakTopics';
-import CustomPractice from './pages/CustomPractice';
-import CustomExam from './pages/CustomExam';
-import AdminSmartImport from './pages/AdminSmartImport';
+import AdminCacheManager from './pages/AdminCacheManager';
+import AdminCorrections from './pages/AdminCorrections';
+import AdminCurriculum from './pages/AdminCurriculum';
+import AdminExamEditor from './pages/AdminExamEditor';
+import AdminExamScanner from './pages/AdminExamScanner';
+import AdminExamViewer from './pages/AdminExamViewer';
+import AdminExams from './pages/AdminExams';
+import AdminFeedback from './pages/AdminFeedback';
 import AdminListeningManager from './pages/AdminListeningManager';
-import ExtendedReading from './pages/ExtendedReading';
+import AdminModules from './pages/AdminModules';
+import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
+import AdminPracticeEditor from './pages/AdminPracticeEditor';
+import AdminPracticeScanner from './pages/AdminPracticeScanner';
+import AdminPracticeTopics from './pages/AdminPracticeTopics';
+import AdminQuestionBank from './pages/AdminQuestionBank';
+import AdminQuestionList from './pages/AdminQuestionList';
+import AdminQuestionManager from './pages/AdminQuestionManager';
+import AdminSmartImport from './pages/AdminSmartImport';
+import AdminSmartTutor from './pages/AdminSmartTutor';
+import AdminTopicDebug from './pages/AdminTopicDebug';
 import AdminTopics from './pages/AdminTopics';
-import Vocabulary from './pages/Vocabulary';
-import VocabularyPractice from './pages/VocabularyPractice';
+import CustomExam from './pages/CustomExam';
+import CustomPractice from './pages/CustomPractice';
+import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
+import CustomPracticeSession from './pages/CustomPracticeSession';
 import CustomWeakExam from './pages/CustomWeakExam';
 import CustomWeakPractice from './pages/CustomWeakPractice';
-import StudyPlanner from './pages/StudyPlanner';
-import CustomPracticeBuilder from './pages/CustomPracticeBuilder';
-import WeakAreaSelection from './pages/WeakAreaSelection';
-import WeakExamSelection from './pages/WeakExamSelection';
 import CustomWeakTopicExam from './pages/CustomWeakTopicExam';
-import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
 import DailyPractice from './pages/DailyPractice';
-import LearningPlan from './pages/LearningPlan';
-import Readiness from './pages/Readiness';
-import Home from './pages/Home';
-import Settings from './pages/Settings';
+import ErrorAnalysisPage from './pages/ErrorAnalysisPage';
+import ExamGeneric from './pages/ExamGeneric';
+import ExamLiterature from './pages/ExamLiterature';
+import ExamMath from './pages/ExamMath';
 import ExamMistakesPractice from './pages/ExamMistakesPractice';
-import StudyPlan from './pages/StudyPlan';
-import CustomPracticeSession from './pages/CustomPracticeSession';
-import VocabularySetMode from './pages/VocabularySetMode';
+import ExamModuleA from './pages/ExamModuleA';
+import ExamModuleB from './pages/ExamModuleB';
+import ExamModuleC from './pages/ExamModuleC';
+import ExamPhysics from './pages/ExamPhysics';
+import ExamReport from './pages/ExamReport';
+import ExamReview from './pages/ExamReview';
+import ExamSessionNew from './pages/ExamSessionNew';
+import Exams from './pages/Exams';
+import ExtendedReading from './pages/ExtendedReading';
+import FullExamSimulation from './pages/FullExamSimulation';
+import GradeCalculator from './pages/GradeCalculator';
 import Grammar from './pages/Grammar';
 import GrammarPractice from './pages/GrammarPractice';
+import GrammarPracticeNew from './pages/GrammarPracticeNew';
+import GrammarTopics from './pages/GrammarTopics';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
+import Home from './pages/Home';
+import LearningPlan from './pages/LearningPlan';
+import Onboarding from './pages/Onboarding';
+import Practice from './pages/Practice';
+import Premium from './pages/Premium';
+import Profile from './pages/Profile';
+import Readiness from './pages/Readiness';
+import ReadingComprehension from './pages/ReadingComprehension';
+import ReadingPractice from './pages/ReadingPractice';
+import Settings from './pages/Settings';
+import StudyPlan from './pages/StudyPlan';
+import StudyPlanner from './pages/StudyPlanner';
+import SubjectSelection from './pages/SubjectSelection';
+import TopicPracticeNew from './pages/TopicPracticeNew';
+import TopicPracticePage from './pages/TopicPracticePage';
+import Vocabulary from './pages/Vocabulary';
 import VocabularyFlashcards from './pages/VocabularyFlashcards';
-import AdminBagrutManager from './pages/AdminBagrutManager';
+import VocabularyPractice from './pages/VocabularyPractice';
+import VocabularyQuickPractice from './pages/VocabularyQuickPractice';
+import VocabularySetMode from './pages/VocabularySetMode';
+import VocabularySets from './pages/VocabularySets';
+import VocabularyStrengthen from './pages/VocabularyStrengthen';
+import VocabularyTraining from './pages/VocabularyTraining';
+import WeakAreaSelection from './pages/WeakAreaSelection';
+import WeakExamSelection from './pages/WeakExamSelection';
+import WeakTopics from './pages/WeakTopics';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Onboarding": Onboarding,
-    "Practice": Practice,
-    "Exams": Exams,
-    "Premium": Premium,
-    "Profile": Profile,
-    "SubjectSelection": SubjectSelection,
-    "GradeCalculator": GradeCalculator,
-    "ExamModuleC": ExamModuleC,
-    "AdminExams": AdminExams,
-    "ExamModuleB": ExamModuleB,
-    "AdminTopicDebug": AdminTopicDebug,
-    "AdminModules": AdminModules,
-    "AdminExamScanner": AdminExamScanner,
-    "AdminCurriculum": AdminCurriculum,
-    "AdminPracticeScanner": AdminPracticeScanner,
-    "ExamGeneric": ExamGeneric,
-    "ExamMath": ExamMath,
-    "ExamPhysics": ExamPhysics,
-    "ExamLiterature": ExamLiterature,
-    "ExamReport": ExamReport,
-    "AdminQuestionBank": AdminQuestionBank,
-    "AdminPracticeTopics": AdminPracticeTopics,
-    "ExamSessionNew": ExamSessionNew,
     "AdminAudioStudio": AdminAudioStudio,
-    "AdminExamEditor": AdminExamEditor,
-    "AdminExamViewer": AdminExamViewer,
-    "ExamModuleA": ExamModuleA,
-    "AdminSmartTutor": AdminSmartTutor,
-    "AdminCorrections": AdminCorrections,
-    "AdminFeedback": AdminFeedback,
-    "AdminCacheManager": AdminCacheManager,
-    "ExamReview": ExamReview,
-    "TopicPracticePage": TopicPracticePage,
-    "AdminQuestionManager": AdminQuestionManager,
-    "FullExamSimulation": FullExamSimulation,
-    "ErrorAnalysisPage": ErrorAnalysisPage,
-    "AdminQuestionList": AdminQuestionList,
+    "AdminBagrutManager": AdminBagrutManager,
     "AdminBulkImport": AdminBulkImport,
-    "TopicPracticeNew": TopicPracticeNew,
-    "AdminPracticeEditor": AdminPracticeEditor,
-    "WeakTopics": WeakTopics,
-    "CustomPractice": CustomPractice,
-    "CustomExam": CustomExam,
-    "AdminSmartImport": AdminSmartImport,
+    "AdminCacheManager": AdminCacheManager,
+    "AdminCorrections": AdminCorrections,
+    "AdminCurriculum": AdminCurriculum,
+    "AdminExamEditor": AdminExamEditor,
+    "AdminExamScanner": AdminExamScanner,
+    "AdminExamViewer": AdminExamViewer,
+    "AdminExams": AdminExams,
+    "AdminFeedback": AdminFeedback,
     "AdminListeningManager": AdminListeningManager,
-    "ExtendedReading": ExtendedReading,
+    "AdminModules": AdminModules,
+    "AdminNotificationTemplates": AdminNotificationTemplates,
+    "AdminPracticeEditor": AdminPracticeEditor,
+    "AdminPracticeScanner": AdminPracticeScanner,
+    "AdminPracticeTopics": AdminPracticeTopics,
+    "AdminQuestionBank": AdminQuestionBank,
+    "AdminQuestionList": AdminQuestionList,
+    "AdminQuestionManager": AdminQuestionManager,
+    "AdminSmartImport": AdminSmartImport,
+    "AdminSmartTutor": AdminSmartTutor,
+    "AdminTopicDebug": AdminTopicDebug,
     "AdminTopics": AdminTopics,
-    "Vocabulary": Vocabulary,
-    "VocabularyPractice": VocabularyPractice,
+    "CustomExam": CustomExam,
+    "CustomPractice": CustomPractice,
+    "CustomPracticeBuilder": CustomPracticeBuilder,
+    "CustomPracticeSession": CustomPracticeSession,
     "CustomWeakExam": CustomWeakExam,
     "CustomWeakPractice": CustomWeakPractice,
-    "StudyPlanner": StudyPlanner,
-    "CustomPracticeBuilder": CustomPracticeBuilder,
-    "WeakAreaSelection": WeakAreaSelection,
-    "WeakExamSelection": WeakExamSelection,
     "CustomWeakTopicExam": CustomWeakTopicExam,
-    "AdminNotificationTemplates": AdminNotificationTemplates,
     "DailyPractice": DailyPractice,
-    "LearningPlan": LearningPlan,
-    "Readiness": Readiness,
-    "Home": Home,
-    "Settings": Settings,
+    "ErrorAnalysisPage": ErrorAnalysisPage,
+    "ExamGeneric": ExamGeneric,
+    "ExamLiterature": ExamLiterature,
+    "ExamMath": ExamMath,
     "ExamMistakesPractice": ExamMistakesPractice,
-    "StudyPlan": StudyPlan,
-    "CustomPracticeSession": CustomPracticeSession,
-    "VocabularySetMode": VocabularySetMode,
+    "ExamModuleA": ExamModuleA,
+    "ExamModuleB": ExamModuleB,
+    "ExamModuleC": ExamModuleC,
+    "ExamPhysics": ExamPhysics,
+    "ExamReport": ExamReport,
+    "ExamReview": ExamReview,
+    "ExamSessionNew": ExamSessionNew,
+    "Exams": Exams,
+    "ExtendedReading": ExtendedReading,
+    "FullExamSimulation": FullExamSimulation,
+    "GradeCalculator": GradeCalculator,
     "Grammar": Grammar,
     "GrammarPractice": GrammarPractice,
+    "GrammarPracticeNew": GrammarPracticeNew,
+    "GrammarTopics": GrammarTopics,
     "GrammarTopicsSelection": GrammarTopicsSelection,
+    "Home": Home,
+    "LearningPlan": LearningPlan,
+    "Onboarding": Onboarding,
+    "Practice": Practice,
+    "Premium": Premium,
+    "Profile": Profile,
+    "Readiness": Readiness,
+    "ReadingComprehension": ReadingComprehension,
+    "ReadingPractice": ReadingPractice,
+    "Settings": Settings,
+    "StudyPlan": StudyPlan,
+    "StudyPlanner": StudyPlanner,
+    "SubjectSelection": SubjectSelection,
+    "TopicPracticeNew": TopicPracticeNew,
+    "TopicPracticePage": TopicPracticePage,
+    "Vocabulary": Vocabulary,
     "VocabularyFlashcards": VocabularyFlashcards,
-    "AdminBagrutManager": AdminBagrutManager,
+    "VocabularyPractice": VocabularyPractice,
+    "VocabularyQuickPractice": VocabularyQuickPractice,
+    "VocabularySetMode": VocabularySetMode,
+    "VocabularySets": VocabularySets,
+    "VocabularyStrengthen": VocabularyStrengthen,
+    "VocabularyTraining": VocabularyTraining,
+    "WeakAreaSelection": WeakAreaSelection,
+    "WeakExamSelection": WeakExamSelection,
+    "WeakTopics": WeakTopics,
 }
 
 export const pagesConfig = {

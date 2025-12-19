@@ -1370,22 +1370,22 @@ export default function ExamMathPage() {
               </Button>
             </div>
 
-            {/* Question Text & Sections - RTL Enforced - PRECISE HEBREW FORMATTING */}
-            <div className="mb-6 text-right" dir="rtl">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 md:p-8 mb-8">
                 {question.question_text && (
-                    <div className="text-xl font-medium text-slate-900 mb-4 leading-relaxed whitespace-pre-wrap font-sans">
+                    <div className="prose prose-xl max-w-none text-right mb-6 text-slate-800" dir="rtl">
                         <LatexRenderer content={question.question_text} />
                     </div>
                 )}
                 
-                {/* Clean Document Layout for Parts - EXACT SOURCE MATCH */}
                 {question.parts && question.parts.length > 0 && (
-                    <div className="mt-4 space-y-4 pr-2">
+                    <div className={`space-y-8 ${question.question_text ? 'mt-8 pt-8 border-t border-slate-200' : ''}`}>
                         {question.parts.map((part, pIdx) => (
-                            <div key={pIdx} className="flex items-baseline gap-3 text-lg text-slate-900">
-                                <span className="font-bold min-w-[24px] text-left text-blue-600">{part.part_id}.</span>
-                                <div className="flex-1 leading-relaxed whitespace-pre-wrap">
-                                    <LatexRenderer content={part.text} />
+                            <div key={pIdx} className="flex items-start gap-4">
+                                <div className="bg-white border border-slate-200 text-slate-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold flex-shrink-0 text-lg shadow-sm">
+                                    {part.part_id}
+                                </div>
+                                <div className="prose prose-lg max-w-none text-right flex-grow pt-1 text-slate-800" dir="rtl">
+                                    <LatexRenderer content={part.text || ''} />
                                 </div>
                             </div>
                         ))}
