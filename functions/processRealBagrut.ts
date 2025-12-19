@@ -72,7 +72,12 @@ Deno.serve(async (req) => {
             if (q.has_diagram) {
                 try {
                     console.log(`Generating diagram for question ${q.question_number}...`);
-                    const diagramPrompt = `Create a clean, black and white, 2D geometry diagram for a math problem. The diagram should be simple, clear, and focused on the geometric shapes and labels mentioned. Do not include the question text in the image. Only output the diagram. Based on the problem: ${q.intro_text || ''} ${q.sections ? q.sections.map(s => s.content).join(' ') : ''}`;
+                    const diagramPrompt = `CRITICAL INSTRUCTION: Generate a VERY simple, clean, black and white 2D line-art diagram for the geometric shape described in the text.
+                    - ONLY draw the main shape and its vertices (e.g., for a pyramid SABCD, draw the pyramid and label the points S, A, B, C, D, and the center O if mentioned).
+                    - Use dashed lines for hidden edges to show perspective.
+                    - DO NOT add any measurements, angles, dimensions, formulas, or extra construction lines. The diagram must be as simple and clean as a standard textbook geometry figure.
+                    - The diagram should ONLY contain the shape and its vertex labels. Nothing else.
+                    The geometric problem description is: ${q.intro_text || ''} ${q.sections ? q.sections.map(s => s.content).join(' ') : ''}`;
 
                     const imageResponse = await base44.asServiceRole.integrations.Core.GenerateImage({
                         prompt: diagramPrompt
