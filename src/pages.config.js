@@ -77,6 +77,9 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
+import PracticeTopics from './pages/PracticeTopics';
+import PracticePlayer from './pages/PracticePlayer';
+import PracticeSummary from './pages/PracticeSummary';
 import __Layout from './Layout.jsx';
 
 
@@ -160,6 +163,9 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
+    "PracticeTopics": PracticeTopics,
+    "PracticePlayer": PracticePlayer,
+    "PracticeSummary": PracticeSummary,
 }
 
 export const pagesConfig = {
