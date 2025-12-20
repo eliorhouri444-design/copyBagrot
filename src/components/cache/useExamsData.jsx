@@ -39,7 +39,8 @@ export function useExamsData(subject, units) {
         moduleAExams,
         moduleBExams,
         moduleCExams,
-        examAttempts
+        examAttempts,
+        bagrutExams
       ] = await Promise.all([
         base44.entities.ModuleDefinition.filter(
           { subject: subject, unit_level: parseInt(units) },
@@ -75,6 +76,11 @@ export function useExamsData(subject, units) {
           { created_by: user.email, subject: subject, unit_level: parseInt(units) },
           "-created_date",
           100
+        ),
+        base44.entities.BagrutExam.filter(
+            { subject: subject, unit_level: parseInt(units) },
+            "-year",
+            100
         )
       ]);
 
@@ -109,6 +115,7 @@ export function useExamsData(subject, units) {
         moduleAExams,
         moduleBExams,
         moduleCExams,
+        bagrutExams,
         subject,
         units
       };

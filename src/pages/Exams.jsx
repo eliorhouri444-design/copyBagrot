@@ -29,6 +29,7 @@ export default function ExamsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
   const [showAttemptDetails, setShowAttemptDetails] = useState(null);
   const [showAllExams, setShowAllExams] = useState(false);
   const [currentExamIndex, setCurrentExamIndex] = useState({});
@@ -49,6 +50,7 @@ export default function ExamsPage() {
   const [cachedUnits, setCachedUnits] = useState(() => localStorage.getItem('selected_units') || '3');
 
   const { data: examsData, isLoading: isExamsLoading, error: examsError } = useExamsData(cachedSubject, cachedUnits);
+  const allBagrutExams = examsData?.bagrutExams || [];
 
   const displaySubject = examsData?.subject || cachedSubject;
   const displayUnits = parseInt(examsData?.units || cachedUnits);
@@ -362,6 +364,37 @@ export default function ExamsPage() {
     }
     return { topicsStarted: 0, totalTopics: 0, avgProgress: 0 };
   }, [examAttempts, isLoading]);
+
+  const handleProcessBagrut = async (bagrut) => {
+    if (!confirm(`האם לעבד ולפרסם את הבגרות: ${bagrut.title}?`)) return;
+    
+    setProcessingId(bagrut.id);
+    try {
+      const response = await base44.functions.invoke('processRealBagrut', {
+         exam_pdf_url: bagrut.exam_file_url,
+         solution_pdf_url: bagrut.solution_file_url, 
+         subject: bagrut.subject_id,
+         unit: bagrut.unit_level,
+         year: bagrut.year,
+         season: bagrut.season,
+         module_symbol: bagrut.module_symbol
+      });
+
+      if (response.data.success) {
+        DataCache.invalidatePattern('exams_data');
+        DataCache.invalidatePattern('home_data');
+        window.dispatchEvent(new Event('cache-update'));
+        alert('הבגרות עובדה ופורסמה בהצלחה!');
+      } else {
+        throw new Error(response.data.error || 'Processing failed');
+      }
+    } catch (error) {
+      console.error('Error processing exam:', error);
+      alert('שגיאה בעיבוד: ' + error.message);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const getProgressColor = (progress) => {
     if (progress >= 80) return "#22C55E";
@@ -776,6 +809,29 @@ export default function ExamsPage() {
             examAttempts={examAttempts} />
 
         </motion.div>
+
+        {allBagrutExams.length > 0 && (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="mt-6"
+            >
+                <div className="flex items-center justify-between mb-2 px-6">
+                    <h3 className="text-xl font-bold text-gray-800">בגרויות רשמיות שהועלו</h3>
+                    {user?.role === 'admin' && (
+                        <Button variant="outline" size="sm" onClick={() => navigate(createPageUrl("AdminBagrutManager"))}>
+                            נהל בגרויות
+                        </Button>
+                    )}
+                </div>
+                <BagrutCarousel 
+                    exams={allBagrutExams} 
+                    onProcess={handleProcessBagrut}
+                    processingId={processingId}
+                />
+            </motion.div>
+        )}
 
 
 
