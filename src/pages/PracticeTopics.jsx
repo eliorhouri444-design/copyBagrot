@@ -46,12 +46,12 @@ export default function PracticeTopics() {
   
   const { data: subjects, isLoading: isLoadingSubjects } = useQuery({
     queryKey: ['subjects'],
-    queryFn: () => base44.entities.Subject.list({sort: {order: 1}}),
+    queryFn: () => base44.entities.Subject.list('order'),
   });
 
   const { data: topics, isLoading: isLoadingTopics } = useQuery({
     queryKey: ['topics'],
-    queryFn: () => base44.entities.Topic.list({sort: {order: 1}}),
+    queryFn: () => base44.entities.Topic.list('order'),
   });
 
   const { data: userStats, isLoading: isLoadingStats } = useQuery({

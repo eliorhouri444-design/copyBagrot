@@ -37,7 +37,7 @@ export default function PracticeSummary() {
 
   const { data: weakTopics, isLoading: isLoadingWeakTopics } = useQuery({
       queryKey: ['weakTopics', user?.email],
-      queryFn: () => base44.entities.UserTopicStats.filter({ user_email: user.email }, '-accuracy', 3),
+      queryFn: () => base44.entities.UserTopicStats.filter({ user_email: user.email }, 'accuracy', 3),
       enabled: !!user,
   })
 

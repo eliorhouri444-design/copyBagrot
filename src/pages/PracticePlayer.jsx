@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
+
 
 const ExplanationStep = ({ step, index }) => (
   <div className="mt-2 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
@@ -19,7 +19,7 @@ export default function PracticePlayer() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState(null); // { is_correct: boolean, explanation_steps: [] }
-  const [sessionId] = useState(uuidv4());
+  const [sessionId] = useState(() => Date.now().toString(36) + Math.random().toString(36).substring(2));
   const [user, setUser] = useState(null);
 
   const params = new URLSearchParams(location.search);
