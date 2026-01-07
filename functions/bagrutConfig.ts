@@ -1,6 +1,6 @@
 export const bagrutConfig = {
   "system_name": "BagrutMathSolverIL",
-  "version": "1.0",
+  "version": "1.1",
   "locale": "he-IL",
   "supported_units": [3, 4, 5],
   "global_policies": {
@@ -23,6 +23,7 @@ export const bagrutConfig = {
   },
 
   "router_rules": [
+    // --- 5 Units Specific Rules (Existing) ---
     {
       "id": "R-FUNC-INVEST",
       "units": [4, 5],
@@ -71,10 +72,98 @@ export const bagrutConfig = {
       "match_any": ["הסתברות", "התפלגות", "ציפייה", "שונות", "סטיית תקן", "בינומי", "נורמלי"],
       "topic": "probability_statistics",
       "template_priority": ["T-PROB-BINOM"]
+    },
+
+    // --- 3/4 Units Addendum Rules ---
+    {
+      "id": "R3-ALG-EQ",
+      "units": [3],
+      "match_any": ["פתור", "משוואה", "מערכת משוואות", "פירוק לגורמים", "נוסחת השורשים"],
+      "topic": "algebra",
+      "template_priority": ["T3-ALG-LINEAR-QUAD", "T3-ALG-SYSTEMS"]
+    },
+    {
+      "id": "R3-GEO-TRI",
+      "units": [3],
+      "match_any": ["משולש", "דמיון", "תלס", "חוצה זווית", "תיכון", "גובה", "חפיפה"],
+      "topic": "geometry_plane",
+      "template_priority": ["T3-GEO-SIMILARITY-THALES", "T3-GEO-ANGLE-BISECTOR", "T3-GEO-CONGRUENCE"]
+    },
+    {
+      "id": "R3-CIRCLE",
+      "units": [3],
+      "match_any": ["מעגל", "זווית היקפית", "קוטר", "משיק", "רדיוס"],
+      "topic": "geometry_circle",
+      "template_priority": ["T3-CIRCLE-ANGLES", "T3-CIRCLE-TANGENT"]
+    },
+    {
+      "id": "R3-FUNC-BASIC",
+      "units": [3],
+      "match_any": ["פונקציה", "גרף", "חיתוך עם הצירים", "תחום", "טווח", "פרבולה", "ישר"],
+      "topic": "functions_basic",
+      "template_priority": ["T3-FUNC-LINE-PARABOLA", "T3-FUNC-TRANSFORMS"]
+    },
+    {
+      "id": "R3-TRIG-BASIC",
+      "units": [3],
+      "match_any": ["sin", "cos", "tan", "משולש ישר זווית", "טריגונומטריה"],
+      "topic": "trigonometry_basic",
+      "template_priority": ["T3-TRIG-RIGHT-TRI", "T3-TRIG-ANGLES"]
+    },
+    {
+      "id": "R3-PROB-BASIC",
+      "units": [3],
+      "match_any": ["הסתברות", "קלפים", "קוביות", "עץ הסתברויות", "מאורעות"],
+      "topic": "probability_basic",
+      "template_priority": ["T3-PROB-TREE-COUNT", "T3-PROB-COND-BASIC"]
+    },
+
+    {
+      "id": "R4-FUNC-CALC",
+      "units": [4],
+      "match_any": ["נגזרת", "קיצון", "עליה", "ירידה", "סקיצה", "חקור"],
+      "topic": "functions_calculus",
+      "template_priority": ["T4-FUNC-INVEST-STD", "T4-FUNC-RATIONAL-ASYM"]
+    },
+    {
+      "id": "R4-TRIG-EQ",
+      "units": [4],
+      "match_any": ["משוואה טריגונומטרית", "זהות", "sin", "cos", "tan", "2x", "טריגו"],
+      "topic": "trigonometry",
+      "template_priority": ["T4-TRIG-EQ-STD", "T4-TRIG-ID-STD"]
+    },
+    {
+      "id": "R4-EXP-LOG",
+      "units": [4],
+      "match_any": ["ln", "log", "מעריכית", "לוגריתמית", "e^"],
+      "topic": "exponential_logarithmic",
+      "template_priority": ["T4-EXPLOG-EQ", "T4-EXPLOG-FUNC"]
+    },
+    {
+      "id": "R4-GEO-PLANE",
+      "units": [4],
+      "match_any": ["מעגל", "משיק", "חזקת נקודה", "דמיון", "תלס", "חוצה זווית"],
+      "topic": "geometry_plane",
+      "template_priority": ["T4-CIRCLE-POWER", "T4-GEO-SIMILARITY-THALES", "T4-GEO-ANGLE-BISECTOR"]
+    },
+    {
+      "id": "R4-PROB",
+      "units": [4],
+      "match_any": ["בינומי", "התפלגות", "הסתברות", "ציפייה", "סטיית תקן"],
+      "topic": "probability_statistics",
+      "template_priority": ["T4-PROB-BINOM", "T4-STAT-MEAN-VAR"]
+    },
+    {
+      "id": "R4-ANALYTIC-GEO",
+      "units": [4],
+      "match_any": ["שיפוע", "משוואת ישר", "מרחק בין נקודות", "אמצע קטע", "מעגל במשוואה"],
+      "topic": "analytic_geometry",
+      "template_priority": ["T4-ANALYTIC-LINE", "T4-ANALYTIC-CIRCLE"]
     }
   ],
 
   "templates": [
+    // --- Existing 5 Units Templates ---
     {
       "id": "T-SEQ-LINREC-SHIFT",
       "topic": "sequences_series",
@@ -242,6 +331,307 @@ export const bagrutConfig = {
               "נשלים חישובים במישור הבסיס לפי הצורך."
           ]
       }
+    },
+
+    // --- 3 Units Templates ---
+    {
+      "id": "T3-ALG-LINEAR-QUAD",
+      "topic": "algebra",
+      "units": [3],
+      "title": "אלגברה: משוואות ליניאריות וריבועיות",
+      "plan": [
+        {"step": 1, "action": "simplify_move_to_one_side"},
+        {"step": 2, "action": "solve_linear_or_quadratic", "methods": ["factoring", "quadratic_formula"], "tools": ["cas_optional"]},
+        {"step": 3, "action": "check_solutions", "methods": ["substitution"]}
+      ],
+      "verifier": [{"type": "substitution", "target": "original_equation"}]
+    },
+    {
+      "id": "T3-ALG-SYSTEMS",
+      "topic": "algebra",
+      "units": [3],
+      "title": "מערכות משוואות (2 נעלמים)",
+      "plan": [
+        {"step": 1, "action": "choose_method", "methods": ["substitution", "elimination"]},
+        {"step": 2, "action": "solve_system", "tools": ["cas_optional"]},
+        {"step": 3, "action": "verify", "methods": ["substitution"]}
+      ]
+    },
+    {
+      "id": "T3-FUNC-LINE-PARABOLA",
+      "topic": "functions_basic",
+      "units": [3],
+      "title": "פונקציות בסיס: ישר/פרבולה – חיתוכים, תחום, קודקוד",
+      "plan": [
+        {"step": 1, "action": "domain_analysis"},
+        {"step": 2, "action": "intercepts"},
+        {"step": 3, "action": "vertex_or_slope", "methods": ["complete_square_optional", "slope_intercept"]},
+        {"step": 4, "action": "sketch_summary"}
+      ]
+    },
+    {
+      "id": "T3-FUNC-TRANSFORMS",
+      "topic": "functions_basic",
+      "units": [3],
+      "title": "טרנספורמציות גרפים (הזזה/מתיחה/שיקוף)",
+      "plan": [
+        {"step": 1, "action": "identify_base_function"},
+        {"step": 2, "action": "apply_transform_rules"},
+        {"step": 3, "action": "key_points_and_sketch"}
+      ]
+    },
+    {
+      "id": "T3-TRIG-RIGHT-TRI",
+      "topic": "trigonometry_basic",
+      "units": [3],
+      "title": "טריגונומטריה במשולש ישר-זווית",
+      "plan": [
+        {"step": 1, "action": "draw_right_triangle_and_label"},
+        {"step": 2, "action": "use_definitions", "rules": ["sin=opp/hyp", "cos=adj/hyp", "tan=opp/adj"]},
+        {"step": 3, "action": "solve_for_unknown"},
+        {"step": 4, "action": "verify_reasonableness"}
+      ]
+    },
+    {
+      "id": "T3-GEO-SIMILARITY-THALES",
+      "topic": "geometry_plane",
+      "units": [3],
+      "title": "דמיון + תלס (מקבילים → יחסים)",
+      "plan": [
+        {"step": 1, "action": "mark_parallel_lines_and_angles"},
+        {"step": 2, "action": "prove_similarity", "methods": ["AA"]},
+        {"step": 3, "action": "write_proportions_and_solve"},
+        {"step": 4, "action": "verify_with_ratio_check"}
+      ]
+    },
+    {
+      "id": "T3-GEO-ANGLE-BISECTOR",
+      "topic": "geometry_plane",
+      "units": [3],
+      "title": "חוצה זווית בסיסי (משפט חוצה זווית)",
+      "plan": [
+        {"step": 1, "action": "identify_angle_bisector"},
+        {"step": 2, "action": "apply_angle_bisector_theorem"},
+        {"step": 3, "action": "solve_for_unknown"},
+        {"step": 4, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T3-GEO-CONGRUENCE",
+      "topic": "geometry_plane",
+      "units": [3],
+      "title": "חפיפת משולשים (צ.צ.צ / צ.ז.צ / ז.צ.ז)",
+      "plan": [
+        {"step": 1, "action": "list_given_equalities"},
+        {"step": 2, "action": "choose_congruence_criterion"},
+        {"step": 3, "action": "deduce_required_angles_sides"}
+      ]
+    },
+    {
+      "id": "T3-CIRCLE-ANGLES",
+      "topic": "geometry_circle",
+      "units": [3],
+      "title": "מעגל: זוויות היקפיות/מרכזיות וקוטר",
+      "plan": [
+        {"step": 1, "action": "identify_circle_theorem", "rules": ["inscribed_angle_half_central", "angle_in_semicircle_90"]},
+        {"step": 2, "action": "compute_angles"},
+        {"step": 3, "action": "verify_angle_range"}
+      ]
+    },
+    {
+      "id": "T3-CIRCLE-TANGENT",
+      "topic": "geometry_circle",
+      "units": [3],
+      "title": "משיק למעגל (רדיוס מאונך למשיק)",
+      "plan": [
+        {"step": 1, "action": "use_tangent_radius_perpendicular"},
+        {"step": 2, "action": "solve_using_right_triangle_or_angles"},
+        {"step": 3, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T3-PROB-TREE-COUNT",
+      "topic": "probability_basic",
+      "units": [3],
+      "title": "הסתברות בסיסית: עץ הסתברויות/ספירה",
+      "plan": [
+        {"step": 1, "action": "define_events"},
+        {"step": 2, "action": "build_tree_or_count_outcomes"},
+        {"step": 3, "action": "compute_probability"},
+        {"step": 4, "action": "verify_bounds_0_1"}
+      ]
+    },
+    {
+      "id": "T3-PROB-COND-BASIC",
+      "topic": "probability_basic",
+      "units": [3],
+      "title": "הסתברות מותנית בסיסית",
+      "plan": [
+        {"step": 1, "action": "use_conditional_definition", "formula": "P(A|B)=P(A∩B)/P(B)"},
+        {"step": 2, "action": "compute_intersection"},
+        {"step": 3, "action": "verify_bounds_0_1"}
+      ]
+    },
+
+    // --- 4 Units Templates ---
+    {
+      "id": "T4-FUNC-INVEST-STD",
+      "topic": "functions_calculus",
+      "units": [4],
+      "title": "חקירת פונקציה (4 יח׳): תחום→חיתוכים→נגזרת→קיצון→סקיצה",
+      "plan": [
+        {"step": 1, "action": "domain_analysis", "tools": ["cas_optional"]},
+        {"step": 2, "action": "intercepts", "tools": ["cas_optional"]},
+        {"step": 3, "action": "differentiate", "tools": ["cas_optional"]},
+        {"step": 4, "action": "critical_points_and_type", "methods": ["sign_chart"]},
+        {"step": 5, "action": "sketch_summary"},
+        {"step": 6, "action": "verify", "methods": ["sample_points"]}
+      ]
+    },
+    {
+      "id": "T4-FUNC-RATIONAL-ASYM",
+      "topic": "functions_calculus",
+      "units": [4],
+      "title": "פונקציות רציונליות: תחום + אסימפטוטות + חקירה",
+      "plan": [
+        {"step": 1, "action": "domain_analysis", "notes": "מכנה ≠ 0"},
+        {"step": 2, "action": "vertical_asymptotes"},
+        {"step": 3, "action": "end_behavior_asymptote", "methods": ["long_division_optional"], "tools": ["cas_optional"]},
+        {"step": 4, "action": "derivative_investigation", "tools": ["cas_optional"]},
+        {"step": 5, "action": "verify", "methods": ["sample_points"]}
+      ]
+    },
+    {
+      "id": "T4-TRIG-EQ-STD",
+      "topic": "trigonometry",
+      "units": [4],
+      "title": "משוואות טריגו (4 יח׳) בתחום נתון",
+      "plan": [
+        {"step": 1, "action": "use_basic_identities", "rules": ["sin2x=2sinxcosx", "cos2x=2cos^2x-1"]},
+        {"step": 2, "action": "factor_or_reduce_to_basic"},
+        {"step": 3, "action": "solve_basic_trig"},
+        {"step": 4, "action": "apply_interval"},
+        {"step": 5, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-TRIG-ID-STD",
+      "topic": "trigonometry",
+      "units": [4],
+      "title": "זהויות טריגונומטריות (פישוט/הוכחה)",
+      "plan": [
+        {"step": 1, "action": "choose_side_to_transform"},
+        {"step": 2, "action": "apply_identities", "rules": ["1-sin^2=cos^2", "tan=sin/cos"]},
+        {"step": 3, "action": "simplify_to_match"},
+        {"step": 4, "action": "verify_equivalence"}
+      ]
+    },
+    {
+      "id": "T4-EXPLOG-EQ",
+      "topic": "exponential_logarithmic",
+      "units": [4],
+      "title": "מעריכי/לוגריתמי (4 יח׳) עם תנאי תחום",
+      "plan": [
+        {"step": 1, "action": "domain_conditions", "notes": "ארגומנט לוג > 0"},
+        {"step": 2, "action": "substitute_t", "rules": ["t=a^x", "t=e^x"]},
+        {"step": 3, "action": "solve_in_t"},
+        {"step": 4, "action": "back_substitute_and_filter"},
+        {"step": 5, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-EXPLOG-FUNC",
+      "topic": "exponential_logarithmic",
+      "units": [4],
+      "title": "חקירת פונקציה מעריכית/לוגריתמית",
+      "plan": [
+        {"step": 1, "action": "domain_analysis"},
+        {"step": 2, "action": "intercepts"},
+        {"step": 3, "action": "derivative_and_extrema"},
+        {"step": 4, "action": "sketch_summary"},
+        {"step": 5, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-CIRCLE-POWER",
+      "topic": "geometry_plane",
+      "units": [4],
+      "title": "חזקת נקודה/מיתרים/משיקים",
+      "plan": [
+        {"step": 1, "action": "identify_configuration", "rules": ["secant_secant", "tangent_secant", "chord_chord"]},
+        {"step": 2, "action": "write_power_equation"},
+        {"step": 3, "action": "solve_for_length"},
+        {"step": 4, "action": "verify_positive_lengths"}
+      ]
+    },
+    {
+      "id": "T4-GEO-SIMILARITY-THALES",
+      "topic": "geometry_plane",
+      "units": [4],
+      "title": "דמיון/תלס (4 יח׳) עם חישובי אורכים/זוויות",
+      "plan": [
+        {"step": 1, "action": "prove_similarity"},
+        {"step": 2, "action": "use_proportions"},
+        {"step": 3, "action": "solve"},
+        {"step": 4, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-GEO-ANGLE-BISECTOR",
+      "topic": "geometry_plane",
+      "units": [4],
+      "title": "חוצה זווית (4 יח׳): יחס צלעות/קטעים",
+      "plan": [
+        {"step": 1, "action": "apply_angle_bisector_theorem"},
+        {"step": 2, "action": "solve"},
+        {"step": 3, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-ANALYTIC-LINE",
+      "topic": "analytic_geometry",
+      "units": [4],
+      "title": "ישר: שיפוע, משוואה, חיתוך, מרחק נקודות",
+      "plan": [
+        {"step": 1, "action": "compute_slope"},
+        {"step": 2, "action": "line_equation"},
+        {"step": 3, "action": "intersections_optional"},
+        {"step": 4, "action": "verify"}
+      ]
+    },
+    {
+      "id": "T4-ANALYTIC-CIRCLE",
+      "topic": "analytic_geometry",
+      "units": [4],
+      "title": "מעגל אנליטי: מרכז ורדיוס, חיתוך עם ישר",
+      "plan": [
+        {"step": 1, "action": "standard_form_center_radius"},
+        {"step": 2, "action": "intersect_with_line", "tools": ["cas_optional"]},
+        {"step": 3, "action": "verify_points_on_circle"}
+      ]
+    },
+    {
+      "id": "T4-PROB-BINOM",
+      "topic": "probability_statistics",
+      "units": [4],
+      "title": "בינומי (4 יח׳): הסתברויות, תוחלת ושונות",
+      "plan": [
+        {"step": 1, "action": "identify_n_p"},
+        {"step": 2, "action": "compute_probabilities"},
+        {"step": 3, "action": "use_mean_variance", "rules": ["E=np", "Var=np(1-p)"]},
+        {"step": 4, "action": "verify_bounds_0_1"}
+      ]
+    },
+    {
+      "id": "T4-STAT-MEAN-VAR",
+      "topic": "probability_statistics",
+      "units": [4],
+      "title": "סטטיסטיקה: ממוצע, שונות, סטיית תקן מטבלה",
+      "plan": [
+        {"step": 1, "action": "compute_mean"},
+        {"step": 2, "action": "compute_variance_std"},
+        {"step": 3, "action": "verify_nonnegative"}
+      ]
     }
   ]
 };
