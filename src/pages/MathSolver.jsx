@@ -6,9 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle, FileText, Code, ThumbsUp, ThumbsDown, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import LatexRenderer from "@/components/exams/LatexRenderer";
-import GeoGebraEmbed from "@/components/exams/GeoGebraEmbed";
-import { Copy, ExternalLink } from "lucide-react";
+import SolutionViewer from "@/components/exams/SolutionViewer";
 
 export default function MathSolver() {
   const [query, setQuery] = useState('');
@@ -16,8 +14,6 @@ export default function MathSolver() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
-  const [feedbackState, setFeedbackState] = useState('none'); // none, helpful, unhelpful, submitted
-  const [correction, setCorrection] = useState('');
   const fileInputRef = useRef(null);
 
   const handleFileUpload = async (e) => {
@@ -29,17 +25,14 @@ export default function MathSolver() {
       setError(null);
       setResult(null);
       
-      // 1. Upload file
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
-      // Show preview based on type
       if (file.type.startsWith('image/')) {
         setUploadedImage(file_url);
       } else {
-        setUploadedImage(null); // Or set a placeholder for PDF/Code
+        setUploadedImage(null);
       }
 
-      // 2. Pass directly to Unified Solver (Backend handles OCR)
       await solveProblem(null, file_url);
 
     } catch (err) {
@@ -57,26 +50,19 @@ export default function MathSolver() {
     setResult(null);
 
     try {
-      // If we have a fileUrl but no text, we send the fileUrl for backend OCR
-      // If we have text (extracted or typed), we send it as query
       const payload = problemText ? { query: problemText } : { file_url: fileUrl };
-
       const { data } = await base44.functions.invoke('unifiedSolver', payload);
 
       if (data.success) {
         setResult(data);
-        // If the backend performed OCR, update the query box with the extracted text
-        if (!problemText && data.classification?.wolfram_query) {
-           // Note: Ideally the backend would return the 'raw_ocr_text', 
-           // but for now we won't override the user's view to keep it clean unless needed.
-           // If we wanted to show the extracted text: setQuery(data.extracted_text);
-        }
       } else {
         setError(data.error || "לא הצלחנו לפתור את הבעיה הזו.");
       }
     } catch (err) {
-      console.error(err);
-      setError("שגיאה בתקשורת עם השרת.");
+      console.error("Solver Error:", err);
+      // Improved error handling
+      const errorMsg = err.response?.data?.error || err.message || "שגיאה בתקשורת עם השרת.";
+      setError(errorMsg);
     } finally {
       setIsAnalyzing(false);
     }
@@ -87,50 +73,25 @@ export default function MathSolver() {
     solveProblem(query);
   };
 
-  const clearAll = () => {
-    setQuery('');
-    setResult(null);
-    setError(null);
-    setUploadedImage(null);
-    setFeedbackState('none');
-    setCorrection('');
-  };
-
-  const submitFeedback = async (isCorrect) => {
+  const handleFeedback = async (isCorrect, correctionText) => {
     try {
-      if (isCorrect) {
-        setFeedbackState('helpful');
-      } else {
-        setFeedbackState('unhelpful');
-        return; // Wait for correction input
-      }
-      
-      // Submit positive feedback immediately
       await base44.entities.SolverFeedback.create({
         query: query,
         image_url: uploadedImage,
         generated_result: result,
-        is_correct: true
+        is_correct: isCorrect,
+        user_correction: correctionText
       });
-      
     } catch (err) {
       console.error("Error submitting feedback:", err);
     }
   };
 
-  const submitCorrection = async () => {
-    try {
-      await base44.entities.SolverFeedback.create({
-        query: query,
-        image_url: uploadedImage,
-        generated_result: result,
-        is_correct: false,
-        user_correction: correction
-      });
-      setFeedbackState('submitted');
-    } catch (err) {
-      console.error("Error submitting correction:", err);
-    }
+  const clearAll = () => {
+    setQuery('');
+    setResult(null);
+    setError(null);
+    setUploadedImage(null);
   };
 
   return (
@@ -253,211 +214,7 @@ export default function MathSolver() {
           )}
 
           {result && (
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
-            >
-                {result.translated_query && result.translated_query !== query && (
-                    <div className="text-xs text-slate-400 text-center">
-                        זוהה: {result.translated_query}
-                    </div>
-                )}
-
-                {/* Router / Classification Badges */}
-                {result.classification && (
-                  <div className="flex flex-wrap gap-2 justify-center">
-                      <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 shadow-sm flex items-center gap-1">
-                          <ScanLine className="w-3 h-3" />
-                          {result.classification.domain} • {result.classification.topic}
-                      </div>
-                      <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold border border-indigo-100 shadow-sm flex items-center gap-1">
-                          <Calculator className="w-3 h-3" />
-                          אסטרטגיה: {result.classification.strategy}
-                      </div>
-                      <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-semibold border border-green-100 shadow-sm flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          {result.classification.unit_level} יח״ל
-                      </div>
-                      <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold border border-blue-100 shadow-sm flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          {result.verification || "מאומת"}
-                      </div>
-                  </div>
-                )}
-
-                {/* Action Plan (New Feature) */}
-                {result.action_plan && result.action_plan.length > 0 && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm"
-                    >
-                        <h4 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
-                            <ScanLine className="w-4 h-4 text-indigo-500" />
-                            תוכנית פתרון (Action Plan)
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                            {result.action_plan.map((step, idx) => (
-                                <div key={idx} className="flex items-center gap-2">
-                                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200">
-                                        {idx + 1}. {step}
-                                    </div>
-                                    {idx < result.action_plan.length - 1 && (
-                                        <ArrowRight className="w-3 h-3 text-slate-300" />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Primary Result Highlight */}
-                {result.primary_result && (
-                    <Card className="border-2 border-indigo-500 shadow-xl shadow-indigo-200/50 overflow-hidden bg-indigo-50/50">
-                        <div className="bg-indigo-500 text-white px-4 py-2 flex items-center gap-2">
-                            <CheckCircle2 className="w-5 h-5" />
-                            <h3 className="font-bold text-lg">{result.primary_result.title}</h3>
-                        </div>
-                        <CardContent className="p-6 flex justify-center">
-                            {result.primary_result.content?.map((sub, i) => (
-                                <div key={i} className="overflow-x-auto">
-                                    <img src={sub.image} alt="Result" className="max-w-full h-auto mix-blend-multiply scale-110" />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* GeoGebra Integration */}
-                {result.geogebra_commands && result.geogebra_commands.length > 0 && (
-                    <Card className="border-2 border-purple-500 shadow-xl overflow-hidden bg-white">
-                        <div className="bg-purple-600 text-white px-4 py-2 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <ScanLine className="w-5 h-5" />
-                                <h3 className="font-bold text-lg">ויזואליזציה אינטראקטיבית (GeoGebra)</h3>
-                            </div>
-                        </div>
-                        <CardContent className="p-0">
-                             <GeoGebraEmbed commands={result.geogebra_commands} height={500} />
-                             <div className="p-4 bg-purple-50 border-t border-purple-100">
-                                <p className="text-sm text-purple-800 flex items-center gap-2">
-                                    <ScanLine className="w-4 h-4" />
-                                    <span>ניתן להזיז נקודות ולחקור את השרטוט האינטראקטיבי.</span>
-                                </p>
-                             </div>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* Step-by-Step Solution */}
-                {result.steps && result.steps.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                            <div className="w-1 h-6 bg-indigo-500 rounded-full"></div>
-                            דרך הפתרון
-                        </h3>
-                        {result.steps.map((step, index) => (
-                            <motion.div 
-                                key={index}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-white rounded-xl border-l-4 border-indigo-500 shadow-sm p-4"
-                            >
-                                <div className="font-bold text-indigo-600 mb-1">{step.title}</div>
-                                <div className="text-slate-700 mb-2">{step.description}</div>
-                                {step.latex && (
-                                    <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 text-left" dir="ltr">
-                                        <LatexRenderer content={step.latex} />
-                                    </div>
-                                )}
-                            </motion.div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Other Pods */}
-                {result.pods?.filter(p => p.id !== 'Result' && p.id !== 'Solution').map((pod, index) => (
-                    <Card key={index} className="border-0 shadow-lg shadow-slate-200/50 overflow-hidden">
-                        <div className="bg-slate-50/80 border-b border-slate-100 px-4 py-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-                            <h3 className="font-bold text-slate-700 text-sm">{pod.title}</h3>
-                        </div>
-                        <CardContent className="p-4">
-                            {pod.content?.map((sub, i) => (
-                                <div key={i} className="overflow-x-auto">
-                                    <img src={sub.image} alt={pod.title} className="max-w-full h-auto mix-blend-multiply" />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                ))}
-
-                {/* Feedback Section */}
-                <div className="mt-8 pt-6 border-t border-slate-200">
-                    {feedbackState === 'none' && (
-                        <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                            <span className="text-sm font-medium text-slate-600">האם הפתרון עזר לך?</span>
-                            <div className="flex gap-2">
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => submitFeedback(true)}
-                                    className="text-slate-500 hover:text-green-600 hover:bg-green-50"
-                                >
-                                    <ThumbsUp className="w-4 h-4 mr-1" />
-                                    כן
-                                </Button>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => submitFeedback(false)}
-                                    className="text-slate-500 hover:text-red-600 hover:bg-red-50"
-                                >
-                                    <ThumbsDown className="w-4 h-4 mr-1" />
-                                    לא
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {feedbackState === 'helpful' && (
-                        <div className="bg-green-50 text-green-700 p-4 rounded-xl text-center text-sm font-medium">
-                            תודה על המשוב! שמחנו לעזור. 🎉
-                        </div>
-                    )}
-
-                    {feedbackState === 'unhelpful' && (
-                        <motion.div 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3"
-                        >
-                            <div className="text-sm font-medium text-slate-700">עזור לנו להשתפר! מהי התשובה הנכונה?</div>
-                            <Textarea 
-                                value={correction}
-                                onChange={(e) => setCorrection(e.target.value)}
-                                placeholder="הסבר בקצרה מה הייתה הטעות או כתוב את התשובה הנכונה..."
-                                className="bg-white min-h-[80px]"
-                            />
-                            <div className="flex justify-end gap-2">
-                                <Button variant="ghost" size="sm" onClick={() => setFeedbackState('none')}>ביטול</Button>
-                                <Button size="sm" onClick={submitCorrection} className="bg-indigo-600 text-white">
-                                    <Send className="w-3 h-3 mr-2" />
-                                    שלח תיקון
-                                </Button>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {feedbackState === 'submitted' && (
-                        <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-center text-sm font-medium">
-                            תודה! המשוב שלך יעזור לנו לשפר את המודל. 🚀
-                        </div>
-                    )}
-                </div>
-            </motion.div>
+              <SolutionViewer result={result} onFeedback={handleFeedback} />
           )}
         </AnimatePresence>
         
