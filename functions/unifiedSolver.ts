@@ -1,5 +1,131 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import { bagrutConfig } from './bagrutConfig.js';
+
+// --- EMBEDDED CONFIGURATION (To ensure zero dependency issues) ---
+const bagrutConfig = {
+  "system_name": "BagrutMathSolverIL",
+  "version": "2.1",
+  "locale": "he-IL",
+  "supported_units": [3, 4, 5],
+  
+  "global_quality": {
+    "routing": {
+      "use_scored_rules": true,
+      "min_confidence_to_auto_solve": 0.72
+    },
+    "output": {
+      "include_common_mistakes": true,
+      "include_grading_rubric": true,
+      "include_hint_buttons": true
+    }
+  },
+
+  "router_rules": [
+    {
+      "id": "R-SEQ-RECUR-STRONG",
+      "units": [5],
+      "topic": "sequences_series",
+      "regex_any": ["a_\\{n\\+1\\}\\s*=\\s*\\d+\\s*a_n", "נסיגה|סדרה\\s+מוגדרת"],
+      "template_priority": ["T-SEQ-LINREC-SHIFT"]
+    },
+    {
+      "id": "R-FUNC-INVEST-STRONG",
+      "units": [4, 5],
+      "topic": "functions_calculus",
+      "regex_any": ["חקור|נגזרת|קיצון|סקיצה|עליה|ירידה|פונקציה"],
+      "template_priority": ["T4-FUNC-INVEST-STD", "T-FUNC-INVEST-STD"]
+    },
+    {
+      "id": "R-TRIG-EQ-STRONG",
+      "units": [4, 5],
+      "topic": "trigonometry",
+      "regex_any": ["sin|cos|tan|טריגו|משוואה"],
+      "template_priority": ["T-TRIG-EQ-STD"]
+    },
+    {
+      "id": "R3-GEO-SIMILARITY-STRONG",
+      "units": [3, 4],
+      "topic": "geometry_plane",
+      "regex_any": ["משולש|דמיון|תלס|חוצה\\s+זווית|יחס"],
+      "template_priority": ["T3-GEO-SIMILARITY-THALES"]
+    }
+  ],
+
+  "templates": [
+    {
+      "id": "T-SEQ-LINREC-SHIFT",
+      "topic": "sequences_series",
+      "units": [5],
+      "title": "נסיגה ליניארית: הזזה לסדרה הנדסית",
+      "hint_steps": {
+        "hint1": ["זו נסיגה מהצורה a_{n+1}=k a_n + c. נסה להגדיר סדרה חדשה b_n."],
+        "hint2": ["בחר b_n=a_n+ c/(k-1) ואז תוכיח ש-b_n הנדסית."],
+        "skeleton": ["הגדרה: b_n=a_n+ c/(k-1).", "הוכחה ש-b_n הנדסית.", "מציאת הנוסחה ל-a_n."],
+        "full": ["פתרון מלא של נסיגה והוכחת סדרה הנדסית."]
+      },
+      "common_mistakes": ["שוכחים ש-k≠1", "טעות בחישוב קבוע ההזזה"],
+      "grading_rubric": [
+        {"points": 30, "for": "הגדרת סדרת עזר והוכחה שהיא הנדסית"},
+        {"points": 40, "for": "מציאת הנוסחה ל-a_n"},
+        {"points": 30, "for": "חישוב סכום או איבר ספציפי"}
+      ]
+    },
+    {
+      "id": "T4-FUNC-INVEST-STD",
+      "topic": "functions_calculus",
+      "units": [4],
+      "title": "חקירת פונקציה סטנדרטית",
+      "hint_steps": {
+        "hint1": ["תחום הגדרה תחילה (מכנה != 0, שורש >= 0)."],
+        "hint2": ["גזור את הפונקציה והשווה ל-0 למציאת קיצון."],
+        "skeleton": ["תחום -> חיתוכים -> נגזרת -> טבלת סימנים -> סקיצה."],
+        "full": ["חקירה מלאה כולל אסימפטוטות וגרף."]
+      },
+      "common_mistakes": ["התעלמות מתחום הגדרה", "טעות בגזירת פונקציה מורכבת"],
+      "grading_rubric": [
+        {"points": 20, "for": "תחום הגדרה וחיתוכים"},
+        {"points": 40, "for": "נגזרת ונקודות קיצון"},
+        {"points": 20, "for": "תחומי עליה/ירידה"},
+        {"points": 20, "for": "סקיצה"}
+      ]
+    },
+    {
+      "id": "T3-GEO-SIMILARITY-THALES",
+      "topic": "geometry_plane",
+      "units": [3],
+      "title": "גיאומטריה: דמיון ותלס",
+      "hint_steps": {
+        "hint1": ["חפש משולשים דומים (זווית-זווית) או ישרים מקבילים."],
+        "hint2": ["רשום את יחס הדמיון/תלס בין הצלעות המתאימות."],
+        "skeleton": ["זיהוי דמיון -> רישום יחס הצלעות -> הצבת נתונים -> פתרון המשוואה."],
+        "full": ["הוכחת דמיון מלאה וחישוב הצלע החסרה."]
+      },
+      "common_mistakes": ["התאמה לא נכונה של צלעות ביחס הדמיון", "שימוש בתלס ללא מקבילים"],
+      "grading_rubric": [
+        {"points": 40, "for": "זיהוי והוכחת דמיון/תלס"},
+        {"points": 30, "for": "רישום יחס הצלעות"},
+        {"points": 30, "for": "חישוב נכון של הנעלם"}
+      ]
+    },
+    {
+      "id": "T-TRIG-EQ-STD",
+      "topic": "trigonometry",
+      "units": [4, 5],
+      "title": "משוואות טריגונומטריות",
+      "hint_steps": {
+        "hint1": ["נסה להשתמש בזהויות כדי להגיע לפונקציה אחת."],
+        "skeleton": ["פישוט -> פתרון כללי -> מציאת פתרונות בתחום."],
+        "full": ["פתרון מלא של המשוואה הטריגונומטרית."]
+      },
+      "common_mistakes": ["איבוד פתרונות בחלוקה", "שכחת המחזוריות (2πk)"],
+      "grading_rubric": [
+        {"points": 50, "for": "פתרון כללי של המשוואה"},
+        {"points": 50, "for": "מציאת הפתרונות בתחום הנתון"}
+      ]
+    }
+  ]
+};
+
+// --- MAIN SERVER LOGIC ---
 
 Deno.serve(async (req) => {
     try {
@@ -14,11 +140,14 @@ Deno.serve(async (req) => {
 
         let { query, file_url } = body;
 
+        console.log("UnifiedSolver Request:", { file_url: !!file_url, query_len: query?.length });
+
         // --- LAYER A: INPUT PROCESSING & OCR (Normalizer) ---
         // If we have a file but no text query, we MUST extract text from the image.
+        // We also check if query is just whitespace
         if (file_url && (!query || query.trim().length === 0)) {
             try {
-                console.log("Starting OCR for:", file_url);
+                console.log("Starting OCR Process for:", file_url);
                 
                 const ocrRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `
@@ -26,18 +155,12 @@ Deno.serve(async (req) => {
                     TASK: Extract ALL problem content from the image for a Solver.
                     
                     CRITICAL INSTRUCTIONS FOR HEBREW & DIAGRAMS:
-                    1. HEBREW: Transcribe all Hebrew text EXACTLY as it appears. Do not translate.
+                    1. HEBREW: Transcribe all Hebrew text EXACTLY as it appears.
                     2. MATH: Convert all formulas to standard LaTeX (e.g. \\frac{a}{b}, x^2).
-                    3. DIAGRAMS: If there is a geometry diagram (triangle, circle, graph):
-                       - Describe it explicitly in text. 
-                       - Example: "משולש ABC, זווית B היא 90 מעלות. נתון AB=5..."
-                       - List all labeled points and values shown in the drawing.
-                    4. IGNORE: Page headers, footers, question numbers (like "Question 5").
+                    3. DIAGRAMS: Describe geometry diagrams explicitly (e.g. "Triangle ABC, angle B=90...").
                     
                     OUTPUT FORMAT:
-                    Return ONLY the extracted text description. 
-                    Do not add "Here is the transcription". 
-                    Do not solve the problem.
+                    Return ONLY the extracted text description.
                     `,
                     file_urls: [file_url]
                 });
@@ -53,7 +176,7 @@ Deno.serve(async (req) => {
                 }
 
                 query = extractedText;
-                console.log("OCR Result:", query);
+                console.log("OCR Result Length:", query?.length);
                 
                 if (!query || query.length < 2) {
                     throw new Error("OCR returned empty text");
@@ -61,15 +184,15 @@ Deno.serve(async (req) => {
             } catch (err) {
                 console.error("OCR Failed:", err);
                 return Response.json({ 
-                    error: 'לא הצלחנו לפענח את התמונה. אנא וודא שהתמונה ברורה, או נסה להקליד את השאלה ידנית.',
+                    error: 'שגיאה בפענוח התמונה. אנא נסה תמונה ברורה יותר או הקלד את השאלה ידנית.',
                     details: err.message
                 }, { status: 400 });
             }
         }
 
         if (!query) {
-            console.warn("Missing query after processing. Body was:", body);
-            return Response.json({ error: 'לא התקבלה שאלה. אנא העלה תמונה או הקלד טקסט.' }, { status: 400 });
+            console.warn("No query available after OCR attempt");
+            return Response.json({ error: 'לא התקבלה שאלה. אנא העלה תמונה תקינה או הקלד טקסט.' }, { status: 400 });
         }
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
@@ -77,20 +200,11 @@ Deno.serve(async (req) => {
         // --- LAYER B: ROUTER (Classification) ---
         const routerPrompt = `
         ROLE: Senior Bagrut Exam Router.
-        SYSTEM: BagrutMathSolverIL v2.0
-        
-        TASK: Classify the problem and select the best matching Template ID.
+        TASK: Classify the problem based on the text below.
         
         PROBLEM: "${query}"
         
-        ROUTER RULES:
-        ${JSON.stringify(bagrutConfig.router_rules)}
-        
-        INSTRUCTIONS:
-        1. Analyze the text for keywords and math structures.
-        2. Match strictly against regex patterns if possible.
-        3. Determine Subject (Math/Physics) and Unit Level (3/4/5).
-        4. Select Template ID. Default: "GENERAL_SOLVER".
+        RULES: ${JSON.stringify(bagrutConfig.router_rules)}
         
         OUTPUT JSON:
         {
@@ -98,7 +212,7 @@ Deno.serve(async (req) => {
             "unit_level": 3 | 4 | 5,
             "topic": "string",
             "template_id": "string",
-            "wolfram_query": "string (translation to english math syntax)"
+            "wolfram_query": "string (english math translation)"
         }
         `;
 
@@ -125,7 +239,6 @@ Deno.serve(async (req) => {
         // --- LAYER C: SOLVER ENGINE (Wolfram CAS) ---
         if (router.wolfram_query && APP_ID) {
             try {
-                // Wolfram doesn't handle heavy geometry text well, better for algebra/calculus
                 const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(router.wolfram_query)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -139,33 +252,21 @@ Deno.serve(async (req) => {
 
         // --- LAYER D & E: EXPLAINER & VERIFIER ---
         const explainerPrompt = `
-        ROLE: Expert Bagrut Tutor & Examiner.
-        TASK: Solve the problem completely and generate student aids.
+        ROLE: Expert Bagrut Tutor.
+        TASK: Solve the problem completely in Hebrew.
         
         CONTEXT:
-        - Problem Text: "${query}"
+        - Problem: "${query}"
         - Classification: ${JSON.stringify(router)}
-        - Selected Template: ${selectedTemplate ? JSON.stringify(selectedTemplate) : "General Approach"}
-        - External CAS Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "None"}
+        - Template: ${selectedTemplate ? selectedTemplate.title : "General"}
+        - Wolfram Data: ${wolframData ? "Available" : "None"}
         
         INSTRUCTIONS:
-        1. SOLUTION:
-           - If GEOMETRY: Deduce properties from the text description (e.g. "square" -> equal sides, 90 deg angles).
-           - Solve step-by-step in HEBREW.
-           - Be explicit about theorems used (e.g. "משפט תלס", "פיתגורס").
+        1. SOLVE step-by-step in Hebrew. Be precise.
+        2. HINTS: Progressive hints + skeleton.
+        3. RUBRIC: Realistic points distribution.
         
-        2. SCAFFOLDING (Hints):
-           - Generate 2 progressive hints.
-           - Generate a Skeleton (main milestones).
-        
-        3. RUBRIC:
-           - Create a realistic grading rubric (total 100% or question points).
-           
-        4. VERIFICATION:
-           - Double check your own logic.
-           - If Geometry, check standard ratios.
-        
-        OUTPUT JSON: Match schema exactly.
+        OUTPUT JSON: Match schema.
         `;
 
         const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -228,7 +329,7 @@ Deno.serve(async (req) => {
 
         return Response.json({
             success: true,
-            translated_query: query, // Pass back the OCR result so user sees what was understood
+            translated_query: query,
             classification: enrichedClassification,
             solution: finalSolutionRes,
             primary_result: { 
