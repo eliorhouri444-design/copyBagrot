@@ -12,9 +12,44 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
-        const { query } = body;
+        let { query, file_url } = body;
+
+        // --- LAYER A: INPUT PROCESSING & OCR (Normalizer) ---
+        if (file_url && (!query || query.trim().length === 0)) {
+            try {
+                console.log("Processing image with OCR/Vision:", file_url);
+                const ocrRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+                    prompt: `
+                    ROLE: Expert Mathematical OCR Engine.
+                    TASK: Transcribe the content of this image perfectly into text/LaTeX.
+                    
+                    INSTRUCTIONS:
+                    1. IDENTIFY: Is this a Math/Physics problem?
+                    2. TRANSCRIBE:
+                       - Copy Hebrew text exactly.
+                       - Convert formulas/equations to standard LaTeX (e.g., x^2 + 5x = 0).
+                       - If there is a geometric diagram, describe it briefly (e.g., "Triangle ABC with angle B=90").
+                    3. CLEANUP: Ignore irrelevant artifacts (page numbers, scribbles).
+                    
+                    OUTPUT: Return ONLY the extracted raw text string.
+                    `,
+                    file_urls: [file_url]
+                });
+                
+                query = typeof ocrRes === 'string' ? ocrRes : ocrRes.content;
+                console.log("OCR Result:", query);
+                
+                if (!query || query.length < 2) {
+                    throw new Error("OCR failed to extract meaningful text.");
+                }
+            } catch (err) {
+                console.error("OCR Error:", err);
+                return Response.json({ error: 'Failed to process image. Please try a clearer image.' }, { status: 400 });
+            }
+        }
+
         if (!query) {
-            return Response.json({ error: 'Missing query' }, { status: 400 });
+            return Response.json({ error: 'Missing query or file' }, { status: 400 });
         }
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
