@@ -261,6 +261,35 @@ Deno.serve(async (req) => {
         
         let wolframData = null;
 
+        // --- LAYER B.5: LEARNING MEMORY (RAG) ---
+        // Fetch recent user corrections to learn from past mistakes
+        let learningContext = "";
+        try {
+            const recentFeedback = await base44.asServiceRole.entities.SolverFeedback.list({
+                filter: { is_correct: false },
+                sort: { created_date: -1 },
+                limit: 5
+            });
+            
+            if (recentFeedback && recentFeedback.length > 0) {
+                const relevantFeedback = recentFeedback
+                    .filter(f => f.user_correction && f.user_correction.length > 5)
+                    .map(f => `- Mistake in: "${f.query?.substring(0, 50)}..." \n  Correction: "${f.user_correction}"`);
+                
+                if (relevantFeedback.length > 0) {
+                    learningContext = `
+                    IMPORTANT - LEARN FROM PREVIOUS MISTAKES:
+                    The following are corrections from real users on similar problems. 
+                    AVOID these specific errors:
+                    ${relevantFeedback.join('\n')}
+                    `;
+                    console.log("Injected Learning Context:", relevantFeedback.length, "corrections");
+                }
+            }
+        } catch (err) {
+            console.warn("Failed to fetch feedback history:", err);
+        }
+
         // --- LAYER C: SOLVER ENGINE (Wolfram CAS) ---
         if (router.wolfram_query && APP_ID) {
             try {
@@ -285,6 +314,8 @@ Deno.serve(async (req) => {
         - Classification: ${JSON.stringify(router)}
         - Template: ${selectedTemplate ? selectedTemplate.title : "General"}
         - Wolfram Data: ${wolframData ? "Available" : "None"}
+        
+        ${learningContext}
         
         CRITICAL SOLVING PROTOCOL:
         1. FORMULA CHECK:
