@@ -1,10 +1,9 @@
-
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 // --- EMBEDDED CONFIGURATION (To ensure zero dependency issues) ---
 const bagrutConfig = {
   "system_name": "BagrutMathSolverIL",
-  "version": "2.1",
+  "version": "2.2",
   "locale": "he-IL",
   "supported_units": [3, 4, 5],
   
@@ -51,7 +50,6 @@ const bagrutConfig = {
     }
   ],
 
-  // --- NEW: Physics & Geometry Specific Templates ---
   "templates": [
     {
       "id": "T-SEQ-LINREC-SHIFT",
@@ -128,18 +126,18 @@ const bagrutConfig = {
       "id": "T3-GEO-ANGLE-BISECTOR-RATIO",
       "topic": "geometry_plane",
       "units": [4, 5],
-      "title": "גיאומטריה: חוצה זווית ויחס קטעים",
+      "title": "גיאומטריה: משפט חוצה הזווית וטריגונומטריה",
       "hint_steps": {
-        "hint1": ["השתמש במשפט חוצה הזווית במשולש הגדול."],
-        "hint2": ["מרכז המעגל החסום (E) מחלק את חוצה הזווית ביחס של סכום הצלעות לצלע השלישית."],
-        "skeleton": ["משפט חוצה זווית -> יחס עם צלעות -> שימוש בטריגונומטריה אם נתונות זוויות -> פתרון המשוואה."],
-        "full": ["פתרון מלא המשלב גיאומטריה וטריגונומטריה למציאת הזווית והיחס."]
+        "hint1": ["היעזר במשפט חוצה הזווית כדי לבטא צלעות."],
+        "hint2": ["שים לב: מפגש חוצי הזוויות (מרכז מעגל חסום) מחלק את חוצה הזווית ביחס מיוחד."],
+        "skeleton": ["הבעת צלעות באמצעות טריגו -> משפט חוצה זווית -> בניית משוואה -> מציאת הזווית."],
+        "full": ["פתרון המשלב טריגונומטריה עם משפטי חוצה הזווית."]
       },
-      "common_mistakes": ["בלבול בין מרכז מעגל חוסם לחסום", "אי-שימוש במשפט חוצה הזווית השני (פנימי)"],
+      "common_mistakes": ["התעלמות מהנתון של מרכז מעגל חסום", "טעות בנוסחת היחס בחוצה זווית"],
       "grading_rubric": [
-        {"points": 33, "for": "מציאת הזווית אלפא"},
-        {"points": 33, "for": "חישוב יחס הרדיוסים"},
-        {"points": 34, "for": "חישוב אורך הקטע AE"}
+        {"points": 35, "for": "בניית המשוואה הטריגונומטרית"},
+        {"points": 30, "for": "פתרון ומציאת הזווית"},
+        {"points": 35, "for": "המשך חישוב (יחס רדיוסים/צלעות)"}
       ]
     }
   ]
@@ -163,8 +161,6 @@ Deno.serve(async (req) => {
         console.log("UnifiedSolver Request:", { file_url: !!file_url, query_len: query?.length });
 
         // --- LAYER A: INPUT PROCESSING & OCR (Normalizer) ---
-        // If we have a file but no text query, we MUST extract text from the image.
-        // We also check if query is just whitespace
         if (file_url && (!query || query.trim().length === 0)) {
             try {
                 console.log("Starting OCR Process for:", file_url);
@@ -175,13 +171,12 @@ Deno.serve(async (req) => {
                     TASK: Extract ALL problem content from the image for a Solver.
                     
                     CRITICAL INSTRUCTIONS:
-                    1. HEBREW: Transcribe exactly.
-                    2. MATH: Use standard LaTeX.
-                    3. DIAGRAMS: Describe explicitly (e.g. "Triangle ABC, angle B=90, D is on AC").
-                    4. SPECIFIC FOR THIS IMAGE:
-                       - If there is a ratio given like EC/DE, extract it carefully.
-                       - Identify given angles (e.g. 2 alpha).
-                       - Identify required tasks (a, b, c).
+                    1. MATH & FORMULAS:
+                       - BE EXTREMELY CAREFUL with radicals/roots. 
+                       - "√3" or "sqrt(3)" must be identified correctly. DO NOT mistake it for "3".
+                       - "2 sin alpha" vs "2 sin 2 alpha".
+                    2. HEBREW: Transcribe exactly.
+                    3. DIAGRAMS: Describe diagram explicitly (e.g. "Triangle ABC, AB=AC...").
                     
                     OUTPUT FORMAT:
                     Return ONLY the extracted text description.
@@ -259,7 +254,7 @@ Deno.serve(async (req) => {
         
         // AUTO-SELECT NEW TEMPLATE FOR GEOMETRY RATIOS IF RELEVANT
         let selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id);
-        if (query.includes("EC") && query.includes("DE") && query.includes("sin")) {
+        if (query.includes("EC") && query.includes("DE") && (query.includes("sin") || query.includes("cos"))) {
             const geoTemplate = bagrutConfig.templates.find(t => t.id === "T3-GEO-ANGLE-BISECTOR-RATIO");
             if (geoTemplate) selectedTemplate = geoTemplate;
         }
@@ -291,14 +286,21 @@ Deno.serve(async (req) => {
         - Template: ${selectedTemplate ? selectedTemplate.title : "General"}
         - Wolfram Data: ${wolframData ? "Available" : "None"}
         
-        CRITICAL FOR THIS GEOMETRY PROBLEM (if matches image context):
-        1. Identify Triangle ABC is isosceles (AB=AC).
-        2. Identify CD is the angle bisector of C.
-        3. Identify E is the INCENTER (intersection of angle bisectors), so AE is also a bisector.
-        4. Use the Angle Bisector Theorem and Trigonometry.
-        5. SOLVE FOR ALPHA first.
-        6. Calculate R/r ratio.
-        7. Calculate AE.
+        CRITICAL SOLVING PROTOCOL:
+        1. FORMULA CHECK:
+           - Did the OCR mistake "sqrt(3)" for "3"? 
+           - Did it mistake "sin(2 alpha)" for "sin(alpha)"?
+           - If a solution implies "sin(x) > 1" or no solution, TRY TO CORRECT THE FORMULA (e.g. assume sqrt(3) instead of 3).
+           
+        2. GEOMETRY SPECIFICS:
+           - AB=AC (Isosceles).
+           - Base angles 2alpha.
+           - E is Incenter (Intersection of bisectors).
+           - Use Angle Bisector Theorem on Triangle ADC or similar.
+           
+        3. FINAL CHECK:
+           - Is alpha a "nice" angle (e.g. 15, 18, 20, 22.5, 30, 45)? Bagrut answers usually are.
+           - Check constraints (alpha < 22.5).
         
         INSTRUCTIONS:
         1. SOLVE step-by-step in Hebrew. Be precise.
