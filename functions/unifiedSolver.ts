@@ -15,62 +15,71 @@ Deno.serve(async (req) => {
         let { query, file_url } = body;
 
         // --- LAYER A: INPUT PROCESSING & OCR (Normalizer) ---
-        // 1. Handle File Upload (OCR)
+        // If we have a file but no text query, we MUST extract text from the image.
         if (file_url && (!query || query.trim().length === 0)) {
             try {
-                console.log("Processing image with OCR/Vision:", file_url);
+                console.log("Starting OCR for:", file_url);
+                
                 const ocrRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `
-                    ROLE: Expert Mathematical OCR Engine.
-                    TASK: Transcribe the content of this image perfectly into text/LaTeX.
+                    ROLE: Elite Mathematical Vision Engine.
+                    TASK: Extract ALL problem content from the image for a Solver.
                     
-                    INSTRUCTIONS:
-                    1. EXTRACT:
-                       - Hebrew text: Copy exactly.
-                       - Math: Convert to standard LaTeX.
-                       - Diagrams: Describe geometric properties explicitly (e.g., "Triangle ABC is isosceles, AB=AC, angle A=30").
+                    CRITICAL INSTRUCTIONS FOR HEBREW & DIAGRAMS:
+                    1. HEBREW: Transcribe all Hebrew text EXACTLY as it appears. Do not translate.
+                    2. MATH: Convert all formulas to standard LaTeX (e.g. \\frac{a}{b}, x^2).
+                    3. DIAGRAMS: If there is a geometry diagram (triangle, circle, graph):
+                       - Describe it explicitly in text. 
+                       - Example: "משולש ABC, זווית B היא 90 מעלות. נתון AB=5..."
+                       - List all labeled points and values shown in the drawing.
+                    4. IGNORE: Page headers, footers, question numbers (like "Question 5").
                     
-                    2. FORMAT:
-                       - Output ONLY the problem text.
-                       - No prefixes like "Here is the text".
-                       - No markdown code blocks.
+                    OUTPUT FORMAT:
+                    Return ONLY the extracted text description. 
+                    Do not add "Here is the transcription". 
+                    Do not solve the problem.
                     `,
                     file_urls: [file_url]
                 });
                 
                 let extractedText = typeof ocrRes === 'string' ? ocrRes : ocrRes.content;
                 
-                // Cleanup common LLM artifacts
+                // Cleanup artifacts
                 if (extractedText) {
-                    extractedText = extractedText.replace(/```(latex|text)?/g, '').replace(/```/g, '').trim();
+                    extractedText = extractedText
+                        .replace(/```(latex|text|markdown)?/gi, '')
+                        .replace(/```/g, '')
+                        .trim();
                 }
 
                 query = extractedText;
-                console.log("OCR Result (Cleaned):", query);
+                console.log("OCR Result:", query);
                 
                 if (!query || query.length < 2) {
-                    throw new Error("OCR produced empty result.");
+                    throw new Error("OCR returned empty text");
                 }
             } catch (err) {
-                console.error("OCR Error:", err);
-                return Response.json({ error: 'שגיאה בפענוח התמונה. אנא נסה תמונה ברורה יותר או הקלד את השאלה.' }, { status: 400 });
+                console.error("OCR Failed:", err);
+                return Response.json({ 
+                    error: 'לא הצלחנו לפענח את התמונה. אנא וודא שהתמונה ברורה, או נסה להקליד את השאלה ידנית.',
+                    details: err.message
+                }, { status: 400 });
             }
         }
 
         if (!query) {
-            console.error("Error: Query is missing after processing. Body:", body);
-            return Response.json({ error: 'לא התקבלה שאלה (טקסט או תמונה).' }, { status: 400 });
+            console.warn("Missing query after processing. Body was:", body);
+            return Response.json({ error: 'לא התקבלה שאלה. אנא העלה תמונה או הקלד טקסט.' }, { status: 400 });
         }
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
         
-        // --- LAYER B: ROUTER (Using Bagrut Config) ---
-        // Provide the LLM with the config rules to select the best template
+        // --- LAYER B: ROUTER (Classification) ---
         const routerPrompt = `
         ROLE: Senior Bagrut Exam Router.
-        SYSTEM: BagrutMathSolverIL v1.0
+        SYSTEM: BagrutMathSolverIL v2.0
         
-        TASK: Classify the problem and select the best matching Template ID from the configuration.
+        TASK: Classify the problem and select the best matching Template ID.
         
         PROBLEM: "${query}"
         
@@ -78,19 +87,18 @@ Deno.serve(async (req) => {
         ${JSON.stringify(bagrutConfig.router_rules)}
         
         INSTRUCTIONS:
-        1. Analyze keywords in the problem.
-        2. Match against "match_any" keywords in rules.
-        3. Select the best "template_priority" ID. If no specific match, use "GENERAL".
-        4. Determine unit level (3/4/5) based on complexity.
-        5. Generate a Wolfram Alpha query string if useful.
-
+        1. Analyze the text for keywords and math structures.
+        2. Match strictly against regex patterns if possible.
+        3. Determine Subject (Math/Physics) and Unit Level (3/4/5).
+        4. Select Template ID. Default: "GENERAL_SOLVER".
+        
         OUTPUT JSON:
         {
             "subject": "Math" | "Physics",
             "unit_level": 3 | 4 | 5,
             "topic": "string",
-            "template_id": "string (e.g., T-FUNC-INVEST-STD)",
-            "wolfram_query": "string (or null)"
+            "template_id": "string",
+            "wolfram_query": "string (translation to english math syntax)"
         }
         `;
 
@@ -110,15 +118,14 @@ Deno.serve(async (req) => {
         });
 
         const router = classificationRes;
-        
-        // Find the full template object
-        const selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id) || null;
+        const selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id);
         
         let wolframData = null;
 
         // --- LAYER C: SOLVER ENGINE (Wolfram CAS) ---
         if (router.wolfram_query && APP_ID) {
             try {
+                // Wolfram doesn't handle heavy geometry text well, better for algebra/calculus
                 const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(router.wolfram_query)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -130,27 +137,35 @@ Deno.serve(async (req) => {
             }
         }
 
-        // --- LAYER D & E: EXPLAINER & VERIFIER (Template-Based) ---
-        
+        // --- LAYER D & E: EXPLAINER & VERIFIER ---
         const explainerPrompt = `
         ROLE: Expert Bagrut Tutor & Examiner.
-        TASK: Solve the problem using the STRICT TEMPLATE PLAN provided and generate pedagogical aids (hints, rubrics).
+        TASK: Solve the problem completely and generate student aids.
         
         CONTEXT:
-        - Problem: "${query}"
+        - Problem Text: "${query}"
         - Classification: ${JSON.stringify(router)}
-        - Selected Template: ${selectedTemplate ? JSON.stringify(selectedTemplate) : "General Problem Solving"}
-        - Wolfram Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
+        - Selected Template: ${selectedTemplate ? JSON.stringify(selectedTemplate) : "General Approach"}
+        - External CAS Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "None"}
         
         INSTRUCTIONS:
-        1. ACTION PLAN: Adopt the 'plan' from the template.
-        2. EXPLAINER: Use the 'explainer_script' tone/style.
-        3. VERIFY: Perform the checks listed in 'verifier'.
-        4. HINTS: Adapt the template hints to the specific numbers/context of this problem.
-        5. MISTAKES: List specific common mistakes relevant to this problem.
-        6. RUBRIC: Define a grading rubric (points allocation).
+        1. SOLUTION:
+           - If GEOMETRY: Deduce properties from the text description (e.g. "square" -> equal sides, 90 deg angles).
+           - Solve step-by-step in HEBREW.
+           - Be explicit about theorems used (e.g. "משפט תלס", "פיתגורס").
         
-        OUTPUT JSON MUST MATCH THE SCHEMA EXACTLY.
+        2. SCAFFOLDING (Hints):
+           - Generate 2 progressive hints.
+           - Generate a Skeleton (main milestones).
+        
+        3. RUBRIC:
+           - Create a realistic grading rubric (total 100% or question points).
+           
+        4. VERIFICATION:
+           - Double check your own logic.
+           - If Geometry, check standard ratios.
+        
+        OUTPUT JSON: Match schema exactly.
         `;
 
         const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -200,19 +215,20 @@ Deno.serve(async (req) => {
                         }
                     }
                 },
-                required: ["steps", "final_answer", "hints", "common_mistakes"]
+                required: ["steps", "final_answer", "action_plan"]
             }
         });
 
-        // Enrich the classification object for frontend display
+        // Enrich classification
         const enrichedClassification = {
             ...router,
-            strategy: selectedTemplate?.title || router.template_id, 
-            domain: router.subject 
+            strategy: selectedTemplate?.title || "פתרון כללי",
+            domain: router.subject
         };
 
         return Response.json({
             success: true,
+            translated_query: query, // Pass back the OCR result so user sees what was understood
             classification: enrichedClassification,
             solution: finalSolutionRes,
             primary_result: { 
@@ -230,6 +246,6 @@ Deno.serve(async (req) => {
 
     } catch (error) {
         console.error("Unified Solver Error:", error);
-        return Response.json({ error: error.message }, { status: 500 });
+        return Response.json({ error: "שגיאה פנימית במערכת: " + error.message }, { status: 500 });
     }
 });
