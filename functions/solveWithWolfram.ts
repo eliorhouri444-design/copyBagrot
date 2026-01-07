@@ -85,14 +85,16 @@ Deno.serve(async (req) => {
                     ${learningContext}
                     
                     Please solve this problem step-by-step.
-                    - If it's code, debug it or write the solution.
-                    - If it's engineering, apply the correct formulas and show work.
-                    - If it's math/physics, show the solution.
+                    
+                    CRITICAL FOR GEOMETRY:
+                    - Use Analytical Geometry methods (coordinates).
+                    - Generate valid GeoGebra commands to visualize the problem.
                     
                     Return a JSON object with:
                     {
                         "primary_result_title": "Final Answer / Summary",
                         "primary_result_content": "The concise final answer",
+                        "geogebra_commands": ["A=(0,0)", "B=(1,0)"],
                         "steps": [
                             { "title": "Step 1", "description": "...", "latex": "..." }
                         ]
@@ -103,6 +105,7 @@ Deno.serve(async (req) => {
                         properties: {
                             primary_result_title: { type: "string" },
                             primary_result_content: { type: "string" },
+                            geogebra_commands: { type: "array", items: { type: "string" } },
                             steps: {
                                 type: "array",
                                 items: {
@@ -127,7 +130,8 @@ Deno.serve(async (req) => {
                             title: fallbackRes.primary_result_title || "תוצאה",
                             content: [{ plaintext: fallbackRes.primary_result_content, image: null }]
                         },
-                        steps: fallbackRes.steps || []
+                        steps: fallbackRes.steps || [],
+                        geogebra_commands: fallbackRes.geogebra_commands || []
                     });
                 }
              } catch (llmErr) {
@@ -172,16 +176,20 @@ Deno.serve(async (req) => {
                     Break it down into logical steps like a math app (Photomath).
                     BE EXTREMELY PRECISE with geometry and algebraic derivations.
                     
+                    IF GEOMETRY: Generate GeoGebra commands for visualization.
+                    
                     Return ONLY a JSON object with this structure:
                     {
                         "steps": [
                             { "title": "שלב 1", "description": "explanation...", "latex": "math formula if needed" },
                             { "title": "שלב 2", "description": "...", "latex": "..." }
-                        ]
+                        ],
+                        "geogebra_commands": ["A=(0,0)", ...]
                     }`,
                     response_json_schema: {
                         type: "object",
                         properties: {
+                            geogebra_commands: { type: "array", items: { type: "string" } },
                             steps: {
                                 type: "array",
                                 items: {
@@ -200,6 +208,12 @@ Deno.serve(async (req) => {
                 if (stepsRes && stepsRes.steps) {
                     steps = stepsRes.steps;
                 }
+                
+                // Attach GeoGebra commands if available
+                if (stepsRes && stepsRes.geogebra_commands) {
+                    // We need to pass this out
+                    var geogebraCommands = stepsRes.geogebra_commands;
+                }
             } catch (err) {
                 console.error("Step generation failed", err);
             }
@@ -210,7 +224,8 @@ Deno.serve(async (req) => {
             translated_query: translatedQuery,
             pods: formattedPods,
             primary_result: formattedPods.find(p => p.id === resultPod?.id),
-            steps: steps
+            steps: steps,
+            geogebra_commands: typeof geogebraCommands !== 'undefined' ? geogebraCommands : []
         });
 
     } catch (error) {
