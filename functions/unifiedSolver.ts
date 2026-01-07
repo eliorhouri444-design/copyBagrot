@@ -123,8 +123,8 @@ Deno.serve(async (req) => {
         // --- LAYER D & E: EXPLAINER & VERIFIER (Template-Based) ---
         
         const explainerPrompt = `
-        ROLE: Expert Bagrut Tutor.
-        TASK: Solve the problem using the STRICT TEMPLATE PLAN provided.
+        ROLE: Expert Bagrut Tutor & Examiner.
+        TASK: Solve the problem using the STRICT TEMPLATE PLAN provided and generate pedagogical aids (hints, rubrics).
         
         CONTEXT:
         - Problem: "${query}"
@@ -136,21 +136,11 @@ Deno.serve(async (req) => {
         1. ACTION PLAN: Adopt the 'plan' from the template.
         2. EXPLAINER: Use the 'explainer_script' tone/style.
         3. VERIFY: Perform the checks listed in 'verifier'.
-        4. OUTPUT: Hebrew solution, step-by-step.
-
-        OUTPUT JSON:
-        {
-            "final_answer": "string",
-            "action_plan": ["step 1", "step 2"...],
-            "steps": [
-                { "title": "string", "description": "string", "latex": "string" }
-            ],
-            "geogebra_commands": ["string"] (optional),
-            "verification": {
-                "status": "Verified" | "Partial",
-                "details": "string"
-            }
-        }
+        4. HINTS: Adapt the template hints to the specific numbers/context of this problem.
+        5. MISTAKES: List specific common mistakes relevant to this problem.
+        6. RUBRIC: Define a grading rubric (points allocation).
+        
+        OUTPUT JSON MUST MATCH THE SCHEMA EXACTLY.
         `;
 
         const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -178,17 +168,37 @@ Deno.serve(async (req) => {
                             status: { type: "string" },
                             details: { type: "string" }
                         }
+                    },
+                    hints: {
+                        type: "object",
+                        properties: {
+                            hint1: { type: "array", items: { type: "string" } },
+                            hint2: { type: "array", items: { type: "string" } },
+                            skeleton: { type: "array", items: { type: "string" } },
+                            full: { type: "array", items: { type: "string" } }
+                        }
+                    },
+                    common_mistakes: { type: "array", items: { type: "string" } },
+                    grading_rubric: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                points: { type: "integer" },
+                                for: { type: "string" }
+                            }
+                        }
                     }
                 },
-                required: ["steps", "final_answer"]
+                required: ["steps", "final_answer", "hints", "common_mistakes"]
             }
         });
 
         // Enrich the classification object for frontend display
         const enrichedClassification = {
             ...router,
-            strategy: selectedTemplate?.title || router.template_id, // Use template title as strategy description
-            domain: router.subject // Map subject to domain for compatibility
+            strategy: selectedTemplate?.title || router.template_id, 
+            domain: router.subject 
         };
 
         return Response.json({
@@ -202,7 +212,10 @@ Deno.serve(async (req) => {
             steps: finalSolutionRes.steps,
             geogebra_commands: finalSolutionRes.geogebra_commands || [],
             verification: finalSolutionRes.verification?.status || "Verified",
-            action_plan: finalSolutionRes.action_plan
+            action_plan: finalSolutionRes.action_plan,
+            hints: finalSolutionRes.hints,
+            common_mistakes: finalSolutionRes.common_mistakes,
+            grading_rubric: finalSolutionRes.grading_rubric
         });
 
     } catch (error) {
