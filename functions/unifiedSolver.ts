@@ -3,149 +3,182 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        const user = await base44.auth.me();
-
-        if (!user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const { imageUrl, questionText, subject, forceSubject, useCache = true } = await req.json();
-
-        if (!imageUrl && !questionText) {
-            return Response.json({ error: 'Missing imageUrl or questionText' }, { status: 400 });
-        }
-
-        console.log('🚀 Starting OPTIMIZED unified solver...');
-
-        const startTime = Date.now();
-        let pipeline = {
-            ocr: null,
-            classification: null,
-            solution: null,
-            diagram: null
-        };
-
-        // **אופטימיזציה 1: Parallel Processing**
-        // אם יש תמונה - נריץ OCR וסיווג במקביל
-        if (imageUrl) {
-            console.log('📸 Running OCR + Classification in parallel...');
-            
-            const [ocrResult, classificationResult] = await Promise.all([
-                base44.functions.invoke('mathOCR', { imageUrl: imageUrl }).catch(e => ({ data: null })),
-                !forceSubject ? base44.functions.invoke('smartClassifier', {
-                    text: questionText || '',
-                    imageUrl: imageUrl
-                }).catch(e => ({ data: null })) : Promise.resolve({ data: null })
-            ]);
-
-            if (ocrResult.data?.success) {
-                pipeline.ocr = ocrResult.data.ocr_result;
-            }
-
-            if (classificationResult.data?.success) {
-                pipeline.classification = classificationResult.data.classification;
-            }
-        } else if (!forceSubject && questionText) {
-            // רק סיווג אם אין תמונה
-            const classificationResult = await base44.functions.invoke('smartClassifier', {
-                text: questionText
-            });
-            
-            if (classificationResult.data?.success) {
-                pipeline.classification = classificationResult.data.classification;
-            }
-        }
-
-        const textForSolving = questionText || pipeline.ocr?.full_text || '';
-        const detectedSubject = forceSubject || pipeline.classification?.recommended_solver || subject || 'math';
         
-        console.log('🎯 Solving with', detectedSubject);
-
-        // **אופטימיזציה 2: Cache-First Strategy**
-        let solverFunction = 'mathSolver';
-        if (detectedSubject === 'physics' || pipeline.classification?.subject === 'פיזיקה') {
-            solverFunction = 'physicsSolver';
-        } else if (detectedSubject === 'chemistry' || pipeline.classification?.subject === 'כימיה') {
-            solverFunction = 'chemistrySolver';
-        } else if (detectedSubject === 'biology' || pipeline.classification?.subject === 'ביולוגיה') {
-            solverFunction = 'biologySolver';
+        let body;
+        try {
+            body = await req.json();
+        } catch (e) {
+            return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
-        const solverResult = await base44.functions.invoke(solverFunction, {
-            question: textForSolving,
-            latexFormulas: pipeline.ocr?.latex_formulas,
-            diagram: pipeline.ocr?.diagram_elements,
-            imageUrl: imageUrl,
-            topic: pipeline.classification?.topic,
-            difficulty: pipeline.classification?.difficulty,
-            useCache: useCache
+        const { query, file_url } = body;
+        if (!query) {
+            return Response.json({ error: 'Missing query' }, { status: 400 });
+        }
+
+        const APP_ID = Deno.env.get('App_ID_wolframalpha');
+        
+        // --- STEP 1: ROUTER & CLASSIFIER ---
+        // Classify the problem and decide on a strategy
+        const classificationRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+            prompt: `
+            ROLE: Senior Bagrut (Israeli Matriculation) Examiner.
+            TASK: Classify the following problem and select the optimal solving strategy.
+            
+            PROBLEM: "${query}"
+            
+            DECISION MAP:
+            1. GEOMETRY:
+               - "Intersection/Square/Rectangle" -> Strategy: "Analytical Geometry (Coordinates)"
+               - "Parallel lines/Ratios" -> Strategy: "Thales / Similarity"
+               - "Circle/Tangent" -> Strategy: "Circle Theorems"
+            2. ANALYSIS (Calculus):
+               - "Function analysis/Area/Extremum" -> Strategy: "Calculus Protocol"
+            3. ALGEBRA:
+               - "Equations/Series/Complex Numbers" -> Strategy: "Algebraic Manipulation"
+            4. PHYSICS:
+               - "Forces/Motion" -> Strategy: "Newton's Laws"
+               - "Energy/Work" -> Strategy: "Energy Conservation"
+               - "Circuits" -> Strategy: "Kirchhoff's Laws"
+
+            OUTPUT JSON:
+            {
+                "domain": "Math" | "Physics",
+                "topic": "string (e.g. Euclidean Geometry, Kinematics)",
+                "difficulty": "3_units" | "4_units" | "5_units",
+                "strategy": "string (The chosen strategy from map)",
+                "tool_needed": "Wolfram" | "GeoGebra" | "LogicalDerivation",
+                "wolfram_query": "string (Translate problem to English for Wolfram Alpha, or null if not applicable)"
+            }
+            `,
+            response_json_schema: {
+                type: "object",
+                properties: {
+                    domain: { type: "string" },
+                    topic: { type: "string" },
+                    difficulty: { type: "string" },
+                    strategy: { type: "string" },
+                    tool_needed: { type: "string" },
+                    wolfram_query: { type: "string" }
+                },
+                required: ["domain", "strategy"]
+            }
         });
 
-        if (solverResult.data?.success) {
-            pipeline.solution = solverResult.data.solution;
-        }
+        const router = classificationRes; // { domain, topic, strategy, ... }
+        let wolframData = null;
+        let solutionSkeleton = "";
 
-        // **אופטימיזציה 3: Diagram רק אם באמת צריך**
-        if (pipeline.ocr?.has_diagram && 
-            pipeline.ocr?.diagram_elements && 
-            Object.keys(pipeline.ocr.diagram_elements.points || {}).length > 0) {
-            
-            console.log('📐 Creating diagram...');
-            
+        // --- STEP 2: SOLVER ENGINE ---
+        
+        // Engine A: Wolfram Alpha (for Calculations / Algebra / Calculus)
+        if (router.wolfram_query && APP_ID) {
             try {
-                const visualResult = await base44.functions.invoke('geometryVisualizer', {
-                    diagramDescription: pipeline.ocr.diagram_description
-                });
-
-                if (visualResult.data?.success) {
-                    pipeline.diagram = visualResult.data;
+                const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(router.wolfram_query)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.queryresult && data.queryresult.success) {
+                    wolframData = data;
                 }
-            } catch (error) {
-                console.warn('⚠️ Diagram skipped');
+            } catch (err) {
+                console.error("Wolfram query failed:", err);
             }
         }
 
-        const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        console.log(`✅ OPTIMIZED pipeline: ${totalTime}s (was ~15-20s before)`);
+        // Engine B: LLM Solver (The "Explainer" & Logic Engine)
+        // We feed it the Router's decision + Wolfram's raw data (if any)
+        
+        const protocols = `
+        *** SOLVING PROTOCOLS ***
+        
+        [Geometry - Analytical Strategy]
+        1. Define Origin: Let A=(0,0) or Center=(0,0).
+        2. Coordinates: Express all points (x,y) based on parameters (t, alpha).
+        3. Equations: Line equations, Distance formula.
+        4. Solve: Find parameters.
+        5. Verify: Check if result makes geometric sense.
 
-        // שמירה
-        try {
-            await base44.asServiceRole.entities.MathLabSession.create({
-                question_text: textForSolving,
-                question_image_url: imageUrl,
-                subject: pipeline.classification?.subject || subject || 'מתמטיקה',
-                topic: pipeline.classification?.topic,
-                difficulty: pipeline.classification?.difficulty,
-                ocr_analysis: pipeline.ocr,
-                solution: pipeline.solution,
-                session_duration: parseInt(totalTime)
-            });
-        } catch (error) {
-            console.warn('⚠️ Session save failed (non-critical)');
-        }
+        [Physics Protocol]
+        1. Diagram & Axis: Define positive direction.
+        2. Knowns: List vars (v, a, t, F, m).
+        3. Law: State Newton's 2nd / Energy Conservation equation.
+        4. Solve: Isolate variable.
+        5. Units: Final answer MUST have units.
+
+        [Calculus Protocol]
+        1. Domain: Check denominators/logs.
+        2. Derivative: f'(x)=0 for extremum.
+        3. Table: Check signs.
+        4. Sketch: Key points.
+        `;
+
+        const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+            prompt: `
+            ROLE: Expert Tutor.
+            TASK: Solve the problem step-by-step in HEBREW, following the defined strategy.
+            
+            CONTEXT:
+            - Problem: "${query}"
+            - Classification: ${JSON.stringify(router)}
+            - Wolfram Alpha Result (Raw): ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
+            
+            ${protocols}
+
+            INSTRUCTIONS:
+            1. Follow the Strategy: "${router.strategy}".
+            2. If Geometry: Generate GeoGebra commands to visualize.
+            3. If Physics: Enforce Units.
+            4. VERIFICATION: Add a final step checking the logic (substitution/sanity check).
+
+            OUTPUT JSON:
+            {
+                "final_answer": "string",
+                "steps": [
+                    { "title": "שלב 1: זיהוי והגדרה", "description": "...", "latex": "..." },
+                    { "title": "שלב 2: משוואה", "description": "...", "latex": "..." }
+                ],
+                "geogebra_commands": ["string"] (optional),
+                "verification_status": "Verified by substitution/logic"
+            }
+            `,
+            response_json_schema: {
+                type: "object",
+                properties: {
+                    final_answer: { type: "string" },
+                    steps: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                title: { type: "string" },
+                                description: { type: "string" },
+                                latex: { type: "string" }
+                            }
+                        }
+                    },
+                    geogebra_commands: { type: "array", items: { type: "string" } },
+                    verification_status: { type: "string" }
+                },
+                required: ["steps", "final_answer"]
+            }
+        });
 
         return Response.json({
             success: true,
-            pipeline: {
-                ocr: pipeline.ocr,
-                classification: pipeline.classification,
-                solution: pipeline.solution,
-                diagram: pipeline.diagram
+            classification: router,
+            solution: finalSolutionRes,
+            // Keep legacy format structure for frontend compatibility where possible
+            primary_result: { 
+                title: "תוצאה סופית", 
+                content: [{ plaintext: finalSolutionRes.final_answer, image: null }] 
             },
-            metadata: {
-                processing_time: totalTime + 's',
-                solver_used: solverFunction,
-                steps_count: pipeline.solution?.steps?.length || 0,
-                from_cache: solverResult.data?.from_cache || false,
-                optimization_applied: true
-            }
+            steps: finalSolutionRes.steps,
+            geogebra_commands: finalSolutionRes.geogebra_commands || [],
+            verification: finalSolutionRes.verification_status
         });
 
     } catch (error) {
-        console.error('❌ Unified Solver Error:', error);
-        return Response.json({
-            error: error.message,
-            details: error.toString()
-        }, { status: 500 });
+        console.error("Unified Solver Error:", error);
+        return Response.json({ error: error.message }, { status: 500 });
     }
 });

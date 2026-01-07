@@ -79,8 +79,8 @@ export default function MathSolver() {
     setResult(null);
 
     try {
-      const { data } = await base44.functions.invoke('solveWithWolfram', { query: problemText });
-      
+      const { data } = await base44.functions.invoke('unifiedSolver', { query: problemText });
+
       if (data.success) {
         setResult(data);
       } else {
@@ -276,21 +276,21 @@ export default function MathSolver() {
                     </div>
                 )}
 
-                {/* Strategy & Method Badge */}
-                {(result.classification || result.method_used) && (
+                {/* Router / Classification Badges */}
+                {result.classification && (
                   <div className="flex flex-wrap gap-2 justify-center">
-                      {result.classification && (
-                          <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 shadow-sm flex items-center gap-1">
-                              <ScanLine className="w-3 h-3" />
-                              {result.classification}
-                          </div>
-                      )}
-                      {result.method_used && (
-                          <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold border border-indigo-100 shadow-sm flex items-center gap-1">
-                              <Calculator className="w-3 h-3" />
-                              {result.method_used}
-                          </div>
-                      )}
+                      <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 shadow-sm flex items-center gap-1">
+                          <ScanLine className="w-3 h-3" />
+                          {result.classification.domain} • {result.classification.topic}
+                      </div>
+                      <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold border border-indigo-100 shadow-sm flex items-center gap-1">
+                          <Calculator className="w-3 h-3" />
+                          אסטרטגיה: {result.classification.strategy}
+                      </div>
+                      <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-semibold border border-green-100 shadow-sm flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {result.verification || "נבדק ע״י מערכת"}
+                      </div>
                   </div>
                 )}
 
