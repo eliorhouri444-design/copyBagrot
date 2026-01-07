@@ -77,6 +77,7 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
+import MathSolver from './pages/MathSolver';
 import __Layout from './Layout.jsx';
 
 
@@ -160,6 +161,7 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
+    "MathSolver": MathSolver,
 }
 
 export const pagesConfig = {
