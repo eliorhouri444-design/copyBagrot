@@ -23,6 +23,30 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Configuration error: Missing API Key' }, { status: 500 });
         }
 
+        // 0. Fetch Learning Context (RAG from Corrections)
+        let learningContext = "";
+        try {
+            // Fetch recent corrections to learn from mistakes
+            const feedback = await base44.asServiceRole.entities.SolverFeedback.filter({ 
+                is_correct: false,
+                category: "math" 
+            }, "-created_date", 3); // Get last 3 math corrections
+
+            if (feedback.length > 0) {
+                learningContext = `
+                IMPORTANT - PREVIOUS USER CORRECTIONS (LEARN FROM THESE MISTAKES):
+                ${feedback.map(f => `
+                - Mistake in similar problem: "${f.query}"
+                - CORRECT LOGIC/ANSWER: "${f.user_correction}"
+                `).join('\n')}
+                
+                APPLY THIS LOGIC IF RELEVANT.
+                `;
+            }
+        } catch (err) {
+            console.error("Failed to fetch learning context", err);
+        }
+
         // 1. Translate Hebrew/Text query to Math/English
         let translatedQuery = query;
         const containsHebrew = /[\u0590-\u05FF]/.test(query);
@@ -57,6 +81,8 @@ Deno.serve(async (req) => {
                 const fallbackRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `You are an expert scientific and engineering solver. The user asked: "${query}".
                     Wolfram Alpha could not solve it directly.
+
+                    ${learningContext}
                     
                     Please solve this problem step-by-step.
                     - If it's code, debug it or write the solution.
@@ -139,9 +165,12 @@ Deno.serve(async (req) => {
                     prompt: `You are a helpful math tutor. 
                     Problem: "${query}"
                     Correct Final Answer (from Wolfram): "${finalAnswer}"
+
+                    ${learningContext}
                     
                     Please provide a clear, step-by-step solution in HEBREW.
                     Break it down into logical steps like a math app (Photomath).
+                    BE EXTREMELY PRECISE with geometry and algebraic derivations.
                     
                     Return ONLY a JSON object with this structure:
                     {
