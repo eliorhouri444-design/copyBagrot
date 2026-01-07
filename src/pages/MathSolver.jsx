@@ -39,30 +39,8 @@ export default function MathSolver() {
         setUploadedImage(null); // Or set a placeholder for PDF/Code
       }
 
-      // 2. Extract Problem using LLM (Enhanced for Diagrams)
-      const extractionRes = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this image/file deeply to extract the problem for a solver.
-        
-        CRITICAL FOR DIAGRAMS/ILLUSTRATIONS:
-        - If the image contains a GEOMETRIC SHAPE, CIRCUIT, MECHANISM, or GRAPH:
-          1. Describe the structure explicitly (e.g., "Right triangle ABC, angle C=90, AB=10...").
-          2. Extract all labels, values, and constraints shown visually.
-          3. Combine the visual data with any accompanying text to form a complete problem statement.
-        
-        FOR TEXT/PDF/CODE:
-        - Transcribe the problem statement exactly.
-        - Keep Hebrew text as is.
-        - If it's code, extract the snippet and the apparent intent.
-
-        Return ONLY the raw problem text (and visual description if needed) ready for the solver. Do not add conversational text.`,
-        file_urls: [file_url]
-      });
-
-      const extractedText = typeof extractionRes === 'string' ? extractionRes : extractionRes.content;
-      setQuery(extractedText);
-
-      // 3. Solve it
-      await solveProblem(extractedText);
+      // 2. Pass directly to Unified Solver (Backend handles OCR)
+      await solveProblem(null, file_url);
 
     } catch (err) {
       console.error(err);
@@ -71,18 +49,28 @@ export default function MathSolver() {
     }
   };
 
-  const solveProblem = async (problemText) => {
-    if (!problemText.trim()) return;
-    
+  const solveProblem = async (problemText, fileUrl = null) => {
+    if (!problemText && !fileUrl) return;
+
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const { data } = await base44.functions.invoke('unifiedSolver', { query: problemText });
+      // If we have a fileUrl but no text, we send the fileUrl for backend OCR
+      // If we have text (extracted or typed), we send it as query
+      const payload = problemText ? { query: problemText } : { file_url: fileUrl };
+
+      const { data } = await base44.functions.invoke('unifiedSolver', payload);
 
       if (data.success) {
         setResult(data);
+        // If the backend performed OCR, update the query box with the extracted text
+        if (!problemText && data.classification?.wolfram_query) {
+           // Note: Ideally the backend would return the 'raw_ocr_text', 
+           // but for now we won't override the user's view to keep it clean unless needed.
+           // If we wanted to show the extracted text: setQuery(data.extracted_text);
+        }
       } else {
         setError(data.error || "לא הצלחנו לפתור את הבעיה הזו.");
       }
