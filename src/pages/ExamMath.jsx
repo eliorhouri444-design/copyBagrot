@@ -763,77 +763,77 @@ export default function ExamMathPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-5 flex flex-col w-full max-w-sm max-h-full"
+          className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 flex flex-col w-full max-w-md h-full max-h-[90vh]"
         >
           {/* Header Row: Back Button + Icon + Title */}
-          <div className="relative mb-2 text-center">
+          <div className="relative mb-6 text-center">
               <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => navigate(createPageUrl("Exams"))} 
-                  className="absolute right-0 top-0 hover:bg-slate-50 h-8 w-8"
+                  className="absolute right-0 top-0 hover:bg-slate-50 h-10 w-10"
               >
-                  <ArrowLeft className="w-5 h-5 text-slate-400" />
+                  <ArrowLeft className="w-6 h-6 text-slate-400" />
               </Button>
 
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 mx-auto mb-2">
-                  <Calculator className="w-6 h-6 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mx-auto mb-4">
+                  <Calculator className="w-8 h-8 text-white" />
               </div>
 
-              <h1 className="text-lg font-bold text-slate-900 leading-tight px-8 line-clamp-2">{exam.title}</h1>
-              <p className="text-xs text-slate-500 mt-1 line-clamp-1 px-4">{exam.description}</p>
+              <h1 className="text-2xl font-bold text-slate-900 leading-tight px-8 line-clamp-2">{exam.title}</h1>
+              <p className="text-sm text-slate-500 mt-2 line-clamp-2 px-4">{exam.description}</p>
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <div className="bg-blue-50 rounded-xl p-2 text-center">
-              <Clock className="w-4 h-4 text-blue-600 mx-auto mb-1" />
-              <div className="text-base font-bold text-slate-900 leading-none">{exam.duration_minutes}</div>
-              <div className="text-[10px] text-slate-500">דקות</div>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-blue-50 rounded-2xl p-4 text-center">
+              <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <div className="text-xl font-bold text-slate-900 leading-none">{exam.duration_minutes}</div>
+              <div className="text-xs text-slate-500 mt-1">דקות</div>
             </div>
-            <div className="bg-indigo-50 rounded-xl p-2 text-center">
-              <BookOpen className="w-4 h-4 text-indigo-600 mx-auto mb-1" />
-              <div className="text-base font-bold text-slate-900 leading-none">{exam.questions.length}</div>
-              <div className="text-[10px] text-slate-500">שאלות</div>
+            <div className="bg-indigo-50 rounded-2xl p-4 text-center">
+              <BookOpen className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+              <div className="text-xl font-bold text-slate-900 leading-none">{exam.questions.length}</div>
+              <div className="text-xs text-slate-500 mt-1">שאלות</div>
             </div>
-            <div className="bg-emerald-50 rounded-xl p-2 text-center">
-              <CheckCircle className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
-              <div className="text-base font-bold text-slate-900 leading-none">{exam.total_points}</div>
-              <div className="text-[10px] text-slate-500">נקודות</div>
+            <div className="bg-emerald-50 rounded-2xl p-4 text-center">
+              <CheckCircle className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+              <div className="text-xl font-bold text-slate-900 leading-none">{exam.total_points}</div>
+              <div className="text-xs text-slate-500 mt-1">נקודות</div>
             </div>
           </div>
 
-          {/* Mode Selection */}
-          <div className="bg-slate-50 rounded-2xl p-3 mb-3 flex-1 flex flex-col justify-center min-h-0">
-            <h3 className="text-xs font-semibold text-slate-900 mb-2 text-center">בחר מצב:</h3>
-            <div className="grid grid-cols-2 gap-2 h-full">
+          {/* Mode Selection - Fill remaining space */}
+          <div className="bg-slate-50 rounded-2xl p-4 mb-6 flex-1 flex flex-col">
+            <h3 className="text-sm font-bold text-slate-900 mb-4 text-center">בחר מצב תרגול:</h3>
+            <div className="grid grid-cols-2 gap-4 flex-1">
               <button
                 onClick={() => setExamMode('practice')}
-                className={`p-2 rounded-xl transition-all flex flex-col items-center justify-center gap-1 border-2 ${
+                className={`p-4 rounded-xl transition-all flex flex-col items-center justify-center gap-3 border-2 h-full ${
                   examMode === 'practice'
-                    ? 'bg-blue-500 border-blue-500 text-white shadow-md'
-                    : 'bg-white border-transparent text-slate-600 hover:bg-slate-100'
+                    ? 'bg-blue-500 border-blue-500 text-white shadow-lg transform scale-[1.02]'
+                    : 'bg-white border-transparent text-slate-600 hover:bg-slate-100 hover:border-slate-200'
                 }`}
               >
-                <Lightbulb className="w-5 h-5" />
+                <Lightbulb className={`w-8 h-8 ${examMode === 'practice' ? 'text-white' : 'text-blue-500'}`} />
                 <div className="text-center">
-                    <div className="font-bold text-sm">אימון</div>
-                    <div className="text-[9px] opacity-80">רמזים זמינים</div>
+                    <div className="font-bold text-lg mb-1">אימון</div>
+                    <div className={`text-xs ${examMode === 'practice' ? 'opacity-90' : 'text-slate-400'}`}>עם רמזים ופתרונות</div>
                 </div>
               </button>
 
               <button
                 onClick={() => setExamMode('real')}
-                className={`p-2 rounded-xl transition-all flex flex-col items-center justify-center gap-1 border-2 ${
+                className={`p-4 rounded-xl transition-all flex flex-col items-center justify-center gap-3 border-2 h-full ${
                   examMode === 'real'
-                    ? 'bg-rose-500 border-rose-500 text-white shadow-md'
-                    : 'bg-white border-transparent text-slate-600 hover:bg-slate-100'
+                    ? 'bg-rose-500 border-rose-500 text-white shadow-lg transform scale-[1.02]'
+                    : 'bg-white border-transparent text-slate-600 hover:bg-slate-100 hover:border-slate-200'
                 }`}
               >
-                <AlertCircle className="w-5 h-5" />
+                <AlertCircle className={`w-8 h-8 ${examMode === 'real' ? 'text-white' : 'text-rose-500'}`} />
                 <div className="text-center">
-                    <div className="font-bold text-sm">בחינה</div>
-                    <div className="text-[9px] opacity-80">ללא רמזים</div>
+                    <div className="font-bold text-lg mb-1">בחינה</div>
+                    <div className={`text-xs ${examMode === 'real' ? 'opacity-90' : 'text-slate-400'}`}>ללא עזרה חיצונית</div>
                 </div>
               </button>
             </div>
@@ -841,7 +841,7 @@ export default function ExamMathPage() {
 
           <Button
             onClick={handleStartExam}
-            className="w-full h-12 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-base font-bold rounded-xl shadow-lg shadow-blue-500/30 mt-auto"
+            className="w-full h-16 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xl font-bold rounded-2xl shadow-xl shadow-blue-500/30 mt-auto transition-transform hover:scale-[1.02]"
           >
             התחל מבחן
           </Button>
