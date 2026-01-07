@@ -48,10 +48,69 @@ Deno.serve(async (req) => {
         const response = await fetch(url);
         const data = await response.json();
 
+        // 2.5 Fallback to LLM if Wolfram fails or for non-math queries
         if (!data.queryresult || !data.queryresult.success) {
+             console.log("Wolfram failed, attempting LLM fallback...");
+             
+             try {
+                // Determine the domain (Math/Physics/Engineering/Code)
+                const fallbackRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
+                    prompt: `You are an expert scientific and engineering solver. The user asked: "${query}".
+                    Wolfram Alpha could not solve it directly.
+                    
+                    Please solve this problem step-by-step.
+                    - If it's code, debug it or write the solution.
+                    - If it's engineering, apply the correct formulas and show work.
+                    - If it's math/physics, show the solution.
+                    
+                    Return a JSON object with:
+                    {
+                        "primary_result_title": "Final Answer / Summary",
+                        "primary_result_content": "The concise final answer",
+                        "steps": [
+                            { "title": "Step 1", "description": "...", "latex": "..." }
+                        ]
+                    }
+                    Output MUST be in HEBREW (except code/formulas).`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            primary_result_title: { type: "string" },
+                            primary_result_content: { type: "string" },
+                            steps: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        title: { type: "string" },
+                                        description: { type: "string" },
+                                        latex: { type: "string" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (fallbackRes) {
+                    return Response.json({
+                        success: true,
+                        translated_query: translatedQuery,
+                        pods: [],
+                        primary_result: {
+                            title: fallbackRes.primary_result_title || "תוצאה",
+                            content: [{ plaintext: fallbackRes.primary_result_content, image: null }]
+                        },
+                        steps: fallbackRes.steps || []
+                    });
+                }
+             } catch (llmErr) {
+                 console.error("LLM Fallback failed:", llmErr);
+             }
+
              return Response.json({ 
                  success: false, 
-                 error: "לא הצלחנו למצוא פתרון. נסה לנסח מחדש.",
+                 error: "לא הצלחנו למצוא פתרון. נסה לנסח מחדש או להעלות קובץ ברור יותר.",
                  details: data.queryresult?.tips?.text
              });
         }

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle, FileText, Code } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LatexRenderer from "@/components/exams/LatexRenderer";
 
@@ -16,7 +16,7 @@ export default function MathSolver() {
   const [uploadedImage, setUploadedImage] = useState(null);
   const fileInputRef = useRef(null);
 
-  const handleImageUpload = async (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -27,14 +27,22 @@ export default function MathSolver() {
       
       // 1. Upload file
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setUploadedImage(file_url);
+      
+      // Show preview based on type
+      if (file.type.startsWith('image/')) {
+        setUploadedImage(file_url);
+      } else {
+        setUploadedImage(null); // Or set a placeholder for PDF/Code
+      }
 
-      // 2. Extract Math Problem using Vision LLM
+      // 2. Extract Problem using LLM (Generic)
       const extractionRes = await base44.integrations.Core.InvokeLLM({
-        prompt: `Extract the math or physics problem from this image exactly as it appears. 
-        If it's Hebrew, keep the Hebrew text. 
-        If it's a formula, write it in standard mathematical notation or LaTeX.
-        Return ONLY the problem text.`,
+        prompt: `Extract the problem or query from this file. 
+        - If it's an image of a math/physics problem, transcribe it exactly.
+        - If it's a PDF, extract the main problem statement.
+        - If it's code, extract the snippet and what seems to be the bug or question.
+        - If it's Hebrew, keep the Hebrew text.
+        - Return ONLY the problem text/code ready for solving.`,
         file_urls: [file_url]
       });
 
@@ -46,7 +54,7 @@ export default function MathSolver() {
 
     } catch (err) {
       console.error(err);
-      setError("שגיאה בפיענוח התמונה. נסה תמונה ברורה יותר.");
+      setError("שגיאה בפיענוח הקובץ. נסה קובץ ברור יותר.");
       setIsAnalyzing(false);
     }
   };
@@ -112,7 +120,7 @@ export default function MathSolver() {
               <Textarea
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="הקלד שאלה, משוואה, או מושג (למשל: אינטגרל של x^2, חוק שני של ניוטון...)"
+                placeholder="הקלד שאלה, משוואה, קוד, או בעיה הנדסית (למשל: אינטגרל של x^2, חישוב עומסים, דיבאג לקוד...)"
                 className="min-h-[120px] border-0 resize-none text-lg p-6 pb-16 focus-visible:ring-0 bg-transparent"
               />
               
@@ -123,8 +131,8 @@ export default function MathSolver() {
                     type="file" 
                     ref={fileInputRef} 
                     className="hidden" 
-                    accept="image/*" 
-                    onChange={handleImageUpload} 
+                    accept="image/*,application/pdf,text/*,.py,.js,.c,.cpp,.java" 
+                    onChange={handleFileUpload} 
                   />
                   <Button 
                     type="button"
@@ -132,15 +140,15 @@ export default function MathSolver() {
                     size="icon"
                     onClick={() => fileInputRef.current?.click()}
                     className="rounded-full w-10 h-10 border-slate-200 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
-                    title="העלה תמונה"
+                    title="העלה קובץ (תמונה, PDF, קוד)"
                   >
-                    <ImageIcon className="w-5 h-5" />
+                    <FileText className="w-5 h-5" />
                   </Button>
                   <Button 
                     type="button"
                     variant="outline" 
                     size="icon"
-                    onClick={() => fileInputRef.current?.click()} // On mobile this triggers camera option usually
+                    onClick={() => fileInputRef.current?.click()}
                     className="rounded-full w-10 h-10 border-slate-200 hover:bg-slate-100 hover:text-indigo-600 transition-colors md:hidden"
                   >
                     <Camera className="w-5 h-5" />

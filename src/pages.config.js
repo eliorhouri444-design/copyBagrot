@@ -53,6 +53,7 @@ import GrammarTopics from './pages/GrammarTopics';
 import GrammarTopicsSelection from './pages/GrammarTopicsSelection';
 import Home from './pages/Home';
 import LearningPlan from './pages/LearningPlan';
+import MathSolver from './pages/MathSolver';
 import Onboarding from './pages/Onboarding';
 import Practice from './pages/Practice';
 import Premium from './pages/Premium';
@@ -77,7 +78,6 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
-import MathSolver from './pages/MathSolver';
 import __Layout from './Layout.jsx';
 
 
@@ -137,6 +137,7 @@ export const PAGES = {
     "GrammarTopicsSelection": GrammarTopicsSelection,
     "Home": Home,
     "LearningPlan": LearningPlan,
+    "MathSolver": MathSolver,
     "Onboarding": Onboarding,
     "Practice": Practice,
     "Premium": Premium,
@@ -161,7 +162,6 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
-    "MathSolver": MathSolver,
 }
 
 export const pagesConfig = {
