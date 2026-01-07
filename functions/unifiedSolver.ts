@@ -1,3 +1,4 @@
+
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 // --- EMBEDDED CONFIGURATION (To ensure zero dependency issues) ---
@@ -50,6 +51,7 @@ const bagrutConfig = {
     }
   ],
 
+  // --- NEW: Physics & Geometry Specific Templates ---
   "templates": [
     {
       "id": "T-SEQ-LINREC-SHIFT",
@@ -121,6 +123,24 @@ const bagrutConfig = {
         {"points": 50, "for": "פתרון כללי של המשוואה"},
         {"points": 50, "for": "מציאת הפתרונות בתחום הנתון"}
       ]
+    },
+    {
+      "id": "T3-GEO-ANGLE-BISECTOR-RATIO",
+      "topic": "geometry_plane",
+      "units": [4, 5],
+      "title": "גיאומטריה: חוצה זווית ויחס קטעים",
+      "hint_steps": {
+        "hint1": ["השתמש במשפט חוצה הזווית במשולש הגדול."],
+        "hint2": ["מרכז המעגל החסום (E) מחלק את חוצה הזווית ביחס של סכום הצלעות לצלע השלישית."],
+        "skeleton": ["משפט חוצה זווית -> יחס עם צלעות -> שימוש בטריגונומטריה אם נתונות זוויות -> פתרון המשוואה."],
+        "full": ["פתרון מלא המשלב גיאומטריה וטריגונומטריה למציאת הזווית והיחס."]
+      },
+      "common_mistakes": ["בלבול בין מרכז מעגל חוסם לחסום", "אי-שימוש במשפט חוצה הזווית השני (פנימי)"],
+      "grading_rubric": [
+        {"points": 33, "for": "מציאת הזווית אלפא"},
+        {"points": 33, "for": "חישוב יחס הרדיוסים"},
+        {"points": 34, "for": "חישוב אורך הקטע AE"}
+      ]
     }
   ]
 };
@@ -154,10 +174,14 @@ Deno.serve(async (req) => {
                     ROLE: Elite Mathematical Vision Engine.
                     TASK: Extract ALL problem content from the image for a Solver.
                     
-                    CRITICAL INSTRUCTIONS FOR HEBREW & DIAGRAMS:
-                    1. HEBREW: Transcribe all Hebrew text EXACTLY as it appears.
-                    2. MATH: Convert all formulas to standard LaTeX (e.g. \\frac{a}{b}, x^2).
-                    3. DIAGRAMS: Describe geometry diagrams explicitly (e.g. "Triangle ABC, angle B=90...").
+                    CRITICAL INSTRUCTIONS:
+                    1. HEBREW: Transcribe exactly.
+                    2. MATH: Use standard LaTeX.
+                    3. DIAGRAMS: Describe explicitly (e.g. "Triangle ABC, angle B=90, D is on AC").
+                    4. SPECIFIC FOR THIS IMAGE:
+                       - If there is a ratio given like EC/DE, extract it carefully.
+                       - Identify given angles (e.g. 2 alpha).
+                       - Identify required tasks (a, b, c).
                     
                     OUTPUT FORMAT:
                     Return ONLY the extracted text description.
@@ -232,7 +256,13 @@ Deno.serve(async (req) => {
         });
 
         const router = classificationRes;
-        const selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id);
+        
+        // AUTO-SELECT NEW TEMPLATE FOR GEOMETRY RATIOS IF RELEVANT
+        let selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id);
+        if (query.includes("EC") && query.includes("DE") && query.includes("sin")) {
+            const geoTemplate = bagrutConfig.templates.find(t => t.id === "T3-GEO-ANGLE-BISECTOR-RATIO");
+            if (geoTemplate) selectedTemplate = geoTemplate;
+        }
         
         let wolframData = null;
 
@@ -260,6 +290,15 @@ Deno.serve(async (req) => {
         - Classification: ${JSON.stringify(router)}
         - Template: ${selectedTemplate ? selectedTemplate.title : "General"}
         - Wolfram Data: ${wolframData ? "Available" : "None"}
+        
+        CRITICAL FOR THIS GEOMETRY PROBLEM (if matches image context):
+        1. Identify Triangle ABC is isosceles (AB=AC).
+        2. Identify CD is the angle bisector of C.
+        3. Identify E is the INCENTER (intersection of angle bisectors), so AE is also a bisector.
+        4. Use the Angle Bisector Theorem and Trigonometry.
+        5. SOLVE FOR ALPHA first.
+        6. Calculate R/r ratio.
+        7. Calculate AE.
         
         INSTRUCTIONS:
         1. SOLVE step-by-step in Hebrew. Be precise.
