@@ -66,6 +66,33 @@ Deno.serve(async (req) => {
             }
         }
 
+        // PROTOCOL INSTRUCTIONS (Bagrut Standard)
+        const protocolInstructions = `
+        *** PROBLEM SOLVING PROTOCOL (ISRAELI BAGRUT STANDARD) ***
+
+        1. SCANNING & CLASSIFICATION:
+           - Identify: Given values, Required, Diagram nature.
+           - Domain: [Math: Algebra/Geometry/Calculus/Vectors/Probability] OR [Physics: Kinematics/Dynamics/Energy/Momentum/Electricity/Optics].
+
+        2. METHOD SELECTION (DECISION MAP):
+           - Geometry:
+             - "Intersection in Square/Rectangle" -> Use Coordinate Geometry (Analytical).
+             - "Parallel lines + Ratios" -> Use Thales.
+             - "Angle Bisector" -> Angle Bisector Theorem.
+             - "Tangent to Circle" -> Power of a Point / Tangent-Secant.
+           - Physics:
+             - "Time + Acceleration" -> Kinematics equations.
+             - "Forces" -> Newton's 2nd Law (Sigma F = ma).
+             - "Height/Spring/Speed change" -> Energy Conservation.
+             - "Collision" -> Momentum Conservation.
+
+        3. EXECUTION:
+           - Write "Given/Required".
+           - State the Theorem/Law used by name.
+           - Show substitution and algebraic manipulation.
+           - Final Answer with Units (for Physics).
+        `;
+
         // 2. Query Wolfram Alpha
         const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(translatedQuery)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
         
@@ -84,7 +111,9 @@ Deno.serve(async (req) => {
 
                     ${learningContext}
                     
-                    Please solve this problem step-by-step.
+                    ${protocolInstructions}
+
+                    Please solve this problem step-by-step using the PROTOCOL above.
                     
                     CRITICAL FOR GEOMETRY:
                     - Use Analytical Geometry methods (coordinates).
@@ -92,6 +121,8 @@ Deno.serve(async (req) => {
                     
                     Return a JSON object with:
                     {
+                        "classification": "Math - Geometry / Physics - Kinematics",
+                        "method_used": "Coordinate Geometry / Energy Conservation",
                         "primary_result_title": "Final Answer / Summary",
                         "primary_result_content": "The concise final answer",
                         "geogebra_commands": ["A=(0,0)", "B=(1,0)"],
@@ -103,6 +134,8 @@ Deno.serve(async (req) => {
                     response_json_schema: {
                         type: "object",
                         properties: {
+                            classification: { type: "string" },
+                            method_used: { type: "string" },
                             primary_result_title: { type: "string" },
                             primary_result_content: { type: "string" },
                             geogebra_commands: { type: "array", items: { type: "string" } },
@@ -126,6 +159,8 @@ Deno.serve(async (req) => {
                         success: true,
                         translated_query: translatedQuery,
                         pods: [],
+                        classification: fallbackRes.classification,
+                        method_used: fallbackRes.method_used,
                         primary_result: {
                             title: fallbackRes.primary_result_title || "תוצאה",
                             content: [{ plaintext: fallbackRes.primary_result_content, image: null }]
@@ -172,7 +207,9 @@ Deno.serve(async (req) => {
 
                     ${learningContext}
                     
-                    Please provide a clear, step-by-step solution in HEBREW.
+                    ${protocolInstructions}
+
+                    Please provide a clear, step-by-step solution in HEBREW following the PROTOCOL.
                     Break it down into logical steps like a math app (Photomath).
                     BE EXTREMELY PRECISE with geometry and algebraic derivations.
                     
@@ -180,6 +217,8 @@ Deno.serve(async (req) => {
                     
                     Return ONLY a JSON object with this structure:
                     {
+                        "classification": "Math - Geometry",
+                        "method_used": "Trigonometry",
                         "steps": [
                             { "title": "שלב 1", "description": "explanation...", "latex": "math formula if needed" },
                             { "title": "שלב 2", "description": "...", "latex": "..." }
@@ -189,6 +228,8 @@ Deno.serve(async (req) => {
                     response_json_schema: {
                         type: "object",
                         properties: {
+                            classification: { type: "string" },
+                            method_used: { type: "string" },
                             geogebra_commands: { type: "array", items: { type: "string" } },
                             steps: {
                                 type: "array",
@@ -214,6 +255,12 @@ Deno.serve(async (req) => {
                     // We need to pass this out
                     var geogebraCommands = stepsRes.geogebra_commands;
                 }
+
+                // Attach classification/method
+                if (stepsRes) {
+                    var classification = stepsRes.classification;
+                    var methodUsed = stepsRes.method_used;
+                }
             } catch (err) {
                 console.error("Step generation failed", err);
             }
@@ -223,6 +270,8 @@ Deno.serve(async (req) => {
             success: true,
             translated_query: translatedQuery,
             pods: formattedPods,
+            classification: typeof classification !== 'undefined' ? classification : undefined,
+            method_used: typeof methodUsed !== 'undefined' ? methodUsed : undefined,
             primary_result: formattedPods.find(p => p.id === resultPod?.id),
             steps: steps,
             geogebra_commands: typeof geogebraCommands !== 'undefined' ? geogebraCommands : []

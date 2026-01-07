@@ -276,6 +276,24 @@ export default function MathSolver() {
                     </div>
                 )}
 
+                {/* Strategy & Method Badge */}
+                {(result.classification || result.method_used) && (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                      {result.classification && (
+                          <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 shadow-sm flex items-center gap-1">
+                              <ScanLine className="w-3 h-3" />
+                              {result.classification}
+                          </div>
+                      )}
+                      {result.method_used && (
+                          <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold border border-indigo-100 shadow-sm flex items-center gap-1">
+                              <Calculator className="w-3 h-3" />
+                              {result.method_used}
+                          </div>
+                      )}
+                  </div>
+                )}
+
                 {/* Primary Result Highlight */}
                 {result.primary_result && (
                     <Card className="border-2 border-indigo-500 shadow-xl shadow-indigo-200/50 overflow-hidden bg-indigo-50/50">
