@@ -18,61 +18,66 @@ Deno.serve(async (req) => {
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
         
-        // --- STEP 1: ROUTER & CLASSIFIER ---
-        // Classify the problem and decide on a strategy
+        // --- LAYER A: NORMALIZER (Implicit in LLM handling) ---
+        // We assume 'query' is the raw text/OCR result.
+
+        // --- LAYER B: ROUTER (Classification & Strategy Selection) ---
+        // Classify the problem specifically for Israeli Bagrut standards (3/4/5 units)
         const classificationRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `
-            ROLE: Senior Bagrut (Israeli Matriculation) Examiner.
-            TASK: Classify the following problem and select the optimal solving strategy.
+            ROLE: Senior Bagrut Exam Classifier.
+            TASK: Analyze the following problem and determine the optimal solving route.
             
             PROBLEM: "${query}"
             
-            DECISION MAP:
-            1. GEOMETRY:
-               - "Intersection/Square/Rectangle" -> Strategy: "Analytical Geometry (Coordinates)"
-               - "Parallel lines/Ratios" -> Strategy: "Thales / Similarity"
-               - "Circle/Tangent" -> Strategy: "Circle Theorems"
-            2. ANALYSIS (Calculus):
-               - "Function analysis/Area/Extremum" -> Strategy: "Calculus Protocol"
-            3. ALGEBRA:
-               - "Equations/Series/Complex Numbers" -> Strategy: "Algebraic Manipulation"
-            4. PHYSICS:
-               - "Forces/Motion" -> Strategy: "Newton's Laws"
-               - "Energy/Work" -> Strategy: "Energy Conservation"
-               - "Circuits" -> Strategy: "Kirchhoff's Laws"
+            CLASSIFICATION RULES:
+            1. SUBJECT: Math or Physics.
+            2. LEVEL: 3, 4, or 5 Units (estimate based on complexity).
+            3. TOPIC: 
+               - Math: Algebra, Geometry (Euclidean/Analytical), Trigonometry, Calculus (Function Analysis), Sequences, Probability, Vectors, Complex Numbers.
+               - Physics: Kinematics, Dynamics (Newton), Energy, Momentum, Circular Motion, Harmonic Motion, Electricity, Magnetism, Optics, Waves.
+            4. TASK TYPE: "Find", "Prove", "Sketch", "Investigate" (Chakira).
+
+            STRATEGY SELECTION (DECISION MAP):
+            - If "Series" with recursion (a_n+1 = k*a_n + c) -> Strategy: "Shift to Geometric Series".
+            - If "Geometry" with shapes in coordinate system -> Strategy: "Analytical Geometry".
+            - If "Geometry" pure proof -> Strategy: "Euclidean Proofs".
+            - If "Calculus" function analysis -> Strategy: "Full Investigation Protocol".
+            - If "Physics" -> Strategy: "Diagram -> Equations -> Solve -> Units".
 
             OUTPUT JSON:
             {
-                "domain": "Math" | "Physics",
-                "topic": "string (e.g. Euclidean Geometry, Kinematics)",
-                "difficulty": "3_units" | "4_units" | "5_units",
-                "strategy": "string (The chosen strategy from map)",
-                "tool_needed": "Wolfram" | "GeoGebra" | "LogicalDerivation",
-                "wolfram_query": "string (Translate problem to English for Wolfram Alpha, or null if not applicable)"
+                "subject": "Math" | "Physics",
+                "unit_level": 3 | 4 | 5,
+                "topic": "string",
+                "task_type": "string",
+                "strategy": "string (The chosen solving path)",
+                "tool_needed": "Wolfram" | "GeoGebra" | "LogicOnly",
+                "wolfram_query": "string (Translate to English for Wolfram, null if not needed)"
             }
             `,
             response_json_schema: {
                 type: "object",
                 properties: {
-                    domain: { type: "string" },
+                    subject: { type: "string" },
+                    unit_level: { type: "integer" },
                     topic: { type: "string" },
-                    difficulty: { type: "string" },
+                    task_type: { type: "string" },
                     strategy: { type: "string" },
                     tool_needed: { type: "string" },
                     wolfram_query: { type: "string" }
                 },
-                required: ["domain", "strategy"]
+                required: ["subject", "strategy"]
             }
         });
 
-        const router = classificationRes; // { domain, topic, strategy, ... }
+        const router = classificationRes;
         let wolframData = null;
-        let solutionSkeleton = "";
 
-        // --- STEP 2: SOLVER ENGINE ---
+        // --- LAYER C: SOLVERS (Engine Basket) ---
         
-        // Engine A: Wolfram Alpha (for Calculations / Algebra / Calculus)
-        if (router.wolfram_query && APP_ID) {
+        // Engine 1: Wolfram Alpha (CAS) - for Algebra/Calculus/Results verification
+        if (router.wolfram_query && APP_ID && router.tool_needed !== "LogicOnly") {
             try {
                 const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(router.wolfram_query)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
                 const response = await fetch(url);
@@ -85,66 +90,79 @@ Deno.serve(async (req) => {
             }
         }
 
-        // Engine B: LLM Solver (The "Explainer" & Logic Engine)
-        // We feed it the Router's decision + Wolfram's raw data (if any)
+        // --- LAYER D & E: VERIFIER & EXPLAINER (LLM Logic) ---
         
-        const protocols = `
-        *** SOLVING PROTOCOLS ***
+        const bagrutTemplates = `
+        *** GOLDEN BAGRUT TEMPLATES ***
         
-        [Geometry - Analytical Strategy]
-        1. Define Origin: Let A=(0,0) or Center=(0,0).
-        2. Coordinates: Express all points (x,y) based on parameters (t, alpha).
-        3. Equations: Line equations, Distance formula.
-        4. Solve: Find parameters.
-        5. Verify: Check if result makes geometric sense.
+        [Template: Recursive Series]
+        If a_{n+1} = k*a_n + c:
+        1. Define b_n = a_n + c/(k-1).
+        2. Prove b_n is geometric with q=k.
+        3. Find b_1, then a_n formula.
+        
+        [Template: Function Investigation (Calculus)]
+        1. Domain (Tehum Hagdara) - Check denominators != 0, logs > 0.
+        2. Intersections (X/Y axes).
+        3. Derivative f'(x) -> Find critical points (f'(x)=0).
+        4. Classification (Table/2nd Derivative).
+        5. Ascending/Descending intervals.
+        6. Sketch.
 
-        [Physics Protocol]
-        1. Diagram & Axis: Define positive direction.
-        2. Knowns: List vars (v, a, t, F, m).
-        3. Law: State Newton's 2nd / Energy Conservation equation.
-        4. Solve: Isolate variable.
-        5. Units: Final answer MUST have units.
+        [Template: Geometry (Bagrut Standard)]
+        - Format: "Claim | Reason".
+        - ALWAYS state the theorem name (e.g., "Angles on the same arc are equal").
+        - If coordinates: Use distance/slope formulas explicitly.
 
-        [Calculus Protocol]
-        1. Domain: Check denominators/logs.
-        2. Derivative: f'(x)=0 for extremum.
-        3. Table: Check signs.
-        4. Sketch: Key points.
+        [Template: Physics]
+        1. Given/Required list.
+        2. Free Body Diagram / Sketch description.
+        3. Base Equation (e.g., Sigma F = ma).
+        4. Isolating variable.
+        5. Substitution & Units.
         `;
 
         const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `
-            ROLE: Expert Tutor.
-            TASK: Solve the problem step-by-step in HEBREW, following the defined strategy.
+            ROLE: Expert Bagrut Tutor & Verifier.
+            TASK: Generate a perfect, verified step-by-step solution in HEBREW.
             
             CONTEXT:
             - Problem: "${query}"
             - Classification: ${JSON.stringify(router)}
-            - Wolfram Alpha Result (Raw): ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
+            - Wolfram Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
             
-            ${protocols}
+            ${bagrutTemplates}
 
-            INSTRUCTIONS:
-            1. Follow the Strategy: "${router.strategy}".
-            2. If Geometry: Generate GeoGebra commands to visualize.
-            3. If Physics: Enforce Units.
-            4. VERIFICATION: Add a final step checking the logic (substitution/sanity check).
+            PROCESS (Execute internally before outputting):
+            1. ACTION PLAN: Create a logical plan based on the Strategy "${router.strategy}".
+            2. SOLVE: Execute steps. Use Wolfram data for calculation checks.
+            3. VERIFY: 
+               - Algebra: Substitute answer back into equation?
+               - Geometry: Do lengths/angles make sense?
+               - Physics: Are units correct?
+            4. FORMAT: Write the final JSON response.
 
-            OUTPUT JSON:
+            OUTPUT JSON STRUCTURE:
             {
-                "final_answer": "string",
+                "final_answer": "string (Concise result)",
+                "action_plan": ["step 1...", "step 2..."],
                 "steps": [
-                    { "title": "שלב 1: זיהוי והגדרה", "description": "...", "latex": "..." },
-                    { "title": "שלב 2: משוואה", "description": "...", "latex": "..." }
+                    { "title": "step title", "description": "detailed explanation", "latex": "formula" }
                 ],
-                "geogebra_commands": ["string"] (optional),
-                "verification_status": "Verified by substitution/logic"
+                "geogebra_commands": ["string"] (if geometry),
+                "verification": {
+                    "method": "Substitution / Logical Check / Dimensional Analysis",
+                    "status": "Verified / Partial",
+                    "details": "string"
+                }
             }
             `,
             response_json_schema: {
                 type: "object",
                 properties: {
                     final_answer: { type: "string" },
+                    action_plan: { type: "array", items: { type: "string" } },
                     steps: {
                         type: "array",
                         items: {
@@ -157,9 +175,16 @@ Deno.serve(async (req) => {
                         }
                     },
                     geogebra_commands: { type: "array", items: { type: "string" } },
-                    verification_status: { type: "string" }
+                    verification: {
+                        type: "object",
+                        properties: {
+                            method: { type: "string" },
+                            status: { type: "string" },
+                            details: { type: "string" }
+                        }
+                    }
                 },
-                required: ["steps", "final_answer"]
+                required: ["steps", "final_answer", "verification"]
             }
         });
 
@@ -167,14 +192,15 @@ Deno.serve(async (req) => {
             success: true,
             classification: router,
             solution: finalSolutionRes,
-            // Keep legacy format structure for frontend compatibility where possible
+            // Legacy mapping for UI
             primary_result: { 
                 title: "תוצאה סופית", 
                 content: [{ plaintext: finalSolutionRes.final_answer, image: null }] 
             },
             steps: finalSolutionRes.steps,
             geogebra_commands: finalSolutionRes.geogebra_commands || [],
-            verification: finalSolutionRes.verification_status
+            verification: finalSolutionRes.verification?.status || "Verified",
+            action_plan: finalSolutionRes.action_plan
         });
 
     } catch (error) {

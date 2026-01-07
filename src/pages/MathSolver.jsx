@@ -289,9 +289,39 @@ export default function MathSolver() {
                       </div>
                       <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-semibold border border-green-100 shadow-sm flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
-                          {result.verification || "נבדק ע״י מערכת"}
+                          {result.classification.unit_level} יח״ל
+                      </div>
+                      <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold border border-blue-100 shadow-sm flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {result.verification || "מאומת"}
                       </div>
                   </div>
+                )}
+
+                {/* Action Plan (New Feature) */}
+                {result.action_plan && result.action_plan.length > 0 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm"
+                    >
+                        <h4 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                            <ScanLine className="w-4 h-4 text-indigo-500" />
+                            תוכנית פתרון (Action Plan)
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                            {result.action_plan.map((step, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200">
+                                        {idx + 1}. {step}
+                                    </div>
+                                    {idx < result.action_plan.length - 1 && (
+                                        <ArrowRight className="w-3 h-3 text-slate-300" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
                 )}
 
                 {/* Primary Result Highlight */}
