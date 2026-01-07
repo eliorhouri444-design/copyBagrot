@@ -1,11 +1,17 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
-// Fixed: Removed 'export default' which caused the deployment issue
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
         
-        const { query } = await req.json();
+        // Ensure we parse the body safely
+        let query;
+        try {
+            const body = await req.json();
+            query = body.query;
+        } catch (e) {
+            return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+        }
 
         if (!query) {
             return Response.json({ error: 'Missing query' }, { status: 400 });
@@ -23,7 +29,8 @@ Deno.serve(async (req) => {
 
         if (containsHebrew) {
             try {
-                const translationRes = await base44.integrations.Core.InvokeLLM({
+                // Use service role to ensure reliability
+                const translationRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `Translate this math problem from Hebrew to English/WolframAlpha syntax. 
                     Keep numbers and formulas intact. 
                     Output ONLY the translated query.
@@ -36,7 +43,6 @@ Deno.serve(async (req) => {
         }
 
         // 2. Query Wolfram Alpha
-        // Added podstate to try and get steps, though often requires Pro
         const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(translatedQuery)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
         
         const response = await fetch(url);
@@ -52,7 +58,7 @@ Deno.serve(async (req) => {
 
         // 3. Process Pods
         const pods = data.queryresult.pods || [];
-        const resultPod = pods.find(p => p.id === 'Result' || p.id === 'Solution') || pods[1]; // Fallback to second pod if no explicit result
+        const resultPod = pods.find(p => p.id === 'Result' || p.id === 'Solution') || pods[1]; 
         
         const formattedPods = pods.map(pod => ({
             title: translateTitle(pod.title),
@@ -63,14 +69,14 @@ Deno.serve(async (req) => {
             })) || []
         }));
 
-        // 4. Generate Step-by-Step Solution (Photomath Style)
-        // We use the LLM to analyze the problem + Wolfram's result to generate clear Hebrew steps
+        // 4. Generate Step-by-Step Solution
         let steps = [];
         if (resultPod) {
             try {
                 const finalAnswer = resultPod.subpods?.[0]?.plaintext || "";
                 
-                const stepsRes = await base44.integrations.Core.InvokeLLM({
+                // Use service role here too
+                const stepsRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
                     prompt: `You are a helpful math tutor. 
                     Problem: "${query}"
                     Correct Final Answer (from Wolfram): "${finalAnswer}"
