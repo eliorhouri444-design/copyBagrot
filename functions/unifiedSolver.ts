@@ -15,6 +15,7 @@ Deno.serve(async (req) => {
         let { query, file_url } = body;
 
         // --- LAYER A: INPUT PROCESSING & OCR (Normalizer) ---
+        // 1. Handle File Upload (OCR)
         if (file_url && (!query || query.trim().length === 0)) {
             try {
                 console.log("Processing image with OCR/Vision:", file_url);
@@ -24,32 +25,41 @@ Deno.serve(async (req) => {
                     TASK: Transcribe the content of this image perfectly into text/LaTeX.
                     
                     INSTRUCTIONS:
-                    1. IDENTIFY: Is this a Math/Physics problem?
-                    2. TRANSCRIBE:
-                       - Copy Hebrew text exactly.
-                       - Convert formulas/equations to standard LaTeX (e.g., x^2 + 5x = 0).
-                       - If there is a geometric diagram, describe it briefly (e.g., "Triangle ABC with angle B=90").
-                    3. CLEANUP: Ignore irrelevant artifacts (page numbers, scribbles).
+                    1. EXTRACT:
+                       - Hebrew text: Copy exactly.
+                       - Math: Convert to standard LaTeX.
+                       - Diagrams: Describe geometric properties explicitly (e.g., "Triangle ABC is isosceles, AB=AC, angle A=30").
                     
-                    OUTPUT: Return ONLY the extracted raw text string.
+                    2. FORMAT:
+                       - Output ONLY the problem text.
+                       - No prefixes like "Here is the text".
+                       - No markdown code blocks.
                     `,
                     file_urls: [file_url]
                 });
                 
-                query = typeof ocrRes === 'string' ? ocrRes : ocrRes.content;
-                console.log("OCR Result:", query);
+                let extractedText = typeof ocrRes === 'string' ? ocrRes : ocrRes.content;
+                
+                // Cleanup common LLM artifacts
+                if (extractedText) {
+                    extractedText = extractedText.replace(/```(latex|text)?/g, '').replace(/```/g, '').trim();
+                }
+
+                query = extractedText;
+                console.log("OCR Result (Cleaned):", query);
                 
                 if (!query || query.length < 2) {
-                    throw new Error("OCR failed to extract meaningful text.");
+                    throw new Error("OCR produced empty result.");
                 }
             } catch (err) {
                 console.error("OCR Error:", err);
-                return Response.json({ error: 'Failed to process image. Please try a clearer image.' }, { status: 400 });
+                return Response.json({ error: 'שגיאה בפענוח התמונה. אנא נסה תמונה ברורה יותר או הקלד את השאלה.' }, { status: 400 });
             }
         }
 
         if (!query) {
-            return Response.json({ error: 'Missing query or file' }, { status: 400 });
+            console.error("Error: Query is missing after processing. Body:", body);
+            return Response.json({ error: 'לא התקבלה שאלה (טקסט או תמונה).' }, { status: 400 });
         }
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
