@@ -1,118 +1,120 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-Deno.serve(async (req) => {
+export default Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
 
-        if (!user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
+        // Allow any authenticated user to use the solver, or maybe restrict to premium?
+        // For now, let's allow everyone but log usage.
+        
         const { query } = await req.json();
-        const appId = Deno.env.get("App_ID_wolframalpha");
-
-        if (!appId) {
-            return Response.json({ error: 'Wolfram Alpha App ID not configured' }, { status: 500 });
-        }
 
         if (!query) {
-            return Response.json({ error: 'Query is required' }, { status: 400 });
+            return Response.json({ error: 'Missing query' }, { status: 400 });
         }
 
-        // Step 1: Translate Hebrew to English Math Syntax (if Hebrew is present)
+        const APP_ID = Deno.env.get('App_ID_wolframalpha');
+        if (!APP_ID) {
+            console.error("Missing App_ID_wolframalpha secret");
+            return Response.json({ error: 'Configuration error: Missing API Key' }, { status: 500 });
+        }
+
+        // 1. Translate Hebrew/Text query to Math/English using LLM
+        // This helps Wolfram understand context like "נגזרת של..." or "שטח של..."
         let translatedQuery = query;
-        if (/[א-ת]/.test(query)) {
+        const containsHebrew = /[\u0590-\u05FF]/.test(query);
+
+        if (containsHebrew) {
             try {
-                const llmResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `You are a math translator. 
-Goal: Convert this Hebrew math question into a precise Wolfram Alpha query string (English).
-Input: "${query}"
-
-Instructions:
-1. Identify the math problem (Equation, Derivative, Integral, Plot, etc.).
-2. Convert to English terminology (e.g., 'נגזרת' -> 'derivative', 'אינטגרל' -> 'integrate').
-3. Format specifically for Wolfram Alpha (e.g., "solve x^2=4", "derivative of x^2", "plot sin(x)").
-4. ONLY output the query string. No extra words.
-
-Query:`,
+                const llmRes = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Translate this math problem from Hebrew to English/WolframAlpha syntax. 
+                    Keep numbers and formulas intact. 
+                    Output ONLY the translated query.
+                    Example: "נגזרת של x^2" -> "derivative of x^2"
+                    Example: "אינטגרל מ 0 עד 1 של x" -> "integrate x from 0 to 1"
+                    Query: "${query}"`
                 });
-                // InvokeLLM returns a string when no schema is provided.
-                // Clean up any potential quotes or whitespace.
-                translatedQuery = llmResponse.trim().replace(/^"|"$/g, '');
-            } catch (e) {
-                console.error("LLM Translation failed:", e);
-                // Fallback to original query if translation fails
+                translatedQuery = typeof llmRes === 'string' ? llmRes.trim() : llmRes.content.trim();
+                console.log(`Translated "${query}" to "${translatedQuery}"`);
+            } catch (err) {
+                console.error("Translation failed, using original query", err);
             }
         }
 
-        console.log(`Wolfram Query: Original="${query}" -> Translated="${translatedQuery}"`);
-
-        // Step 2: Query Wolfram Alpha
-        const url = `https://api.wolframalpha.com/v2/query?appid=${appId}&input=${encodeURIComponent(translatedQuery)}&output=json&format=image,plaintext`;
+        // 2. Query Wolfram Alpha
+        // output=json is key here
+        const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(translatedQuery)}&output=json`;
         
+        console.log("Calling Wolfram Alpha...");
         const response = await fetch(url);
         const data = await response.json();
 
-        if (data.queryresult.success === false) {
+        if (!data.queryresult || !data.queryresult.success) {
+             console.log("Wolfram failed or didn't understand:", data);
+             // Fallback: Ask LLM to solve it if Wolfram fails? 
+             // For now, just return error.
              return Response.json({ 
-                success: false,
-                error: "Wolfram Alpha could not understand the query",
-                debug_query: translatedQuery
-            });
+                 success: false, 
+                 error: "לא הצלחנו להבין את השאלה או למצוא פתרון. נסה לנסח מחדש.",
+                 details: data.queryresult?.tips?.text
+             });
         }
 
-        // Step 3: Process and Filter Pods
+        // 3. Process Pods
         const pods = data.queryresult.pods || [];
         
-        // Prioritize result/solution pods
-        const resultPods = pods.filter(pod => 
-            pod.primary || 
-            pod.title === 'Result' || 
-            pod.title === 'Decimal approximation' ||
-            pod.title === 'Solution' || 
-            pod.title === 'Exact result' ||
-            pod.title === 'Complex solution' ||
-            pod.title === 'Real solution' ||
-            pod.title === 'Plot' ||
-            pod.title === 'Graphs'
-        );
-        
-        const targetPods = resultPods.length > 0 ? resultPods : pods.slice(0, 3);
+        // Filter and format pods
+        const formattedPods = pods.map(pod => {
+            return {
+                title: translateTitle(pod.title),
+                id: pod.id,
+                content: pod.subpods?.map(sub => ({
+                    plaintext: sub.plaintext,
+                    image: sub.img?.src
+                })) || []
+            };
+        });
 
-        // Dictionary for title translation
-        const titleTranslation = {
-            "Result": "תוצאה",
-            "Solution": "פתרון",
-            "Decimal approximation": "קירוב עשרוני",
-            "Exact result": "תוצאה מדויקת",
-            "Complex solution": "פתרון מרוכב",
-            "Real solution": "פתרון ממשי",
-            "Plot": "גרף",
-            "Graphs": "גרפים",
-            "Derivative": "נגזרת",
-            "Indefinite integral": "אינטגרל לא מסוים",
-            "Definite integral": "אינטגרל מסוים",
-            "Geometric figure": "צורה גאומטרית",
-            "Input": "קלט",
-            "Input interpretation": "פרשנות קלט"
-        };
+        // Prioritize "Result" or "Solution" pods
+        const resultPod = formattedPods.find(p => p.id === 'Result' || p.id === 'Solution');
+        const plotPods = formattedPods.filter(p => p.id.includes('Plot'));
 
-        const relevantPods = targetPods.map(pod => ({
-            title: titleTranslation[pod.title] || pod.title,
-            content: pod.subpods.map(sub => ({
-                text: sub.plaintext,
-                image: sub.img.src
-            }))
-        }));
-
-        return Response.json({ 
+        return Response.json({
             success: true,
-            pods: relevantPods,
-            translated_query: translatedQuery
+            translated_query: translatedQuery,
+            pods: formattedPods,
+            primary_result: resultPod,
+            plots: plotPods
         });
 
     } catch (error) {
+        console.error("Wolfram Solver Error:", error);
         return Response.json({ error: error.message }, { status: 500 });
     }
 });
+
+// Simple dictionary for common pod titles
+function translateTitle(title) {
+    const map = {
+        "Input": "הקלט שזוהה",
+        "Input interpretation": "פרשנות הקלט",
+        "Result": "תוצאה",
+        "Solution": "פתרון",
+        "Decimal approximation": "קירוב עשרוני",
+        "Number line": "ציר המספרים",
+        "Plots": "גרפים",
+        "Plot": "גרף",
+        "3D plot": "גרף תלת-ממדי",
+        "Geometric figure": "צורה גיאומטרית",
+        "Derivative": "נגזרת",
+        "Indefinite integral": "אינטגרל לא מסוים",
+        "Definite integral": "אינטגרל מסוים",
+        "Limit": "גבול",
+        "Alternative forms": "צורות אלטרנטיביות",
+        "Roots": "שורשים (פתרונות)",
+        "Expanded form": "צורה מורחבת",
+        "Differential equation solution": "פתרון משוואה דיפרנציאלית"
+    };
+    return map[title] || title;
+}

@@ -217,10 +217,28 @@ export default function MathSolver() {
                     </div>
                 )}
 
-                {result.pods?.map((pod, index) => (
+                {/* Primary Result Highlight */}
+                {result.primary_result && (
+                    <Card className="border-2 border-indigo-500 shadow-xl shadow-indigo-200/50 overflow-hidden bg-indigo-50/50">
+                        <div className="bg-indigo-500 text-white px-4 py-2 flex items-center gap-2">
+                            <CheckCircle2 className="w-5 h-5" />
+                            <h3 className="font-bold text-lg">{result.primary_result.title}</h3>
+                        </div>
+                        <CardContent className="p-6 flex justify-center">
+                            {result.primary_result.content?.map((sub, i) => (
+                                <div key={i} className="overflow-x-auto">
+                                    <img src={sub.image} alt="Result" className="max-w-full h-auto mix-blend-multiply scale-110" />
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Other Pods */}
+                {result.pods?.filter(p => p.id !== 'Result' && p.id !== 'Solution').map((pod, index) => (
                     <Card key={index} className="border-0 shadow-lg shadow-slate-200/50 overflow-hidden">
                         <div className="bg-slate-50/80 border-b border-slate-100 px-4 py-2 flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
                             <h3 className="font-bold text-slate-700 text-sm">{pod.title}</h3>
                         </div>
                         <CardContent className="p-4">
