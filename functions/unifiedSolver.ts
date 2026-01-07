@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { bagrutConfig } from './bagrutConfig.js';
 
 Deno.serve(async (req) => {
     try {
@@ -11,73 +12,67 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
-        const { query, file_url } = body;
+        const { query } = body;
         if (!query) {
             return Response.json({ error: 'Missing query' }, { status: 400 });
         }
 
         const APP_ID = Deno.env.get('App_ID_wolframalpha');
         
-        // --- LAYER A: NORMALIZER (Implicit in LLM handling) ---
-        // We assume 'query' is the raw text/OCR result.
+        // --- LAYER B: ROUTER (Using Bagrut Config) ---
+        // Provide the LLM with the config rules to select the best template
+        const routerPrompt = `
+        ROLE: Senior Bagrut Exam Router.
+        SYSTEM: BagrutMathSolverIL v1.0
+        
+        TASK: Classify the problem and select the best matching Template ID from the configuration.
+        
+        PROBLEM: "${query}"
+        
+        ROUTER RULES:
+        ${JSON.stringify(bagrutConfig.router_rules)}
+        
+        INSTRUCTIONS:
+        1. Analyze keywords in the problem.
+        2. Match against "match_any" keywords in rules.
+        3. Select the best "template_priority" ID. If no specific match, use "GENERAL".
+        4. Determine unit level (3/4/5) based on complexity.
+        5. Generate a Wolfram Alpha query string if useful.
 
-        // --- LAYER B: ROUTER (Classification & Strategy Selection) ---
-        // Classify the problem specifically for Israeli Bagrut standards (3/4/5 units)
+        OUTPUT JSON:
+        {
+            "subject": "Math" | "Physics",
+            "unit_level": 3 | 4 | 5,
+            "topic": "string",
+            "template_id": "string (e.g., T-FUNC-INVEST-STD)",
+            "wolfram_query": "string (or null)"
+        }
+        `;
+
         const classificationRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-            prompt: `
-            ROLE: Senior Bagrut Exam Classifier.
-            TASK: Analyze the following problem and determine the optimal solving route.
-            
-            PROBLEM: "${query}"
-            
-            CLASSIFICATION RULES:
-            1. SUBJECT: Math or Physics.
-            2. LEVEL: 3, 4, or 5 Units (estimate based on complexity).
-            3. TOPIC: 
-               - Math: Algebra, Geometry (Euclidean/Analytical), Trigonometry, Calculus (Function Analysis), Sequences, Probability, Vectors, Complex Numbers.
-               - Physics: Kinematics, Dynamics (Newton), Energy, Momentum, Circular Motion, Harmonic Motion, Electricity, Magnetism, Optics, Waves.
-            4. TASK TYPE: "Find", "Prove", "Sketch", "Investigate" (Chakira).
-
-            STRATEGY SELECTION (DECISION MAP):
-            - If "Series" with recursion (a_n+1 = k*a_n + c) -> Strategy: "Shift to Geometric Series".
-            - If "Geometry" with shapes in coordinate system -> Strategy: "Analytical Geometry".
-            - If "Geometry" pure proof -> Strategy: "Euclidean Proofs".
-            - If "Calculus" function analysis -> Strategy: "Full Investigation Protocol".
-            - If "Physics" -> Strategy: "Diagram -> Equations -> Solve -> Units".
-
-            OUTPUT JSON:
-            {
-                "subject": "Math" | "Physics",
-                "unit_level": 3 | 4 | 5,
-                "topic": "string",
-                "task_type": "string",
-                "strategy": "string (The chosen solving path)",
-                "tool_needed": "Wolfram" | "GeoGebra" | "LogicOnly",
-                "wolfram_query": "string (Translate to English for Wolfram, null if not needed)"
-            }
-            `,
+            prompt: routerPrompt,
             response_json_schema: {
                 type: "object",
                 properties: {
                     subject: { type: "string" },
                     unit_level: { type: "integer" },
                     topic: { type: "string" },
-                    task_type: { type: "string" },
-                    strategy: { type: "string" },
-                    tool_needed: { type: "string" },
+                    template_id: { type: "string" },
                     wolfram_query: { type: "string" }
                 },
-                required: ["subject", "strategy"]
+                required: ["subject", "template_id"]
             }
         });
 
         const router = classificationRes;
+        
+        // Find the full template object
+        const selectedTemplate = bagrutConfig.templates.find(t => t.id === router.template_id) || null;
+        
         let wolframData = null;
 
-        // --- LAYER C: SOLVERS (Engine Basket) ---
-        
-        // Engine 1: Wolfram Alpha (CAS) - for Algebra/Calculus/Results verification
-        if (router.wolfram_query && APP_ID && router.tool_needed !== "LogicOnly") {
+        // --- LAYER C: SOLVER ENGINE (Wolfram CAS) ---
+        if (router.wolfram_query && APP_ID) {
             try {
                 const url = `http://api.wolframalpha.com/v2/query?appid=${APP_ID}&input=${encodeURIComponent(router.wolfram_query)}&output=json&podstate=Step-by-step%20solution&podstate=Show%20steps`;
                 const response = await fetch(url);
@@ -90,74 +85,41 @@ Deno.serve(async (req) => {
             }
         }
 
-        // --- LAYER D & E: VERIFIER & EXPLAINER (LLM Logic) ---
+        // --- LAYER D & E: EXPLAINER & VERIFIER (Template-Based) ---
         
-        const bagrutTemplates = `
-        *** GOLDEN BAGRUT TEMPLATES ***
+        const explainerPrompt = `
+        ROLE: Expert Bagrut Tutor.
+        TASK: Solve the problem using the STRICT TEMPLATE PLAN provided.
         
-        [Template: Recursive Series]
-        If a_{n+1} = k*a_n + c:
-        1. Define b_n = a_n + c/(k-1).
-        2. Prove b_n is geometric with q=k.
-        3. Find b_1, then a_n formula.
+        CONTEXT:
+        - Problem: "${query}"
+        - Classification: ${JSON.stringify(router)}
+        - Selected Template: ${selectedTemplate ? JSON.stringify(selectedTemplate) : "General Problem Solving"}
+        - Wolfram Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
         
-        [Template: Function Investigation (Calculus)]
-        1. Domain (Tehum Hagdara) - Check denominators != 0, logs > 0.
-        2. Intersections (X/Y axes).
-        3. Derivative f'(x) -> Find critical points (f'(x)=0).
-        4. Classification (Table/2nd Derivative).
-        5. Ascending/Descending intervals.
-        6. Sketch.
+        INSTRUCTIONS:
+        1. ACTION PLAN: Adopt the 'plan' from the template.
+        2. EXPLAINER: Use the 'explainer_script' tone/style.
+        3. VERIFY: Perform the checks listed in 'verifier'.
+        4. OUTPUT: Hebrew solution, step-by-step.
 
-        [Template: Geometry (Bagrut Standard)]
-        - Format: "Claim | Reason".
-        - ALWAYS state the theorem name (e.g., "Angles on the same arc are equal").
-        - If coordinates: Use distance/slope formulas explicitly.
-
-        [Template: Physics]
-        1. Given/Required list.
-        2. Free Body Diagram / Sketch description.
-        3. Base Equation (e.g., Sigma F = ma).
-        4. Isolating variable.
-        5. Substitution & Units.
+        OUTPUT JSON:
+        {
+            "final_answer": "string",
+            "action_plan": ["step 1", "step 2"...],
+            "steps": [
+                { "title": "string", "description": "string", "latex": "string" }
+            ],
+            "geogebra_commands": ["string"] (optional),
+            "verification": {
+                "status": "Verified" | "Partial",
+                "details": "string"
+            }
+        }
         `;
 
         const finalSolutionRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
-            prompt: `
-            ROLE: Expert Bagrut Tutor & Verifier.
-            TASK: Generate a perfect, verified step-by-step solution in HEBREW.
-            
-            CONTEXT:
-            - Problem: "${query}"
-            - Classification: ${JSON.stringify(router)}
-            - Wolfram Data: ${wolframData ? JSON.stringify(wolframData.queryresult.pods) : "Not available"}
-            
-            ${bagrutTemplates}
-
-            PROCESS (Execute internally before outputting):
-            1. ACTION PLAN: Create a logical plan based on the Strategy "${router.strategy}".
-            2. SOLVE: Execute steps. Use Wolfram data for calculation checks.
-            3. VERIFY: 
-               - Algebra: Substitute answer back into equation?
-               - Geometry: Do lengths/angles make sense?
-               - Physics: Are units correct?
-            4. FORMAT: Write the final JSON response.
-
-            OUTPUT JSON STRUCTURE:
-            {
-                "final_answer": "string (Concise result)",
-                "action_plan": ["step 1...", "step 2..."],
-                "steps": [
-                    { "title": "step title", "description": "detailed explanation", "latex": "formula" }
-                ],
-                "geogebra_commands": ["string"] (if geometry),
-                "verification": {
-                    "method": "Substitution / Logical Check / Dimensional Analysis",
-                    "status": "Verified / Partial",
-                    "details": "string"
-                }
-            }
-            `,
+            prompt: explainerPrompt,
             response_json_schema: {
                 type: "object",
                 properties: {
@@ -178,21 +140,26 @@ Deno.serve(async (req) => {
                     verification: {
                         type: "object",
                         properties: {
-                            method: { type: "string" },
                             status: { type: "string" },
                             details: { type: "string" }
                         }
                     }
                 },
-                required: ["steps", "final_answer", "verification"]
+                required: ["steps", "final_answer"]
             }
         });
 
+        // Enrich the classification object for frontend display
+        const enrichedClassification = {
+            ...router,
+            strategy: selectedTemplate?.title || router.template_id, // Use template title as strategy description
+            domain: router.subject // Map subject to domain for compatibility
+        };
+
         return Response.json({
             success: true,
-            classification: router,
+            classification: enrichedClassification,
             solution: finalSolutionRes,
-            // Legacy mapping for UI
             primary_result: { 
                 title: "תוצאה סופית", 
                 content: [{ plaintext: finalSolutionRes.final_answer, image: null }] 
