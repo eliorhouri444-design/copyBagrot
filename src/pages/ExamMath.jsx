@@ -763,10 +763,10 @@ export default function ExamMathPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 flex flex-col w-full max-w-md h-full max-h-[90vh]"
+          className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 pb-8 flex flex-col gap-6 w-full max-w-md h-full max-h-[90vh]"
         >
           {/* Header Row: Back Button + Icon + Title */}
-          <div className="relative mb-6 text-center">
+          <div className="relative text-center shrink-0">
               <Button 
                   variant="ghost" 
                   size="icon" 
@@ -785,7 +785,7 @@ export default function ExamMathPage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 shrink-0">
             <div className="bg-blue-50 rounded-2xl p-4 text-center">
               <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
               <div className="text-xl font-bold text-slate-900 leading-none">{exam.duration_minutes}</div>
@@ -804,7 +804,7 @@ export default function ExamMathPage() {
           </div>
 
           {/* Mode Selection - Fill remaining space */}
-          <div className="bg-slate-50 rounded-2xl p-4 mb-6 flex-1 flex flex-col">
+          <div className="bg-slate-50 rounded-2xl p-4 flex-1 flex flex-col min-h-0">
             <h3 className="text-sm font-bold text-slate-900 mb-4 text-center">בחר מצב תרגול:</h3>
             <div className="grid grid-cols-2 gap-4 flex-1">
               <button
@@ -841,7 +841,7 @@ export default function ExamMathPage() {
 
           <Button
             onClick={handleStartExam}
-            className="w-full h-16 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xl font-bold rounded-2xl shadow-xl shadow-blue-500/30 mt-auto transition-transform hover:scale-[1.02]"
+            className="w-full h-16 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xl font-bold rounded-2xl shadow-xl shadow-blue-500/30 transition-transform hover:scale-[1.02] shrink-0"
           >
             התחל מבחן
           </Button>
