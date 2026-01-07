@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle, FileText, Code, ThumbsUp, ThumbsDown, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LatexRenderer from "@/components/exams/LatexRenderer";
+import { Copy, ExternalLink } from "lucide-react";
 
 export default function MathSolver() {
   const [query, setQuery] = useState('');
@@ -287,6 +288,47 @@ export default function MathSolver() {
                                     <img src={sub.image} alt="Result" className="max-w-full h-auto mix-blend-multiply scale-110" />
                                 </div>
                             ))}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* GeoGebra Integration */}
+                {result.geogebra_commands && result.geogebra_commands.length > 0 && (
+                    <Card className="border-2 border-purple-500 shadow-xl overflow-hidden bg-purple-50">
+                        <div className="bg-purple-600 text-white px-4 py-2 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <ScanLine className="w-5 h-5" />
+                                <h3 className="font-bold text-lg">ויזואליזציה (GeoGebra)</h3>
+                            </div>
+                            <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="text-white hover:bg-purple-500"
+                                onClick={() => window.open('https://www.geogebra.org/calculator', '_blank')}
+                            >
+                                פתח GeoGebra <ExternalLink className="w-4 h-4 mr-1" />
+                            </Button>
+                        </div>
+                        <CardContent className="p-4 space-y-3">
+                            <p className="text-sm text-purple-900">
+                                המערכת יצרה עבורך סקריפט GeoGebra להמחשת הפתרון. העתק את הפקודות והדבק אותן ב-GeoGebra.
+                            </p>
+                            <div className="bg-slate-900 rounded-lg p-3 relative group">
+                                <pre className="text-green-400 text-xs font-mono overflow-x-auto whitespace-pre-wrap" dir="ltr">
+                                    {result.geogebra_commands.join('\n')}
+                                </pre>
+                                <Button
+                                    size="icon"
+                                    variant="secondary"
+                                    className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(result.geogebra_commands.join('\n'));
+                                        alert('הפקודות הועתקו!');
+                                    }}
+                                >
+                                    <Copy className="w-3 h-3" />
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 )}
