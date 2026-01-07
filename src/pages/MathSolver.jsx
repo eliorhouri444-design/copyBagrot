@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle, FileText, Code } from "lucide-react";
+import { Loader2, Camera, Image as ImageIcon, Send, Calculator, ArrowRight, X, ScanLine, CheckCircle2, AlertCircle, FileText, Code, ThumbsUp, ThumbsDown, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LatexRenderer from "@/components/exams/LatexRenderer";
 
@@ -14,6 +14,8 @@ export default function MathSolver() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [feedbackState, setFeedbackState] = useState('none'); // none, helpful, unhelpful, submitted
+  const [correction, setCorrection] = useState('');
   const fileInputRef = useRef(null);
 
   const handleFileUpload = async (e) => {
@@ -35,14 +37,22 @@ export default function MathSolver() {
         setUploadedImage(null); // Or set a placeholder for PDF/Code
       }
 
-      // 2. Extract Problem using LLM (Generic)
+      // 2. Extract Problem using LLM (Enhanced for Diagrams)
       const extractionRes = await base44.integrations.Core.InvokeLLM({
-        prompt: `Extract the problem or query from this file. 
-        - If it's an image of a math/physics problem, transcribe it exactly.
-        - If it's a PDF, extract the main problem statement.
-        - If it's code, extract the snippet and what seems to be the bug or question.
-        - If it's Hebrew, keep the Hebrew text.
-        - Return ONLY the problem text/code ready for solving.`,
+        prompt: `Analyze this image/file deeply to extract the problem for a solver.
+        
+        CRITICAL FOR DIAGRAMS/ILLUSTRATIONS:
+        - If the image contains a GEOMETRIC SHAPE, CIRCUIT, MECHANISM, or GRAPH:
+          1. Describe the structure explicitly (e.g., "Right triangle ABC, angle C=90, AB=10...").
+          2. Extract all labels, values, and constraints shown visually.
+          3. Combine the visual data with any accompanying text to form a complete problem statement.
+        
+        FOR TEXT/PDF/CODE:
+        - Transcribe the problem statement exactly.
+        - Keep Hebrew text as is.
+        - If it's code, extract the snippet and the apparent intent.
+
+        Return ONLY the raw problem text (and visual description if needed) ready for the solver. Do not add conversational text.`,
         file_urls: [file_url]
       });
 
@@ -92,6 +102,45 @@ export default function MathSolver() {
     setResult(null);
     setError(null);
     setUploadedImage(null);
+    setFeedbackState('none');
+    setCorrection('');
+  };
+
+  const submitFeedback = async (isCorrect) => {
+    try {
+      if (isCorrect) {
+        setFeedbackState('helpful');
+      } else {
+        setFeedbackState('unhelpful');
+        return; // Wait for correction input
+      }
+      
+      // Submit positive feedback immediately
+      await base44.entities.SolverFeedback.create({
+        query: query,
+        image_url: uploadedImage,
+        generated_result: result,
+        is_correct: true
+      });
+      
+    } catch (err) {
+      console.error("Error submitting feedback:", err);
+    }
+  };
+
+  const submitCorrection = async () => {
+    try {
+      await base44.entities.SolverFeedback.create({
+        query: query,
+        image_url: uploadedImage,
+        generated_result: result,
+        is_correct: false,
+        user_correction: correction
+      });
+      setFeedbackState('submitted');
+    } catch (err) {
+      console.error("Error submitting correction:", err);
+    }
   };
 
   return (
@@ -285,6 +334,70 @@ export default function MathSolver() {
                         </CardContent>
                     </Card>
                 ))}
+
+                {/* Feedback Section */}
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                    {feedbackState === 'none' && (
+                        <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">האם הפתרון עזר לך?</span>
+                            <div className="flex gap-2">
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => submitFeedback(true)}
+                                    className="text-slate-500 hover:text-green-600 hover:bg-green-50"
+                                >
+                                    <ThumbsUp className="w-4 h-4 mr-1" />
+                                    כן
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => submitFeedback(false)}
+                                    className="text-slate-500 hover:text-red-600 hover:bg-red-50"
+                                >
+                                    <ThumbsDown className="w-4 h-4 mr-1" />
+                                    לא
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {feedbackState === 'helpful' && (
+                        <div className="bg-green-50 text-green-700 p-4 rounded-xl text-center text-sm font-medium">
+                            תודה על המשוב! שמחנו לעזור. 🎉
+                        </div>
+                    )}
+
+                    {feedbackState === 'unhelpful' && (
+                        <motion.div 
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3"
+                        >
+                            <div className="text-sm font-medium text-slate-700">עזור לנו להשתפר! מהי התשובה הנכונה?</div>
+                            <Textarea 
+                                value={correction}
+                                onChange={(e) => setCorrection(e.target.value)}
+                                placeholder="הסבר בקצרה מה הייתה הטעות או כתוב את התשובה הנכונה..."
+                                className="bg-white min-h-[80px]"
+                            />
+                            <div className="flex justify-end gap-2">
+                                <Button variant="ghost" size="sm" onClick={() => setFeedbackState('none')}>ביטול</Button>
+                                <Button size="sm" onClick={submitCorrection} className="bg-indigo-600 text-white">
+                                    <Send className="w-3 h-3 mr-2" />
+                                    שלח תיקון
+                                </Button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {feedbackState === 'submitted' && (
+                        <div className="bg-blue-50 text-blue-700 p-4 rounded-xl text-center text-sm font-medium">
+                            תודה! המשוב שלך יעזור לנו לשפר את המודל. 🚀
+                        </div>
+                    )}
+                </div>
             </motion.div>
           )}
         </AnimatePresence>
