@@ -234,6 +234,33 @@ export default function MathSolver() {
                     </Card>
                 )}
 
+                {/* Step-by-Step Solution */}
+                {result.steps && result.steps.length > 0 && (
+                    <div className="space-y-4">
+                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <div className="w-1 h-6 bg-indigo-500 rounded-full"></div>
+                            דרך הפתרון
+                        </h3>
+                        {result.steps.map((step, index) => (
+                            <motion.div 
+                                key={index}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="bg-white rounded-xl border-l-4 border-indigo-500 shadow-sm p-4"
+                            >
+                                <div className="font-bold text-indigo-600 mb-1">{step.title}</div>
+                                <div className="text-slate-700 mb-2">{step.description}</div>
+                                {step.latex && (
+                                    <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 text-left" dir="ltr">
+                                        <LatexRenderer content={step.latex} />
+                                    </div>
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+
                 {/* Other Pods */}
                 {result.pods?.filter(p => p.id !== 'Result' && p.id !== 'Solution').map((pod, index) => (
                     <Card key={index} className="border-0 shadow-lg shadow-slate-200/50 overflow-hidden">
