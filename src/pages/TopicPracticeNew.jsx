@@ -850,7 +850,7 @@ export default function TopicPracticeNewPage() {
       return;
     }
 
-    const isPremiumUser = user?.is_premium;
+    const isPremiumUser = user?.is_premium === true;
     console.log(`👤 User premium status: ${isPremiumUser}`);
 
     if (isPremiumUser) {

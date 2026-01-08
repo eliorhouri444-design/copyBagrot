@@ -118,7 +118,7 @@ export default function HomePage() {
 
   // Timer for rating and share dialogs
   useEffect(() => {
-    if (!user || user.is_premium) return;
+    if (!user || user?.is_premium) return;
     
     const checkAndShowDialogs = async () => {
       try {
