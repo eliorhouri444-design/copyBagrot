@@ -18,7 +18,6 @@ Deno.serve(async (req) => {
         }
 
         // 1. Fetch the Question and Official Solution ("Gold Standard")
-        // We use 'asServiceRole' to ensure we can read the official solution details
         const questionData = await base44.asServiceRole.entities.QuestionBank.list({
             filter: { question_id: question_id },
             limit: 1
@@ -30,7 +29,6 @@ Deno.serve(async (req) => {
 
         const question = questionData[0];
         
-        // Prepare context for the AI Grader
         const solutionContext = question.ai_solution_steps 
             ? question.ai_solution_steps.join('\n') 
             : "No official step-by-step solution provided. Rely on general math knowledge.";
@@ -39,7 +37,7 @@ Deno.serve(async (req) => {
             ? JSON.stringify(question.ai_rubric)
             : "No specific rubric. Use general logic: 40% for method, 40% for calculation accuracy, 20% for final answer.";
 
-        // 2. Perform Grading via LLM
+        // 2. Perform Grading via LLM with Enhanced Vision Instructions
         const gradingRes = await base44.asServiceRole.integrations.Core.InvokeLLM({
             prompt: `
             ROLE: You are an expert, fair, and encouraging Math/Physics Teacher.
@@ -56,8 +54,14 @@ Deno.serve(async (req) => {
             ${rubricContext}
             
             STUDENT SUBMISSION:
-            ${student_text ? `Text: "${student_text}"` : ""}
-            ${student_image_url ? `[Image provided at ${student_image_url}]` : ""}
+            ${student_text ? `Text Input: "${student_text}"` : ""}
+            ${student_image_url ? `[Image Uploaded: Contains handwritten work, graphs, or diagrams]` : ""}
+            
+            VISUAL ANALYSIS INSTRUCTIONS (IF IMAGE PROVIDED):
+            1. **Handwritten Equations**: Carefully OCR and evaluate the mathematical logic step-by-step.
+            2. **Graphs**: Check for correct axis labels (x, y), appropriate scale, critical points (intercepts, extrema), and correct curve shape/behavior (increasing/decreasing, concavity).
+            3. **Geometric Sketches**: Verify that the drawing correctly represents the problem statement (e.g., correct labelling of vertices, angles, parallel lines).
+            4. **Diagrams**: Look for Free Body Diagrams (Physics) or other schematic representations and check vectors/forces directions and labels.
             
             GRADING RULES:
             1. **Alternative Methods**: If the student uses a DIFFERENT but MATHEMATICALLY VALID method (e.g., Vectors instead of Geometry, or Energy instead of Kinematics), give FULL CREDIT for the logic. Do NOT penalize for deviating from the official steps if the math is sound.
@@ -111,9 +115,6 @@ Deno.serve(async (req) => {
                 }
             }
         });
-
-        // 3. Save Attempt (Optional - can be done by frontend, but good to log here if needed)
-        // For now, we just return the grading result
         
         return Response.json(gradingRes);
 
