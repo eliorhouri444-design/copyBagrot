@@ -10,26 +10,26 @@ function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  
+
   const isActiveExamSession = [
-    'ExamMath', 
-    'ExamPhysics', 
-    'ExamLiterature', 
-    'ExamGeneric',
-    'ExamModuleA', 
-    'ExamModuleB', 
-    'ExamModuleC',
-    'TopicPracticeNew',
-    'ExtendedReading',
-    'Onboarding',
-    'SubjectSelection',
-    'CustomWeakExam',
-    'VocabularyFlashcards',
-    'VocabularyQuickPractice',
-    'VocabularyTraining',
-    'VocabularyStrengthen'
-  ].includes(currentPageName);
-  
+  'ExamMath',
+  'ExamPhysics',
+  'ExamLiterature',
+  'ExamGeneric',
+  'ExamModuleA',
+  'ExamModuleB',
+  'ExamModuleC',
+  'TopicPracticeNew',
+  'ExtendedReading',
+  'Onboarding',
+  'SubjectSelection',
+  'CustomWeakExam',
+  'VocabularyFlashcards',
+  'VocabularyQuickPractice',
+  'VocabularyTraining',
+  'VocabularyStrengthen'].
+  includes(currentPageName);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [location.pathname]);
@@ -46,21 +46,21 @@ function LayoutContent({ children, currentPageName }) {
     };
     loadUser();
   }, []);
-  
+
   const navItems = [
-    { name: "StudyPlan", icon: TrendingUp, path: createPageUrl("StudyPlan"), label: "התוכנית", color: "#EC4899" },
-    { name: "Practice", icon: BookOpen, path: createPageUrl("Practice"), label: "תרגול", color: "#8B5CF6" },
-    { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#3B82F6" },
-    { name: "Exams", icon: FileCheck, path: createPageUrl("Exams"), label: "בגרויות", color: "#10B981" },
-    { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }
-    ];
+  { name: "StudyPlan", icon: TrendingUp, path: createPageUrl("StudyPlan"), label: "התוכנית", color: "#EC4899" },
+  { name: "Practice", icon: BookOpen, path: createPageUrl("Practice"), label: "תרגול", color: "#8B5CF6" },
+  { name: "Home", icon: Home, path: createPageUrl("Home"), label: "בית", color: "#3B82F6" },
+  { name: "Exams", icon: FileCheck, path: createPageUrl("Exams"), label: "בגרויות", color: "#10B981" },
+  { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }];
+
 
   const adminNavItems = user?.role === 'admin' ? [] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-blue-100 flex flex-col">
+    <div dir="rtl" className="min-h-screen bg-blue-100">
       <style>
         {`
           :root {
@@ -259,58 +259,58 @@ function LayoutContent({ children, currentPageName }) {
         `}
       </style>
       
-      <main className="flex-1">
+      <main className="min-h-screen">
         {children}
       </main>
 
       {/* Legal Disclaimer Footer */}
-      <div className="bg-slate-50 border-t border-slate-200 py-6 px-4 pb-24 text-center">
+      <div className="bg-slate-50 px-3 py-6 text-center border-t border-slate-200">
         <p className="text-[10px] text-slate-400 max-w-md mx-auto leading-relaxed">
           הבהרה משפטית: השאלות באפליקציה מבוססות על שאלוני בגרות שפורסמו על ידי משרד החינוך וזמינים לציבור. 
           השימוש נעשה לצרכים חינוכיים בלבד. הפתרונות, ההסברים, והמערכת הדיגיטלית לבדיקת התשובות הם יצירה מקורית של צוות האפליקציה ואינם מהווים חומר רשמי של משרד החינוך.
         </p>
       </div>
 
-      {!isActiveExamSession && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 h-16">
+      {!isActiveExamSession &&
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 h-16">
           <div className="flex justify-around items-center h-full max-w-screen-xl mx-auto px-4">
             {allNavItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              const Icon = item.icon;
-              
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
-                    isActive 
-                      ? 'text-[#3B82F6]' 
-                      : 'text-gray-500 hover:text-[#3B82F6]'
-                  }`}
-                >
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+                isActive ?
+                'text-[#3B82F6]' :
+                'text-gray-500 hover:text-[#3B82F6]'}`
+                }>
+
                   <Icon className={`w-6 h-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
                   <span className={`text-xs font-medium ${isActive ? 'font-semibold' : ''}`}>
                     {item.label}
                   </span>
-                  {isActive && (
-                    <div 
-                      className="absolute bottom-0 w-8 h-1 rounded-t-full bg-[#3B82F6]"
-                    />
-                  )}
-                </Link>
-              );
-            })}
+                  {isActive &&
+                <div
+                  className="absolute bottom-0 w-8 h-1 rounded-t-full bg-[#3B82F6]" />
+
+                }
+                </Link>);
+
+          })}
           </div>
         </nav>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
 
 export default function Layout({ children, currentPageName }) {
   return (
     <ThemeProvider>
       <LayoutContent children={children} currentPageName={currentPageName} />
-    </ThemeProvider>
-  );
+    </ThemeProvider>);
+
 }
