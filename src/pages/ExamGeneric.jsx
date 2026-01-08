@@ -41,6 +41,7 @@ export default function ExamGenericPage() {
   const [showRetryAd, setShowRetryAd] = useState(false);
   const [wolframSolution, setWolframSolution] = useState(null);
   const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState({});
 
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
@@ -223,11 +224,49 @@ export default function ExamGenericPage() {
     }, 500);
   };
 
-  const handleAnswerChange = (questionNumber, answer) => {
-    setUserAnswers((prev) => ({
-      ...prev,
-      [questionNumber]: answer
-    }));
+  const handleAnswerChange = (questionNumber, answer, fieldKey = null) => {
+    setUserAnswers((prev) => {
+      if (fieldKey) {
+        // Structured answer
+        const currentAnswer = typeof prev[questionNumber] === 'object' ? prev[questionNumber] : { text: prev[questionNumber] || '' };
+        return {
+          ...prev,
+          [questionNumber]: {
+            ...currentAnswer,
+            [fieldKey]: answer
+          }
+        };
+      }
+      return {
+        ...prev,
+        [questionNumber]: answer
+      };
+    });
+  };
+
+  const handleFileUpload = async (e, questionNumber) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingFiles(prev => ({ ...prev, [questionNumber]: true }));
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setUserAnswers(prev => {
+        const currentAnswer = typeof prev[questionNumber] === 'object' ? prev[questionNumber] : { text: prev[questionNumber] || '' };
+        return {
+          ...prev,
+          [questionNumber]: {
+            ...currentAnswer,
+            file_url: file_url
+          }
+        };
+      });
+    } catch (error) {
+      console.error("File upload failed:", error);
+      alert("שגיאה בהעלאת הקובץ");
+    } finally {
+      setUploadingFiles(prev => ({ ...prev, [questionNumber]: false }));
+    }
   };
 
   const handleSolveWithWolfram = async (questionText, resultIndex = null) => {
@@ -262,80 +301,64 @@ export default function ExamGenericPage() {
       const results = [];
       const unitLevel = exam.unit_level || 0;
 
-      const checkAnswerWithAI = async (userAnswer, correctAnswer, questionText) => {
-        try {
-          const response = await base44.integrations.Core.InvokeLLM({
-            prompt: `אתה בודק תשובות במבחן. בדוק את תשובת התלמיד והחזר משוב בעברית בלבד.
-
-הוראות לבדיקה:
-1. בדוק את המשמעות הסמנטית, לא ניסוח מדויק.
-2. השווה את תשובת התלמיד לתשובה הנכונה וקבל וריאציות מקובלות.
-3. התעלם מרישיות, פיסוק ושגיאות כתיב קלות.
-4. דחה תשובות שמשנות עובדות, נושא, זמן או מטרה.
-5. דרג תשובות בסקאלה:
-   - similarity_score 100 = נכון לחלוטין
-   - similarity_score 70-90 = משמעות נכונה אך חסרים פרטים
-   - similarity_score 40-60 = קשור אך לא נכון
-   - similarity_score 0-30 = שגוי
-
-מקצוע: ${exam.subject} ${unitLevel} יחידות
-שאלה: ${questionText}
-תשובה נכונה: ${correctAnswer}
-תשובת התלמיד: ${userAnswer}
-
-חשוב מאוד מאוד: 
-- כתוב את כל ההסברים בעברית בלבד! 
-- גם אם המבחן באנגלית, ההסבר חייב להיות בעברית!
-- השדה explanation_hebrew חייב להיות בעברית מלאה!`,
-            response_json_schema: {
-              type: "object",
-              properties: {
-                is_correct: { type: "boolean", description: "האם התשובה נכונה" },
-                has_spelling_error: { type: "boolean", description: "האם יש שגיאות כתיב" },
-                similarity_score: { type: "number", description: "ציון דמיון 0-100" },
-                points_deduction_percent: { type: "number", description: "אחוז הורדה בגלל שגיאות" },
-                explanation_hebrew: { type: "string", description: "הסבר מפורט בעברית - למה התשובה נכונה או שגויה" }
-              },
-              required: ["is_correct", "similarity_score", "explanation_hebrew"]
-            }
-          });
-
-          return response;
-        } catch (error) {
-          console.error("Error invoking LLM for answer check:", error);
-          const isMatch = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
-          return {
-            is_correct: isMatch,
-            has_spelling_error: false,
-            similarity_score: isMatch ? 100 : 0,
-            points_deduction_percent: 0,
-            explanation_hebrew: isMatch ? "תשובה נכונה!" : "התשובה שגויה. התשובה הנכונה היא: " + correctAnswer
-          };
-        }
-      };
-
       for (const questionItem of exam.questions) {
-        const userAnswer = userAnswers[questionItem.question_number];
+        const userAnswerData = userAnswers[questionItem.question_number];
+        // Handle structured answers or simple text
+        const userAnswerText = typeof userAnswerData === 'object' && userAnswerData !== null
+          ? (userAnswerData.text || JSON.stringify(userAnswerData)) 
+          : (userAnswerData || '');
+          
+        const uploadedFileUrl = typeof userAnswerData === 'object' ? userAnswerData.file_url : null;
+        const structuredAnswers = typeof userAnswerData === 'object' ? userAnswerData : null;
+
         let isCorrect = false;
         let pointsAwarded = 0;
         let aiResult = null;
 
         totalScore += questionItem.points;
 
-        if (userAnswer && userAnswer.trim()) {
+        // Skip if no answer provided
+        if (!userAnswerText.trim() && !uploadedFileUrl && (!structuredAnswers || Object.keys(structuredAnswers).length === 0)) {
+           // Treated as unanswered
+        } else {
           if (questionItem.question_type === 'multiple_choice') {
-            isCorrect = userAnswer.trim().toLowerCase() === questionItem.correct_answer.trim().toLowerCase();
+            isCorrect = userAnswerText.trim().toLowerCase() === questionItem.correct_answer.trim().toLowerCase();
             pointsAwarded = isCorrect ? questionItem.points : 0;
           } else {
-            aiResult = await checkAnswerWithAI(userAnswer, questionItem.correct_answer, questionItem.question_text);
-            isCorrect = aiResult.is_correct;
+            // Use the advanced checkStudentAnswer function
+            try {
+              const { data: checkData } = await base44.functions.invoke('checkStudentAnswer', {
+                question: questionItem.question_text,
+                studentAnswer: userAnswerText,
+                uploadedFileUrl: uploadedFileUrl,
+                structuredAnswers: structuredAnswers,
+                correctAnswer: questionItem.correct_answer,
+                correctSolutionSteps: questionItem.solution_steps,
+                subject: exam.subject,
+                checkingMode: 'partial'
+              });
 
-            if (isCorrect) {
-              pointsAwarded = questionItem.points;
-              if (aiResult.has_spelling_error) {
-                const deductionPercent = Math.min(aiResult.points_deduction_percent || 20, 20);
-                pointsAwarded = questionItem.points * (1 - deductionPercent / 100);
+              aiResult = checkData;
+              
+              if (checkData.success || checkData.is_correct !== undefined) {
+                const percentage = checkData.score_percentage || (checkData.is_correct ? 100 : 0);
+                pointsAwarded = (percentage / 100) * questionItem.points;
+                isCorrect = percentage >= 60; // Consider it "correct" for simple boolean status if > 60%
+                
+                // Map fields to match existing UI structure if needed
+                aiResult = {
+                  is_correct: isCorrect,
+                  similarity_score: percentage,
+                  explanation_hebrew: checkData.detailed_explanation || checkData.feedback?.positive || '',
+                  points_deduction_percent: 100 - percentage
+                };
               }
+            } catch (err) {
+              console.error("Advanced check failed, falling back to simple check", err);
+              // Fallback to simple matching if function fails
+              const isMatch = userAnswerText.toLowerCase().trim() === questionItem.correct_answer.toLowerCase().trim();
+              isCorrect = isMatch;
+              pointsAwarded = isMatch ? questionItem.points : 0;
             }
           }
 
@@ -1137,26 +1160,45 @@ export default function ExamGenericPage() {
 
                 }
 
-                  {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof') && !extractAmericanOptions(question.question_text)?.hasOptions &&
-                <Textarea
-                  value={userAnswers[question.question_number] || ''}
-                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                  placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                  className="w-full h-32 text-base resize-none"
-                  dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
+                  {/* Structured Inputs for Math/Science (Carousel Mode) */}
+                  {question.answer_fields && question.answer_fields.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                      {question.answer_fields.map((field) => (
+                        <div key={field.key}>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">{field.label}</label>
+                          <Input
+                            type={field.type === 'number' ? 'number' : 'text'}
+                            value={userAnswers[question.question_number]?.[field.key] || ''}
+                            onChange={(e) => handleAnswerChange(question.question_number, e.target.value, field.key)}
+                            placeholder={field.label}
+                            className="bg-white"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                }
+                  {/* File Upload for Handwritten Solutions (Carousel Mode) */}
+                  <div className="mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg transition-colors w-fit">
+                      {uploadingFiles[question.question_number] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      <span className="text-sm font-medium">העלה פתרון כתוב (תמונה)</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, question.question_number)} />
+                    </label>
+                    {userAnswers[question.question_number]?.file_url && (
+                      <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        קובץ הועלה בהצלחה
+                        <a href={userAnswers[question.question_number].file_url} target="_blank" rel="noreferrer" className="underline ml-1">צפה</a>
+                      </div>
+                    )}
+                  </div>
 
-                  {question.question_type !== 'multiple_choice' &&
-                question.question_type !== 'short_answer' &&
-                question.question_type !== 'open_question' &&
-                question.question_type !== 'calculation' &&
-                question.question_type !== 'proof' &&
-                !extractAmericanOptions(question.question_text)?.hasOptions &&
+                  {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof' || (!question.question_type && !extractAmericanOptions(question.question_text)?.hasOptions)) &&
                 <Textarea
-                  value={userAnswers[question.question_number] || ''}
-                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value)}
-                  placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                  value={typeof userAnswers[question.question_number] === 'object' ? userAnswers[question.question_number].text : (userAnswers[question.question_number] || '')}
+                  onChange={(e) => handleAnswerChange(question.question_number, e.target.value, 'text')}
+                  placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה או הסבר..."}
                   className="w-full h-32 text-base resize-none"
                   dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
 
@@ -1302,28 +1344,46 @@ export default function ExamGenericPage() {
 
               }
 
+                  {/* Structured Inputs for Math/Science */}
+                  {questionItem.answer_fields && questionItem.answer_fields.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                      {questionItem.answer_fields.map((field) => (
+                        <div key={field.key}>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">{field.label}</label>
+                          <Input
+                            type={field.type === 'number' ? 'number' : 'text'}
+                            value={userAnswers[questionItem.question_number]?.[field.key] || ''}
+                            onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value, field.key)}
+                            placeholder={field.label}
+                            className="bg-white"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* File Upload for Handwritten Solutions */}
+                  <div className="mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded-lg transition-colors w-fit">
+                      {uploadingFiles[questionItem.question_number] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      <span className="text-sm font-medium">העלה פתרון כתוב (תמונה)</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, questionItem.question_number)} />
+                    </label>
+                    {userAnswers[questionItem.question_number]?.file_url && (
+                      <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        קובץ הועלה בהצלחה
+                        <a href={userAnswers[questionItem.question_number].file_url} target="_blank" rel="noreferrer" className="underline ml-1">צפה</a>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Open questions, calculations, proofs - only if no American style */}
-                  {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof') && !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
+                  {(questionItem.question_type === 'open_question' || questionItem.question_type === 'calculation' || questionItem.question_type === 'proof' || (!questionItem.question_type && !extractAmericanOptions(questionItem.question_text)?.hasOptions)) &&
               <Textarea
-                value={userAnswers[questionItem.question_number] || ''}
-                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה..."}
-                className="w-full h-32"
-                dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
-
-              }
-
-                  {/* Fallback for any other question type - as long as not American style */}
-                  {questionItem.question_type !== 'multiple_choice' &&
-              questionItem.question_type !== 'short_answer' &&
-              questionItem.question_type !== 'open_question' &&
-              questionItem.question_type !== 'calculation' &&
-              questionItem.question_type !== 'proof' &&
-              !extractAmericanOptions(questionItem.question_text)?.hasOptions &&
-              <Textarea
-                value={userAnswers[questionItem.question_number] || ''}
-                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value)}
-                placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "הקלד תשובה..."}
+                value={typeof userAnswers[questionItem.question_number] === 'object' ? userAnswers[questionItem.question_number].text : (userAnswers[questionItem.question_number] || '')}
+                onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value, 'text')}
+                placeholder={exam.subject === 'אנגלית' ? "Write your answer..." : "כתוב תשובה או הסבר..."}
                 className="w-full h-32"
                 dir={exam.subject === 'אנגלית' ? 'ltr' : 'rtl'} />
 

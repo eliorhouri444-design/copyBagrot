@@ -46,6 +46,18 @@ Deno.serve(async (req) => {
                                 },
                                 topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
+                                answer_fields: { 
+                                    type: "array", 
+                                    description: "For Math/Physics questions: A list of specific fields the student needs to find. E.g., 'Value of X', 'Area of triangle', 'Velocity'. This helps create a structured input form.",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            label: { type: "string", description: "Label for the input field in Hebrew (e.g., 'ערך X', 'שטח המעגל')" },
+                                            key: { type: "string", description: "Unique key for the field (e.g., 'x_val', 'area')" },
+                                            type: { type: "string", enum: ["number", "text"], default: "number" }
+                                        }
+                                    }
+                                },
                                 explanation: { type: "string", description: "ULTRA-CRITICAL: The output for this field MUST be in the HEBREW language. Provide a detailed step-by-step explanation. If the source material is in English, you MUST translate the entire explanation to HEBREW. NO ENGLISH is allowed in the output." },
                                 has_diagram: { type: "boolean", description: "CRITICAL: Analyze the question area. Set to 'true' if ANY non-text element like a diagram, geometric shape, coordinate system, graph, or illustration is present. Set to 'false' otherwise. This is very important." }
                             },
@@ -170,6 +182,7 @@ Deno.serve(async (req) => {
                 correct_answer: q.correct_answer || '',
                 explanation: q.explanation || '',
                 solution_steps: q.solution_steps || [],
+                answer_fields: q.answer_fields || [],
                 has_diagram: q.has_diagram || false,
                 question_image_url: q.question_image_url_generated || (q.has_diagram ? "pending_crop" : null),
                 parts: parts

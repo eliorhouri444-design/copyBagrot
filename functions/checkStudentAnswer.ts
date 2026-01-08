@@ -14,15 +14,19 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { question, studentAnswer, correctAnswer, correctSolutionSteps, subject, checkingMode = 'strict', useCache = true } = await req.json();
+        const { question, studentAnswer, uploadedFileUrl, structuredAnswers, correctAnswer, correctSolutionSteps, subject, checkingMode = 'strict', useCache = true } = await req.json();
 
-        if (!question || !studentAnswer) {
-            return Response.json({ error: 'Missing required fields' }, { status: 400 });
+        if (!question || (!studentAnswer && !uploadedFileUrl && !structuredAnswers)) {
+            return Response.json({ error: 'Missing required fields (question or answer)' }, { status: 400 });
         }
 
-        // ✅ Cache למהירות (רק אם זה בדיקה זהה)
-        if (useCache) {
-            const checkHash = `check_${question.substring(0, 50)}_${studentAnswer.substring(0, 50)}`;
+        // Use vision model if file is uploaded
+        const modelToUse = uploadedFileUrl ? "gpt-4o" : "gpt-4o-mini";
+        const fileUrls = uploadedFileUrl ? [uploadedFileUrl] : undefined;
+
+        // ✅ Cache logic (skip if file uploaded for now, difficult to hash)
+        if (useCache && !uploadedFileUrl) {
+            const checkHash = `check_${question.substring(0, 50)}_${typeof studentAnswer === 'string' ? studentAnswer.substring(0, 50) : JSON.stringify(structuredAnswers)}`;
             const cached = await base44.asServiceRole.entities.CachedResponse.filter({ 
                 question_hash: checkHash 
             });
@@ -92,7 +96,8 @@ Deno.serve(async (req) => {
 ${question}
 
 **תשובת התלמיד:**
-${studentAnswer}
+${structuredAnswers ? JSON.stringify(structuredAnswers) : studentAnswer}
+${uploadedFileUrl ? "(שים לב: התלמיד העלה תמונה של הפתרון - נתח אותה)" : ""}
 
 ${correctAnswer ? `\n**תשובה סופית נכונה:**\n${correctAnswer}\n` : ''}
 ${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המחוון):**\n${Array.isArray(correctSolutionSteps) ? correctSolutionSteps.join('\n') : correctSolutionSteps}\n` : ''}
@@ -100,6 +105,7 @@ ${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המח�
 **מצב בדיקה:** ${checkingMode}`
                 }
             ],
+            file_urls: fileUrls, // Pass image if exists
             response_format: { type: "json_object" },
             temperature: 0.2,
             max_tokens: 1500
@@ -116,9 +122,9 @@ ${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המח�
         };
 
         // Cache save
-        if (useCache) {
+        if (useCache && !uploadedFileUrl) {
             try {
-                const checkHash = `check_${question.substring(0, 50)}_${studentAnswer.substring(0, 50)}`;
+                const checkHash = `check_${question.substring(0, 50)}_${typeof studentAnswer === 'string' ? studentAnswer.substring(0, 50) : JSON.stringify(structuredAnswers)}`;
                 await base44.asServiceRole.entities.CachedResponse.create({
                     question_hash: checkHash,
                     question_text: question,
