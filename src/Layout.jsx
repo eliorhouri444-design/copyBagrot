@@ -264,7 +264,7 @@ function LayoutContent({ children, currentPageName }) {
       </main>
 
       {/* Legal Disclaimer Footer */}
-      <div className="bg-slate-50 px-3 py-6 text-center border-t border-slate-200">
+      <div className={`bg-slate-50 px-3 py-6 text-center border-t border-slate-200 ${!isActiveExamSession ? 'pb-24' : ''}`}>
         <p className="text-[10px] text-slate-400 max-w-md mx-auto leading-relaxed">
           הבהרה משפטית: השאלות באפליקציה מבוססות על שאלוני בגרות שפורסמו על ידי משרד החינוך וזמינים לציבור. 
           השימוש נעשה לצרכים חינוכיים בלבד. הפתרונות, ההסברים, והמערכת הדיגיטלית לבדיקת התשובות הם יצירה מקורית של צוות האפליקציה ואינם מהווים חומר רשמי של משרד החינוך.
