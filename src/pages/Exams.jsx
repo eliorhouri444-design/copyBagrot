@@ -715,6 +715,44 @@ export default function ExamsPage() {
     }
   };
 
+  const groupExams = (exams) => {
+    const groups = {};
+    const noYear = [];
+
+    exams.forEach(exam => {
+      let year = exam.year;
+      let season = exam.season; // 'winter', 'summer'
+
+      // Parsing title if missing
+      if (!year && exam.title) {
+        const yearMatch = exam.title.match(/\b20[0-2][0-9]\b/);
+        if (yearMatch) year = parseInt(yearMatch[0]);
+      }
+      
+      // Normalized season
+      if (!season && exam.title) {
+        if (/קיץ|summer|kayits/i.test(exam.title)) season = 'summer';
+        else if (/חורף|winter|choref/i.test(exam.title)) season = 'winter';
+        else if (/מועד ב|moed b/i.test(exam.title)) season = 'summer'; 
+      }
+
+      if (!year) {
+        noYear.push(exam);
+        return;
+      }
+
+      if (!groups[year]) groups[year] = { summer: [], winter: [], other: [] };
+      
+      if (season === 'summer') groups[year].summer.push(exam);
+      else if (season === 'winter') groups[year].winter.push(exam);
+      else groups[year].other.push(exam);
+    });
+
+    // Sort years descending
+    const sortedYears = Object.keys(groups).sort((a, b) => b - a);
+    return { sortedYears, groups, noYear };
+  };
+
   const handleSaveModuleOrder = async () => {
     try {
       const orderKey = `${displaySubject}_${displayUnits}`;
@@ -1362,33 +1400,95 @@ export default function ExamsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-2 overflow-y-auto max-h-[70vh] px-1">
-            {showAllExamsModule && getModuleExams(showAllExamsModule).map((exam) =>
-            <button
-              key={exam.id}
-              onClick={() => {
-                if (!isPremium) {
-                  // Show ad dialog before starting exam for free users
-                  setShowAllExamsModule(null);
-                  setShowAdDialog({ ...exam, isExamStart: true });
-                } else {
-                  setShowAllExamsModule(null);
-                  handleExamClick(exam);
-                }
-              }}
-              className="w-full text-right hover:bg-blue-100 bg-white rounded-xl p-3 transition-all border-2 border-blue-200 hover:border-blue-400 flex items-center justify-between group shadow-sm hover:shadow-md">
+          <div className="space-y-4 overflow-y-auto max-h-[70vh] px-1">
+            {showAllExamsModule && (() => {
+              const { sortedYears, groups, noYear } = groupExams(getModuleExams(showAllExamsModule));
+              
+              const renderExamButton = (exam) => (
+                <button
+                  key={exam.id}
+                  onClick={() => {
+                    if (!isPremium) {
+                      setShowAllExamsModule(null);
+                      setShowAdDialog({ ...exam, isExamStart: true });
+                    } else {
+                      setShowAllExamsModule(null);
+                      handleExamClick(exam);
+                    }
+                  }}
+                  className="w-full text-right hover:bg-blue-50 bg-white rounded-lg p-3 transition-all border border-blue-100 hover:border-blue-300 flex items-center justify-between group shadow-sm mb-2"
+                >
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 break-words">
+                      {exam.title}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {exam.duration_minutes || exam.duration || 90} דקות • {exam.total_points || 100} נקודות
+                    </div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                </button>
+              );
 
-                <div className="flex-1 min-w-0 pr-2">
-                  <div className="text-sm font-bold text-gray-900 group-hover:text-blue-700 break-words">
-                    {exam.title}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {exam.duration_minutes || exam.duration || 90} דקות • {exam.total_points || 100} נקודות
-                  </div>
+              return (
+                <div className="space-y-4">
+                  {sortedYears.map(year => (
+                    <div key={year} className="bg-white rounded-xl border border-blue-200 overflow-hidden shadow-sm">
+                      <div className="bg-blue-50/50 px-4 py-2 font-bold text-blue-800 border-b border-blue-100 flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {year}
+                      </div>
+                      <div className="p-3">
+                        {groups[year].summer.length > 0 && (
+                          <div className="mb-3">
+                            <div className="text-xs font-bold text-orange-600 mb-2 flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                              מועד קיץ
+                            </div>
+                            {groups[year].summer.map(renderExamButton)}
+                          </div>
+                        )}
+                        {groups[year].winter.length > 0 && (
+                          <div className="mb-3">
+                            <div className="text-xs font-bold text-blue-600 mb-2 flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                              מועד חורף
+                            </div>
+                            {groups[year].winter.map(renderExamButton)}
+                          </div>
+                        )}
+                        {groups[year].other.length > 0 && (
+                          <div>
+                            <div className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                              מועדים נוספים
+                            </div>
+                            {groups[year].other.map(renderExamButton)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {noYear.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                      <div className="bg-gray-50 px-4 py-2 font-bold text-gray-700 border-b border-gray-100">
+                        תרגול כללי / ללא שנה
+                      </div>
+                      <div className="p-3">
+                        {noYear.map(renderExamButton)}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {sortedYears.length === 0 && noYear.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      לא נמצאו מבחנים לשאלון זה
+                    </div>
+                  )}
                 </div>
-                <ChevronLeft className="w-5 h-5 text-blue-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
-              </button>
-            )}
+              );
+            })()}
 
             {!isPremium && showAllExamsModule &&
             <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-200 mt-3">
