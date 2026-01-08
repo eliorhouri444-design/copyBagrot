@@ -1,14 +1,19 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, Languages, Calculator, Atom, FlaskConical, Dna, BookMarked, Lock } from "lucide-react";
+import { CheckCircle, Languages, Calculator, Atom, FlaskConical, Dna, BookMarked, Lock, Scroll, History, Scale, PenTool, Monitor } from "lucide-react";
 
 const subjects = [
-  { id: "אנגלית", name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", isLocked: false },
   { id: "מתמטיקה", name: "מתמטיקה", icon: Calculator, color: "from-purple-500 to-purple-600", isLocked: false },
+  { id: "אנגלית", name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", isLocked: false },
+  { id: "לשון", name: "לשון והבעה", icon: PenTool, color: "from-red-500 to-red-600", isLocked: false },
+  { id: "היסטוריה", name: "היסטוריה", icon: History, color: "from-amber-500 to-amber-600", isLocked: false },
+  { id: "אזרחות", name: "אזרחות", icon: Scale, color: "from-indigo-500 to-indigo-600", isLocked: false },
+  { id: "תנך", name: "תנ\"ך", icon: Scroll, color: "from-yellow-500 to-yellow-600", isLocked: false },
+  { id: "ספרות", name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", isLocked: false },
   { id: "פיזיקה", name: "פיזיקה", icon: Atom, color: "from-green-500 to-emerald-600", isLocked: true },
   { id: "כימיה", name: "כימיה", icon: FlaskConical, color: "from-orange-500 to-orange-600", isLocked: true },
   { id: "ביולוגיה", name: "ביולוגיה", icon: Dna, color: "from-teal-500 to-teal-600", isLocked: true },
-  { id: "ספרות", name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", isLocked: true }
+  { id: "מדעי המחשב", name: "מדעי המחשב", icon: Monitor, color: "from-cyan-500 to-cyan-600", isLocked: true }
 ];
 
 export default function SubjectSelector({ selectedSubjects, onToggleSubject }) {

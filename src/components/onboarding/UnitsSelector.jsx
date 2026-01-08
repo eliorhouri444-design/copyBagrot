@@ -3,7 +3,28 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 
 export default function UnitsSelector({ subject, selectedUnit, onSelectUnit }) {
-  const units = [3, 4, 5];
+  // Determine available units based on subject
+  let units = [3, 4, 5];
+  
+  if (subject === "מתמטיקה" || subject === "אנגלית") {
+    units = [3, 4, 5];
+  } else if (subject === "לשון") {
+    units = [2];
+  } else if (subject === "היסטוריה" || subject === "אזרחות" || subject === "ספרות") {
+    units = [2, 5]; // Basic 2, Extended 5
+  } else if (subject === "תנך") {
+    units = [2, 3, 5]; // Basic 2, Religious 3, Extended 5
+  } else {
+    // Default or locked subjects (mostly 5 for sciences)
+    units = [5];
+  }
+
+  // Auto-select if there's only one option and nothing is selected
+  React.useEffect(() => {
+    if (units.length === 1 && selectedUnit !== units[0]) {
+      onSelectUnit(units[0]);
+    }
+  }, [units, selectedUnit, onSelectUnit]);
   
   return (
     <div className="space-y-2">
