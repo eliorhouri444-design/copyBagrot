@@ -46,17 +46,24 @@ Deno.serve(async (req) => {
                                 },
                                 topic: { type: "string", description: "The topic of the question in HEBREW" },
                                 points: { type: "integer" },
-                                answer_fields: { 
-                                    type: "array", 
-                                    description: "For Math/Physics questions: A list of specific fields the student needs to find. E.g., 'Value of X', 'Area of triangle', 'Velocity'. This helps create a structured input form.",
+                                structure: {
+                                    type: "array",
+                                    description: "CRITICAL: The internal structure of the question. List ALL sub-questions and sections (א, ב, ג, 1, 2) that require an answer.",
                                     items: {
                                         type: "object",
                                         properties: {
-                                            label: { type: "string", description: "Label for the input field in Hebrew (e.g., 'ערך X', 'שטח המעגל')" },
-                                            key: { type: "string", description: "Unique key for the field (e.g., 'x_val', 'area')" },
-                                            type: { type: "string", enum: ["number", "text"], default: "number" }
-                                        }
+                                            id: { type: "string", description: "The section identifier (e.g., 'א', 'ב(1)', 'ג')" },
+                                            text: { type: "string", description: "The text of the sub-question" },
+                                            type: { type: "string", enum: ["number", "text", "proof", "expression"], description: "Expected answer type" },
+                                            points: { type: "integer", description: "Points for this specific section" }
+                                        },
+                                        required: ["id", "type"]
                                     }
+                                },
+                                answer_fields: { 
+                                    type: "array", 
+                                    description: "DEPRECATED - Use 'structure' instead for full section mapping.",
+                                    items: { type: "object", properties: { label: {type: "string"}, key: {type: "string"}, type: {type: "string"} } }
                                 },
                                 explanation: { type: "string", description: "ULTRA-CRITICAL: The output for this field MUST be in the HEBREW language. Provide a detailed step-by-step explanation. If the source material is in English, you MUST translate the entire explanation to HEBREW. NO ENGLISH is allowed in the output." },
                                 has_diagram: { type: "boolean", description: "CRITICAL: Analyze the question area. Set to 'true' if ANY non-text element like a diagram, geometric shape, coordinate system, graph, or illustration is present. Set to 'false' otherwise. This is very important." }
@@ -162,30 +169,54 @@ Deno.serve(async (req) => {
         const title = `${subject} - שאלון ${module_symbol || 'כללי'} - ${seasonStr} ${year}`;
         
         const finalQuestions = questions.map((q, idx) => {
-            // Construct a clean structured text if sections exist
-            let formattedText = q.intro_text || "";
-            if (q.content && !q.sections) formattedText = q.content; // Fallback
+            // Construct a clean structured text
+            let formattedText = q.intro_text || q.question_text || "";
+            if (q.content && !q.intro_text) formattedText = q.content; // Fallback
+
+            // Use the new 'structure' array if available, otherwise fallback to old 'sections' or 'parts' logic
+            let structure = q.structure || [];
             
-            const parts = q.sections ? q.sections.map(s => ({
-                part_id: s.section_id,
-                text: s.content
-            })) : [];
+            // Backwards compatibility / Bible logic mapping
+            if (structure.length === 0 && q.sections) {
+                structure = q.sections.map(s => ({
+                    id: s.section_id,
+                    text: s.content,
+                    type: "text",
+                    points: 0
+                }));
+            } else if (structure.length === 0 && q.parts) {
+                 structure = q.parts.map(p => ({
+                    id: p.part_id,
+                    text: p.text,
+                    type: "text",
+                    points: p.points
+                }));
+            }
+
+            // Create structured answer fields based on the detected structure
+            const answerFields = structure.map(part => ({
+                key: `section_${part.id}`,
+                label: `סעיף ${part.id}`,
+                description: part.text, // Show the specific question text for this section
+                type: part.type === 'number' ? 'number' : 'text',
+                points: part.points
+            }));
 
             return {
                 question_number: q.question_number || idx + 1,
                 page_number: q.page_number || 1,
                 question_text: formattedText,
-                question_type: 'sectioned',
+                question_type: structure.length > 0 ? 'structured' : 'open',
                 topic: q.topic || subject,
                 points: q.points || Math.round(100 / questions.length),
                 options: [],
                 correct_answer: q.correct_answer || '',
                 explanation: q.explanation || '',
                 solution_steps: q.solution_steps || [],
-                answer_fields: q.answer_fields || [],
+                answer_fields: answerFields, // This is now the main driver for the UI
+                structure: structure, // Keep the full structure data
                 has_diagram: q.has_diagram || false,
-                question_image_url: q.question_image_url_generated || (q.has_diagram ? "pending_crop" : null),
-                parts: parts
+                question_image_url: q.question_image_url_generated || (q.has_diagram ? "pending_crop" : null)
             };
         });
 

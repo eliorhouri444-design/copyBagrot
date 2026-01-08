@@ -1160,19 +1160,42 @@ export default function ExamGenericPage() {
 
                 }
 
-                  {/* Structured Inputs for Math/Science (Carousel Mode) */}
+                  {/* Structured Inputs for Math/Science (Carousel Mode) - Dynamic Sections */}
                   {question.answer_fields && question.answer_fields.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div className="mb-6 space-y-4">
                       {question.answer_fields.map((field) => (
-                        <div key={field.key}>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">{field.label}</label>
-                          <Input
-                            type={field.type === 'number' ? 'number' : 'text'}
-                            value={userAnswers[question.question_number]?.[field.key] || ''}
-                            onChange={(e) => handleAnswerChange(question.question_number, e.target.value, field.key)}
-                            placeholder={field.label}
-                            className="bg-white"
-                          />
+                        <div key={field.key} className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                          <div className="flex justify-between items-start mb-2">
+                            <label className="block text-sm font-bold text-gray-900">{field.label}</label>
+                            {field.points && <span className="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full">{field.points} נק'</span>}
+                          </div>
+                          
+                          {field.description && (
+                            <p className="text-sm text-gray-700 mb-2 leading-relaxed">{field.description}</p>
+                          )}
+
+                          {field.type === 'number' ? (
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                value={userAnswers[question.question_number]?.[field.key] || ''}
+                                onChange={(e) => handleAnswerChange(question.question_number, e.target.value, field.key)}
+                                placeholder="הכנס ערך מספרי..."
+                                className="bg-white text-left pl-4"
+                                dir="ltr"
+                              />
+                              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                                <Calculator className="w-4 h-4" />
+                              </div>
+                            </div>
+                          ) : (
+                            <Textarea
+                              value={userAnswers[question.question_number]?.[field.key] || ''}
+                              onChange={(e) => handleAnswerChange(question.question_number, e.target.value, field.key)}
+                              placeholder={`כתוב את תשובתך ל${field.label}...`}
+                              className="bg-white min-h-[80px]"
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1344,19 +1367,35 @@ export default function ExamGenericPage() {
 
               }
 
-                  {/* Structured Inputs for Math/Science */}
+                  {/* Structured Inputs for Math/Science (Normal Mode) */}
                   {questionItem.answer_fields && questionItem.answer_fields.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div className="mb-4 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                      <h4 className="text-sm font-bold text-gray-500 mb-2">סעיפי השאלה:</h4>
                       {questionItem.answer_fields.map((field) => (
-                        <div key={field.key}>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">{field.label}</label>
-                          <Input
-                            type={field.type === 'number' ? 'number' : 'text'}
-                            value={userAnswers[questionItem.question_number]?.[field.key] || ''}
-                            onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value, field.key)}
-                            placeholder={field.label}
-                            className="bg-white"
-                          />
+                        <div key={field.key} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-blue-700">{field.label}</span>
+                            {field.points && <span className="text-xs text-gray-500">{field.points} נק'</span>}
+                          </div>
+                          {field.description && <p className="text-sm text-gray-600 mb-2">{field.description}</p>}
+                          
+                          {field.type === 'number' ? (
+                            <Input
+                              type="number"
+                              value={userAnswers[questionItem.question_number]?.[field.key] || ''}
+                              onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value, field.key)}
+                              placeholder="תשובה מספרית"
+                              className="w-full"
+                              dir="ltr"
+                            />
+                          ) : (
+                            <Textarea
+                              value={userAnswers[questionItem.question_number]?.[field.key] || ''}
+                              onChange={(e) => handleAnswerChange(questionItem.question_number, e.target.value, field.key)}
+                              placeholder="תשובה מילולית / הוכחה"
+                              className="w-full h-20"
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
