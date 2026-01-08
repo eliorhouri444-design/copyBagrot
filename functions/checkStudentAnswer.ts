@@ -96,8 +96,13 @@ Deno.serve(async (req) => {
 ${question}
 
 **תשובת התלמיד:**
-${structuredAnswers ? JSON.stringify(structuredAnswers) : studentAnswer}
+${structuredAnswers ? "תשובה מובנית לפי סעיפים:\n" + JSON.stringify(structuredAnswers, null, 2) : studentAnswer}
 ${uploadedFileUrl ? "(שים לב: התלמיד העלה תמונה של הפתרון - נתח אותה)" : ""}
+
+**הנחיה ספציפית לתשובות מרובות סעיפים:**
+אם התשובה היא אובייקט JSON עם סעיפים (כגון section_א, section_ב), בדוק כל סעיף בנפרד מול הסעיף המתאים בפתרון.
+הציון הסופי צריך לשקלל את הנכונות של כל הסעיפים.
+במשוב, התייחס לכל סעיף בנפרד (למשל: "בסעיף א' צדקת, אך בסעיף ב' הייתה טעות חישוב").
 
 ${correctAnswer ? `\n**תשובה סופית נכונה:**\n${correctAnswer}\n` : ''}
 ${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המחוון):**\n${Array.isArray(correctSolutionSteps) ? correctSolutionSteps.join('\n') : correctSolutionSteps}\n` : ''}
