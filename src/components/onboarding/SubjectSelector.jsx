@@ -9,11 +9,7 @@ const subjects = [
   { id: "היסטוריה", name: "היסטוריה", icon: History, color: "from-amber-500 to-amber-600", isLocked: false },
   { id: "אזרחות", name: "אזרחות", icon: Scale, color: "from-indigo-500 to-indigo-600", isLocked: false },
   { id: "תנך", name: "תנ\"ך", icon: Scroll, color: "from-yellow-500 to-yellow-600", isLocked: false },
-  { id: "ספרות", name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", isLocked: false },
-  { id: "פיזיקה", name: "פיזיקה", icon: Atom, color: "from-green-500 to-emerald-600", isLocked: true },
-  { id: "כימיה", name: "כימיה", icon: FlaskConical, color: "from-orange-500 to-orange-600", isLocked: true },
-  { id: "ביולוגיה", name: "ביולוגיה", icon: Dna, color: "from-teal-500 to-teal-600", isLocked: true },
-  { id: "מדעי המחשב", name: "מדעי המחשב", icon: Monitor, color: "from-cyan-500 to-cyan-600", isLocked: true }
+  { id: "ספרות", name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", isLocked: false }
 ];
 
 export default function SubjectSelector({ selectedSubjects, onToggleSubject }) {
