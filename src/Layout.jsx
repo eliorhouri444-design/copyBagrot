@@ -60,7 +60,7 @@ function LayoutContent({ children, currentPageName }) {
   const allNavItems = [...navItems, ...adminNavItems];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-blue-100">
+    <div dir="rtl" className="min-h-screen bg-blue-100 flex flex-col">
       <style>
         {`
           :root {
@@ -259,7 +259,7 @@ function LayoutContent({ children, currentPageName }) {
         `}
       </style>
       
-      <main className="min-h-screen">
+      <main className="flex-1">
         {children}
       </main>
 
