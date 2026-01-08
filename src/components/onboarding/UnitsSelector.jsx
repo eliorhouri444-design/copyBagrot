@@ -9,7 +9,7 @@ export default function UnitsSelector({ subject, selectedUnit, onSelectUnit }) {
   if (subject === "מתמטיקה" || subject === "אנגלית") {
     units = [3, 4, 5];
   } else if (subject === "לשון") {
-    units = [2];
+    units = [2, 5];
   } else if (subject === "היסטוריה" || subject === "אזרחות" || subject === "ספרות") {
     units = [2, 5]; // Basic 2, Extended 5
   } else if (subject === "תנך") {
