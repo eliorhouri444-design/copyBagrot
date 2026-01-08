@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { question, studentAnswer, correctAnswer, subject, checkingMode = 'strict', useCache = true } = await req.json();
+        const { question, studentAnswer, correctAnswer, correctSolutionSteps, subject, checkingMode = 'strict', useCache = true } = await req.json();
 
         if (!question || !studentAnswer) {
             return Response.json({ error: 'Missing required fields' }, { status: 400 });
@@ -51,33 +51,42 @@ Deno.serve(async (req) => {
             messages: [
                 {
                     role: "system",
-                    content: `אתה בודק תשובות למתמטיקה בבגרות.
+                    content: `אתה בודק תשובות בחינות בגרות (מתמטיקה/פיזיקה/מדעים).
+מטרתך היא לתת ניקוד הוגן גם אם התשובה הסופית שגויה, בהתבסס על הדרך.
+
+**הנחיות קריטיות לניקוד חלקי (Partial Credit):**
+1. אם התשובה הסופית נכונה והדרך נכונה -> 100%.
+2. אם התשובה הסופית שגויה, בדוק את הדרך:
+   - האם הגישה/הנוסחה נכונה? (תן ~40-60% מהניקוד)
+   - האם הייתה טעות חישוב קטנה ("נגררת")? (הורד 10-20% בלבד)
+   - האם ההבנה הפיזיקלית/מתמטית נכונה?
+3. השווה את שלבי התלמיד לשלבי הפתרון הנכון (אם סופקו).
 
 **החזר JSON:**
 {
-  "is_correct": true/false,
-  "score_percentage": 0-100,
+  "is_correct": true/false (האם קיבל ניקוד מלא או כמעט מלא),
+  "score_percentage": 0-100 (מספר שלם),
   "partial_credit": {
-    "correct_steps": ["שלב 1", "שלב 2"],
-    "incorrect_steps": ["שלב שגוי"],
-    "missing_steps": ["שלב חסר"]
+    "correct_steps": ["זיהוי נכון של הנוסחה", "הצבה נכונה"],
+    "incorrect_steps": ["טעות חישוב בשורה 3"],
+    "missing_steps": ["לא ציין יחידות מידה"]
   },
   "feedback": {
-    "positive": "מה טוב",
-    "errors": ["טעות 1", "טעות 2"],
-    "suggestions": ["המלצה 1"]
+    "positive": "חיזוק חיובי על הדרך",
+    "errors": ["פירוט הטעות"],
+    "suggestions": ["איך להימנע מהטעות להבא"]
   },
-  "detailed_explanation": "הסבר מפורט"
+  "detailed_explanation": "הסבר מלא בעברית, כולל פתרון נכון אם צריך"
 }
 
 **מצבי בדיקה:**
-- strict: רק תשובה סופית נכונה = 100%
-- partial: ניקוד חלקי לשלבים נכונים
-- lenient: קבל גם קירובים סבירים`
+- strict: מחמיר (בעיקר לתשובות סופיות)
+- partial: **ברירת מחדל** - תן ניקוד על הדרך!
+- lenient: מקל מאוד`
                 },
                 {
                     role: "user",
-                    content: `בדוק:
+                    content: `בדוק את התשובה הבאה:
 
 **שאלה:**
 ${question}
@@ -85,7 +94,8 @@ ${question}
 **תשובת התלמיד:**
 ${studentAnswer}
 
-${correctAnswer ? `\n**תשובה נכונה:**\n${correctAnswer}\n` : ''}
+${correctAnswer ? `\n**תשובה סופית נכונה:**\n${correctAnswer}\n` : ''}
+${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המחוון):**\n${Array.isArray(correctSolutionSteps) ? correctSolutionSteps.join('\n') : correctSolutionSteps}\n` : ''}
 
 **מצב בדיקה:** ${checkingMode}`
                 }

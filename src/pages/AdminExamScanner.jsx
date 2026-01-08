@@ -12,9 +12,12 @@ export default function AdminExamScannerPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [solutionFile, setSolutionFile] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState('אנגלית');
   const [selectedUnits, setSelectedUnits] = useState(3);
   const [selectedModule, setSelectedModule] = useState('');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedSeason, setSelectedSeason] = useState('summer');
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
@@ -389,7 +392,7 @@ export default function AdminExamScannerPage() {
     }
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -398,20 +401,19 @@ export default function AdminExamScannerPage() {
       return;
     }
 
-    // בדיקת גודל - מגבלה של 20MB (הוכפל!)
     if (file.size > 20 * 1024 * 1024) {
-      setError(`הקובץ גדול מדי! (${(file.size / 1024 / 1024).toFixed(1)}MB)\n\nמקסימום: 20MB\n\n💡 טיפ: דחוס את ה-PDF או פצל אותו למספר קבצים קטנים יותר.`);
-      setSelectedFile(null);
+      setError(`הקובץ גדול מדי! (${(file.size / 1024 / 1024).toFixed(1)}MB)\n\nמקסימום: 20MB`);
       return;
     }
 
-    setSelectedFile(file);
+    if (type === 'exam') setSelectedFile(file);
+    if (type === 'solution') setSolutionFile(file);
     setError(null);
   };
 
   const handleScanExam = async () => {
     if (!selectedFile) {
-      setError('יש לבחור קובץ');
+      setError('יש לבחור טופס בחינה (PDF)');
       return;
     }
 
@@ -420,253 +422,62 @@ export default function AdminExamScannerPage() {
       return;
     }
 
-    // בדיקה כפולה של גודל הקובץ
-    if (selectedFile.size > 20 * 1024 * 1024) {
-      setError(`⚠️ הקובץ גדול מדי!\n\nגודל הקובץ: ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB\nמקסימום: 20MB\n\n💡 פתרונות:\n1. דחוס את ה-PDF (באתרים כמו ilovepdf.com)\n2. פצל למספר קבצים קטנים יותר\n3. צלם תמונות של הדפים והעלה במקום PDF`);
-      setSelectedFile(null);
-      return;
-    }
-
     setIsProcessing(true);
     setProgress(10);
-    setStatusMessage('מעלה קובץ...');
+    setStatusMessage('מעלה קבצים...');
     setError(null);
 
     try {
-      // 1. Upload PDF file
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
-      setProgress(20);
-      setStatusMessage('מנתח מבנה מבחן...');
-
-      const moduleInfo = availableModules.find(m => m.id === selectedModule) || availableModules[0] || {};
-      const structure = {
-        name: moduleInfo.title || selectedModule,
-        pointsPerQuestion: 10,
-        totalQuestions: 10,
-        passingGrade: 56
-      };
+      // 1. Upload Exam PDF
+      const { file_url: examPdfUrl } = await base44.integrations.Core.UploadFile({ file: selectedFile });
       
+      // 2. Upload Solution PDF (Optional)
+      let solutionPdfUrl = null;
+      if (solutionFile) {
+        setStatusMessage('מעלה קובץ תשובות...');
+        const { file_url } = await base44.integrations.Core.UploadFile({ file: solutionFile });
+        solutionPdfUrl = file_url;
+      }
+
       setProgress(30);
-      setStatusMessage('חולץ נתונים מה-PDF...');
+      setStatusMessage('מעבד מבחן ותשובות (זה עשוי לקחת דקה)...');
 
-      // 2. Extract data using ExtractDataFromUploadedFile
-      const isBibleExam = selectedSubject === 'תנ"ך';
-      
-      const extractionSchema = isBibleExam ? {
-        type: "object",
-        properties: {
-          reading_text: { type: "string", description: "הקטע המקראי המלא" },
-          questions: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                question_number: { type: "integer" },
-                question_text: { type: "string", description: "טקסט השאלה הראשית" },
-                parts: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      part_id: { type: "string", description: "מזהה הסעיף (א, ב, ג)" },
-                      text: { type: "string", description: "טקסט הסעיף" },
-                      correct_answer: { type: "string" },
-                      explanation: { type: "string" },
-                      points: { type: "integer" }
-                    }
-                  }
-                },
-                question_type: { type: "string" },
-                points: { type: "integer" },
-                topic: { type: "string" }
-              }
-            }
-          }
-        }
-      } : {
-        type: "object",
-        properties: {
-          questions: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                question_number: { type: "integer" },
-                question_text: { type: "string" },
-                question_type: { type: "string" },
-                options: { type: "array", items: { type: "string" } },
-                correct_answer: { type: "string" },
-                explanation: { type: "string" },
-                points: { type: "integer" },
-                topic: { type: "string" }
-              }
-            }
-          }
-        }
-      };
-
-      setProgress(50);
-      setStatusMessage('מעבד עם AI...');
-
-      const prompt = isBibleExam 
-        ? `נתח את מבחן הבגרות בתנ"ך הבא בקפידה רבה.
-
-🎯 מבנה מבחן תנ"ך - הבנה קריטית:
-
-**שאלה 1 בפרק ראשון לדוגמה:**
-- שאלה 1: "קראו בראשית פרק כ"א"
-  - סעיף א(1): "קראו פסוקים א'-י"ד. על פי פסוקים אלה..." = 4 נקודות
-  - סעיף א(2): "קראו פסוקים א'-ד'. בפסוקים אלה..." = 4 נקודות
-  - סעיף ב(1): "על פי המסופר, ישמעאל היה..." = 4 נקודות
-  - סעיף ב(2): "קראו פסוקים י"ד-כ"א..." = 4 נקודות
-  - סעיף ג: "קראו בראשית פרק כ"א..." = 8 נקודות
-  - **סך הכל: 24 נקודות לשאלה 1**
-
-⚠️ כללי זיהוי חשובים:
-1. כל "שאלה X" = question_number אחד
-2. כל "סעיף א", "סעיף ב", "סעיף ג" = parts במערך
-3. תת-סעיפים כמו א(1), א(2), ב(1), ב(2) = parts נפרדים עם part_id: "א1", "א2", "ב1", "ב2"
-4. הפרקים (בראשית, שמות, דברים וכו') = chapter
-5. אין reading_text נפרד - התלמידים משתמשים בתנ"ך
-
-📝 פורמט המוצא המדויק:
-{
-  "questions": [
-    {
-      "question_number": 1,
-      "question_text": "קראו בראשית, פרק כ"א",
-      "chapter": "בראשית",
-      "topic": "משפחת אברהם",
-      "points": 24,
-      "parts": [
-        {
-          "part_id": "א1",
-          "text": "קראו פסוקים א'–י"ד. על פי פסוקים אלה, מיהו הבן שנוסף...",
-          "points": 4,
-          "source_verses": "בראשית כא, א-יד"
-        },
-        {
-          "part_id": "א2",
-          "text": "קראו פסוקים א'–ד'. בפסוקים אלה מודגש...",
-          "points": 4,
-          "source_verses": "בראשית כא, א-ד"
-        }
-      ]
-    }
-  ]
-}
-
-⚠️ אל תיצור question_number נפרד לכל סעיף!
-כל המספרים 1, 2, 3, 4... הם question_number.
-כל האותיות א, ב, ג, ד והמספרים בסוגריים (1), (2) הם part_id.`
-        : `חלץ את כל השאלות מהמבחן, כולל מספר שאלה, טקסט, סוג, אפשרויות תשובה, תשובה נכונה, נקודות ונושא.`;
-
-      // שימוש ב-InvokeLLM עם הקובץ ישירות - יותר יציב ומהיר
-      const extractionResult = await base44.integrations.Core.InvokeLLM({
-        prompt: isBibleExam ? prompt : 'חלץ את כל השאלות מהמבחן, כולל מספר שאלה, טקסט, סוג, אפשרויות תשובה, תשובה נכונה, נקודות ונושא.',
-        file_urls: [file_url],
-        response_json_schema: extractionSchema
-      });
-
-      // התוצאה מגיעה ישירות כאובייקט מ-InvokeLLM
-      let questionsData = extractionResult;
-
-      if (questionsData.questions && Array.isArray(questionsData.questions)) {
-        questionsData = questionsData.questions;
-      }
-
-      if (!Array.isArray(questionsData)) {
-        questionsData = [questionsData];
-      }
-
-      setProgress(70);
-      setStatusMessage('מזהה איורים גאומטריים ומוסיף ויזואליזציות...');
-
-      // 3. Process each question - detect geometry and add visualizations
-      const processedQuestions = questionsData.map((q, idx) => {
-        // בדיקת תקינות השאלה
-        if (!q || !q.question_text || typeof q.question_text !== 'string') {
-          console.warn(`Question ${idx} has invalid question_text`);
-          return q; // החזר את השאלה כמו שהיא
-        }
-
-        // זיהוי אוטומטי של ויזואליזציות
-        const vizData = detectVisualizationFromText(q.question_text);
-        
-        if (vizData) {
-          Object.assign(q, vizData);
-        }
-        
-        // Set default points
-        if (!q.points) {
-          q.points = structure.pointsPerQuestion;
-        }
-
-        return q;
-      });
-
-      setProgress(90);
-      setStatusMessage('שומר מבחן...');
-
-      // 4. Create exam
-      const examData = {
-        title: `${selectedSubject} ${structure.name} - ${new Date().toLocaleDateString('he-IL')}`,
+      // 3. Invoke Backend Function
+      const { data } = await base44.functions.invoke('processRealBagrut', {
+        exam_pdf_url: examPdfUrl,
+        solution_pdf_url: solutionPdfUrl,
         subject: selectedSubject,
-        unit_level: selectedUnits,
-        module_id: selectedModule,
-        description: `שאלון ${structure.name} - ${selectedUnits} יחידות`,
-        duration_minutes: selectedUnits === 5 ? 120 : selectedUnits === 4 ? 90 : 75,
-        total_points: processedQuestions.reduce((sum, q) => sum + (q?.points || 10), 0),
-        passing_grade: structure.passingGrade,
-        instructions: `ענה על כל השאלות. מותר להשתמש במחשבון ${selectedSubject === 'מתמטיקה' ? 'ובדף נוסחאות' : ''}.`,
-        questions: processedQuestions
-      };
+        unit: selectedUnits,
+        year: selectedYear,
+        season: selectedSeason,
+        module_symbol: selectedModule
+      });
 
-      // Add reading text for Bible exams
-      if (isBibleExam && extractionResult.output?.reading_text) {
-        examData.reading_text = extractionResult.output.reading_text;
-      }
-
-      const newExam = await base44.entities.GenericExam.create(examData);
+      if (data.error) throw new Error(data.error);
 
       setProgress(100);
       setStatusMessage('הושלם בהצלחה! ✅');
       
-      const geometryCount = processedQuestions.filter(q => q.geometry_shape).length;
-      const graphCount = processedQuestions.filter(q => q.has_graph).length;
-      const visualizationCount = processedQuestions.filter(q => q.visualization_type).length;
+      const questions = data.data?.questions || [];
       
       setResult({
-        examId: newExam.id,
-        questionsCount: processedQuestions.length,
-        totalPoints: processedQuestions.reduce((sum, q) => sum + (q?.points || 10), 0),
-        geometryQuestions: geometryCount,
-        graphQuestions: graphCount,
-        visualizationQuestions: visualizationCount
+        examId: data.data?.id,
+        questionsCount: questions.length,
+        totalPoints: questions.reduce((sum, q) => sum + (q?.points || 0), 0),
+        geometryQuestions: questions.filter(q => q.has_diagram).length,
+        graphQuestions: 0,
+        visualizationQuestions: 0
       });
 
       setTimeout(() => {
         navigate(createPageUrl("AdminExams"));
-      }, 3000);
+      }, 2000);
 
     } catch (err) {
       console.error("Scan error:", err);
-      let errorMessage = 'שגיאה בסריקת המבחן';
-      
-      if (err.message) {
-        if (err.message.includes('20MB') || err.message.includes('10MB') || err.message.includes('size') || err.message.includes('גדול')) {
-          errorMessage = `⚠️ הקובץ גדול מדי!\n\nמקסימום: 20MB\nהקובץ שלך: ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB\n\n💡 פתרונות:\n• דחוס את ה-PDF באתר ilovepdf.com\n• פצל לקבצים קטנים יותר\n• צלם תמונות של הדפים`;
-        } else if (err.message.includes('PDF')) {
-          errorMessage = 'הקובץ לא נתמך. נסה להעלות תמונות של דפי המבחן במקום PDF.';
-        } else {
-          errorMessage = err.message;
-        }
-      }
-      
-      setError(errorMessage);
+      setError(err.message || 'שגיאה בעיבוד המבחן');
       setIsProcessing(false);
       setProgress(0);
-      setSelectedFile(null); // נקה את הקובץ כשיש שגיאה
     }
   };
 
@@ -779,6 +590,35 @@ export default function AdminExamScannerPage() {
             </div>
           </div>
 
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">שנה</label>
+              <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(parseInt(v))}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">מועד</label>
+              <Select value={selectedSeason} onValueChange={setSelectedSeason}>
+                <SelectTrigger className="h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="summer">קיץ</SelectItem>
+                  <SelectItem value="winter">חורף</SelectItem>
+                  <SelectItem value="special">מיוחד</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {selectedModule && availableModules.find(m => m.id === selectedModule) && (
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
               <div className="flex items-center gap-3 mb-4">
@@ -795,28 +635,57 @@ export default function AdminExamScannerPage() {
             </div>
           )}
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-slate-900 mb-3">העלה קובץ PDF</label>
-            <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileSelect}
-                className="hidden"
-                id="file-upload"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <Upload className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                <p className="text-slate-700 font-medium mb-1">
-                  {selectedFile ? selectedFile.name : 'לחץ להעלאת קובץ'}
-                </p>
-                <p className="text-xs text-slate-500">PDF עד 20MB</p>
-                {selectedFile && (
-                  <div className="mt-2 text-xs text-green-600 font-semibold">
-                    ✓ {(selectedFile.size / 1024 / 1024).toFixed(1)}MB
-                  </div>
-                )}
-              </label>
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Exam File Upload */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-3 text-center">טופס בחינה (PDF) <span className="text-red-500">*</span></label>
+              <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors bg-white">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => handleFileChange(e, 'exam')}
+                  className="hidden"
+                  id="exam-upload"
+                />
+                <label htmlFor="exam-upload" className="cursor-pointer block h-full">
+                  <Upload className="w-10 h-10 text-blue-500 mx-auto mb-3" />
+                  <p className="text-slate-700 font-medium mb-1 truncate">
+                    {selectedFile ? selectedFile.name : 'בחר טופס בחינה'}
+                  </p>
+                  <p className="text-xs text-slate-500">חובה</p>
+                  {selectedFile && (
+                    <div className="mt-2 text-xs text-green-600 font-semibold">
+                      ✓ {(selectedFile.size / 1024 / 1024).toFixed(1)}MB
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            {/* Solution File Upload */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-3 text-center">קובץ תשובות (PDF)</label>
+              <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-green-400 transition-colors bg-white">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => handleFileChange(e, 'solution')}
+                  className="hidden"
+                  id="solution-upload"
+                />
+                <label htmlFor="solution-upload" className="cursor-pointer block h-full">
+                  <BookOpen className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                  <p className="text-slate-700 font-medium mb-1 truncate">
+                    {solutionFile ? solutionFile.name : 'בחר קובץ תשובות'}
+                  </p>
+                  <p className="text-xs text-slate-500">אופציונלי אך מומלץ</p>
+                  {solutionFile && (
+                    <div className="mt-2 text-xs text-green-600 font-semibold">
+                      ✓ {(solutionFile.size / 1024 / 1024).toFixed(1)}MB
+                    </div>
+                  )}
+                </label>
+              </div>
             </div>
           </div>
 
