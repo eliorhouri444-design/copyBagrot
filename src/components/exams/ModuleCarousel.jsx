@@ -296,7 +296,11 @@ export default function ModuleCarousel({
     return '#10B981';
   };
 
-  const isLocked = currentModule.is_premium && !(isPremium === true);
+  const isLocked = currentModule?.is_premium && !(isPremium === true);
+
+  if (!currentModule) {
+    return <div className="text-center p-6 text-gray-500 bg-white rounded-xl shadow-sm">אין שאלונים זמינים עבור נושא זה</div>;
+  }
 
   return (
     <div className="relative w-full py-4">
