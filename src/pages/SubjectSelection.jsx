@@ -3,20 +3,17 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BookOpen, Calculator, FlaskConical, Globe, Languages, History, Check, ChevronDown, Atom, TestTube, Dna, BookMarked, Landmark, MapPin, Scale, ScrollText, Beaker, Lock } from "lucide-react";
+import { BookOpen, Calculator, FlaskConical, Globe, Languages, History, Check, ChevronDown, Atom, TestTube, Dna, BookMarked, Landmark, MapPin, Scale, ScrollText, Beaker, Lock, PenTool } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const subjects = [
-{ name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", units: [3, 4, 5], isLocked: false },
 { name: "מתמטיקה", icon: Calculator, color: "from-purple-500 to-purple-600", units: [3, 4, 5], isLocked: false },
-{ name: "פיזיקה", icon: Atom, color: "from-green-500 to-emerald-600", units: [5], isLocked: true },
-{ name: "כימיה", icon: FlaskConical, color: "from-orange-500 to-orange-600", units: [5], isLocked: true },
-{ name: "ביולוגיה", icon: Dna, color: "from-teal-500 to-teal-600", units: [5], isLocked: true },
-{ name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", units: [2, 5], isLocked: true },
-{ name: "היסטוריה", icon: Landmark, color: "from-amber-500 to-yellow-600", units: [2, 5], isLocked: true },
-{ name: "גאוגרפיה", icon: MapPin, color: "from-cyan-500 to-sky-600", units: [5], isLocked: true },
-{ name: "אזרחות", icon: Scale, color: "from-indigo-500 to-violet-600", units: [2], isLocked: true },
-{ name: "תנ\"ך", icon: ScrollText, color: "from-rose-500 to-red-600", units: [2, 5], isLocked: true }];
+{ name: "אנגלית", icon: Languages, color: "from-blue-500 to-blue-600", units: [3, 4, 5], isLocked: false },
+{ name: "לשון והבעה", icon: PenTool, color: "from-red-500 to-red-600", units: [2, 5], isLocked: false },
+{ name: "היסטוריה", icon: Landmark, color: "from-amber-500 to-yellow-600", units: [2, 5], isLocked: false },
+{ name: "אזרחות", icon: Scale, color: "from-indigo-500 to-violet-600", units: [2], isLocked: false },
+{ name: "תנ\"ך", icon: ScrollText, color: "from-rose-500 to-red-600", units: [2, 5], isLocked: false },
+{ name: "ספרות", icon: BookMarked, color: "from-pink-500 to-fuchsia-600", units: [2, 5], isLocked: false }];
 
 
 export default function SubjectSelectionPage() {
