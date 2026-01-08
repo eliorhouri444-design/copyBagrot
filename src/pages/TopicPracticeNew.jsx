@@ -68,6 +68,7 @@ export default function TopicPracticeNewPage() {
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [wolframSolution, setWolframSolution] = useState(null);
   const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
 
   const hasNextSet = useMemo(() => {
     if (!allQuestions || allQuestions.length === 0) return false;
@@ -236,6 +237,41 @@ export default function TopicPracticeNewPage() {
         alert("שגיאה בחיבור ל-Wolfram Alpha");
     } finally {
         setIsLoadingWolfram(false);
+    }
+  };
+
+  const handleGenerateAIQuestion = async () => {
+    setIsGeneratingQuestion(true);
+    try {
+        // Find basic info from current context
+        const subjectId = currentSetQuestions[0]?.subject_id || "מתמטיקה"; // Default fallback
+        const unitLevel = currentSetQuestions[0]?.unit_level || 3;
+        
+        // Pass relevant criteria
+        const { data } = await base44.functions.invoke('generatePracticeQuestion', {
+            subject_id: subjectId,
+            unit_level: unitLevel,
+            topic_id: topicId,
+            difficulty: 'medium', // Could vary or let user pick if we add UI
+            question_type: 'open'
+        });
+
+        if (data.success && data.question) {
+            // Add the new question to the current set and display it
+            const newQ = data.question;
+            setCurrentSetQuestions(prev => [...prev, newQ]);
+            setAllQuestions(prev => [...prev, newQ]);
+            // Jump to the new question (which is at the end)
+            setCurrentQuestionIndex(currentSetQuestions.length); 
+            alert("שאלה חדשה נוצרה בהצלחה!");
+        } else {
+            alert("שגיאה ביצירת השאלה");
+        }
+    } catch (error) {
+        console.error("Generation error:", error);
+        alert("שגיאה ביצירת השאלה");
+    } finally {
+        setIsGeneratingQuestion(false);
     }
   };
 
@@ -1508,6 +1544,18 @@ export default function TopicPracticeNewPage() {
                           {isLoadingWolfram ? <Loader2 className="w-5 h-5 animate-spin" /> : <Calculator className="w-5 h-5" />}
                       </Button>
                     )}
+                    
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mr-2 text-indigo-600 hover:bg-indigo-50 flex-shrink-0"
+                        title="צור שאלה חדשה דומה"
+                        onClick={handleGenerateAIQuestion}
+                        disabled={isGeneratingQuestion}
+                    >
+                        {isGeneratingQuestion ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                        <span className="mr-1 text-xs">AI</span>
+                    </Button>
                 </div>
               </div>
             </div>
