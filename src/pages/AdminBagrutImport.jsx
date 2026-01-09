@@ -115,7 +115,7 @@ export default function AdminBagrutImport() {
     <div className="min-h-screen bg-gray-50 p-8" dir="rtl">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ייבוא בגרויות מקיבינימטיקה</h1>
+          <h1 className="text-3xl font-bold text-gray-900">ייבוא בגרויות מ-BagrutOnline</h1>
           <Button variant="outline" onClick={() => navigate(createPageUrl('AdminExams'))}>
             חזרה לניהול בגרויות
           </Button>
@@ -123,7 +123,7 @@ export default function AdminBagrutImport() {
 
         <Card className="mb-8 bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800">ייבוא אוטומטי מקיבינימטיקה</CardTitle>
+            <CardTitle className="text-blue-800">ייבוא אוטומטי מ-BagrutOnline</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -150,7 +150,7 @@ export default function AdminBagrutImport() {
             </div>
             
             <p className="text-blue-900 mt-4 text-sm">
-              המערכת תסרוק את אתר קיבינימטיקה עבור השאלון הנבחר, תאתר את דפי השנים והמועדים, ותחלץ את הקישורים הישירים לקבצי ה-PDF (שאלון ופתרון).
+              המערכת תסרוק את אתר BagrutOnline, תנתח את טבלת הבגרויות, ותאתר קישורי PDF לשאלון ולפתרונות (כולל איחוד פתרונות המופיעים בחלקים).
             </p>
           </CardContent>
         </Card>
