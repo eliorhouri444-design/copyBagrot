@@ -20,19 +20,16 @@ Deno.serve(async (req) => {
         const foundExams = [];
         const processPromises = [];
         
-        // The structure seems to be Elementor Accordion items
         const accordionItems = $('.elementor-accordion-item');
 
         for (const item of accordionItems) {
             const titleElement = $(item).find('.elementor-tab-title');
             const titleText = titleElement.text().trim();
             
-            // Extract year (e.g. "שנת 2024")
             const yearMatch = titleText.match(/20\d{2}/);
             if (!yearMatch) continue;
             
             const year = parseInt(yearMatch[0]);
-            // Limit to recent years to avoid timeout/too much data if needed, or keep all
             if (year < 2018) continue; 
 
             const contentId = titleElement.attr('aria-controls');
@@ -58,7 +55,6 @@ Deno.serve(async (req) => {
                     term = 'special';
                 }
 
-                // Create a promise for processing each exam entry to run in parallel
                 processPromises.push((async () => {
                     let examUrl = null;
                     let solutionUrl = null;
@@ -66,47 +62,46 @@ Deno.serve(async (req) => {
                     if (href.endsWith('.pdf')) {
                         examUrl = href; 
                     } else {
-                        // Fetch sub-page
+                        // Fetch sub-page to find the actual PDF links
                         try {
                             const subRes = await fetch(href);
                             const subHtml = await subRes.text();
                             const $sub = cheerio.load(subHtml);
                             
-                            // Look for PDF links
-                            const pdfLinks = $sub('a[href$=".pdf"]');
-                            
-                            // Heuristics
-                            const candidates = [];
-                            pdfLinks.each((i, el) => {
-                                candidates.push({
+                            // 1. Look for all links ending in .pdf
+                            const pdfCandidates = [];
+                            $sub('a[href$=".pdf"]').each((i, el) => {
+                                pdfCandidates.push({
                                     href: $sub(el).attr('href'),
                                     text: $sub(el).text().trim(),
-                                    isButton: $sub(el).find('.elementor-button-text').length > 0
+                                    parentText: $sub(el).parent().text().trim(),
+                                    isButton: $sub(el).find('.elementor-button-text').length > 0 || $sub(el).hasClass('elementor-button')
                                 });
                             });
 
-                            for (const pdf of candidates) {
-                                const lowerText = pdf.text.toLowerCase();
-                                const lowerHref = pdf.href.toLowerCase();
-
-                                if (lowerText.includes('שאלון') || lowerText.includes('בחינה') || lowerText.includes('טופס')) {
-                                    if (!examUrl) examUrl = pdf.href;
-                                } else if (lowerText.includes('פתרון') || lowerText.includes('תשובות') || lowerText.includes('מלא')) {
+                            // 2. Filter and Assign
+                            for (const pdf of pdfCandidates) {
+                                const fullText = (pdf.text + " " + pdf.parentText).toLowerCase();
+                                
+                                // Solution detection
+                                if (fullText.includes('פתרון') || fullText.includes('תשובות') || fullText.includes('מלא') || pdf.href.includes('sol')) {
                                     if (!solutionUrl) solutionUrl = pdf.href;
+                                }
+                                // Exam detection
+                                else if (fullText.includes('שאלון') || fullText.includes('בחינה') || fullText.includes('טופס') || fullText.includes('נקיה') || pdf.href.includes('exam')) {
+                                    if (!examUrl) examUrl = pdf.href;
                                 }
                             }
 
-                            // If distinct text not found, try fallback based on button text or order
-                            if (!examUrl && !solutionUrl && candidates.length >= 2) {
-                                // Assume first is exam, second is solution if typical layout
-                                examUrl = candidates[0].href;
-                                solutionUrl = candidates[1].href;
-                            } else if (!examUrl && candidates.length === 1) {
-                                // If only one PDF, determine what it is
-                                if (candidates[0].text.includes('פתרון')) {
-                                    solutionUrl = candidates[0].href;
-                                } else {
-                                    examUrl = candidates[0].href;
+                            // 3. Fallback: If we have exactly 2 PDFs and couldn't decide, assume order (usually Exam then Solution or vice versa, site specific)
+                            // Kibinimatika usually puts Exam button then Solution button
+                            if ((!examUrl || !solutionUrl) && pdfCandidates.length >= 2) {
+                                if (!examUrl) examUrl = pdfCandidates[0].href;
+                                if (!solutionUrl) solutionUrl = pdfCandidates[1].href;
+                            } else if (!examUrl && pdfCandidates.length === 1) {
+                                // Only one PDF found
+                                if (!pdfCandidates[0].text.includes('פתרון')) {
+                                    examUrl = pdfCandidates[0].href;
                                 }
                             }
 
@@ -132,10 +127,7 @@ Deno.serve(async (req) => {
             }
         }
 
-        // Wait for all sub-pages to be scraped
         await Promise.all(processPromises);
-
-        // Sort by year descending
         foundExams.sort((a, b) => b.year - a.year);
 
         return Response.json({ success: true, exams: foundExams });
