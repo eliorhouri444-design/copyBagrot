@@ -83,8 +83,9 @@ export default function AdminBagrutImport() {
       const response = await base44.functions.invoke('processRealBagrut', {
         exam_pdf_url: exam.examUrl,
         solution_pdf_url: exam.solutionUrl,
+        solution_part_urls: exam.solutionParts || [],
         subject: "מתמטיקה",
-        unit: moduleSymbol.startsWith("5") ? 5 : (moduleSymbol.startsWith("4") ? 4 : 3), // Infer unit from module
+        unit: moduleSymbol.startsWith("5") ? 5 : (moduleSymbol.startsWith("4") ? 4 : 3),
         year: exam.year,
         season: exam.season,
         term: exam.term || 'a',
