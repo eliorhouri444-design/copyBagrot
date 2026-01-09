@@ -22,6 +22,21 @@ function containsDigits(txt, digits) {
   return t.includes(d);
 }
 
+function getAliases(moduleId) {
+  const m = String(moduleId).replace(/[^0-9]/g, '');
+  const map = {
+    '381': ['381', '802'],
+    '382': ['382', '803'],
+    '481': ['481', '804'],
+    '482': ['482', '805'],
+    '581': ['581', '806'],
+    '582': ['582', '807'],
+    '801': ['801'], '802': ['802'], '803': ['803'], '804': ['804'], '805': ['805'], '806': ['806'], '807': ['807'],
+    '471': ['471'], '472': ['472'], '571': ['571'], '572': ['572']
+  };
+  return map[m] || [m];
+}
+
 async function fetchHtml(url) {
   const res = await fetch(url, {
     headers: {
@@ -34,26 +49,29 @@ async function fetchHtml(url) {
 }
 
 // Try to find the specific module page from the main “פתרונות מלאים” page
-function findModulePageUrl(mainHtml, mainUrl, moduleId) {
+function findModulePageUrl(mainHtml, mainUrl, aliases) {
   const $ = cheerio.load(mainHtml);
   let found = '';
   $('a').each((_, a) => {
     const text = normalizeText($(a).text());
-    // Buttons usually contain "פתרונות מלאים שאלון 471" וכד'
-    if (text.includes('פתרונות') || text.includes('שאלון')) {
-      if (containsDigits(text, moduleId)) {
-        const href = $(a).attr('href');
-        if (href && !found) found = absUrl(mainUrl, href);
-      }
+    const href = $(a).attr('href') || '';
+    const inText = aliases.some(id => containsDigits(text, id));
+    const inHref = aliases.some(id => containsDigits(href, id));
+    if (inText || inHref) {
+      const target = absUrl(mainUrl, href);
+      // prefer links that mention "פתרונות"/"שאלון"
+      if (!found || /פתרונות|שאלון/i.test(text)) found = target;
     }
   });
   return found;
 }
 
 // Parse a module page (accordion by year). Return list of post links of the chosen module
-function collectPostLinksForModule(moduleHtml, moduleUrl, moduleId) {
+function collectPostLinksForModule(moduleHtml, moduleUrl, aliases) {
   const $ = cheerio.load(moduleHtml);
   const links = new Set();
+
+  const isMatch = (text) => aliases.some(id => containsDigits(text, id));
 
   // Strategy 1: inside Elementor accordion items per year
   $('.elementor-accordion-item, .elementor-accordion').each((_, item) => {
@@ -62,7 +80,7 @@ function collectPostLinksForModule(moduleHtml, moduleUrl, moduleId) {
       const href = $(a).attr('href');
       if (!href) return;
       // Typical post titles contain year + season + "שאלון <id>"
-      if (containsDigits(text, moduleId) || /מועד|חורף|קיץ|שנת|פתרון/.test(text)) {
+      if (isMatch(text) || /מועד|חורף|קיץ|שנת|פתרון/.test(text)) {
         links.add(absUrl(moduleUrl, href));
       }
     });
@@ -73,7 +91,7 @@ function collectPostLinksForModule(moduleHtml, moduleUrl, moduleId) {
     const text = normalizeText($(a).text());
     const href = $(a).attr('href');
     if (!href) return;
-    if (containsDigits(text, moduleId)) links.add(absUrl(moduleUrl, href));
+    if (isMatch(text) || isMatch(href)) links.add(absUrl(moduleUrl, href));
   });
 
   // Filter obvious non-posts (pdf direct links we will handle later anyway)
@@ -145,14 +163,25 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const moduleId = String(body?.module || '').replace(/[^0-9]/g, '') || '581';
+    const aliases = getAliases(moduleId);
     let startUrl = body?.url || '';
 
-    const MAIN_URL = 'https://kibinimatika.org/2019/04/17/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%9e%d7%91%d7%97%d7%a0%d7%99-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/';
+    const MAIN_URLS = [
+      'https://kibinimatika.org/2019/04/17/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%9e%d7%91%d7%97%d7%a0%d7%99-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/',
+      'https://kibinimatika.org/2019/12/12/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%9c%d7%91%d7%97%d7%99%d7%a0%d7%aa-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/'
+    ];
 
     // Resolve module page
     if (!startUrl) {
-      const mainHtml = await fetchHtml(MAIN_URL);
-      startUrl = findModulePageUrl(mainHtml, MAIN_URL, moduleId);
+      for (const MAIN_URL of MAIN_URLS) {
+        try {
+          const mainHtml = await fetchHtml(MAIN_URL);
+          startUrl = findModulePageUrl(mainHtml, MAIN_URL, aliases);
+          if (startUrl) break;
+        } catch (e) {
+          console.warn('Failed fetching main url', MAIN_URL, e?.message);
+        }
+      }
       if (!startUrl) {
         return Response.json({ success: false, error: `לא נמצא עמוד לשאלון ${moduleId}` }, { status: 404 });
       }
@@ -160,7 +189,7 @@ Deno.serve(async (req) => {
 
     // Collect post links from module page
     const moduleHtml = await fetchHtml(startUrl);
-    const postLinks = collectPostLinksForModule(moduleHtml, startUrl, moduleId)
+    const postLinks = collectPostLinksForModule(moduleHtml, startUrl, aliases)
       // remove duplicates & keep only links that look like single post pages (usually contain year or the word "פתרון")
       .filter(u => /20\d{2}|פתרון|מועד|חורף|קיץ/.test(decodeURIComponent(u)));
 
