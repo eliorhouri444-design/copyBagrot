@@ -18,8 +18,9 @@ Deno.serve(async (req) => {
         const $ = cheerio.load(html);
 
         const foundExams = [];
+        const processPromises = [];
         
-        // The structure seems to be Elementor Accordion items, usually representing years
+        // The structure seems to be Elementor Accordion items
         const accordionItems = $('.elementor-accordion-item');
 
         for (const item of accordionItems) {
@@ -31,11 +32,11 @@ Deno.serve(async (req) => {
             if (!yearMatch) continue;
             
             const year = parseInt(yearMatch[0]);
+            // Limit to recent years to avoid timeout/too much data if needed, or keep all
+            if (year < 2018) continue; 
+
             const contentId = titleElement.attr('aria-controls');
             const contentDiv = $(`#${contentId}`);
-            
-            // Look for links inside the content div
-            // Usually organized in tables or lists: "מועד חורף", "מועד א", "מועד ב"
             const links = contentDiv.find('a');
             
             for (const link of links) {
@@ -46,87 +47,96 @@ Deno.serve(async (req) => {
 
                 let season = 'summer';
                 let term = 'a';
-                let label = linkText;
 
                 if (linkText.includes('חורף')) {
                     season = 'winter';
-                    term = 'a'; // Winter usually has one term, or A
-                } else if (linkText.includes('קיץ')) {
-                    season = 'summer';
                 }
-
+                
                 if (linkText.includes('מועד ב')) {
                     term = 'b';
-                } else if (linkText.includes('מועד ג') || linkText.includes('מיוחד')) {
+                } else if (linkText.includes('מועד ג') || linkText.includes('מיוחד') || linkText.includes('נבצרים')) {
                     term = 'special';
                 }
 
-                // Identify if it's a direct PDF or a post page
-                let examUrl = null;
-                let solutionUrl = null;
+                // Create a promise for processing each exam entry to run in parallel
+                processPromises.push((async () => {
+                    let examUrl = null;
+                    let solutionUrl = null;
 
-                if (href.endsWith('.pdf')) {
-                    // It's likely the exam or solution directly (older years sometimes behave like this)
-                    // But usually Kibinimatika links to a post page for recent years
-                    // We'll assume if it's a PDF in the main list, it might be the exam
-                    examUrl = href; 
-                } else {
-                    // It's a post page. We need to fetch it to find the PDF links.
-                    try {
-                        console.log(`Fetching sub-page for ${year} ${season} ${term}: ${href}`);
-                        const subRes = await fetch(href);
-                        const subHtml = await subRes.text();
-                        const $sub = cheerio.load(subHtml);
-                        
-                        // Look for PDF links in the sub-page
-                        const pdfLinks = $sub('a[href$=".pdf"]');
-                        
-                        for (const pdf of pdfLinks) {
-                            const pdfHref = $sub(pdf).attr('href');
-                            const pdfText = $sub(pdf).text().trim();
+                    if (href.endsWith('.pdf')) {
+                        examUrl = href; 
+                    } else {
+                        // Fetch sub-page
+                        try {
+                            const subRes = await fetch(href);
+                            const subHtml = await subRes.text();
+                            const $sub = cheerio.load(subHtml);
                             
-                            // Heuristic to detect Exam vs Solution
-                            if (pdfText.includes('שאלון') || pdfText.includes('בחינה') || pdfHref.includes('exam') || pdfHref.includes('question')) {
-                                if (!examUrl) examUrl = pdfHref;
-                            } else if (pdfText.includes('פתרון') || pdfText.includes('תשובות') || pdfHref.includes('solution') || pdfHref.includes('sol')) {
-                                if (!solutionUrl) solutionUrl = pdfHref;
-                            } else if ($sub(pdf).find('i.fa-file-pdf').length > 0) {
-                                // Fallback: button with PDF icon
-                                if (!examUrl) examUrl = pdfHref; // Assume first is exam
+                            // Look for PDF links
+                            const pdfLinks = $sub('a[href$=".pdf"]');
+                            
+                            // Heuristics
+                            const candidates = [];
+                            pdfLinks.each((i, el) => {
+                                candidates.push({
+                                    href: $sub(el).attr('href'),
+                                    text: $sub(el).text().trim(),
+                                    isButton: $sub(el).find('.elementor-button-text').length > 0
+                                });
+                            });
+
+                            for (const pdf of candidates) {
+                                const lowerText = pdf.text.toLowerCase();
+                                const lowerHref = pdf.href.toLowerCase();
+
+                                if (lowerText.includes('שאלון') || lowerText.includes('בחינה') || lowerText.includes('טופס')) {
+                                    if (!examUrl) examUrl = pdf.href;
+                                } else if (lowerText.includes('פתרון') || lowerText.includes('תשובות') || lowerText.includes('מלא')) {
+                                    if (!solutionUrl) solutionUrl = pdf.href;
+                                }
                             }
-                        }
-                        
-                        // If only one found, logic might be tricky. 
-                        // Kibinimatika specific: "להורדת השאלון" vs "לצפיה בפתרון"
-                        if (!examUrl) {
-                             const examBtn = $sub('a:contains("השאלון")');
-                             if (examBtn.length) examUrl = examBtn.attr('href');
-                        }
-                        if (!solutionUrl) {
-                             const solBtn = $sub('a:contains("בפתרון")');
-                             if (solBtn.length) solutionUrl = solBtn.attr('href');
-                        }
 
-                    } catch (e) {
-                        console.error(`Error fetching sub-page ${href}:`, e);
+                            // If distinct text not found, try fallback based on button text or order
+                            if (!examUrl && !solutionUrl && candidates.length >= 2) {
+                                // Assume first is exam, second is solution if typical layout
+                                examUrl = candidates[0].href;
+                                solutionUrl = candidates[1].href;
+                            } else if (!examUrl && candidates.length === 1) {
+                                // If only one PDF, determine what it is
+                                if (candidates[0].text.includes('פתרון')) {
+                                    solutionUrl = candidates[0].href;
+                                } else {
+                                    examUrl = candidates[0].href;
+                                }
+                            }
+
+                        } catch (e) {
+                            console.error(`Error fetching sub-page ${href}:`, e);
+                        }
                     }
-                }
 
-                if (examUrl) {
-                    foundExams.push({
-                        id: `kibinimatika_581_${year}_${season}_${term}`,
-                        title: `${season === 'winter' ? 'חורף' : 'קיץ'} ${year} מועד ${term === 'a' ? "א'" : (term === 'b' ? "ב'" : "מיוחד")}`,
-                        year,
-                        season,
-                        term,
-                        module: "581",
-                        examUrl,
-                        solutionUrl,
-                        status: "ready"
-                    });
-                }
+                    if (examUrl) {
+                        foundExams.push({
+                            id: `kibinimatika_581_${year}_${season}_${term}`,
+                            title: `${season === 'winter' ? 'חורף' : 'קיץ'} ${year} מועד ${term === 'a' ? "א'" : (term === 'b' ? "ב'" : "מיוחד")}`,
+                            year,
+                            season,
+                            term,
+                            module: "581",
+                            examUrl,
+                            solutionUrl: solutionUrl || "",
+                            status: "ready"
+                        });
+                    }
+                })());
             }
         }
+
+        // Wait for all sub-pages to be scraped
+        await Promise.all(processPromises);
+
+        // Sort by year descending
+        foundExams.sort((a, b) => b.year - a.year);
 
         return Response.json({ success: true, exams: foundExams });
 

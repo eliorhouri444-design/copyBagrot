@@ -13,43 +13,7 @@ export default function AdminBagrutImport() {
   const [loading, setLoading] = useState(false);
   const [activeImport, setActiveImport] = useState(null);
 
-  // Hardcoded list of exams found on Kibinimatika (2024)
-  const [foundExams, setFoundExams] = useState([
-    {
-      id: "winter_2024_581",
-      year: 2024,
-      season: "winter",
-      term: "a",
-      title: "חורף 2024",
-      module: "581",
-      examUrl: "https://kibinimatika.org/wp-content/uploads/2024/03/%D7%91%D7%92%D7%A8%D7%95%D7%AA-581-%D7%97%D7%95%D7%A8%D7%A3-2024.pdf",
-      solutionUrl: "https://files.geva.co.il/geva_website/uploads/2024/03/%D7%A4%D7%AA%D7%A8%D7%95%D7%9F-%D7%9E%D7%9C%D7%90-35581-2.pdf",
-      status: "ready" // ready, processing, done, error
-    },
-    // Placeholders for others - user can fill
-    {
-      id: "moed_a_2024_581",
-      year: 2024,
-      season: "summer",
-      term: "a",
-      title: "קיץ 2024 מועד א'",
-      module: "581",
-      examUrl: "",
-      solutionUrl: "",
-      status: "pending_url" 
-    },
-    {
-      id: "moed_b_2024_581",
-      year: 2024,
-      season: "summer",
-      term: "b",
-      title: "קיץ 2024 מועד ב'",
-      module: "581",
-      examUrl: "",
-      solutionUrl: "",
-      status: "pending_url" 
-    }
-  ]);
+  const [foundExams, setFoundExams] = useState([]);
 
   const [isScanning, setIsScanning] = useState(false);
 
