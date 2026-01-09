@@ -53,8 +53,9 @@ export default function AdminBagrutImport() {
         units: 3,
       });
       if (res.data.success && res.data.exams) {
-        setFoundExams(res.data.exams.filter(e => e.module && e.examUrl));
-        alert(`נסרקו ${res.data.exams.length} פריטים (סוננו רק עם קובץ שאלון תקין).`);
+        const filtered = res.data.exams.filter(e => String(e.module) === String(selectedModule) && e.examUrl);
+        setFoundExams(filtered);
+        alert(`נסרקו ${filtered.length} פריטים לשאלון ${selectedModule} (רק עם קובץ שאלון תקין).`);
       } else {
         alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה.');
       }
