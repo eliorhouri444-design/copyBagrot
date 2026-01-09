@@ -14,9 +14,27 @@ export default function AdminBagrutImport() {
   const [activeImport, setActiveImport] = useState(null);
 
   const [foundExams, setFoundExams] = useState([]);
+  const [viewMode, setViewMode] = useState('table');
 
   const [isScanning, setIsScanning] = useState(false);
   const [selectedModule, setSelectedModule] = useState("801");
+
+  const modulesList = React.useMemo(() => {
+    const set = new Set(foundExams.map(e => String(e.module)));
+    return Array.from(set).sort();
+  }, [foundExams]);
+
+  const sessionRows = React.useMemo(() => {
+    const map = new Map();
+    foundExams.forEach(e => {
+      const key = `${e.year}-${e.season}-${e.term}`;
+      if (!map.has(key)) map.set(key, { year: e.year, season: e.season, term: e.term, items: {} });
+      map.get(key).items[String(e.module)] = e;
+    });
+    const seasonOrder = { winter: 0, summer: 1 };
+    const termOrder = { a: 0, b: 1 };
+    return Array.from(map.values()).sort((a,b)=> (b.year - a.year) || (seasonOrder[a.season]-seasonOrder[b.season]) || (termOrder[a.term]-termOrder[b.term]));
+  }, [foundExams]);
 
   const modules = [
     { id: "471", label: "471 - תוכנית חדשה 4 יח\"ל" },
@@ -44,18 +62,16 @@ export default function AdminBagrutImport() {
     try {
       const res = await base44.functions.invoke('scanBagrutOnline', {
         page_url: 'https://www.bagrutonline.co.il/page/108/%D7%91%D7%92%D7%A8%D7%95%D7%AA-%D7%91%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94-%D7%9B%D7%9C-%D7%94%D7%A9%D7%90%D7%9C%D7%95%D7%A0%D7%99%D7%9D-%D7%95%D7%9B%D7%9C-%D7%94%D7%A4%D7%AA%D7%A8%D7%95%D7%A0%D7%95%D7%AA-%D7%9E%D7%9B%D7%9C-%D7%94%D7%A9%D7%A0%D7%99%D7%9D---%D7%91%D7%92%D7%A8%D7%95%D7%AA-%D7%90%D7%95%D7%A0%D7%9C%D7%99%D7%99.aspx',
-        start_year: 2012,
+        start_year: 2010,
         start_season: 'winter',
         start_term: 'a',
-        end_year: 2022,
+        end_year: new Date().getFullYear(),
         end_season: 'summer',
-        end_term: 'a',
-        units: 3,
+        end_term: 'b'
       });
       if (res.data.success && res.data.exams) {
-        const filtered = res.data.exams.filter(e => String(e.module) === String(selectedModule) && e.examUrl);
-        setFoundExams(filtered);
-        alert(`נסרקו ${filtered.length} פריטים לשאלון ${selectedModule} (רק עם קובץ שאלון תקין).`);
+        setFoundExams(res.data.exams);
+        alert(`נסרקו ${res.data.exams.length} פריטים מטבלת האתר (כל המודולים והיחידות הזמינים).`);
       } else {
         alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה.');
       }
@@ -156,7 +172,57 @@ export default function AdminBagrutImport() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        {foundExams.length > 0 && (
+          <div className="flex items-center justify-end mb-4 gap-2">
+            <Button variant={viewMode==='table'?'default':'outline'} onClick={()=>setViewMode('table')}>תצוגת טבלה</Button>
+            <Button variant={viewMode==='list'?'default':'outline'} onClick={()=>setViewMode('list')}>תצוגת כרטיסים</Button>
+          </div>
+        )}
+
+        {viewMode === 'table' && foundExams.length > 0 ? (
+          <div className="overflow-auto bg-white rounded-xl border">
+            <table className="min-w-full text-right">
+              <thead className="bg-blue-50">
+                <tr>
+                  <th className="px-3 py-2 text-sm font-bold text-blue-900 sticky right-0 bg-blue-50">מועד/שנה</th>
+                  {modulesList.map(m => (
+                    <th key={m} className="px-3 py-2 text-sm font-bold text-blue-900">{m}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sessionRows.map(row => (
+                  <tr key={`${row.year}-${row.season}-${row.term}`} className="border-t">
+                    <td className="px-3 py-2 whitespace-nowrap sticky right-0 bg-white">
+                      {row.season==='winter'?'חורף':'קיץ'}{row.season==='summer' ? (row.term==='b'?' (ב)':' (א)') : ''} {row.year}
+                    </td>
+                    {modulesList.map(m => {
+                      const e = row.items[m];
+                      return (
+                        <td key={m} className="px-3 py-2 align-top">
+                          {e ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs">
+                                {e.examUrl ? <a href={e.examUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">שאלון</a> : <span className="text-gray-400">אין שאלון</span>}
+                                {Array.isArray(e.solutionParts) && e.solutionParts.length>0 && (
+                                  <span className="text-gray-600">• פתרון {e.solutionParts.length} חלקים</span>
+                                )}
+                              </div>
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={!e.examUrl} onClick={()=>handleImport(e)}>ייבא</Button>
+                            </div>
+                          ) : (
+                            <span className="text-gray-300 text-xs">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="space-y-4">
           {foundExams.map((exam) => (
             <Card key={exam.id} className={`border-2 ${exam.status === 'done' ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
               <CardContent className="p-6">
@@ -229,8 +295,9 @@ export default function AdminBagrutImport() {
               </CardContent>
             </Card>
           ))}
-        </div>
-      </div>
+          </div>
+          )}
+          </div>
     </div>
   );
 }

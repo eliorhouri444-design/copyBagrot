@@ -130,10 +130,10 @@ async function scanBagrutOnline(url, { start, end, units = 3 }) {
       }
     }
 
-    // Identify indices for 3-unit modules
+    // Identify indices for module columns by any 3-digit code in header
     const moduleIndices = [];
     headers.forEach((m, idx) => {
-      if (['801', '802', '803'].includes(m)) moduleIndices.push({ idx, module: m });
+      if (/^\d{3}$/.test(m)) moduleIndices.push({ idx, module: m });
     });
 
     if (moduleIndices.length === 0) return; // not a 3-units table
