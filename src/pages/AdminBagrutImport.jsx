@@ -16,20 +16,30 @@ export default function AdminBagrutImport() {
   const [foundExams, setFoundExams] = useState([]);
 
   const [isScanning, setIsScanning] = useState(false);
+  const [selectedModule, setSelectedModule] = useState("581");
+
+  const modules = [
+    { id: "581", label: "581 (806) - מתמטיקה 5 יח\"ל" },
+    { id: "582", label: "582 (807) - מתמטיקה 5 יח\"ל" },
+    { id: "481", label: "481 (804) - מתמטיקה 4 יח\"ל" },
+    { id: "482", label: "482 (805) - מתמטיקה 4 יח\"ל" },
+    { id: "381", label: "381 (802) - מתמטיקה 3 יח\"ל" },
+    { id: "382", label: "382 (803) - מתמטיקה 3 יח\"ל" }
+  ];
 
   const handleScanWebsite = async () => {
     setIsScanning(true);
     try {
-      const res = await base44.functions.invoke('scanKibinimatika', {});
+      const res = await base44.functions.invoke('scanKibinimatika', { module: selectedModule });
       if (res.data.success && res.data.exams) {
         // Merge with existing found exams to avoid duplicates
         const newExams = res.data.exams.filter(
           newE => !foundExams.some(existing => existing.id === newE.id)
         );
         setFoundExams([...newExams, ...foundExams]);
-        alert(`סריקה הסתיימה! נמצאו ${newExams.length} בגרויות חדשות.`);
+        alert(`סריקה הסתיימה עבור שאלון ${selectedModule}! נמצאו ${newExams.length} בגרויות חדשות.`);
       } else {
-        alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה.');
+        alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה. נסה שאלון אחר.');
       }
     } catch (e) {
       console.error("Scan error:", e);
