@@ -55,7 +55,9 @@ function LayoutContent({ children, currentPageName }) {
   { name: "Profile", icon: User, path: createPageUrl("Profile"), label: "פרופיל", color: "#F59E0B" }];
 
 
-  const adminNavItems = user?.role === 'admin' ? [] : [];
+  const adminNavItems = user?.role === 'admin' ? [
+    { name: "AdminBagrutImport", icon: FileCheck, path: createPageUrl("AdminBagrutImport"), label: "ייבוא בגרויות", color: "#EF4444" }
+  ] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];
 
