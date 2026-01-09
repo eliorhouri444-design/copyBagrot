@@ -184,11 +184,16 @@ export default function AdminBagrutImport() {
                         <Label>קישור לפתרון (PDF)</Label>
                         <Input 
                           dir="ltr"
-                          value={exam.solutionUrl} 
+                          value={exam.solutionUrl}
                           onChange={(e) => updateUrl(exam.id, 'solutionUrl', e.target.value)}
-                          placeholder="https://..."
+                          placeholder="https://... (אפשר להשאיר ריק אם יש solutionParts)"
                           className="mt-1"
                         />
+                        {Array.isArray(exam.solutionParts) && exam.solutionParts.length > 0 && (
+                          <div className="text-xs text-gray-600 mt-1">
+                            נמצאו {exam.solutionParts.length} חלקי פתרון מהאתר. יאוחדו אוטומטית בעת העיבוד.
+                          </div>
+                        )}
                       </div>
                     </div>
 
