@@ -37,6 +37,29 @@ function getAliases(moduleId) {
   return map[m] || [m];
 }
 
+async function searchSiteForModule(aliases) {
+  const base = 'https://kibinimatika.org/';
+  const links = new Set();
+  for (const id of aliases) {
+    try {
+      const html = await fetchHtml(`${base}?s=${encodeURIComponent(id)}`);
+      const $ = cheerio.load(html);
+      $('a').each((_, a) => {
+        const href = $(a).attr('href') || '';
+        const text = normalizeText($(a).text());
+        if (!href) return;
+        const isPost = /20\d{2}|פתרון|מועד|חורף|קיץ|שאלון/.test(text + ' ' + href);
+        if (isPost && /kibinimatika\.org\//.test(absUrl(base, href))) {
+          links.add(absUrl(base, href));
+        }
+      });
+    } catch (e) {
+      console.warn('searchSiteForModule failed for', id, e?.message);
+    }
+  }
+  return Array.from(links).filter(u => !u.toLowerCase().endsWith('.pdf'));
+}
+
 async function fetchHtml(url) {
   const res = await fetch(url, {
     headers: {
@@ -182,16 +205,28 @@ Deno.serve(async (req) => {
           console.warn('Failed fetching main url', MAIN_URL, e?.message);
         }
       }
-      if (!startUrl) {
-        return Response.json({ success: false, error: `לא נמצא עמוד לשאלון ${moduleId}` }, { status: 404 });
+    }
+
+    let postLinks = [];
+    if (startUrl) {
+      try {
+        const moduleHtml = await fetchHtml(startUrl);
+        postLinks = collectPostLinksForModule(moduleHtml, startUrl, aliases)
+          // remove duplicates & keep only links that look like single post pages (usually contain year or the word "פתרון")
+          .filter(u => /20\d{2}|פתרון|מועד|חורף|קיץ/.test(decodeURIComponent(u)));
+      } catch (e) {
+        console.warn('Failed parsing module page, will fallback to site search', e?.message);
       }
     }
 
-    // Collect post links from module page
-    const moduleHtml = await fetchHtml(startUrl);
-    const postLinks = collectPostLinksForModule(moduleHtml, startUrl, aliases)
-      // remove duplicates & keep only links that look like single post pages (usually contain year or the word "פתרון")
-      .filter(u => /20\d{2}|פתרון|מועד|חורף|קיץ/.test(decodeURIComponent(u)));
+    if (postLinks.length === 0) {
+      const viaSearch = await searchSiteForModule(aliases);
+      postLinks = [...new Set(viaSearch)];
+    }
+
+    if (postLinks.length === 0) {
+      return Response.json({ success: true, exams: [], sourceUrl: startUrl || 'site-search', note: `לא נמצאו פוסטים לשאלון ${moduleId}` });
+    }
 
     if (postLinks.length === 0) {
       return Response.json({ success: true, exams: [], sourceUrl: startUrl, note: 'לא נמצאו פוסטים לשנים/מועדים' });
