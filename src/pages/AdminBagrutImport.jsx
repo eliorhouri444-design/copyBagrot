@@ -40,18 +40,27 @@ export default function AdminBagrutImport() {
 
   const handleScanWebsite = async () => {
     setIsScanning(true);
-    setFoundExams([]); // Clear previous results
+    setFoundExams([]);
     try {
-      const res = await base44.functions.invoke('scanKibinimatika', { module: selectedModule });
+      const res = await base44.functions.invoke('scanBagrutOnline', {
+        page_url: 'https://www.bagrutonline.co.il/page/108/%D7%91%D7%92%D7%A8%D7%95%D7%AA-%D7%91%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94-%D7%9B%D7%9C-%D7%94%D7%A9%D7%90%D7%9C%D7%95%D7%A0%D7%99%D7%9D-%D7%95%D7%9B%D7%9C-%D7%94%D7%A4%D7%AA%D7%A8%D7%95%D7%A0%D7%95%D7%AA-%D7%9E%D7%9B%D7%9C-%D7%94%D7%A9%D7%A0%D7%99%D7%9D---%D7%91%D7%92%D7%A8%D7%95%D7%AA-%D7%90%D7%95%D7%A0%D7%9C%D7%99%D7%99.aspx',
+        start_year: 2012,
+        start_season: 'winter',
+        start_term: 'a',
+        end_year: 2022,
+        end_season: 'summer',
+        end_term: 'a',
+        units: 3,
+      });
       if (res.data.success && res.data.exams) {
-        setFoundExams(res.data.exams);
-        alert(`סריקה הסתיימה עבור שאלון ${selectedModule}! נמצאו ${res.data.exams.length} בגרויות חדשות.`);
+        setFoundExams(res.data.exams.filter(e => e.module && e.examUrl));
+        alert(`נסרקו ${res.data.exams.length} פריטים (סוננו רק עם קובץ שאלון תקין).`);
       } else {
-        alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה. נסה שאלון אחר.');
+        alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה.');
       }
     } catch (e) {
-      console.error("Scan error:", e);
-      alert("שגיאה בסריקת האתר: " + e.message);
+      console.error('Scan error:', e);
+      alert('שגיאה בסריקת האתר: ' + e.message);
     } finally {
       setIsScanning(false);
     }
