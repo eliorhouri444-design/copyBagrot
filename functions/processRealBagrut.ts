@@ -233,6 +233,31 @@ Deno.serve(async (req) => {
             }
         }
 
+        // Merge from parts if available (works even when no single solution PDF provided)
+        if (globalThis.__mergedSolutions) {
+            try {
+                const mergedFromParts = globalThis.__mergedSolutions;
+                const solutionsMap = new Map();
+                for (const [q, stepsArr] of mergedFromParts.byQ || []) {
+                    solutionsMap.set(parseInt(q), { question_number: parseInt(q), final_answer: mergedFromParts.finals?.get(parseInt(q)) || '', steps: stepsArr });
+                }
+                if (solutionsMap.size > 0) {
+                    questions = questions.map(q => {
+                        const sol = solutionsMap.get(q.question_number);
+                        return {
+                            ...q,
+                            correct_answer: sol?.final_answer || q.correct_answer || '',
+                            solution_steps: sol?.steps || q.solution_steps || [],
+                            explanation: sol?.steps ? sol.steps.join('\n') : (q.explanation || '')
+                        };
+                    });
+                    console.log('Merged solutions from parts (post hook).');
+                }
+            } finally {
+                try { delete globalThis.__mergedSolutions; } catch {}
+            }
+        }
+
         // 3. Normalize Data for GenericExam
         const seasonStr = season === 'winter' ? 'חורף' : 'קיץ';
         const title = `${subject} - שאלון ${module_symbol || 'כללי'} - ${seasonStr} ${year}`;
