@@ -192,8 +192,27 @@ Deno.serve(async (req) => {
                     }
                 });
 
-                if (solutionExtraction.status === 'success' && solutionExtraction.output?.solutions) {
-                    const solutionsMap = new Map(solutionExtraction.output.solutions.map(s => [s.question_number, s]));
+                const mergedFromParts = globalThis.__mergedSolutions;
+                        if (mergedFromParts) {
+                            const solutionsMap = new Map();
+                            // build pseudo items
+                            for (const [q, stepsArr] of mergedFromParts.byQ || []) {
+                                solutionsMap.set(parseInt(q), { question_number: parseInt(q), final_answer: mergedFromParts.finals?.get(parseInt(q)) || '', steps: stepsArr });
+                            }
+                            if (solutionsMap.size > 0) {
+                                questions = questions.map(q => {
+                                    const sol = solutionsMap.get(q.question_number);
+                                    return {
+                                        ...q,
+                                        correct_answer: sol?.final_answer || q.correct_answer || '',
+                                        solution_steps: sol?.steps || q.solution_steps || [],
+                                        explanation: sol?.steps ? sol.steps.join('\n') : (q.explanation || '')
+                                    };
+                                });
+                                console.log('Merged solutions from parts successfully.');
+                            }
+                        } else if (solutionExtraction.status === 'success' && solutionExtraction.output?.solutions) {
+                            const solutionsMap = new Map(solutionExtraction.output.solutions.map(s => [s.question_number, s]));
                     
                     // Merge solutions into questions
                     questions = questions.map(q => {
