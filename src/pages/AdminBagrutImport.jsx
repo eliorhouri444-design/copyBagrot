@@ -29,15 +29,12 @@ export default function AdminBagrutImport() {
 
   const handleScanWebsite = async () => {
     setIsScanning(true);
+    setFoundExams([]); // Clear previous results
     try {
       const res = await base44.functions.invoke('scanKibinimatika', { module: selectedModule });
       if (res.data.success && res.data.exams) {
-        // Merge with existing found exams to avoid duplicates
-        const newExams = res.data.exams.filter(
-          newE => !foundExams.some(existing => existing.id === newE.id)
-        );
-        setFoundExams([...newExams, ...foundExams]);
-        alert(`סריקה הסתיימה עבור שאלון ${selectedModule}! נמצאו ${newExams.length} בגרויות חדשות.`);
+        setFoundExams(res.data.exams);
+        alert(`סריקה הסתיימה עבור שאלון ${selectedModule}! נמצאו ${res.data.exams.length} בגרויות חדשות.`);
       } else {
         alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה. נסה שאלון אחר.');
       }
@@ -59,15 +56,19 @@ export default function AdminBagrutImport() {
     setLoading(true);
 
     try {
+      // Determine module_symbol if not present (from scan or user input)
+      // Usually scan provides it as 'module'
+      const moduleSymbol = exam.module || selectedModule;
+
       const response = await base44.functions.invoke('processRealBagrut', {
         exam_pdf_url: exam.examUrl,
         solution_pdf_url: exam.solutionUrl,
         subject: "מתמטיקה",
-        unit: 5,
+        unit: moduleSymbol.startsWith("5") ? 5 : (moduleSymbol.startsWith("4") ? 4 : 3), // Infer unit from module
         year: exam.year,
         season: exam.season,
         term: exam.term || 'a',
-        module_symbol: exam.module
+        module_symbol: moduleSymbol
       });
 
       if (response.data.success) {
@@ -93,7 +94,7 @@ export default function AdminBagrutImport() {
     <div className="min-h-screen bg-gray-50 p-8" dir="rtl">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ייבוא בגרויות מקיבינימטיקה (581)</h1>
+          <h1 className="text-3xl font-bold text-gray-900">ייבוא בגרויות מקיבינימטיקה</h1>
           <Button variant="outline" onClick={() => navigate(createPageUrl('AdminExams'))}>
             חזרה לניהול בגרויות
           </Button>
@@ -101,35 +102,35 @@ export default function AdminBagrutImport() {
 
         <Card className="mb-8 bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800 flex justify-between items-center">
-              <span>ייבוא אוטומטי</span>
+            <CardTitle className="text-blue-800">ייבוא אוטומטי מקיבינימטיקה</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1 space-y-2">
+                <Label>בחר שאלון לסריקה:</Label>
+                <select 
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={selectedModule}
+                  onChange={(e) => setSelectedModule(e.target.value)}
+                >
+                  {modules.map(m => (
+                    <option key={m.id} value={m.id}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
               <Button 
                 onClick={handleScanWebsite} 
                 disabled={isScanning}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
               >
                 {isScanning ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Download className="w-4 h-4 ml-2" />}
-                סרוק אתר קיבינימטיקה (581)
+                סרוק ומצא בגרויות
               </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-blue-900 mb-4">
-              לחץ על הכפתור למעלה כדי לסרוק אוטומטית את אתר קיבינימטיקה ולחלץ את כל המבחנים הקיימים לשאלון 581.
-              <br />
-              המערכת תמצא שאלונים משנים 2019-2025 ותציג אותם בטבלה למטה לאישור וייבוא.
-            </p>
-            <div className="text-sm text-gray-500">
-              מקור: 
-              <a 
-                href="https://kibinimatika.org/2019/12/12/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%91%d7%97%d7%99%d7%a0%d7%aa-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline inline-flex items-center gap-1 mx-1"
-              >
-                דף בחינות 581 <ExternalLink className="w-3 h-3" />
-              </a>
             </div>
+            
+            <p className="text-blue-900 mt-4 text-sm">
+              המערכת תסרוק את אתר קיבינימטיקה עבור השאלון הנבחר, תאתר את דפי השנים והמועדים, ותחלץ את הקישורים הישירים לקבצי ה-PDF (שאלון ופתרון).
+            </p>
           </CardContent>
         </Card>
 
