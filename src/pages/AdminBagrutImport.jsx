@@ -16,7 +16,7 @@ export default function AdminBagrutImport() {
   const [foundExams, setFoundExams] = useState([]);
 
   const [isScanning, setIsScanning] = useState(false);
-  const [selectedModule, setSelectedModule] = useState("581");
+  const [selectedModule, setSelectedModule] = useState("801");
 
   const modules = [
     { id: "471", label: "471 - תוכנית חדשה 4 יח\"ל" },

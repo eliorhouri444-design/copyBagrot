@@ -1,4 +1,5 @@
 import AdminAudioStudio from './pages/AdminAudioStudio';
+import AdminBagrutImport from './pages/AdminBagrutImport';
 import AdminBagrutManager from './pages/AdminBagrutManager';
 import AdminBulkImport from './pages/AdminBulkImport';
 import AdminCacheManager from './pages/AdminCacheManager';
@@ -78,12 +79,12 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
-import AdminBagrutImport from './pages/AdminBagrutImport';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AdminAudioStudio": AdminAudioStudio,
+    "AdminBagrutImport": AdminBagrutImport,
     "AdminBagrutManager": AdminBagrutManager,
     "AdminBulkImport": AdminBulkImport,
     "AdminCacheManager": AdminCacheManager,
@@ -163,7 +164,6 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
-    "AdminBagrutImport": AdminBagrutImport,
 }
 
 export const pagesConfig = {
