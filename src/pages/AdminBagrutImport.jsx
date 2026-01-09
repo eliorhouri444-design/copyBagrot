@@ -51,6 +51,30 @@ export default function AdminBagrutImport() {
     }
   ]);
 
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleScanWebsite = async () => {
+    setIsScanning(true);
+    try {
+      const res = await base44.functions.invoke('scanKibinimatika', {});
+      if (res.data.success && res.data.exams) {
+        // Merge with existing found exams to avoid duplicates
+        const newExams = res.data.exams.filter(
+          newE => !foundExams.some(existing => existing.id === newE.id)
+        );
+        setFoundExams([...newExams, ...foundExams]);
+        alert(`סריקה הסתיימה! נמצאו ${newExams.length} בגרויות חדשות.`);
+      } else {
+        alert('לא נמצאו בגרויות בסריקה או שאירעה שגיאה.');
+      }
+    } catch (e) {
+      console.error("Scan error:", e);
+      alert("שגיאה בסריקת האתר: " + e.message);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
   const handleImport = async (exam) => {
     if (!exam.examUrl) {
       alert("נא להזין קישור לשאלון");
@@ -74,14 +98,13 @@ export default function AdminBagrutImport() {
 
       if (response.data.success) {
         setFoundExams(prev => prev.map(e => e.id === exam.id ? { ...e, status: 'done' } : e));
-        alert(`הבגרות ${exam.title} יובאה בהצלחה!`);
       } else {
         throw new Error(response.data.error);
       }
     } catch (error) {
       console.error("Import error:", error);
       setFoundExams(prev => prev.map(e => e.id === exam.id ? { ...e, status: 'error', error: error.message } : e));
-      alert("שגיאה בייבוא: " + error.message);
+      alert(`שגיאה בייבוא ${exam.title}: ` + error.message);
     } finally {
       setLoading(false);
       setActiveImport(null);
@@ -104,22 +127,35 @@ export default function AdminBagrutImport() {
 
         <Card className="mb-8 bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800">הוראות</CardTitle>
+            <CardTitle className="text-blue-800 flex justify-between items-center">
+              <span>ייבוא אוטומטי</span>
+              <Button 
+                onClick={handleScanWebsite} 
+                disabled={isScanning}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {isScanning ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Download className="w-4 h-4 ml-2" />}
+                סרוק אתר קיבינימטיקה (581)
+              </Button>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-blue-900 mb-2">
-              דף זה מרכז את הבגרויות שנמצאו באתר קיבינימטיקה לשאלון 581.
+            <p className="text-blue-900 mb-4">
+              לחץ על הכפתור למעלה כדי לסרוק אוטומטית את אתר קיבינימטיקה ולחלץ את כל המבחנים הקיימים לשאלון 581.
               <br />
-              עבור בגרויות שחסר להן קישור, ניתן להעתיק ולהדביק מהאתר ידנית.
+              המערכת תמצא שאלונים משנים 2019-2025 ותציג אותם בטבלה למטה לאישור וייבוא.
             </p>
-            <a 
-              href="https://kibinimatika.org/2019/12/12/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%91%d7%97%d7%99%d7%a0%d7%aa-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline flex items-center gap-1 font-bold"
-            >
-              מעבר לאתר קיבינימטיקה <ExternalLink className="w-4 h-4" />
-            </a>
+            <div className="text-sm text-gray-500">
+              מקור: 
+              <a 
+                href="https://kibinimatika.org/2019/12/12/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%91%d7%97%d7%99%d7%a0%d7%aa-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline inline-flex items-center gap-1 mx-1"
+              >
+                דף בחינות 581 <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
           </CardContent>
         </Card>
 
