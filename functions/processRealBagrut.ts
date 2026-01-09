@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
         }
 
         const body = await req.json();
-        const { exam_pdf_url, solution_pdf_url, subject, unit, year, season, module_symbol } = body;
+        const { exam_pdf_url, solution_pdf_url, solution_part_urls = [], subject, unit, year, season, module_symbol } = body;
 
         if (!exam_pdf_url) {
             return Response.json({ error: 'Missing Exam PDF' }, { status: 400 });
