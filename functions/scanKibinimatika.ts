@@ -1,196 +1,221 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import * as cheerio from 'npm:cheerio@1.0.0-rc.12';
 
-Deno.serve(async (req) => {
-    try {
-        const base44 = createClientFromRequest(req);
-        const user = await base44.auth.me();
+// Helpers
+function absUrl(base, href) {
+  try {
+    if (!href) return '';
+    return new URL(href, base).toString();
+  } catch {
+    return href || '';
+  }
+}
 
-        if (!user || user.role !== 'admin') {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+function normalizeText(str = '') {
+  return String(str).replace(/\s+/g, ' ').trim();
+}
 
-        const body = await req.json();
-        const module = body?.module;
-        let url = body?.url;
+function containsDigits(txt, digits) {
+  // true if all digits of `digits` appear in order inside txt
+  const d = String(digits).replace(/[^0-9]/g, '');
+  const t = String(txt).replace(/[^0-9]/g, '');
+  return t.includes(d);
+}
 
-        // Main navigation page for all modules
-        const MAIN_URL = "https://kibinimatika.org/2019/04/17/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%9e%d7%91%d7%97%d7%a0%d7%99-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/";
-
-        // 1. If module is provided, find the specific page URL first
-        if (module && !url) {
-            console.log(`Searching for module ${module} on main page...`);
-            const mainRes = await fetch(MAIN_URL);
-            const mainHtml = await mainRes.text();
-            const $main = cheerio.load(mainHtml);
-            
-            // Try to find a link containing the module number
-            const links = $main('a');
-            for (const link of links) {
-                const text = $main(link).text().trim();
-                // Check if text contains module number (e.g. "581" or "806")
-                // Kibinimatika often writes "שאלון 581" or "581 (806)"
-                if (text.includes(module)) {
-                    url = $main(link).attr('href');
-                    console.log(`Found URL for module ${module}: ${url}`);
-                    break;
-                }
-            }
-            
-            if (!url) {
-                return Response.json({ error: `Could not find a page for module ${module} on the main site.` }, { status: 404 });
-            }
-        }
-
-        if (!url) {
-             return Response.json({ error: "No URL or Module provided" }, { status: 400 });
-        }
-
-        console.log(`Scanning URL: ${url}`);
-        const response = await fetch(url);
-        const html = await response.text();
-        const $ = cheerio.load(html);
-
-        const foundExams = [];
-        const processPromises = [];
-        
-        // The structure seems to be Elementor Accordion items
-        const accordionItems = $('.elementor-accordion-item');
-
-        for (const item of accordionItems) {
-            const titleElement = $(item).find('.elementor-tab-title');
-            const titleText = titleElement.text().trim();
-            
-            // Extract year (e.g. "שנת 2024")
-            const yearMatch = titleText.match(/20\d{2}/);
-            if (!yearMatch) continue;
-            
-            const year = parseInt(yearMatch[0]);
-            // Limit scanning to 2018+ to save resources, can be adjusted
-            if (year < 2018) continue; 
-
-            const contentId = titleElement.attr('aria-controls');
-            const contentDiv = $(`#${contentId}`);
-            
-            // Inside the year content, there are usually rows or lists for each term
-            // Often it's links like "Moed A", "Winter", etc.
-            const links = contentDiv.find('a');
-            
-            for (const link of links) {
-                const linkText = $(link).text().trim();
-                const href = $(link).attr('href');
-                
-                if (!href) continue;
-
-                let season = 'summer';
-                let term = 'a';
-
-                if (linkText.includes('חורף')) {
-                    season = 'winter';
-                }
-                
-                if (linkText.includes('מועד ב')) {
-                    term = 'b';
-                } else if (linkText.includes('מועד ג') || linkText.includes('מיוחד') || linkText.includes('נבצרים')) {
-                    term = 'special';
-                }
-
-                processPromises.push((async () => {
-                    let examUrl = null;
-                    let solutionUrl = null;
-
-                    if (href.endsWith('.pdf')) {
-                        // Sometimes the main link is the exam or solution directly
-                        // We can't be sure which one it is without context
-                        examUrl = href; 
-                    } else {
-                        // Fetch sub-page to find the actual PDF links
-                        try {
-                            const subRes = await fetch(href);
-                            const subHtml = await subRes.text();
-                            const $sub = cheerio.load(subHtml);
-                            
-                            // 1. Look for all links ending in .pdf
-                            const pdfCandidates = [];
-                            $sub('a[href$=".pdf"]').each((i, el) => {
-                                pdfCandidates.push({
-                                    href: $sub(el).attr('href'),
-                                    text: $sub(el).text().trim(),
-                                    parentText: $sub(el).parent().text().trim(),
-                                    isButton: $sub(el).find('.elementor-button-text').length > 0 || $sub(el).hasClass('elementor-button')
-                                });
-                            });
-
-                            // 2. Filter and Assign
-                            for (const pdf of pdfCandidates) {
-                                const fullText = (pdf.text + " " + pdf.parentText).toLowerCase();
-                                
-                                // Solution detection
-                                if (fullText.includes('פתרון') || fullText.includes('תשובות') || fullText.includes('מלא') || pdf.href.includes('sol')) {
-                                    if (!solutionUrl) solutionUrl = pdf.href;
-                                }
-                                // Exam detection
-                                else if (fullText.includes('שאלון') || fullText.includes('בחינה') || fullText.includes('טופס') || fullText.includes('נקיה') || pdf.href.includes('exam') || pdf.href.includes('question')) {
-                                    if (!examUrl) examUrl = pdf.href;
-                                }
-                            }
-
-                            // 3. Fallback: If we have exactly 2 PDFs and couldn't decide, assume order (usually Exam then Solution or vice versa, site specific)
-                            // Kibinimatika usually puts Exam button then Solution button
-                            if ((!examUrl || !solutionUrl) && pdfCandidates.length >= 2) {
-                                // Reset and try strict order
-                                // Typically: Left button is Exam, Right is Solution (or top/bottom)
-                                // Let's try to detect by checking if one text contains "Questionnaire"
-                                
-                                const first = pdfCandidates[0];
-                                const second = pdfCandidates[1];
-                                
-                                if (!examUrl && !solutionUrl) {
-                                     // Blind guess if text didn't help: first is exam?
-                                     // Actually usually they label them clearly.
-                                     // If we are here, text matching failed.
-                                     // Let's assume the one with shorter text or specific keywords
-                                     examUrl = first.href;
-                                     solutionUrl = second.href;
-                                }
-                            } else if (!examUrl && pdfCandidates.length === 1) {
-                                // Only one PDF found
-                                if (!pdfCandidates[0].text.includes('פתרון')) {
-                                    examUrl = pdfCandidates[0].href;
-                                } else {
-                                    solutionUrl = pdfCandidates[0].href;
-                                }
-                            }
-
-                        } catch (e) {
-                            console.error(`Error fetching sub-page ${href}:`, e);
-                        }
-                    }
-
-                    if (examUrl || solutionUrl) {
-                        foundExams.push({
-                            id: `kibinimatika_${module || 'unknown'}_${year}_${season}_${term}`,
-                            title: `${season === 'winter' ? 'חורף' : 'קיץ'} ${year} מועד ${term === 'a' ? "א'" : (term === 'b' ? "ב'" : "מיוחד")}`,
-                            year,
-                            season,
-                            term,
-                            module: module || "581", // Default or passed module
-                            examUrl: examUrl || "",
-                            solutionUrl: solutionUrl || "",
-                            status: "ready"
-                        });
-                    }
-                })());
-            }
-        }
-
-        await Promise.all(processPromises);
-        foundExams.sort((a, b) => b.year - a.year);
-
-        return Response.json({ success: true, exams: foundExams, sourceUrl: url });
-
-    } catch (error) {
-        console.error("Scan Error:", error);
-        return Response.json({ error: error.message }, { status: 500 });
+async function fetchHtml(url) {
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; Base44Crawler/1.0)',
+      'Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7'
     }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return await res.text();
+}
+
+// Try to find the specific module page from the main “פתרונות מלאים” page
+function findModulePageUrl(mainHtml, mainUrl, moduleId) {
+  const $ = cheerio.load(mainHtml);
+  let found = '';
+  $('a').each((_, a) => {
+    const text = normalizeText($(a).text());
+    // Buttons usually contain "פתרונות מלאים שאלון 471" וכד'
+    if (text.includes('פתרונות') || text.includes('שאלון')) {
+      if (containsDigits(text, moduleId)) {
+        const href = $(a).attr('href');
+        if (href && !found) found = absUrl(mainUrl, href);
+      }
+    }
+  });
+  return found;
+}
+
+// Parse a module page (accordion by year). Return list of post links of the chosen module
+function collectPostLinksForModule(moduleHtml, moduleUrl, moduleId) {
+  const $ = cheerio.load(moduleHtml);
+  const links = new Set();
+
+  // Strategy 1: inside Elementor accordion items per year
+  $('.elementor-accordion-item, .elementor-accordion').each((_, item) => {
+    $(item).find('a').each((__, a) => {
+      const text = normalizeText($(a).text());
+      const href = $(a).attr('href');
+      if (!href) return;
+      // Typical post titles contain year + season + "שאלון <id>"
+      if (containsDigits(text, moduleId) || /מועד|חורף|קיץ|שנת|פתרון/.test(text)) {
+        links.add(absUrl(moduleUrl, href));
+      }
+    });
+  });
+
+  // Strategy 2: any link on the page that clearly mentions the module id
+  $('a').each((_, a) => {
+    const text = normalizeText($(a).text());
+    const href = $(a).attr('href');
+    if (!href) return;
+    if (containsDigits(text, moduleId)) links.add(absUrl(moduleUrl, href));
+  });
+
+  // Filter obvious non-posts (pdf direct links we will handle later anyway)
+  return Array.from(links).filter(u => !u.toLowerCase().endsWith('.pdf'));
+}
+
+// From a specific post (e.g., "פתרון בגרות חורף 2025 שאלון 471"), collect the PDF links
+async function extractExamAndSolutionFromPost(postUrl) {
+  try {
+    const html = await fetchHtml(postUrl);
+    const $ = cheerio.load(html);
+
+    const pdfs = [];
+    $('a[href$=".pdf"]').each((_, a) => {
+      pdfs.push({
+        href: absUrl(postUrl, $(a).attr('href')),
+        text: normalizeText($(a).text()),
+        parentText: normalizeText($(a).parent().text())
+      });
+    });
+
+    let exam = '';
+    let solution = '';
+
+    for (const p of pdfs) {
+      const t = `${p.text} ${p.parentText}`;
+      // solution cues
+      if (/פתרון|תשובות|כתוב|מלא/i.test(t)) {
+        if (!solution) solution = p.href;
+        continue;
+      }
+      // exam cues
+      if (/שאלון|בחינה|טופס|נקיה/i.test(t)) {
+        if (!exam) exam = p.href;
+        continue;
+      }
+    }
+
+    // Fallback: if exactly two pdfs, guess first=exam second=solution
+    if ((!exam || !solution) && pdfs.length >= 2) {
+      exam = exam || pdfs[0].href;
+      solution = solution || pdfs[1].href;
+    } else if (!exam && pdfs.length === 1) {
+      const t = `${pdfs[0].text} ${pdfs[0].parentText}`;
+      if (!/פתרון|תשובות|כתוב/i.test(t)) exam = pdfs[0].href; else solution = pdfs[0].href;
+    }
+
+    // infer year + season from title if present
+    let title = normalizeText($('h1, .entry-title, .elementor-heading-title').first().text()) || postUrl;
+    let year = 0;
+    const ym = title.match(/20\d{2}/);
+    if (ym) year = parseInt(ym[0]);
+    let season = /חורף/.test(title) ? 'winter' : (/קיץ/.test(title) ? 'summer' : 'summer');
+
+    return { examUrl: exam, solutionUrl: solution, meta: { title, year, season } };
+  } catch (e) {
+    console.error('Post parse error', postUrl, e);
+    return { examUrl: '', solutionUrl: '', meta: { title: postUrl, year: 0, season: 'summer' } };
+  }
+}
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const moduleId = String(body?.module || '').replace(/[^0-9]/g, '') || '581';
+    let startUrl = body?.url || '';
+
+    const MAIN_URL = 'https://kibinimatika.org/2019/04/17/%d7%a4%d7%aa%d7%a8%d7%95%d7%a0%d7%95%d7%aa-%d7%9e%d7%9c%d7%90%d7%99%d7%9d-%d7%9c%d7%9e%d7%91%d7%97%d7%a0%d7%99-%d7%94%d7%91%d7%92%d7%a8%d7%95%d7%aa-%d7%91%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94/';
+
+    // Resolve module page
+    if (!startUrl) {
+      const mainHtml = await fetchHtml(MAIN_URL);
+      startUrl = findModulePageUrl(mainHtml, MAIN_URL, moduleId);
+      if (!startUrl) {
+        return Response.json({ success: false, error: `לא נמצא עמוד לשאלון ${moduleId}` }, { status: 404 });
+      }
+    }
+
+    // Collect post links from module page
+    const moduleHtml = await fetchHtml(startUrl);
+    const postLinks = collectPostLinksForModule(moduleHtml, startUrl, moduleId)
+      // remove duplicates & keep only links that look like single post pages (usually contain year or the word "פתרון")
+      .filter(u => /20\d{2}|פתרון|מועד|חורף|קיץ/.test(decodeURIComponent(u)));
+
+    if (postLinks.length === 0) {
+      return Response.json({ success: true, exams: [], sourceUrl: startUrl, note: 'לא נמצאו פוסטים לשנים/מועדים' });
+    }
+
+    // Limit concurrency to avoid hammering site
+    const results = [];
+    const queue = [...postLinks];
+    const inFlight = new Set();
+    const MAX = 4;
+
+    async function runNext() {
+      if (queue.length === 0) return;
+      while (inFlight.size < MAX && queue.length) {
+        const url = queue.shift();
+        const p = extractExamAndSolutionFromPost(url).then(r => {
+          results.push({ url, ...r });
+        }).catch(e => console.error('extract error', url, e)).finally(() => inFlight.delete(p));
+        inFlight.add(p);
+      }
+      if (inFlight.size) {
+        await Promise.race(inFlight);
+        await runNext();
+      }
+    }
+
+    await runNext();
+
+    // Build exams array
+    const exams = results
+      .map(r => {
+        const year = r.meta.year || 0;
+        const season = r.meta.season || 'summer';
+        if (!r.examUrl && !r.solutionUrl) return null;
+        return {
+          id: `kib_${moduleId}_${year || 'y'}_${season}`,
+          title: `${season === 'winter' ? 'חורף' : 'קיץ'} ${year || ''}`.trim() + ` • שאלון ${moduleId}`,
+          year: year || 0,
+          season,
+          term: 'a',
+          module: moduleId,
+          examUrl: r.examUrl || '',
+          solutionUrl: r.solutionUrl || '',
+          status: 'ready'
+        };
+      })
+      .filter(Boolean)
+      // sort by year desc, winter after summer same year
+      .sort((a, b) => (b.year - a.year) || (a.season === 'winter' ? -1 : 1));
+
+    return Response.json({ success: true, sourceUrl: startUrl, exams });
+  } catch (error) {
+    console.error('scanKibinimatika fatal', error);
+    return Response.json({ success: false, error: error.message }, { status: 500 });
+  }
 });
