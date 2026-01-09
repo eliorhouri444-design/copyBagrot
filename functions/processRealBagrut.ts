@@ -117,7 +117,57 @@ Deno.serve(async (req) => {
         console.log("Diagram generation complete.");
 
         // 2. Extract Solutions (if provided)
-        if (solution_pdf_url) {
+        if (solution_part_urls && Array.isArray(solution_part_urls) && solution_part_urls.length > 0) {
+            console.log("Merging multiple solution parts (from site) ... count:", solution_part_urls.length);
+            try {
+                // We won't actually merge bytes server-side here; instead, pass parts to extractor one by one and merge steps
+                const allSteps = [];
+                const allFinals = [];
+                for (const partUrl of solution_part_urls) {
+                    const part = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
+                        file_url: partUrl,
+                        json_schema: {
+                            type: "object",
+                            properties: {
+                                solutions: {
+                                    type: "array",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            question_number: { type: "integer" },
+                                            final_answer: { type: "string" },
+                                            steps: { type: "array", items: { type: "string" } }
+                                        },
+                                        required: ["question_number"]
+                                    }
+                                }
+                            },
+                            required: ["solutions"]
+                        }
+                    });
+                    if (part.status === 'success' && part.output?.solutions) {
+                        for (const s of part.output.solutions) {
+                            allFinals.push({ q: s.question_number, a: s.final_answer || '' });
+                            (s.steps || []).forEach(step => allSteps.push({ q: s.question_number, step }));
+                        }
+                    }
+                }
+                // Build map
+                const byQ = new Map();
+                allSteps.forEach(({ q, step }) => {
+                    const arr = byQ.get(q) || [];
+                    arr.push(step);
+                    byQ.set(q, arr);
+                });
+                const finals = new Map();
+                allFinals.forEach(({ q, a }) => { if (a) finals.set(q, a); });
+
+                // Merge into questions after exam extraction later (we'll access this closure var)
+                globalThis.__mergedSolutions = { byQ, finals };
+            } catch (e) {
+                console.error('Merging solution parts failed (continue without merge):', e);
+            }
+        } else if (solution_pdf_url) {
             console.log("Extracting solutions from solution PDF...");
             try {
                 const solutionExtraction = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
