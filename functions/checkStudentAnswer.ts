@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
         let ocrSections = null;
         if (uploadedFileUrl) {
             try {
-                const ocrRes = await base44.functions.invoke('advancedOCR', { imageUrl: uploadedFileUrl });
+                const ocrRes = await base44.functions.invoke('advancedOCR', { imageUrl: uploadedFileUrl, enhanceQuality: true });
                 ocrText = ocrRes?.data?.formatted_text || ocrRes?.data?.ocr?.text_detected || '';
                 ocrSections = ocrRes?.data?.answers_by_part || ocrRes?.data?.detected_sections || null;
             } catch (_e) {}
