@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { imageUrl, questionContext } = await req.json();
+        const { imageUrl, questionContext, correctAnswer, questionId, subject } = await req.json();
 
         if (!imageUrl) {
             return Response.json({ error: 'Missing imageUrl' }, { status: 400 });
@@ -91,13 +91,64 @@ ${questionContext ? `**הקשר השאלה:**\n${questionContext}\n\n` : ''}
 
         console.log('✅ Scan completed:', scanResult.confidence_score);
 
+        // Build a complete solution path aligned to a final answer
+        let targetFinal = (correctAnswer || '').toString().trim();
+        if (!targetFinal && scanResult?.text_content) {
+            try {
+                const fa = await base44.integrations.Core.InvokeLLM({
+                    prompt: `אתה מחלץ תשובה סופית אחת מטקסט OCR של פתרון בכתב יד בעברית. החזר רק תשובה סופית אם קיימת.\n\nOCR:\n${scanResult.text_content}`,
+                    response_json_schema: { type: "object", properties: { final_answer: { type: "string" } } }
+                });
+                targetFinal = (fa?.final_answer || '').trim();
+            } catch (_) {}
+        }
+
+        let completion = null;
+        if (targetFinal) {
+            completion = await base44.integrations.Core.InvokeLLM({
+                prompt: `המטרה: לבנות פתרון מלא וקוהרנטי שמוביל בדיוק לתשובה הסופית המבוקשת.\n- שפה: עברית.\n- היה תמציתי אך מלא בשלבים ברורים.\n- אם חסרים שלבים ב-OCR – השלם אותם בצורה הגיונית (אל תמציא נתונים שאינם סבירים).\n\nנושא: ${subject || 'מתמטיקה'}\nשאלה (תקציר, אם קיים):\n${questionContext || '(לא סופק טקסט שאלה מלא)'}\n\nOCR – תוכן שזוהה ותתי-שלבים:\n${scanResult.text_content || ''}\n${(scanResult.detected_steps || []).map(s=>`- ${s.content||''}`).join('\n')}\n\nתשובה סופית יעד: ${targetFinal}\n\nהחזר JSON:\n{\n  "completed_steps": ["שלב 1 בעברית", "שלב 2"],\n  "completed_explanation": "פסקה מסכמת בעברית",\n  "final_answer": "${targetFinal}"\n}`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        completed_steps: { type: "array", items: { type: "string" } },
+                        completed_explanation: { type: "string" },
+                        final_answer: { type: "string" }
+                    }
+                }
+            });
+
+            // Optional: persist to SolutionBank if admin and questionId provided
+            try {
+                if (questionId && user.role === 'admin' && completion?.completed_steps?.length) {
+                    const existing = await base44.asServiceRole.entities.SolutionBank.filter({ question_id: questionId });
+                    const solutionData = {
+                        question_id: questionId,
+                        solution_text: completion.final_answer || targetFinal,
+                        solution_steps: completion.completed_steps.map((desc, i) => ({ step: i + 1, description: desc })),
+                        verified: false
+                    };
+                    if (existing.length > 0) {
+                        await base44.asServiceRole.entities.SolutionBank.update(existing[0].id, solutionData);
+                    } else {
+                        await base44.asServiceRole.entities.SolutionBank.create(solutionData);
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ Persist completed solution failed', e);
+            }
+        }
+
         return Response.json({
             success: true,
             scanned_content: scanResult.text_content,
             steps: scanResult.detected_steps || [],
             diagram: scanResult.detected_diagram || null,
             confidence: scanResult.confidence_score || 0,
-            warnings: scanResult.unclear_parts || []
+            warnings: scanResult.unclear_parts || [],
+            target_final_answer: targetFinal || null,
+            completed_steps: completion?.completed_steps || [],
+            completed_explanation: completion?.completed_explanation || '',
+            final_answer: completion?.final_answer || targetFinal || ''
         });
 
     } catch (error) {
