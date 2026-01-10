@@ -48,9 +48,64 @@ Deno.serve(async (req) => {
             }
         }
 
+        // ⚙️ זיהוי סעיפי שאלה וחלוקת תשובת התלמיד לכל סעיף
+        let detectedParts = [];
+        try {
+            const partsRes = await base44.integrations.Core.InvokeLLM({
+                prompt: `נתח את השאלה הבאה וחלץ את מבנה הסעיפים (א/ב/ג/ד/ה) והנקודות אם מצוינות. החזר JSON בלבד.\n\nשאלה:\n${question}\n\nאם אין סעיפים מפורשים, החזר חלק אחד עם part_id="א" ו-points משוערים (100).`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        parts: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    part_id: { type: "string" },
+                                    description: { type: "string" },
+                                    points: { type: "number" }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            detectedParts = Array.isArray(partsRes?.parts) ? partsRes.parts : [];
+            if (!detectedParts.length) detectedParts = [{ part_id: 'א', description: 'סעיף יחיד', points: 100 }];
+        } catch (_e) {
+            detectedParts = [{ part_id: 'א', description: 'סעיף יחיד', points: 100 }];
+        }
+
+        let answersByPart = structuredAnswers || null;
+        if (!answersByPart) {
+            try {
+                const mapRes = await base44.integrations.Core.InvokeLLM({
+                    prompt: `חלק את תשובת התלמיד לפי הסעיפים שסופקו, והפק תשובה סופית לכל סעיף אם קיימת. החזר JSON בלבד.\n\nשאלה:\n${question}\n\nסעיפים:\n${JSON.stringify(detectedParts)}\n\nתשובת תלמיד (טקסט חופשי/OCR):\n${(ocrText || studentAnswer || '').toString().slice(0, 8000)}`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            answers_by_part: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        part_id: { type: "string" },
+                                        answer_text: { type: "string" },
+                                        final_answer: { type: "string" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                answersByPart = mapRes?.answers_by_part || null;
+            } catch (_e) {}
+        }
+
         // ✅ Cache logic (skip if file uploaded for now, difficult to hash)
         if (useCache && !uploadedFileUrl) {
-            const checkHash = `check_${question.substring(0, 50)}_${typeof studentAnswer === 'string' ? studentAnswer.substring(0, 50) : JSON.stringify(structuredAnswers)}`;
+            const cacheKeyInput = answersByPart ? JSON.stringify(answersByPart).substring(0,200) : (typeof studentAnswer === 'string' ? studentAnswer.substring(0,200) : JSON.stringify(structuredAnswers).substring(0,200));
+            const checkHash = `check_${question.substring(0, 50)}_${cacheKeyInput}`;
             const cached = await base44.asServiceRole.entities.CachedResponse.filter({ 
                 question_hash: checkHash 
             });
@@ -73,74 +128,71 @@ Deno.serve(async (req) => {
 
         console.log('📝 Checking answer with mode:', checkingMode);
 
-        // שימוש ב-gpt-4o-mini לבדיקה - מהיר ומדויק מספיק
+        // בדיקה פרטנית לכל סעיף + שקלול נקודות
         const checkResponse = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
-                    content: `אתה בודק תשובות בחינות בגרות (מתמטיקה/פיזיקה/מדעים).
-מטרתך היא לתת ניקוד הוגן גם אם התשובה הסופית שגויה, בהתבסס על הדרך.
-
-הפעל עקרון "Final-Answer Alignment": אם זוהתה תשובה סופית מהתמונה – נסה ליישב את הדרך עם התשובה, להשלים פערים סבירים, ולהדגיש היכן הסטייה התרחשה (אם יש).
-
- **הנחיות קריטיות לניקוד חלקי (Partial Credit):**
- 1. אם התשובה הסופית נכונה והדרך נכונה -> 100%.
- 2. אם התשובה הסופית שגויה, בדוק את הדרך:
-    - האם הגישה/הנוסחה נכונה? (תן ~40-60% מהניקוד)
-    - האם הייתה טעות חישוב קטנה ("נגררת")? (הורד 10-20% בלבד)
-    - האם ההבנה הפיזיקלית/מתמטית נכונה?
- 3. השווה את שלבי התלמיד לשלבי הפתרון הנכון (אם סופקו).
- 4. אם יש OCR חלקי – אפשר להשלים שלבים חסרים באופן קוהרנטי על בסיס ההיגיון והנתונים.
-
- **החזר JSON:**
-{
-  "is_correct": true/false (האם קיבל ניקוד מלא או כמעט מלא),
-  "score_percentage": 0-100 (מספר שלם),
-  "partial_credit": {
-    "correct_steps": ["זיהוי נכון של הנוסחה", "הצבה נכונה"],
-    "incorrect_steps": ["טעות חישוב בשורה 3"],
-    "missing_steps": ["לא ציין יחידות מידה"]
-  },
-  "feedback": {
-    "positive": "חיזוק חיובי על הדרך",
-    "errors": ["פירוט הטעות"],
-    "suggestions": ["איך להימנע מהטעות להבא"]
-  },
-  "detailed_explanation": "הסבר מלא בעברית, כולל פתרון נכון אם צריך"
-}
-
-**מצבי בדיקה:**
-- strict: מחמיר (בעיקר לתשובות סופיות)
-- partial: **ברירת מחדל** - תן ניקוד על הדרך!
-- lenient: מקל מאוד`
+                    content: `אתה בוחן בגרויות. בדוק תשובות לפי סעיפים נפרדים (א/ב/ג...). לכל סעיף החזר ניקוד, נימוק מפורט ומשוב לשיפור. בצע שקלול כולל לפי נקודות הסעיפים. תמוך ב-OCR חלקי והשלמת שלבים חסרים באופן קוהרנטי. החזר JSON בלבד במבנה הבא:
+        {
+        "part_results": [{
+        "part_id": "א",
+        "is_correct": true/false,
+        "score": number,            // הניקוד בפועל
+        "max_score": number,        // נקודות הסעיף (מהמבנה)
+        "score_percentage": number, // 0-100
+        "extracted_final_answer": "",
+        "feedback": {
+        "positive": ["..."],
+        "errors": ["..."],
+        "suggestions": ["..."]
+        },
+        "steps_feedback": {
+        "correct_steps": ["..."],
+        "incorrect_steps": ["..."],
+        "missing_steps": ["..."]
+        }
+        }],
+        "overall": {
+        "score": number,
+        "max_score": number,
+        "percentage": number
+        },
+        "is_correct": true/false,              // תאימות לאחור
+        "score_percentage": number,            // תאימות לאחור
+        "feedback_overall": ""
+        }`
                 },
                 {
                     role: "user",
-                    content: `בדוק את התשובה הבאה:
+                    content: `בדוק את התשובה הבאה לפי סעיפים.
 
-**שאלה:**
-${question}
+        # שאלה
+        ${question}
 
-**תשובת התלמיד:**
-${structuredAnswers ? "תשובה מובנית לפי סעיפים:\n" + JSON.stringify(structuredAnswers, null, 2) : studentAnswer}
-${uploadedFileUrl ? "(שים לב: התלמיד העלה תמונה של הפתרון - נתח אותה)" : ""}
+        # מבנה סעיפים (כולל נקודות אם קיימות)
+        ${JSON.stringify(detectedParts, null, 2)}
 
-**הנחיה ספציפית לתשובות מרובות סעיפים:**
-אם התשובה היא אובייקט JSON עם סעיפים (כגון section_א, section_ב), בדוק כל סעיף בנפרד מול הסעיף המתאים בפתרון.
-הציון הסופי צריך לשקלל את הנכונות של כל הסעיפים.
-במשוב, התייחס לכל סעיף בנפרד (למשל: "בסעיף א' צדקת, אך בסעיף ב' הייתה טעות חישוב").
+        # תשובת תלמיד לפי סעיפים (אם חסר – נתח מהטקסט/‏OCR)
+        ${JSON.stringify(answersByPart || structuredAnswers || [], null, 2)}
 
-${correctAnswer ? `\n**תשובה סופית נכונה:**\n${correctAnswer}\n` : ''}
-${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המחוון):**\n${Array.isArray(correctSolutionSteps) ? correctSolutionSteps.join('\n') : correctSolutionSteps}\n` : ''}
+        # OCR (אם זמין)
+        ${(ocrText || '').slice(0, 4000)}
 
-**מצב בדיקה:** ${checkingMode}`
+        # פתרון נכון/מחוון (אם סופק)
+        ${correctAnswer ? `תשובות סופיות:\n${correctAnswer}` : ''}
+        ${correctSolutionSteps ? `שלבים:\n${Array.isArray(correctSolutionSteps) ? correctSolutionSteps.join('\n') : correctSolutionSteps}` : ''}
+
+        # מצב בדיקה
+        ${checkingMode}
+        `
                 }
             ],
-            file_urls: fileUrls, // Pass image if exists
+            file_urls: fileUrls,
             response_format: { type: "json_object" },
-            temperature: 0.2,
-            max_tokens: 1500
+            temperature: 0.15,
+            max_tokens: 2200
         });
 
         const checkResult = JSON.parse(checkResponse.choices[0].message.content);
@@ -150,13 +202,16 @@ ${correctSolutionSteps ? `\n**שלבי הפתרון הנכון (מתוך המח�
         const result = {
             success: true,
             from_cache: false,
+            detected_parts: detectedParts,
+            answers_by_part: answersByPart,
             ...checkResult
         };
 
         // Cache save
         if (useCache && !uploadedFileUrl) {
             try {
-                const checkHash = `check_${question.substring(0, 50)}_${typeof studentAnswer === 'string' ? studentAnswer.substring(0, 50) : JSON.stringify(structuredAnswers)}`;
+                const cacheKeyInput2 = answersByPart ? JSON.stringify(answersByPart).substring(0,200) : (typeof studentAnswer === 'string' ? studentAnswer.substring(0,200) : JSON.stringify(structuredAnswers).substring(0,200));
+                const checkHash = `check_${question.substring(0, 50)}_${cacheKeyInput2}`;
                 await base44.asServiceRole.entities.CachedResponse.create({
                     question_hash: checkHash,
                     question_text: question,
