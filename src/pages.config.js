@@ -78,6 +78,7 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
+import AdminKibinimatikaImport from './pages/AdminKibinimatikaImport';
 import __Layout from './Layout.jsx';
 
 
@@ -162,6 +163,7 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
+    "AdminKibinimatikaImport": AdminKibinimatikaImport,
 }
 
 export const pagesConfig = {
