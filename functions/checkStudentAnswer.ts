@@ -27,10 +27,12 @@ Deno.serve(async (req) => {
         // Advanced Hebrew OCR pre-pass (to improve handwriting understanding)
         let ocrText = '';
         let finalAnswer = '';
+        let ocrSections = null;
         if (uploadedFileUrl) {
             try {
                 const ocrRes = await base44.functions.invoke('advancedOCR', { imageUrl: uploadedFileUrl });
                 ocrText = ocrRes?.data?.formatted_text || ocrRes?.data?.ocr?.text_detected || '';
+                ocrSections = ocrRes?.data?.answers_by_part || ocrRes?.data?.detected_sections || null;
             } catch (_e) {}
             if (ocrText) {
                 try {
@@ -77,6 +79,14 @@ Deno.serve(async (req) => {
         }
 
         let answersByPart = structuredAnswers || null;
+        // נסה להשתמש בפענוח מה-OCR אם קיים
+        if (!answersByPart && Array.isArray(ocrSections) && ocrSections.length) {
+            answersByPart = ocrSections.map(s => ({
+                part_id: s.part_id || s.section_id || s.id || 'א',
+                answer_text: s.answer_text || s.text || s.raw_text || '',
+                final_answer: s.final_answer || ''
+            }));
+        }
         if (!answersByPart) {
             try {
                 const mapRes = await base44.integrations.Core.InvokeLLM({
