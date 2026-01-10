@@ -24,6 +24,30 @@ Deno.serve(async (req) => {
         const modelToUse = uploadedFileUrl ? "gpt-4o" : "gpt-4o-mini";
         const fileUrls = uploadedFileUrl ? [uploadedFileUrl] : undefined;
 
+        // Advanced Hebrew OCR pre-pass (to improve handwriting understanding)
+        let ocrText = '';
+        let finalAnswer = '';
+        if (uploadedFileUrl) {
+            try {
+                const ocrRes = await base44.functions.invoke('advancedOCR', { imageUrl: uploadedFileUrl });
+                ocrText = ocrRes?.data?.formatted_text || ocrRes?.data?.ocr?.text_detected || '';
+            } catch (_e) {}
+            if (ocrText) {
+                try {
+                    const fa = await base44.integrations.Core.InvokeLLM({
+                        prompt: `אתה מחלץ תשובה סופית מתוך OCR של פתרון בכתב יד בעברית.\nהחזר רק תשובה סופית אחת כפי שהסטודנט סימן/מסגר (מספר/שבר/ביטוי). אם לא ברור, החזר ריק.\n\nOCR:\n${ocrText}`,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                final_answer: { type: "string" }
+                            }
+                        }
+                    });
+                    finalAnswer = (fa?.final_answer || '').trim();
+                } catch (_e) {}
+            }
+        }
+
         // ✅ Cache logic (skip if file uploaded for now, difficult to hash)
         if (useCache && !uploadedFileUrl) {
             const checkHash = `check_${question.substring(0, 50)}_${typeof studentAnswer === 'string' ? studentAnswer.substring(0, 50) : JSON.stringify(structuredAnswers)}`;
