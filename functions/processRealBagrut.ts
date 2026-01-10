@@ -85,6 +85,54 @@ Deno.serve(async (req) => {
         let questions = examExtraction.output.questions;
         console.log(`Extracted ${questions.length} questions.`);
 
+        // 🔧 Enrich structure if missing: split into parts (א/ב/ג...) with points
+        try {
+            const enriched = await Promise.all(questions.map(async (q) => {
+                if (!q.structure || !Array.isArray(q.structure) || q.structure.length === 0) {
+                    // If sections exist, map them first
+                    if (Array.isArray(q.sections) && q.sections.length) {
+                        q.structure = q.sections.map((s, idx) => ({
+                            id: s.section_id || ['א','ב','ג','ד','ה','ו','ז','ח','ט','י'][idx] || String(idx+1),
+                            text: s.content || s.text || '',
+                            type: 'text',
+                            points: typeof s.points === 'number' ? s.points : undefined
+                        }));
+                    } else if (q.intro_text || q.content || q.question_text) {
+                        try {
+                            const split = await base44.asServiceRole.integrations.Core.InvokeLLM({
+                                prompt: `חלק את הטקסט הבא לסעיפים (א/ב/ג/ד/ה) ללא דילוגים. החזר JSON בלבד עם structure:[{id,text,type,points}].\n\n${(q.intro_text || q.content || q.question_text).toString().slice(0,8000)}`,
+                                response_json_schema: {
+                                    type: 'object',
+                                    properties: {
+                                        structure: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    id: { type: 'string' },
+                                                    text: { type: 'string' },
+                                                    type: { type: 'string' },
+                                                    points: { type: 'integer' }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            if (Array.isArray(split?.structure) && split.structure.length) {
+                                q.structure = split.structure;
+                            }
+                        } catch (_e) {}
+                    }
+                }
+                return q;
+            }));
+            questions = enriched;
+            console.log('Structure enrichment complete.');
+        } catch (_e) {
+            console.warn('Structure enrichment skipped.');
+        }
+
         // 2.5 Generate diagrams for questions that need them
         console.log("Generating diagrams for questions...");
         const diagramPromises = questions.map(async (q) => {
