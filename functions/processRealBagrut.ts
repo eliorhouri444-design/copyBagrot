@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
         }
 
         const body = await req.json();
-        const { exam_pdf_url, solution_pdf_url, solution_part_urls = [], subject, unit, year, season, module_symbol } = body;
+        const { exam_pdf_url, solution_pdf_url, subject, unit, year, season, module_symbol } = body;
 
         if (!exam_pdf_url) {
             return Response.json({ error: 'Missing Exam PDF' }, { status: 400 });
@@ -117,57 +117,7 @@ Deno.serve(async (req) => {
         console.log("Diagram generation complete.");
 
         // 2. Extract Solutions (if provided)
-        if (solution_part_urls && Array.isArray(solution_part_urls) && solution_part_urls.length > 0) {
-            console.log("Merging multiple solution parts (from site) ... count:", solution_part_urls.length);
-            try {
-                // We won't actually merge bytes server-side here; instead, pass parts to extractor one by one and merge steps
-                const allSteps = [];
-                const allFinals = [];
-                for (const partUrl of solution_part_urls) {
-                    const part = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
-                        file_url: partUrl,
-                        json_schema: {
-                            type: "object",
-                            properties: {
-                                solutions: {
-                                    type: "array",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            question_number: { type: "integer" },
-                                            final_answer: { type: "string" },
-                                            steps: { type: "array", items: { type: "string" } }
-                                        },
-                                        required: ["question_number"]
-                                    }
-                                }
-                            },
-                            required: ["solutions"]
-                        }
-                    });
-                    if (part.status === 'success' && part.output?.solutions) {
-                        for (const s of part.output.solutions) {
-                            allFinals.push({ q: s.question_number, a: s.final_answer || '' });
-                            (s.steps || []).forEach(step => allSteps.push({ q: s.question_number, step }));
-                        }
-                    }
-                }
-                // Build map
-                const byQ = new Map();
-                allSteps.forEach(({ q, step }) => {
-                    const arr = byQ.get(q) || [];
-                    arr.push(step);
-                    byQ.set(q, arr);
-                });
-                const finals = new Map();
-                allFinals.forEach(({ q, a }) => { if (a) finals.set(q, a); });
-
-                // Merge into questions after exam extraction later (we'll access this closure var)
-                globalThis.__mergedSolutions = { byQ, finals };
-            } catch (e) {
-                console.error('Merging solution parts failed (continue without merge):', e);
-            }
-        } else if (solution_pdf_url) {
+        if (solution_pdf_url) {
             console.log("Extracting solutions from solution PDF...");
             try {
                 const solutionExtraction = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
@@ -192,27 +142,8 @@ Deno.serve(async (req) => {
                     }
                 });
 
-                const mergedFromParts = globalThis.__mergedSolutions;
-                        if (mergedFromParts) {
-                            const solutionsMap = new Map();
-                            // build pseudo items
-                            for (const [q, stepsArr] of mergedFromParts.byQ || []) {
-                                solutionsMap.set(parseInt(q), { question_number: parseInt(q), final_answer: mergedFromParts.finals?.get(parseInt(q)) || '', steps: stepsArr });
-                            }
-                            if (solutionsMap.size > 0) {
-                                questions = questions.map(q => {
-                                    const sol = solutionsMap.get(q.question_number);
-                                    return {
-                                        ...q,
-                                        correct_answer: sol?.final_answer || q.correct_answer || '',
-                                        solution_steps: sol?.steps || q.solution_steps || [],
-                                        explanation: sol?.steps ? sol.steps.join('\n') : (q.explanation || '')
-                                    };
-                                });
-                                console.log('Merged solutions from parts successfully.');
-                            }
-                        } else if (solutionExtraction.status === 'success' && solutionExtraction.output?.solutions) {
-                            const solutionsMap = new Map(solutionExtraction.output.solutions.map(s => [s.question_number, s]));
+                if (solutionExtraction.status === 'success' && solutionExtraction.output?.solutions) {
+                    const solutionsMap = new Map(solutionExtraction.output.solutions.map(s => [s.question_number, s]));
                     
                     // Merge solutions into questions
                     questions = questions.map(q => {
@@ -230,31 +161,6 @@ Deno.serve(async (req) => {
                 }
             } catch (solErr) {
                 console.error("Error extracting solutions (continuing without them):", solErr);
-            }
-        }
-
-        // Merge from parts if available (works even when no single solution PDF provided)
-        if (globalThis.__mergedSolutions) {
-            try {
-                const mergedFromParts = globalThis.__mergedSolutions;
-                const solutionsMap = new Map();
-                for (const [q, stepsArr] of mergedFromParts.byQ || []) {
-                    solutionsMap.set(parseInt(q), { question_number: parseInt(q), final_answer: mergedFromParts.finals?.get(parseInt(q)) || '', steps: stepsArr });
-                }
-                if (solutionsMap.size > 0) {
-                    questions = questions.map(q => {
-                        const sol = solutionsMap.get(q.question_number);
-                        return {
-                            ...q,
-                            correct_answer: sol?.final_answer || q.correct_answer || '',
-                            solution_steps: sol?.steps || q.solution_steps || [],
-                            explanation: sol?.steps ? sol.steps.join('\n') : (q.explanation || '')
-                        };
-                    });
-                    console.log('Merged solutions from parts (post hook).');
-                }
-            } finally {
-                try { delete globalThis.__mergedSolutions; } catch {}
             }
         }
 

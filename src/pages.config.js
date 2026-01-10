@@ -1,5 +1,4 @@
 import AdminAudioStudio from './pages/AdminAudioStudio';
-import AdminBagrutImport from './pages/AdminBagrutImport';
 import AdminBagrutManager from './pages/AdminBagrutManager';
 import AdminBulkImport from './pages/AdminBulkImport';
 import AdminCacheManager from './pages/AdminCacheManager';
@@ -84,7 +83,6 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "AdminAudioStudio": AdminAudioStudio,
-    "AdminBagrutImport": AdminBagrutImport,
     "AdminBagrutManager": AdminBagrutManager,
     "AdminBulkImport": AdminBulkImport,
     "AdminCacheManager": AdminCacheManager,
