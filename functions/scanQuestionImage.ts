@@ -20,25 +20,30 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'image_url is required' }, { status: 400 });
     }
 
-    // LLM extraction: question text, parts (א/ב/ג/ד/ה...), and diagram structure (histogram/graph/geometry)
+    // Pre-OCR to improve section detection
+    const ocrRes = await base44.functions.invoke('advancedOCR', { imageUrl: image_url, enhanceQuality: true });
+    const ocrText = ocrRes?.data?.formatted_text || ocrRes?.data?.ocr?.text_detected || '';
+    const ocrSections = Array.isArray(ocrRes?.data?.detected_sections) ? ocrRes.data.detected_sections : [];
+
+    // LLM extraction with OCR context
     const extractionPrompt = `
-אתה מנתח תמונת שאלה מבגרות ומחזיר מבנה נתונים מדויק בעברית.
+    אתה מנתח תמונת שאלה מבגרות ומחזיר מבנה נתונים מדויק בעברית.
 
-משימות:
-1) חילוץ טקסט השאלה המלא.
-2) זיהוי סעיפי המשנה (א, ב, ג, ד, ה...) בסדר נכון. לכל סעיף: תיאור קצר, סוג תשובה (מספר/שבר/טקסט/בחירה) והניקוד אם מצוין.
-3) אם יש תרשים/גרף/היסטוגרמה/איור – החזר תיאור מפורט ושדות מבניים לשחזור המדויק:
-   - histogram: ציר X (תוויות/ערכים), ציר Y (תוויות/יחידות), עמודות: [{label, value}], רוחב עמודה אחיד.
-   - graph: צירים, נקודות מפתח, פונקציות/קווים (אם מזוהים), טווחים.
-   - geometry: נקודות, קווים, צורות, תוויות, זוויות אם מצוינות.
-4) אל תמציא נתונים שלא קיימים; אם נתון חסר – השאר ריק.
-5) החזר JSON בלבד לפי הסכמה.
+    משימות:
+    1) חילוץ טקסט השאלה המלא.
+    2) זיהוי כל סעיפי המשנה (א, ב, ג, ד, ה...) ללא דילוגים; אם הניקוד לא מופיע – points=null.
+    3) אם יש תרשים/גרף/היסטוגרמה/איור – החזר תיאור מפורט ושדות מבניים לשחזור המדויק.
+    4) אל תמציא נתונים שלא קיימים; אם נתון חסר – השאר ריק.
+    5) החזר JSON בלבד לפי הסכמה.
 
-הקשר (אם רלוונטי):
-- מקצוע: ${subject}
-- יחידות: ${unit_level ?? ''}
-- שאלון: ${module_id ?? ''}
-`;
+    טקסט מ-OCR לעזר בפילוח סעיפים:
+    ${ (ocrText || '').slice(0, 4000) }
+
+    הקשר (אם רלוונטי):
+    - מקצוע: ${subject}
+    - יחידות: ${unit_level ?? ''}
+    - שאלון: ${module_id ?? ''}
+    `;
 
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: extractionPrompt,
@@ -121,10 +126,25 @@ Deno.serve(async (req) => {
       }
     });
 
-    // Normalize parts to ensure Hebrew order א-ב-ג-ד-ה
+    // Normalize & fallback using OCR-detected sections
     let parts = Array.isArray(result.parts) ? result.parts : [];
+    if (!parts.length && Array.isArray(ocrSections) && ocrSections.length) {
+      parts = ocrSections.map((s, idx) => ({
+        part_id: s.part_id || ['א','ב','ג','ד','ה','ו','ז'][idx] || String(idx + 1),
+        description: s.heading || s.text || '',
+        answer_type: 'text',
+        points: Number.isFinite(s.points) ? s.points : null
+      }));
+    }
+
     const hebrewOrder = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'];
-    parts = parts.sort((a, b) => hebrewOrder.indexOf(a.part_id) - hebrewOrder.indexOf(b.part_id));
+    const order = (id) => { const i = hebrewOrder.indexOf(id); return i >= 0 ? i : 999; };
+    parts = parts
+      .map(p => ({
+        ...p,
+        points: Number.isFinite(p.points) ? p.points : null
+      }))
+      .sort((a, b) => order(a.part_id) - order(b.part_id));
 
     return Response.json({
       success: true,
