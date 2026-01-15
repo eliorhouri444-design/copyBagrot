@@ -574,6 +574,37 @@ export default function AdminExamEditorPage() {
                 />
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">העלה קובץ בחינה (PDF)</label>
+                  <input type="file" accept="application/pdf" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                      setEditingExam({ ...editingExam, exam_file_url: file_url });
+                      toast.success('קובץ בחינה הועלה');
+                    } catch (err) {
+                      toast.error('שגיאה בהעלאת קובץ בחינה');
+                    }
+                  }} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">העלה קובץ פתרון (PDF)</label>
+                  <input type="file" accept="application/pdf" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                      setEditingExam({ ...editingExam, solution_file_url: file_url });
+                      toast.success('קובץ פתרון הועלה');
+                    } catch (err) {
+                      toast.error('שגיאה בהעלאת קובץ פתרון');
+                    }
+                  }} />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-blue-600" />
