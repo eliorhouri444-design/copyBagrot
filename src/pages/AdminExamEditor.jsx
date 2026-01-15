@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import QuestionListDnD from "../components/admin/QuestionListDnD";
+import QuestionEditor from "../components/admin/QuestionEditor";
 import {
   Dialog,
   DialogContent,
