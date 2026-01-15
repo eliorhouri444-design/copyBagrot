@@ -29,14 +29,19 @@ Deno.serve(async (req) => {
     const extractionPrompt = `
     אתה מנתח תמונת שאלה מבגרות ומחזיר מבנה נתונים מדויק בעברית.
 
-    משימות:
+    משימות (חובה):
     1) חילוץ טקסט השאלה המלא.
-    2) זיהוי כל סעיפי המשנה (א, ב, ג, ד, ה...) ללא דילוגים; אם הניקוד לא מופיע – points=null.
-    3) אם יש תרשים/גרף/היסטוגרמה/איור – החזר תיאור מפורט ושדות מבניים לשחזור המדויק.
-    4) אל תמציא נתונים שלא קיימים; אם נתון חסר – השאר ריק.
-    5) החזר JSON בלבד לפי הסכמה.
+    2) זיהוי כל סעיפי המשנה ללא דילוגים, כולל מקרים מורכבים:
+       - אותיות: א. ב. ג. או א) ב) (כולל (א))
+       - מספרים: 1. 2. או 1) (כולל (1))
+       - תתי-סעיפים: ב(1), ב(2) וכו' – השתמש בפורמט part_id="ב(1)".
+       - תבליטים (•, -, –) – פצל לסעיפים כשברור שיש דרישות נפרדות.
+    3) אם הסעיפים אינם מסומנים אך הטקסט מכיל דרישות רבות (מצא/חשב/הוכח/הסבר/קבע/פרק) – פצל לסעיפים בהתאם.
+    4) אם יש תרשים/גרף/היסטוגרמה/איור – החזר תיאור מפורט ושדות מבניים לשחזור מדויק.
+    5) אל תמציא נתונים; שדות חסרים יש להותיר ריקים/points=null.
+    6) החזר JSON בלבד לפי הסכמה.
 
-    טקסט מ-OCR לעזר בפילוח סעיפים:
+    רמזים מ-OCR (לסייע בפילוח, מותר להתעלם אם שגוי):
     ${ (ocrText || '').slice(0, 4000) }
 
     הקשר (אם רלוונטי):
@@ -137,14 +142,27 @@ Deno.serve(async (req) => {
       }));
     }
 
-    const hebrewOrder = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'];
-    const order = (id) => { const i = hebrewOrder.indexOf(id); return i >= 0 ? i : 999; };
+    const hebrewOrderMap = { 'א':0,'ב':1,'ג':2,'ד':3,'ה':4,'ו':5,'ז':6,'ח':7,'ט':8,'י':9,'כ':10,'ל':11,'מ':12,'נ':13,'ס':14,'ע':15,'פ':16,'צ':17,'ק':18,'ר':19,'ש':20,'ת':21 };
+    const parseKey = (id='') => {
+      const m = String(id).match(/^([א-ת])(?:\((\d+)\))?$/);
+      if (m) return { letterIdx: hebrewOrderMap[m[1]] ?? 999, sub: m[2] ? parseInt(m[2],10) : 0, raw: id };
+      const m2 = String(id).match(/^(\d{1,2})$/);
+      if (m2) return { letterIdx: 998, sub: parseInt(m2[1],10), raw: id };
+      const m3 = String(id).match(/^\(?\s*(\d{1,2})\s*\)?$/);
+      if (m3) return { letterIdx: 998, sub: parseInt(m3[1],10), raw: id };
+      return { letterIdx: 999, sub: 0, raw: id };
+    };
     parts = parts
       .map(p => ({
         ...p,
         points: Number.isFinite(p.points) ? p.points : null
       }))
-      .sort((a, b) => order(a.part_id) - order(b.part_id));
+      .sort((a, b) => {
+        const A = parseKey(a.part_id); const B = parseKey(b.part_id);
+        if (A.letterIdx !== B.letterIdx) return A.letterIdx - B.letterIdx;
+        if (A.sub !== B.sub) return A.sub - B.sub;
+        return String(A.raw).localeCompare(String(B.raw));
+      });
 
     return Response.json({
       success: true,
