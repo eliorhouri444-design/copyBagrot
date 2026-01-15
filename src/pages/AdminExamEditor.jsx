@@ -492,6 +492,17 @@ export default function AdminExamEditorPage() {
         <DialogContent dir="rtl" className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">עריכת מבחן</DialogTitle>
+            {editingExam?.exam_file_url && (
+              <div className="text-xs mt-1">
+                <a href={editingExam.exam_file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">קובץ בחינה (PDF)</a>
+                {editingExam.solution_file_url && (
+                  <>
+                    <span className="mx-2">•</span>
+                    <a href={editingExam.solution_file_url} target="_blank" rel="noreferrer" className="text-green-600 underline">קובץ פתרון (PDF)</a>
+                  </>
+                )}
+              </div>
+            )}
             <DialogDescription>
               {editingExam?.entity} - {editingExam?.subject} - {editingExam?.unit_level || editingExam?.units}יח'
             </DialogDescription>
