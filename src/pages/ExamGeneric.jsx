@@ -42,6 +42,7 @@ export default function ExamGenericPage() {
   const [wolframSolution, setWolframSolution] = useState(null);
   const [isLoadingWolfram, setIsLoadingWolfram] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState({});
+  const [instantResults, setInstantResults] = useState({});
 
   const urlParams = new URLSearchParams(window.location.search);
   const examId = urlParams.get('examId');
@@ -291,7 +292,40 @@ export default function ExamGenericPage() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleInstantCheck = async (questionItem) => {
+    try {
+      const qa = userAnswers[questionItem.question_number];
+      const userAnswerText = typeof qa === 'object' && qa !== null ? (qa.text || JSON.stringify(qa)) : (qa || '');
+      if (!userAnswerText && !qa?.file_url) return;
+
+      // Local fast path for MCQ
+      if (questionItem.question_type === 'multiple_choice') {
+        const isCorrect = String(userAnswerText).trim().toLowerCase() === String(questionItem.correct_answer || '').trim().toLowerCase();
+        setInstantResults(prev => ({ ...prev, [questionItem.question_number]: { percent: isCorrect ? 100 : 0, is_correct: isCorrect } }));
+        return;
+      }
+
+      const { data } = await base44.functions.invoke('checkStudentAnswer', {
+        question: questionItem.question_text,
+        studentAnswer: userAnswerText,
+        uploadedFileUrl: qa?.file_url,
+        structuredAnswers: typeof qa === 'object' ? qa : null,
+        correctAnswer: questionItem.correct_answer,
+        correctSolutionSteps: questionItem.solution_steps,
+        subject: exam.subject,
+        checkingMode: 'partial',
+        questionType: questionItem.question_type,
+        options: questionItem.options
+      });
+      const percent = data?.score_percentage ?? (data?.is_correct ? 100 : 0);
+      setInstantResults(prev => ({ ...prev, [questionItem.question_number]: { percent, is_correct: percent >= 60 } }));
+    } catch (e) {
+      console.error('Instant check failed', e);
+      setInstantResults(prev => ({ ...prev, [questionItem.question_number]: { percent: 0, is_correct: false } }));
+    }
+  };
+
+   const handleSubmit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -1217,6 +1251,17 @@ export default function ExamGenericPage() {
                     )}
                   </div>
 
+                  <div className="flex items-center gap-3 mb-4">
+                    <Button variant="outline" size="sm" onClick={() => handleInstantCheck(question)} disabled={!userAnswers[question.question_number]}>
+                      בדוק תשובה
+                    </Button>
+                    {instantResults[question.question_number] && (
+                      <span className={`text-sm font-bold ${instantResults[question.question_number].is_correct ? 'text-green-600' : 'text-red-600'}`}>
+                        {instantResults[question.question_number].percent}%
+                      </span>
+                    )}
+                  </div>
+
                   {(question.question_type === 'open_question' || question.question_type === 'calculation' || question.question_type === 'proof' || (!question.question_type && !extractAmericanOptions(question.question_text)?.hasOptions)) &&
                 <Textarea
                   value={typeof userAnswers[question.question_number] === 'object' ? userAnswers[question.question_number].text : (userAnswers[question.question_number] || '')}
@@ -1414,6 +1459,17 @@ export default function ExamGenericPage() {
                         קובץ הועלה בהצלחה
                         <a href={userAnswers[questionItem.question_number].file_url} target="_blank" rel="noreferrer" className="underline ml-1">צפה</a>
                       </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-4">
+                    <Button variant="outline" size="sm" onClick={() => handleInstantCheck(questionItem)} disabled={!userAnswers[questionItem.question_number]}>
+                      בדוק תשובה
+                    </Button>
+                    {instantResults[questionItem.question_number] && (
+                      <span className={`text-sm font-bold ${instantResults[questionItem.question_number].is_correct ? 'text-green-600' : 'text-red-600'}`}>
+                        {instantResults[questionItem.question_number].percent}%
+                      </span>
                     )}
                   </div>
 

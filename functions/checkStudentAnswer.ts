@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import OpenAI from 'npm:openai@4.28.0';
 
 const openai = new OpenAI({
@@ -14,10 +14,46 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { question, studentAnswer, uploadedFileUrl, structuredAnswers, correctAnswer, correctSolutionSteps, subject, checkingMode = 'strict', useCache = true } = await req.json();
+        const { question, studentAnswer, uploadedFileUrl, structuredAnswers, correctAnswer, correctSolutionSteps, subject, checkingMode = 'strict', useCache = true, questionType, options } = await req.json();
 
         if (!question || (!studentAnswer && !uploadedFileUrl && !structuredAnswers)) {
             return Response.json({ error: 'Missing required fields (question or answer)' }, { status: 400 });
+        }
+
+        // Fast-path checks for specific types (no LLM)
+        const norm = (s) => String(s ?? '').trim().toLowerCase();
+        const isNumeric = (s) => /^-?\d+(?:[\.,]\d+)?$/.test(String(s ?? '').trim());
+
+        if (questionType === 'multiple_choice') {
+            const ua = norm(studentAnswer);
+            const ca = norm(correctAnswer);
+            // Allow letter answers (a/b/c/d) or full text match
+            const letterMap = { a: 0, b: 1, c: 2, d: 3, e: 4 };
+            let isCorrect = false;
+            if (ua in letterMap && Array.isArray(options) && options[letterMap[ua]] !== undefined) {
+                isCorrect = norm(options[letterMap[ua]]) === ca || ua === ca;
+            } else {
+                isCorrect = ua === ca;
+            }
+            return Response.json({ success: true, is_correct: isCorrect, score_percentage: isCorrect ? 100 : 0, feedback_overall: isCorrect ? 'תשובה נכונה' : 'תשובה שגויה' });
+        }
+
+        if (questionType === 'true_false') {
+            const tfMap = { 'true': true, 'false': false, 'נכון': true, 'לא נכון': false };
+            const ua = tfMap[norm(studentAnswer)];
+            const ca = tfMap[norm(correctAnswer)];
+            if (ua !== undefined && ca !== undefined) {
+                const isCorrect = ua === ca;
+                return Response.json({ success: true, is_correct: isCorrect, score_percentage: isCorrect ? 100 : 0, feedback_overall: isCorrect ? 'תשובה נכונה' : 'תשובה שגויה' });
+            }
+        }
+
+        if (questionType === 'number' || (isNumeric(studentAnswer) && isNumeric(correctAnswer))) {
+            const ua = parseFloat(String(studentAnswer).replace(',', '.'));
+            const ca = parseFloat(String(correctAnswer).replace(',', '.'));
+            const tol = Math.max(0.01, Math.abs(ca) * 0.01); // 1% or 0.01
+            const isCorrect = Math.abs(ua - ca) <= tol;
+            return Response.json({ success: true, is_correct: isCorrect, score_percentage: isCorrect ? 100 : 0, feedback_overall: isCorrect ? 'תשובה נכונה' : 'תשובה שגויה' });
         }
 
         // Use vision model if file is uploaded
