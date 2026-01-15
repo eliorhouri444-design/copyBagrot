@@ -330,6 +330,6 @@ Deno.serve(async (req) => {
 
     } catch (error) {
         console.error("Process Bagrut Main Error:", error);
-        return Response.json({ error: error.message }, { status: 500 });
+        return Response.json({ success: false, error: error.message }, { status: 500 });
     }
 });
