@@ -674,41 +674,11 @@ export default function AdminExamEditorPage() {
           </DialogHeader>
 
           {editingQuestion && (
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="block text-sm font-semibold mb-2">טקסט השאלה</label>
-                <Textarea
-                  value={editingQuestion.question_text || ""}
-                  onChange={(e) => setEditingQuestion({...editingQuestion, question_text: e.target.value})}
-                  className="w-full h-24"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">תשובה נכונה</label>
-                <Input
-                  value={editingQuestion.correct_answer || ""}
-                  onChange={(e) => setEditingQuestion({...editingQuestion, correct_answer: e.target.value})}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">הסבר</label>
-                <Textarea
-                  value={editingQuestion.explanation || ""}
-                  onChange={(e) => setEditingQuestion({...editingQuestion, explanation: e.target.value})}
-                  className="w-full h-20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">נקודות</label>
-                <Input
-                  type="number"
-                  value={editingQuestion.points || 0}
-                  onChange={(e) => setEditingQuestion({...editingQuestion, points: parseInt(e.target.value)})}
-                />
-              </div>
+            <div className="space-y-4 py-2">
+              <QuestionEditor
+                question={editingQuestion}
+                onChange={(q) => setEditingQuestion({ ...q, index: editingQuestion.index })}
+              />
             </div>
           )}
 
