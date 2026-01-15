@@ -675,10 +675,8 @@ useEffect(() => {
                     <Loader2 className="w-6 h-6 ml-2 animate-spin" />
                     מעבד ובונה מבחן... (עשוי לקחת כדקה)
                   </>
-                ) : (
-                  {!isAdmin ? "אין הרשאת אדמין" : "עבד ופרסם את הבגרות לאפליקציה 🚀"}
-                  )}
-                  </Button>
+                ) : (!isAdmin ? "אין הרשאת אדמין" : "עבד ופרסם את הבגרות לאפליקציה 🚀")}
+                </Button>
               {processError && (
                 <div className="text-red-600 text-sm mt-2">שגיאה: {processError}</div>
               )}
