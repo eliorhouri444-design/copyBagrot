@@ -677,7 +677,8 @@ useEffect(() => {
                   </>
                 ) : (
                   {!isAdmin ? "אין הרשאת אדמין" : "עבד ופרסם את הבגרות לאפליקציה 🚀"}
-              </Button>
+                  )}
+                  </Button>
               {processError && (
                 <div className="text-red-600 text-sm mt-2">שגיאה: {processError}</div>
               )}
