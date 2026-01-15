@@ -591,39 +591,12 @@ export default function AdminExamEditorPage() {
                 </div>
 
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {editingExam.questions?.map((question, idx) => (
-                    <div key={idx} className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <div className="font-bold text-gray-900 mb-1">שאלה {idx + 1}</div>
-                          <div className="text-sm text-gray-700 mb-2">{question.question_text}</div>
-                          {question.correct_answer && (
-                            <div className="text-xs text-green-700">
-                              <strong>תשובה נכונה:</strong> {question.correct_answer}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditQuestion(question, idx)}
-                            className="border-blue-500 text-blue-600"
-                          >
-                            <Edit2 className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteQuestion(idx)}
-                            className="border-red-500 text-red-600"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  <QuestionListDnD
+                    questions={editingExam.questions || []}
+                    onReorder={(renumbered) => setEditingExam({ ...editingExam, questions: renumbered })}
+                    onEdit={(q, idx) => handleEditQuestion(q, idx)}
+                    onDelete={(idx) => handleDeleteQuestion(idx)}
+                  />
                 </div>
               </div>
             </div>
