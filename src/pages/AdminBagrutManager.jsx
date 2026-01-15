@@ -22,6 +22,9 @@ export default function AdminBagrutManager() {
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+const [isAdmin, setIsAdmin] = useState(true);
+const [authChecked, setAuthChecked] = useState(false);
+const [processError, setProcessError] = useState("");
   
   const [formData, setFormData] = useState({
     subject_id: "מתמטיקה",
@@ -40,6 +43,20 @@ export default function AdminBagrutManager() {
       }));
     }
   }, [location.state]);
+
+// בדיקת הרשאת אדמין כדי למנוע קריאות כושלות מראש
+useEffect(() => {
+  (async () => {
+    try {
+      const u = await base44.auth.me();
+      setIsAdmin(u?.role === 'admin');
+    } catch {
+      setIsAdmin(false);
+    } finally {
+      setAuthChecked(true);
+    }
+  })();
+}, []);
 
   // Fetch custom module definitions to match the carousel
   const { data: customModules = [] } = useQuery({
@@ -334,6 +351,8 @@ export default function AdminBagrutManager() {
 
   const handleProcessRealExam = async () => {
     if (!uploadedExamUrl) return;
+    setProcessError("");
+    if (!isAdmin) { alert('רק אדמין יכול לעבד ולפרסם בגרויות.'); return; }
 
     setIsProcessing(true);
     try {
@@ -359,7 +378,9 @@ export default function AdminBagrutManager() {
       }
     } catch (error) {
       console.error('Error processing exam:', error);
-      alert('שגיאה בעיבוד הבגרות: ' + error.message);
+      const msg = error?.response?.data?.error || error?.message || 'שגיאה לא ידועה';
+      setProcessError(msg);
+      alert('שגיאה בעיבוד הבגרות: ' + msg);
     } finally {
       setIsProcessing(false);
     }
@@ -369,6 +390,8 @@ export default function AdminBagrutManager() {
     if (!confirm(`האם לעבד ולפרסם את הבגרות: ${bagrut.title}?`)) return;
     
     setProcessingId(bagrut.id);
+    setProcessError("");
+    if (!isAdmin) { alert('רק אדמין יכול לעבד ולפרסם בגרויות.'); setProcessingId(null); return; }
     try {
       const response = await base44.functions.invoke('processRealBagrut', {
          exam_pdf_url: bagrut.exam_file_url,
@@ -390,7 +413,9 @@ export default function AdminBagrutManager() {
       }
     } catch (error) {
       console.error('Error processing exam:', error);
-      alert('שגיאה בעיבוד: ' + error.message);
+      const msg = error?.response?.data?.error || error?.message || 'שגיאה לא ידועה';
+      setProcessError(msg);
+      alert('שגיאה בעיבוד: ' + msg);
     } finally {
       setProcessingId(null);
     }
@@ -622,6 +647,14 @@ export default function AdminBagrutManager() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {authChecked && !isAdmin && (
+                <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-3 py-2 rounded text-sm">
+                  אין לך הרשאת אדמין. עיבוד הבגרות זמין רק למנהלים.
+                </div>
+              )}
+              {processError && (
+                <div className="text-red-600 text-sm">שגיאה: {processError}</div>
+              )}
               <div className="bg-white p-4 rounded-lg text-sm text-gray-700 border border-blue-100">
                 <p className="font-bold mb-2">מה המערכת תעשה?</p>
                 <ul className="list-disc list-inside space-y-1">
@@ -634,8 +667,8 @@ export default function AdminBagrutManager() {
 
               <Button 
                 onClick={handleProcessRealExam} 
-                disabled={isProcessing}
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-200/50"
+                disabled={isProcessing || !isAdmin}
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-200/50 disabled:opacity-60"
               >
                 {isProcessing ? (
                   <>
@@ -643,9 +676,11 @@ export default function AdminBagrutManager() {
                     מעבד ובונה מבחן... (עשוי לקחת כדקה)
                   </>
                 ) : (
-                  "עבד ופרסם את הבגרות לאפליקציה 🚀"
-                )}
+                  {!isAdmin ? "אין הרשאת אדמין" : "עבד ופרסם את הבגרות לאפליקציה 🚀"}
               </Button>
+              {processError && (
+                <div className="text-red-600 text-sm mt-2">שגיאה: {processError}</div>
+              )}
             </CardContent>
           </Card>
         )}

@@ -9,6 +9,7 @@ import AdminExamScanner from './pages/AdminExamScanner';
 import AdminExamViewer from './pages/AdminExamViewer';
 import AdminExams from './pages/AdminExams';
 import AdminFeedback from './pages/AdminFeedback';
+import AdminKibinimatikaImport from './pages/AdminKibinimatikaImport';
 import AdminListeningManager from './pages/AdminListeningManager';
 import AdminModules from './pages/AdminModules';
 import AdminNotificationTemplates from './pages/AdminNotificationTemplates';
@@ -78,7 +79,6 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
-import AdminKibinimatikaImport from './pages/AdminKibinimatikaImport';
 import __Layout from './Layout.jsx';
 
 
@@ -94,6 +94,7 @@ export const PAGES = {
     "AdminExamViewer": AdminExamViewer,
     "AdminExams": AdminExams,
     "AdminFeedback": AdminFeedback,
+    "AdminKibinimatikaImport": AdminKibinimatikaImport,
     "AdminListeningManager": AdminListeningManager,
     "AdminModules": AdminModules,
     "AdminNotificationTemplates": AdminNotificationTemplates,
@@ -163,7 +164,6 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
-    "AdminKibinimatikaImport": AdminKibinimatikaImport,
 }
 
 export const pagesConfig = {
