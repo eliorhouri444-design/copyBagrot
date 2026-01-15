@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
         if (examExtraction.status === 'error' || !examExtraction.output?.questions) {
             console.error("Exam extraction failed:", examExtraction);
             const errorDetails = typeof examExtraction.details === 'string' ? examExtraction.details : JSON.stringify(examExtraction.details);
-            return Response.json({ error: 'נכשל בחילוץ שאלות מהמבחן. וודא שהקובץ תקין. פרטים: ' + errorDetails }, { status: 500 });
+            return Response.json({ success: false, error: 'נכשל בחילוץ שאלות מהמבחן. ודא שהקובץ תקין. פרטים: ' + errorDetails });
         }
 
         let questions = examExtraction.output.questions;
