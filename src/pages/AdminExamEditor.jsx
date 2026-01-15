@@ -668,7 +668,7 @@ export default function AdminExamEditorPage() {
 
       {/* Edit Question Dialog */}
       <Dialog open={!!editingQuestion} onOpenChange={() => setEditingQuestion(null)}>
-        <DialogContent dir="rtl" className="max-w-2xl">
+        <DialogContent dir="rtl" className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>עריכת שאלה {editingQuestion?.index !== undefined ? editingQuestion.index + 1 : ''}</DialogTitle>
           </DialogHeader>
