@@ -10,8 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import QuestionListDnD from "../components/admin/QuestionListDnD";
-import QuestionEditor from "../components/admin/QuestionEditor";
+import QuestionListDnD from "@/components/admin/QuestionListDnD";
+import QuestionEditor from "@/components/admin/QuestionEditor";
 import {
   Dialog,
   DialogContent,
@@ -177,7 +177,9 @@ export default function AdminExamEditorPage() {
         reading_text: editingExam.reading_text || "",
         title: editingExam.title,
         description: editingExam.description || "",
-        module_id: editingExam.module_id, // Added module_id
+        module_id: editingExam.module_id,
+        exam_file_url: editingExam.exam_file_url || null,
+        solution_file_url: editingExam.solution_file_url || null,
         questions: editingExam.questions
       };
 

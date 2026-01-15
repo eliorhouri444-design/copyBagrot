@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import QuestionTypePicker from "./QuestionTypePicker";
 import StructuredFieldsEditor from "./StructuredFieldsEditor";
 import { Plus, Trash2, Upload } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function QuestionEditor({ question, onChange }) {
   const q = question || {};
@@ -50,7 +51,7 @@ export default function QuestionEditor({ question, onChange }) {
                       const file = e.target.files?.[0];
                       if (!file) return;
                       try {
-                        const { file_url } = await window.base44.integrations.Core.UploadFile({ file });
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
                         const next = [...(q.option_images || [])];
                         next[idx] = file_url;
                         update({ option_images: next });
