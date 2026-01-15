@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 Deno.serve(async (req) => {
     try {
@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
                                 question_number: { type: "integer" },
                                 page_number: { type: "integer", description: "The page number in the PDF where this question appears" },
                                 intro_text: { type: "string", description: "The main introductory text of the question in HEBREW ONLY. Preserve formatting." },
+                                content: { type: "string", description: "Full combined question text in HEBREW (fallback if intro_text not provided)" },
                                 sections: { 
                                     type: "array", 
                                     items: { 
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
                                 explanation: { type: "string", description: "ULTRA-CRITICAL: The output for this field MUST be in the HEBREW language. Provide a detailed step-by-step explanation. If the source material is in English, you MUST translate the entire explanation to HEBREW. NO ENGLISH is allowed in the output." },
                                 has_diagram: { type: "boolean", description: "CRITICAL: Analyze the question area. Set to 'true' if ANY non-text element like a diagram, geometric shape, coordinate system, graph, or illustration is present. Set to 'false' otherwise. This is very important." }
                             },
-                            required: ["question_number", "content"]
+                            required: ["question_number"]
                         }
                     }
                 },
