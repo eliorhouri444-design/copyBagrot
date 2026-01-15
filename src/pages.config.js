@@ -79,6 +79,7 @@ import VocabularyTraining from './pages/VocabularyTraining';
 import WeakAreaSelection from './pages/WeakAreaSelection';
 import WeakExamSelection from './pages/WeakExamSelection';
 import WeakTopics from './pages/WeakTopics';
+import AdminAccurateScan from './pages/AdminAccurateScan';
 import __Layout from './Layout.jsx';
 
 
@@ -164,6 +165,7 @@ export const PAGES = {
     "WeakAreaSelection": WeakAreaSelection,
     "WeakExamSelection": WeakExamSelection,
     "WeakTopics": WeakTopics,
+    "AdminAccurateScan": AdminAccurateScan,
 }
 
 export const pagesConfig = {
