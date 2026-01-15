@@ -145,9 +145,9 @@ ${enhanceQuality ? `
                 const markers = [];
                 const pushMarker = (idx, id, title) => markers.push({ idx, id, title: title || '' });
 
-                const letterRe = /^\s*([א-ת])\s*[).:】】】】\.]\s+/;
+                const letterRe = /^\s*([א-ת])\s*[).:\.]\s+/;
                 const letterParenRe = /^\s*\(\s*([א-ת])\s*\)\s+/;
-                const numRe = /^\s*(\d{1,2})\s*[).:】】】】\.]\s+/;
+                const numRe = /^\s*(\d{1,2})\s*[).:\.]\s+/;
                 const numParenRe = /^\s*\(\s*(\d{1,2})\s*\)\s+/;
                 const nestedRe = /^\s*([א-ת])\s*\(\s*(\d{1,2})\s*\)\s+/; // ב(1)
                 const bulletRe = /^\s*[•\-*–]\s+/;
