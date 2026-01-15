@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,53 @@ export default function AdminAccurateScan() {
   const [year, setYear] = useState(2025);
   const [season, setSeason] = useState("summer");
   const [moduleSymbol, setModuleSymbol] = useState("");
+
+  // Subjects and available unit levels aligned with Exams carousel
+  const subjectsConfig = {
+    "אנגלית": [3,4,5],
+    "מתמטיקה": [3,4,5],
+    "פיזיקה": [5],
+    "כימיה": [5],
+    "ביולוגיה": [5],
+    "גאוגרפיה": [5],
+    "היסטוריה": [2,5],
+    "ספרות": [2,5],
+    "אזרחות": [2],
+    "תנ\"ך": [2,5]
+  };
+  const subjectOptions = Object.keys(subjectsConfig);
+  const subjectUnits = subject ? subjectsConfig[subject] || [3,4,5] : [3,4,5];
+
+  // Admin check and defaults from previous selection
+  const [me, setMe] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const u = await base44.auth.me();
+        setMe(u);
+      } catch {}
+      const savedSubject = localStorage.getItem('selected_subject');
+      const savedUnits = localStorage.getItem('selected_units');
+      if (savedSubject && subjectsConfig[savedSubject]) {
+        setSubject(savedSubject);
+        const unitsArr = subjectsConfig[savedSubject];
+        const targetUnit = parseInt(savedUnits || unitsArr[0], 10);
+        setUnit(unitsArr.includes(targetUnit) ? targetUnit : unitsArr[0]);
+      } else if (!subject && subjectOptions.length) {
+        setSubject(subjectOptions[0]);
+        setUnit(subjectsConfig[subjectOptions[0]][0]);
+      }
+    })();
+  }, []);
+
+  // Keep unit valid if subject changes
+  useEffect(() => {
+    if (!subject) return;
+    const unitsArr = subjectsConfig[subject] || [];
+    if (unitsArr.length && !unitsArr.includes(Number(unit))) {
+      setUnit(unitsArr[0]);
+    }
+  }, [subject]);
 
   const [examFileUrl, setExamFileUrl] = useState("");
   const [solutionFileUrl, setSolutionFileUrl] = useState("");
@@ -41,6 +88,11 @@ export default function AdminAccurateScan() {
     setError("");
     setResult(null);
     try {
+      if (me && me.role !== 'admin') {
+        setError('רק אדמין יכול להריץ את הסורק החדש');
+        setBusy(false);
+        return;
+      }
       const payload = {
         subject: subject.trim(),
         unit: Number(unit),
@@ -58,7 +110,8 @@ export default function AdminAccurateScan() {
         setError(data?.error || "שגיאה כללית")
       }
     } catch (e) {
-      setError(e?.message || "שגיאה לא צפויה");
+      const apiError = e?.response?.data?.error || e?.message || "שגיאה לא צפויה";
+      setError(apiError);
     } finally {
       setBusy(false);
     }
@@ -74,16 +127,25 @@ export default function AdminAccurateScan() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1">מקצוע</label>
-              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="לדוגמה: מתמטיקה" />
+              <Select value={subject} onValueChange={setSubject}>
+                <SelectTrigger>
+                  <SelectValue placeholder="בחר מקצוע" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjectOptions.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">רמת יחידות</label>
               <Select value={String(unit)} onValueChange={(v) => setUnit(Number(v))}>
                 <SelectTrigger><SelectValue placeholder="בחר" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="5">5</SelectItem>
+                  {subjectUnits.map((u) => (
+                    <SelectItem key={u} value={String(u)}>{u}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
