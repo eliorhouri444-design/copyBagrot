@@ -1,0 +1,71 @@
+{
+  "name": "UserMastery",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "mastery": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "\u05e8\u05de\u05ea \u05e9\u05dc\u05d9\u05d8\u05d4 0-100"
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05e0\u05e8\u05d0\u05d4 \u05dc\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4"
+    },
+    "rolling_accuracy": {
+      "type": "number",
+      "description": "\u05d3\u05d9\u05d5\u05e7 \u05de\u05ea\u05d2\u05dc\u05d2\u05dc (\u05de\u05de\u05d5\u05e6\u05e2 \u05e0\u05e2)"
+    },
+    "attempts_count": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea"
+    },
+    "correct_count": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e0\u05db\u05d5\u05e0\u05d5\u05ea"
+    },
+    "streak": {
+      "type": "integer",
+      "description": "\u05e8\u05e6\u05e3 \u05e0\u05db\u05d5\u05e0\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "user_id",
+    "topic_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_id": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

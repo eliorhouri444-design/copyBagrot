@@ -1,0 +1,120 @@
+{
+  "name": "SolutionBank",
+  "type": "object",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "solution_text": {
+      "type": "string",
+      "description": "\u05e4\u05ea\u05e8\u05d5\u05df \u05de\u05dc\u05d0 \u05db\u05ea\u05d5\u05d1"
+    },
+    "solution_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "key_formula": {
+            "type": "string"
+          },
+          "key_result": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "\u05e9\u05dc\u05d1\u05d9 \u05d4\u05e4\u05ea\u05e8\u05d5\u05df"
+    },
+    "final_answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05e1\u05d5\u05e4\u05d9\u05d5\u05ea \u05dc\u05db\u05dc \u05e1\u05e2\u05d9\u05e3"
+    },
+    "acceptable_variants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05e9\u05e7\u05d5\u05dc\u05d5\u05ea (0.5, 1/2, 50%)"
+    },
+    "rubric": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "max_score": {
+            "type": "number"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "condition": {
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "percentage": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "\u05d8\u05d1\u05dc\u05ea \u05e0\u05d9\u05e7\u05d5\u05d3 \u05de\u05e4\u05d5\u05e8\u05d8\u05ea"
+    },
+    "explanation_video_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e1\u05e8\u05d8\u05d5\u05df \u05d4\u05e1\u05d1\u05e8"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05e4\u05ea\u05e8\u05d5\u05df \u05d0\u05d5\u05de\u05ea \u05e2\u05dc \u05d9\u05d3\u05d9 \u05de\u05d5\u05e8\u05d4"
+    }
+  },
+  "required": [
+    "question_id",
+    "solution_text",
+    "final_answers"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

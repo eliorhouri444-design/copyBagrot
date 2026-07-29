@@ -1,0 +1,95 @@
+{
+  "name": "ReadingComprehensionText",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Text title"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "Difficulty level (3/4/5 units)"
+    },
+    "test_module": {
+      "type": "string",
+      "description": "Module (A-G)"
+    },
+    "text_content": {
+      "type": "string",
+      "description": "The full text content"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "true_false",
+              "fill_blank",
+              "vocabulary_in_context",
+              "evidence_from_text",
+              "matching",
+              "open_question"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "detail",
+              "main_idea",
+              "inference",
+              "true_false",
+              "vocabulary",
+              "matching",
+              "cause_effect"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "answer": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "List of questions for this text"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "unit_level",
+    "text_content",
+    "questions"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

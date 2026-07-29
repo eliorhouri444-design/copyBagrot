@@ -1,0 +1,78 @@
+{
+  "name": "ModuleCResult",
+  "type": "object",
+  "properties": {
+    "exam_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "reading_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05d4\u05d1\u05e0\u05ea \u05d4\u05e0\u05e7\u05e8\u05d0 (0-70)"
+    },
+    "writing_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05db\u05ea\u05d9\u05d1\u05d4 (0-30)"
+    },
+    "final_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05e1\u05d5\u05e4\u05d9 (0-100)"
+    },
+    "reading_answers": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "writing_text": {
+      "type": "string",
+      "description": "\u05d4\u05d8\u05e7\u05e1\u05d8 \u05e9\u05e0\u05db\u05ea\u05d1"
+    },
+    "word_count": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05de\u05d9\u05dc\u05d9\u05dd"
+    },
+    "duration": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d6\u05de\u05df \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "units": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "exam_id",
+    "final_score",
+    "subject",
+    "units"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

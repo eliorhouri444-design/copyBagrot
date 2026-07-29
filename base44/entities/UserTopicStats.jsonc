@@ -1,0 +1,104 @@
+{
+  "name": "UserTopicStats",
+  "type": "object",
+  "properties": {
+    "topic_key": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "unique_items_attempted": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9\u05d9\u05dd \u05e9\u05e0\u05e2\u05e0\u05d5"
+    },
+    "correct_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05e0\u05db\u05d5\u05e0\u05d5\u05ea"
+    },
+    "total_attempts": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e1\u05da \u05d4\u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea"
+    },
+    "last_7d_attempts": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea \u05d1-7 \u05d9\u05de\u05d9\u05dd \u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd"
+    },
+    "recent_20_correct": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e0\u05db\u05d5\u05e0\u05d5\u05ea \u05de\u05ea\u05d5\u05da 20 \u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd"
+    },
+    "recent_20_total": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e1\u05d4\"\u05db 20 \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea \u05d0\u05d7\u05e8\u05d5\u05e0\u05d9\u05dd"
+    },
+    "repetitions": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d7\u05d6\u05e8\u05d5\u05ea (Spaced Repetition)"
+    },
+    "easiness_factor": {
+      "type": "number",
+      "default": 2.5,
+      "description": "\u05de\u05e7\u05d3\u05dd \u05e7\u05dc\u05d5\u05ea (SM-2)"
+    },
+    "review_interval": {
+      "type": "integer",
+      "default": 1,
+      "description": "\u05de\u05e8\u05d5\u05d5\u05d7 \u05d7\u05d6\u05e8\u05d4 \u05d1\u05d9\u05de\u05d9\u05dd"
+    },
+    "next_review_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05d7\u05d6\u05e8\u05d4 \u05d4\u05d1\u05d0\u05d4"
+    }
+  },
+  "required": [
+    "topic_key",
+    "subject",
+    "unit_level"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

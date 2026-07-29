@@ -1,0 +1,172 @@
+{
+  "name": "UserLearningProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05ea\u05dc\u05de\u05d9\u05d3"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "target_score": {
+      "type": "integer",
+      "default": 85,
+      "description": "\u05d9\u05e2\u05d3 \u05d4\u05e6\u05d9\u05d5\u05df (55-100)"
+    },
+    "target_level": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "good",
+        "excellence"
+      ],
+      "default": "good",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05e2\u05d3: \u05dc\u05e2\u05d1\u05d5\u05e8 / \u05d8\u05d5\u05d1 / \u05de\u05e6\u05d5\u05d9\u05e0\u05d5\u05ea"
+    },
+    "exam_date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05d1\u05d2\u05e8\u05d5\u05ea"
+    },
+    "current_mastery": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05e9\u05dc\u05d9\u05d8\u05d4 \u05e0\u05d5\u05db\u05d7\u05d9 \u05d1\u05d7\u05d5\u05de\u05e8 (0-100)"
+    },
+    "daily_availability_minutes": {
+      "type": "integer",
+      "default": 45,
+      "description": "\u05d6\u05de\u05d9\u05e0\u05d5\u05ea \u05d9\u05d5\u05de\u05d9\u05ea \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "learning_pace": {
+      "type": "string",
+      "enum": [
+        "slow",
+        "normal",
+        "fast"
+      ],
+      "default": "normal",
+      "description": "\u05e7\u05e6\u05d1 \u05dc\u05de\u05d9\u05d3\u05d4"
+    },
+    "completed_chapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chapter_number": {
+            "type": "integer"
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "mastery_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "\u05e4\u05e8\u05e7\u05d9\u05dd \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5 \u05de\u05d4\u05e1\u05d9\u05dc\u05d1\u05d5\u05e1"
+    },
+    "current_chapter": {
+      "type": "integer",
+      "description": "\u05d4\u05e4\u05e8\u05e7 \u05d4\u05e0\u05d5\u05db\u05d7\u05d9 \u05d1\u05e1\u05d9\u05dc\u05d1\u05d5\u05e1"
+    },
+    "chapters_remaining": {
+      "type": "integer",
+      "description": "\u05e4\u05e8\u05e7\u05d9\u05dd \u05e9\u05e0\u05d5\u05ea\u05e8\u05d5 \u05dc\u05dc\u05de\u05d5\u05d3"
+    },
+    "weak_topics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "topic_id": {
+            "type": "string"
+          },
+          "mastery": {
+            "type": "number"
+          },
+          "priority": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05d7\u05dc\u05e9\u05d9\u05dd \u05dc\u05e4\u05d9 \u05e2\u05d3\u05d9\u05e4\u05d5\u05ea"
+    },
+    "completed_topics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5 (\u05e9\u05dc\u05d9\u05d8\u05d4 > 80%)"
+    },
+    "daily_goal_questions": {
+      "type": "integer",
+      "description": "\u05d9\u05e2\u05d3 \u05e9\u05d0\u05dc\u05d5\u05ea \u05d9\u05d5\u05de\u05d9 \u05de\u05d7\u05d5\u05e9\u05d1"
+    },
+    "days_until_exam": {
+      "type": "integer",
+      "description": "\u05d9\u05de\u05d9\u05dd \u05e2\u05d3 \u05d4\u05d1\u05d2\u05e8\u05d5\u05ea"
+    },
+    "remaining_material_percent": {
+      "type": "number",
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05d7\u05d5\u05de\u05e8 \u05e9\u05e0\u05e9\u05d0\u05e8 \u05dc\u05dc\u05de\u05d5\u05d3"
+    },
+    "difficulty_factor": {
+      "type": "number",
+      "description": "\u05e4\u05e7\u05d8\u05d5\u05e8 \u05e7\u05d5\u05e9\u05d9 (3 \u05d9\u05d7'=1.0, 4 \u05d9\u05d7'=1.15, 5 \u05d9\u05d7'=1.3)"
+    },
+    "target_score_factor": {
+      "type": "number",
+      "description": "\u05e4\u05e7\u05d8\u05d5\u05e8 \u05d9\u05e2\u05d3 \u05e6\u05d9\u05d5\u05df (pass=1.0, good=1.2, excellence=1.35)"
+    },
+    "last_recalculated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d7\u05d5\u05e9\u05d1 \u05dc\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4"
+    }
+  },
+  "required": [
+    "user_email",
+    "subject_id",
+    "unit_level",
+    "exam_date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

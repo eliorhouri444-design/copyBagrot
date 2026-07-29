@@ -1,0 +1,247 @@
+{
+  "name": "DetailedExamReview",
+  "type": "object",
+  "properties": {
+    "exam_attempt_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05d1\u05de\u05d1\u05d7\u05df"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "total_score": {
+      "type": "number",
+      "description": "\u05d4\u05e6\u05d9\u05d5\u05df \u05d4\u05db\u05d5\u05dc\u05dc"
+    },
+    "question_reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_number": {
+            "type": "integer"
+          },
+          "user_answer": {
+            "type": "string",
+            "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05e9\u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e0\u05ea\u05df"
+          },
+          "user_drawing_url": {
+            "type": "string",
+            "description": "\u05e6\u05d9\u05d5\u05e8/\u05db\u05ea\u05d1 \u05d9\u05d3 \u05e9\u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d4\u05e2\u05dc\u05d4"
+          },
+          "scanned_content": {
+            "type": "string",
+            "description": "\u05ea\u05d5\u05db\u05df \u05e9\u05e0\u05e1\u05e8\u05e7 \u05de\u05d4\u05e6\u05d9\u05d5\u05e8/\u05db\u05ea\u05d1 \u05d9\u05d3"
+          },
+          "correct_answer": {
+            "type": "string",
+            "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05e0\u05db\u05d5\u05e0\u05d4"
+          },
+          "is_fully_correct": {
+            "type": "boolean",
+            "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05e0\u05db\u05d5\u05e0\u05d4 \u05dc\u05d7\u05dc\u05d5\u05d8\u05d9\u05df"
+          },
+          "partial_credit": {
+            "type": "boolean",
+            "description": "\u05d4\u05d0\u05dd \u05e7\u05d9\u05d1\u05dc \u05e6\u05d9\u05d5\u05df \u05d7\u05dc\u05e7\u05d9"
+          },
+          "points_earned": {
+            "type": "number",
+            "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05e9\u05d4\u05e8\u05d5\u05d5\u05d9\u05d7"
+          },
+          "max_points": {
+            "type": "number",
+            "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9\u05d5\u05ea"
+          },
+          "step_by_step_review": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step_number": {
+                  "type": "integer"
+                },
+                "step_description": {
+                  "type": "string"
+                },
+                "is_correct": {
+                  "type": "boolean"
+                },
+                "points_earned": {
+                  "type": "number"
+                },
+                "feedback": {
+                  "type": "string"
+                },
+                "correct_approach": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "\u05d1\u05d9\u05e7\u05d5\u05e8\u05ea \u05e9\u05dc\u05d1 \u05d0\u05d7\u05e8 \u05e9\u05dc\u05d1 (\u05dc\u05de\u05ea\u05de\u05d8\u05d9\u05e7\u05d4/\u05e4\u05d9\u05d6\u05d9\u05e7\u05d4)"
+          },
+          "language_errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "error_type": {
+                  "type": "string",
+                  "enum": [
+                    "spelling",
+                    "grammar",
+                    "punctuation",
+                    "structure"
+                  ]
+                },
+                "error_text": {
+                  "type": "string"
+                },
+                "correction": {
+                  "type": "string"
+                },
+                "points_deducted": {
+                  "type": "number"
+                }
+              }
+            },
+            "description": "\u05e9\u05d2\u05d9\u05d0\u05d5\u05ea \u05dc\u05e9\u05d5\u05e0\u05d9\u05d5\u05ea (\u05dc\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea/\u05e2\u05d1\u05e8\u05d9\u05ea)"
+          },
+          "content_feedback": {
+            "type": "object",
+            "properties": {
+              "content_accuracy": {
+                "type": "boolean",
+                "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05d5\u05db\u05df \u05e0\u05db\u05d5\u05df"
+              },
+              "content_completeness": {
+                "type": "number",
+                "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e9\u05dc\u05de\u05d5\u05ea \u05d4\u05ea\u05d5\u05db\u05df"
+              },
+              "strengths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "weaknesses": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "improvement_suggestions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "\u05de\u05e9\u05d5\u05d1 \u05e2\u05dc \u05d4\u05ea\u05d5\u05db\u05df"
+          },
+          "diagram_review": {
+            "type": "object",
+            "properties": {
+              "diagram_accuracy": {
+                "type": "boolean"
+              },
+              "missing_elements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "incorrect_elements": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "diagram_score": {
+                "type": "number"
+              },
+              "diagram_feedback": {
+                "type": "string"
+              }
+            },
+            "description": "\u05d1\u05d9\u05e7\u05d5\u05e8\u05ea \u05d0\u05d9\u05d5\u05e8/\u05e6\u05d9\u05d5\u05e8"
+          },
+          "overall_feedback": {
+            "type": "string",
+            "description": "\u05de\u05e9\u05d5\u05d1 \u05db\u05dc\u05dc\u05d9 \u05e2\u05dc \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4"
+          }
+        }
+      },
+      "description": "\u05d1\u05d9\u05e7\u05d5\u05e8\u05ea \u05de\u05e4\u05d5\u05e8\u05d8\u05ea \u05dc\u05db\u05dc \u05e9\u05d0\u05dc\u05d4"
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05d7\u05d5\u05d6\u05e7 \u05db\u05dc\u05dc\u05d9\u05d5\u05ea"
+    },
+    "areas_for_improvement": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d7\u05d5\u05de\u05d9\u05dd \u05dc\u05e9\u05d9\u05e4\u05d5\u05e8"
+    },
+    "study_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05d4\u05de\u05dc\u05e6\u05d5\u05ea \u05dc\u05dc\u05de\u05d9\u05d3\u05d4"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d1\u05d5\u05e6\u05e2\u05d4 \u05d4\u05d1\u05d3\u05d9\u05e7\u05d4"
+    },
+    "review_version": {
+      "type": "string",
+      "default": "1.0",
+      "description": "\u05d2\u05e8\u05e1\u05ea \u05de\u05e0\u05d5\u05e2 \u05d4\u05d1\u05d3\u05d9\u05e7\u05d4"
+    }
+  },
+  "required": [
+    "exam_attempt_id",
+    "subject",
+    "unit_level",
+    "total_score",
+    "question_reviews"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

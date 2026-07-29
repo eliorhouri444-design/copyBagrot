@@ -1,0 +1,269 @@
+{
+  "name": "ThemeSettings",
+  "type": "object",
+  "properties": {
+    "theme_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05e2\u05e8\u05db\u05ea \u05d4\u05e2\u05d9\u05e6\u05d5\u05d1"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05e2\u05e8\u05db\u05d4 \u05e4\u05e2\u05d9\u05dc\u05d4"
+    },
+    "colors": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "default": "#3B82F6"
+        },
+        "secondary": {
+          "type": "string",
+          "default": "#8B5CF6"
+        },
+        "accent": {
+          "type": "string",
+          "default": "#10B981"
+        },
+        "background": {
+          "type": "string",
+          "default": "#F9FAFB"
+        },
+        "surface": {
+          "type": "string",
+          "default": "#FFFFFF"
+        },
+        "text_primary": {
+          "type": "string",
+          "default": "#1F2937"
+        },
+        "text_secondary": {
+          "type": "string",
+          "default": "#6B7280"
+        },
+        "success": {
+          "type": "string",
+          "default": "#10B981"
+        },
+        "warning": {
+          "type": "string",
+          "default": "#F59E0B"
+        },
+        "error": {
+          "type": "string",
+          "default": "#EF4444"
+        },
+        "premium": {
+          "type": "string",
+          "default": "#FACC15"
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "font_family": {
+          "type": "string",
+          "default": "system-ui"
+        },
+        "heading_size": {
+          "type": "string",
+          "default": "2rem"
+        },
+        "body_size": {
+          "type": "string",
+          "default": "1rem"
+        },
+        "small_size": {
+          "type": "string",
+          "default": "0.875rem"
+        }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "properties": {
+        "card_padding": {
+          "type": "string",
+          "default": "1.5rem"
+        },
+        "section_gap": {
+          "type": "string",
+          "default": "1.5rem"
+        },
+        "button_padding": {
+          "type": "string",
+          "default": "0.75rem 1.5rem"
+        }
+      }
+    },
+    "borders": {
+      "type": "object",
+      "properties": {
+        "radius_small": {
+          "type": "string",
+          "default": "0.5rem"
+        },
+        "radius_medium": {
+          "type": "string",
+          "default": "1rem"
+        },
+        "radius_large": {
+          "type": "string",
+          "default": "1.5rem"
+        },
+        "width": {
+          "type": "string",
+          "default": "1px"
+        }
+      }
+    },
+    "shadows": {
+      "type": "object",
+      "properties": {
+        "small": {
+          "type": "string",
+          "default": "0 1px 3px rgba(0,0,0,0.1)"
+        },
+        "medium": {
+          "type": "string",
+          "default": "0 4px 6px rgba(0,0,0,0.1)"
+        },
+        "large": {
+          "type": "string",
+          "default": "0 10px 15px rgba(0,0,0,0.1)"
+        }
+      }
+    },
+    "animations": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "default": "0.3s"
+        },
+        "easing": {
+          "type": "string",
+          "default": "ease-in-out"
+        },
+        "hover_scale": {
+          "type": "number",
+          "default": 1.02
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "button_style": {
+          "type": "string",
+          "enum": [
+            "rounded",
+            "sharp",
+            "pill"
+          ],
+          "default": "rounded"
+        },
+        "card_style": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "elevated",
+            "bordered"
+          ],
+          "default": "elevated"
+        },
+        "header_gradient": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "buttons": {
+      "type": "object",
+      "description": "\u05e2\u05d9\u05e6\u05d5\u05d1 \u05db\u05e4\u05ea\u05d5\u05e8\u05d9\u05dd \u05e1\u05e4\u05e6\u05d9\u05e4\u05d9\u05d9\u05dd",
+      "properties": {
+        "primary_bg": {
+          "type": "string",
+          "default": "#3B82F6"
+        },
+        "primary_text": {
+          "type": "string",
+          "default": "#FFFFFF"
+        },
+        "primary_hover": {
+          "type": "string",
+          "default": "#2563EB"
+        },
+        "secondary_bg": {
+          "type": "string",
+          "default": "#8B5CF6"
+        },
+        "secondary_text": {
+          "type": "string",
+          "default": "#FFFFFF"
+        },
+        "secondary_hover": {
+          "type": "string",
+          "default": "#7C3AED"
+        },
+        "border_radius": {
+          "type": "string",
+          "default": "0.5rem"
+        },
+        "font_size": {
+          "type": "string",
+          "default": "1rem"
+        },
+        "font_weight": {
+          "type": "string",
+          "default": "600"
+        },
+        "padding": {
+          "type": "string",
+          "default": "0.75rem 1.5rem"
+        },
+        "shadow": {
+          "type": "string",
+          "default": "0 1px 3px rgba(0,0,0,0.1)"
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "description": "\u05d8\u05e7\u05e1\u05d8\u05d9\u05dd \u05d1\u05e2\u05de\u05d5\u05d3\u05d9\u05dd",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "string"
+          },
+          "align": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "theme_name"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

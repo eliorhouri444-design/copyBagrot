@@ -1,0 +1,206 @@
+{
+  "name": "GenericExam",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea (0 \u05dc\u05dc\u05d0 \u05e8\u05de\u05d5\u05ea)"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d5\u05d3\u05d5\u05dc"
+    },
+    "description": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05de\u05d1\u05d7\u05df \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "total_points": {
+      "type": "integer",
+      "description": "\u05e1\u05da \u05d4\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea"
+    },
+    "passing_grade": {
+      "type": "integer",
+      "default": 56,
+      "description": "\u05e6\u05d9\u05d5\u05df \u05e2\u05d5\u05d1\u05e8"
+    },
+    "reading_text": {
+      "type": "string",
+      "description": "\u05d8\u05e7\u05e1\u05d8 \u05e7\u05e8\u05d9\u05d0\u05d4/\u05e7\u05d8\u05e2 \u05de\u05e7\u05e8\u05d0\u05d9 (\u05e2\u05d1\u05d5\u05e8 \u05ea\u05e0\"\u05da/\u05e1\u05e4\u05e8\u05d5\u05ea)"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_number": {
+            "type": "integer"
+          },
+          "question_text": {
+            "type": "string"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "short_answer",
+              "open_question",
+              "calculation",
+              "proof",
+              "interactive",
+              "sectioned"
+            ]
+          },
+          "question_image_url": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correct_answer": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "solution_steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "parts": {
+            "type": "array",
+            "description": "\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd \u05e4\u05e0\u05d9\u05de\u05d9\u05d9\u05dd \u05dc\u05e9\u05d0\u05dc\u05d4 (\u05d0, \u05d1, \u05d2 \u05d5\u05db\u05d5')",
+            "items": {
+              "type": "object",
+              "properties": {
+                "part_id": {
+                  "type": "string",
+                  "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e1\u05e2\u05d9\u05e3 (\u05d0, \u05d1, \u05d2)"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "\u05d8\u05e7\u05e1\u05d8 \u05d4\u05e1\u05e2\u05d9\u05e3"
+                },
+                "correct_answer": {
+                  "type": "string"
+                },
+                "explanation": {
+                  "type": "string"
+                },
+                "points": {
+                  "type": "integer"
+                },
+                "requires_biblical_basis": {
+                  "type": "boolean",
+                  "description": "\u05d4\u05d0\u05dd \u05e0\u05d3\u05e8\u05e9 \u05d1\u05d9\u05e1\u05d5\u05e1 \u05de\u05d4\u05db\u05ea\u05d5\u05d1"
+                },
+                "source_verses": {
+                  "type": "string",
+                  "description": "\u05e4\u05e1\u05d5\u05e7\u05d9 \u05d4\u05de\u05e7\u05d5\u05e8 (\u05dc\u05de\u05e9\u05dc: \u05d1\u05e8\u05d0\u05e9\u05d9\u05ea \u05db\"\u05d0 \u05d0-\u05d3)"
+                }
+              }
+            }
+          },
+          "chapter": {
+            "type": "string",
+            "description": "\u05e4\u05e8\u05e7 \u05d1\u05ea\u05e0\"\u05da (\u05d1\u05e8\u05d0\u05e9\u05d9\u05ea, \u05e9\u05de\u05d5\u05ea \u05d5\u05db\u05d5')"
+          },
+          "source_verses": {
+            "type": "string",
+            "description": "\u05e4\u05e1\u05d5\u05e7\u05d9 \u05d4\u05de\u05e7\u05d5\u05e8"
+          }
+        }
+      },
+      "description": "\u05e8\u05e9\u05d9\u05de\u05ea \u05e9\u05d0\u05dc\u05d5\u05ea \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "instructions": {
+      "type": "string",
+      "description": "\u05d4\u05d5\u05e8\u05d0\u05d5\u05ea \u05dc\u05de\u05d1\u05d7\u05df"
+    },
+    "is_generated": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05e0\u05d5\u05e6\u05e8 \u05e2\u05dc \u05d9\u05d3\u05d9 AI"
+    },
+    "is_copyright_free": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05dc\u05d0 \u05d6\u05db\u05d5\u05d9\u05d5\u05ea \u05d9\u05d5\u05e6\u05e8\u05d9\u05dd"
+    },
+    "chapters": {
+      "type": "array",
+      "description": "\u05d7\u05dc\u05d5\u05e7\u05d4 \u05dc\u05e4\u05e8\u05e7\u05d9\u05dd (\u05e2\u05d1\u05d5\u05e8 \u05ea\u05e0\"\u05da)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chapter_number": {
+            "type": "integer"
+          },
+          "chapter_name": {
+            "type": "string",
+            "description": "\u05e9\u05dd \u05d4\u05e4\u05e8\u05e7 (\u05d1\u05e8\u05d0\u05e9\u05d9\u05ea, \u05e9\u05de\u05d5\u05ea \u05d5\u05db\u05d5')"
+          },
+          "chapter_topic": {
+            "type": "string",
+            "description": "\u05e0\u05d5\u05e9\u05d0 \u05d4\u05e4\u05e8\u05e7"
+          },
+          "points": {
+            "type": "integer",
+            "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05d4\u05e4\u05e8\u05e7"
+          },
+          "question_numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "\u05de\u05e1\u05e4\u05e8\u05d9 \u05d4\u05e9\u05d0\u05dc\u05d5\u05ea \u05d1\u05e4\u05e8\u05e7"
+          }
+        }
+      }
+    },
+    "exam_file_url": {
+      "type": "string",
+      "description": "URL of the original PDF"
+    },
+    "solution_file_url": {
+      "type": "string",
+      "description": "URL of the solution PDF"
+    }
+  },
+  "required": [
+    "title",
+    "subject",
+    "unit_level",
+    "questions"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

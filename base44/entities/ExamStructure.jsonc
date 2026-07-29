@@ -1,0 +1,291 @@
+{
+  "name": "ExamStructure",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        0,
+        2,
+        3,
+        4,
+        5
+      ],
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea (0 = \u05dc\u05dc\u05d0 \u05e8\u05de\u05d5\u05ea)"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d5\u05df (381, 382, C, A, 035201 \u05d5\u05db\u05d5')"
+    },
+    "exam_year": {
+      "type": "integer",
+      "description": "\u05e9\u05e0\u05ea \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4"
+    },
+    "exam_season": {
+      "type": "string",
+      "enum": [
+        "\u05e7\u05d9\u05e5",
+        "\u05d7\u05d5\u05e8\u05e3",
+        "\u05de\u05d9\u05d5\u05d7\u05d3"
+      ],
+      "description": "\u05de\u05d5\u05e2\u05d3 \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4"
+    },
+    "structure_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d1\u05e0\u05d4"
+    },
+    "total_questions": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e9\u05d0\u05dc\u05d5\u05ea \u05db\u05d5\u05dc\u05dc"
+    },
+    "total_points": {
+      "type": "integer",
+      "description": "\u05e1\u05da \u05d4\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4 \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "section_number": {
+            "type": "integer"
+          },
+          "section_name": {
+            "type": "string"
+          },
+          "section_type": {
+            "type": "string",
+            "enum": [
+              "reading",
+              "listening",
+              "grammar",
+              "writing",
+              "calculation",
+              "proof",
+              "open_question",
+              "multiple_choice"
+            ]
+          },
+          "points": {
+            "type": "integer"
+          },
+          "question_range": {
+            "type": "string",
+            "description": "\u05d8\u05d5\u05d5\u05d7 \u05d4\u05e9\u05d0\u05dc\u05d5\u05ea (\u05dc\u05d3\u05d5\u05d2\u05de\u05d4: 1-7)"
+          }
+        }
+      },
+      "description": "\u05d7\u05dc\u05e7\u05d9 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "question_structure": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_number": {
+            "type": "integer"
+          },
+          "topic": {
+            "type": "string",
+            "description": "\u05d4\u05e0\u05d5\u05e9\u05d0 \u05e9\u05dc \u05d4\u05e9\u05d0\u05dc\u05d4"
+          },
+          "sub_topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "\u05ea\u05ea\u05d9 \u05e0\u05d5\u05e9\u05d0\u05d9\u05dd"
+          },
+          "difficulty_level": {
+            "type": "string",
+            "enum": [
+              "easy",
+              "medium",
+              "hard",
+              "expert"
+            ],
+            "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "short_answer",
+              "open_question",
+              "calculation",
+              "proof",
+              "listening",
+              "writing"
+            ],
+            "description": "\u05e1\u05d5\u05d2 \u05d4\u05e9\u05d0\u05dc\u05d4"
+          },
+          "points": {
+            "type": "integer",
+            "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05dc\u05e9\u05d0\u05dc\u05d4"
+          },
+          "requires_diagram": {
+            "type": "boolean",
+            "description": "\u05d4\u05d0\u05dd \u05d3\u05e8\u05d5\u05e9 \u05d0\u05d9\u05d5\u05e8/\u05d2\u05e8\u05e3"
+          },
+          "diagram_type": {
+            "type": "string",
+            "enum": [
+              "geometry",
+              "graph",
+              "chart",
+              "physics",
+              "none"
+            ],
+            "description": "\u05e1\u05d5\u05d2 \u05d4\u05d0\u05d9\u05d5\u05e8"
+          },
+          "diagram_details": {
+            "type": "object",
+            "description": "\u05e4\u05e8\u05d8\u05d9 \u05d4\u05d0\u05d9\u05d5\u05e8 \u05d4\u05de\u05dc\u05d0\u05d9\u05dd",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05de\u05d9\u05dc\u05d5\u05dc\u05d9 \u05e9\u05dc \u05d4\u05d0\u05d9\u05d5\u05e8"
+              },
+              "points": {
+                "type": "object",
+                "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05d1\u05d0\u05d9\u05d5\u05e8 - {A: {x, y, label}, B: {...}}"
+              },
+              "lines": {
+                "type": "array",
+                "description": "\u05e7\u05d5\u05d5\u05d9\u05dd - [{from: 'A', to: 'B', style: 'solid'}]"
+              },
+              "shapes": {
+                "type": "array",
+                "description": "\u05e6\u05d5\u05e8\u05d5\u05ea - [{type: 'square', vertices: ['A','B','C','D']}]"
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "\u05ea\u05d5\u05d5\u05d9\u05d5\u05ea \u05e2\u05dc \u05d4\u05d0\u05d9\u05d5\u05e8 (BE=5, \u05d6\u05d5\u05d5\u05d9\u05ea 60\u00b0)"
+              },
+              "special_marks": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "\u05e1\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05de\u05d9\u05d5\u05d7\u05d3\u05d9\u05dd (H-\u05d7\u05d9\u05ea\u05d5\u05da, \u05d2\u05d5\u05d1\u05d4)"
+              },
+              "generated_image_url": {
+                "type": "string",
+                "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05d0\u05d9\u05d5\u05e8 \u05e9\u05e0\u05d5\u05e6\u05e8"
+              }
+            }
+          },
+          "expected_answer_length": {
+            "type": "string",
+            "description": "\u05d0\u05d5\u05e8\u05da \u05ea\u05e9\u05d5\u05d1\u05d4 \u05e6\u05e4\u05d5\u05d9 (\u05e7\u05e6\u05e8/\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9/\u05d0\u05e8\u05d5\u05da)"
+          },
+          "cognitive_level": {
+            "type": "string",
+            "enum": [
+              "knowledge",
+              "comprehension",
+              "application",
+              "analysis",
+              "synthesis",
+              "evaluation"
+            ],
+            "description": "\u05e8\u05de\u05ea \u05d7\u05e9\u05d9\u05d1\u05d4 (\u05d8\u05e7\u05e1\u05d5\u05e0\u05d5\u05de\u05d9\u05d9\u05ea \u05d1\u05dc\u05d5\u05dd)"
+          }
+        }
+      },
+      "description": "\u05de\u05d1\u05e0\u05d4 \u05de\u05e4\u05d5\u05e8\u05d8 \u05e9\u05dc \u05db\u05dc \u05e9\u05d0\u05dc\u05d4"
+    },
+    "topic_distribution": {
+      "type": "object",
+      "description": "\u05d4\u05ea\u05e4\u05dc\u05d2\u05d5\u05ea \u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05d1\u05de\u05d1\u05d7\u05df",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "percentage": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "difficulty_distribution": {
+      "type": "object",
+      "description": "\u05d4\u05ea\u05e4\u05dc\u05d2\u05d5\u05ea \u05e8\u05de\u05d5\u05ea \u05e7\u05d5\u05e9\u05d9",
+      "properties": {
+        "easy": {
+          "type": "integer"
+        },
+        "medium": {
+          "type": "integer"
+        },
+        "hard": {
+          "type": "integer"
+        },
+        "expert": {
+          "type": "integer"
+        }
+      }
+    },
+    "source_file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05de\u05d1\u05d7\u05df \u05d4\u05de\u05e7\u05d5\u05e8\u05d9 (\u05dc\u05d0 \u05de\u05e4\u05d5\u05e8\u05e1\u05dd)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05d1\u05e0\u05d4 \u05e4\u05e2\u05d9\u05dc \u05dc\u05d9\u05e6\u05d9\u05e8\u05ea \u05de\u05d1\u05d7\u05e0\u05d9\u05dd"
+    },
+    "generated_exams_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05de\u05d1\u05d7\u05e0\u05d9\u05dd \u05e0\u05d5\u05e6\u05e8\u05d5 \u05e2\u05dc \u05e4\u05d9 \u05de\u05d1\u05e0\u05d4 \u05d6\u05d4"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "\u05de\u05d9\u05d3\u05e2 \u05e0\u05d5\u05e1\u05e3",
+      "properties": {
+        "scanned_by": {
+          "type": "string"
+        },
+        "scan_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "subject",
+    "unit_level",
+    "module_id",
+    "structure_name",
+    "question_structure"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

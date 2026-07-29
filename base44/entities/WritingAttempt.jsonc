@@ -1,0 +1,109 @@
+{
+  "name": "WritingAttempt",
+  "type": "object",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "writing_text": {
+      "type": "string",
+      "description": "\u05d4\u05d8\u05e7\u05e1\u05d8 \u05e9\u05e0\u05db\u05ea\u05d1"
+    },
+    "word_count": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05de\u05d9\u05dc\u05d9\u05dd"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "submitted",
+        "evaluated"
+      ],
+      "default": "draft",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4"
+    },
+    "score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df 0-100"
+    },
+    "evaluation": {
+      "type": "object",
+      "properties": {
+        "grammar": {
+          "type": "number",
+          "description": "\u05e6\u05d9\u05d5\u05df \u05d3\u05e7\u05d3\u05d5\u05e7 0-25"
+        },
+        "vocabulary": {
+          "type": "number",
+          "description": "\u05e6\u05d9\u05d5\u05df \u05d0\u05d5\u05e6\u05e8 \u05de\u05d9\u05dc\u05d9\u05dd 0-25"
+        },
+        "organization": {
+          "type": "number",
+          "description": "\u05e6\u05d9\u05d5\u05df \u05d0\u05e8\u05d2\u05d5\u05df 0-25"
+        },
+        "task_achievement": {
+          "type": "number",
+          "description": "\u05e6\u05d9\u05d5\u05df \u05d4\u05e9\u05d2\u05ea \u05d4\u05de\u05e9\u05d9\u05de\u05d4 0-25"
+        }
+      },
+      "description": "\u05d4\u05e2\u05e8\u05db\u05d4 \u05de\u05e4\u05d5\u05e8\u05d8\u05ea"
+    },
+    "feedback": {
+      "type": "string",
+      "description": "\u05de\u05e9\u05d5\u05d1 \u05de\u05e4\u05d5\u05e8\u05d8"
+    },
+    "prompt": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05d4\u05db\u05ea\u05d9\u05d1\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9"
+    },
+    "is_manual_check": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05e0\u05d1\u05d3\u05e7 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05de\u05d5\u05e8\u05d4"
+    }
+  },
+  "required": [
+    "question_id",
+    "writing_text"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

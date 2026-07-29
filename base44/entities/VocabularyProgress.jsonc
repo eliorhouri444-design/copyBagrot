@@ -1,0 +1,105 @@
+{
+  "name": "VocabularyProgress",
+  "type": "object",
+  "properties": {
+    "word_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d9\u05dc\u05d4 \u05de-VocabularyQuestion"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "hebrew_word": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05d9\u05dc\u05d4 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea"
+    },
+    "english_word": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05d9\u05dc\u05d4 \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "times_seen": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05e0\u05e6\u05e4\u05ea\u05d4"
+    },
+    "times_correct": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05e0\u05e2\u05e0\u05d4 \u05e0\u05db\u05d5\u05df"
+    },
+    "times_incorrect": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05e0\u05e2\u05e0\u05d4 \u05dc\u05d0 \u05e0\u05db\u05d5\u05df"
+    },
+    "is_weak": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05de\u05e1\u05d5\u05de\u05df \u05db\u05d7\u05dc\u05e9"
+    },
+    "is_known": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05de\u05db\u05d9\u05e8 \u05d0\u05ea \u05d4\u05de\u05d9\u05dc\u05d4"
+    },
+    "mastery_level": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05e8\u05de\u05ea \u05e9\u05dc\u05d9\u05d8\u05d4 0-100"
+    },
+    "last_practiced": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05ea\u05d5\u05e8\u05d2\u05dc \u05dc\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4"
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05e6\u05e8\u05d9\u05da \u05dc\u05d7\u05d6\u05d5\u05e8 (spaced repetition)"
+    },
+    "streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e8\u05e6\u05e3 \u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05e0\u05db\u05d5\u05e0\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "word_id",
+    "user_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

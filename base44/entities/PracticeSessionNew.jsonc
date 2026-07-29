@@ -1,0 +1,111 @@
+{
+  "name": "PracticeSessionNew",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05e1\u05e9\u05df"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "topic_practice",
+        "full_exam",
+        "custom"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e1\u05e9\u05df"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 (\u05d0\u05dd \u05ea\u05e8\u05d2\u05d5\u05dc \u05e0\u05d5\u05e9\u05d0)"
+    },
+    "exam_details": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer"
+        },
+        "season": {
+          "type": "string"
+        },
+        "module": {
+          "type": "string"
+        }
+      },
+      "description": "\u05e4\u05e8\u05d8\u05d9 \u05de\u05d1\u05d7\u05df (\u05d0\u05dd \u05e1\u05d9\u05de\u05d5\u05dc\u05e6\u05d9\u05d4)"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e8\u05e9\u05d9\u05de\u05ea question_id"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "total_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05db\u05d5\u05dc\u05dc"
+    },
+    "max_score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9"
+    },
+    "percentage": {
+      "type": "number",
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e6\u05dc\u05d7\u05d4"
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d6\u05de\u05df \u05d1\u05e4\u05d5\u05e2\u05dc"
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "session_type",
+    "subject_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

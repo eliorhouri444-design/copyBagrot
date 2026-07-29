@@ -1,0 +1,68 @@
+{
+  "name": "UserAdSettings",
+  "type": "object",
+  "properties": {
+    "free_attempts": {
+      "type": "integer",
+      "default": 3,
+      "description": "\u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea \u05d7\u05d9\u05e0\u05dd \u05e9\u05e0\u05d5\u05ea\u05e8\u05d5 \u05dc\u05d4\u05d9\u05d5\u05dd"
+    },
+    "has_seen_info_today": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e8\u05d0\u05d4 \u05d4\u05d9\u05d5\u05dd \u05d0\u05ea \u05de\u05e1\u05da \u05d4\u05d4\u05e1\u05d1\u05e8"
+    },
+    "ads_viewed_today": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d5\u05ea \u05e4\u05e8\u05e1\u05d5\u05de\u05d5\u05ea \u05e0\u05e6\u05e4\u05d5\u05ea \u05d1\u05d9\u05d5\u05dd"
+    },
+    "bonus_active_until": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e1\u05d9\u05d5\u05dd \u05d4\u05d1\u05d5\u05e0\u05d5\u05e1"
+    },
+    "has_rated": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d3\u05d9\u05e8\u05d2 \u05db\u05d1\u05e8 \u05e4\u05e2\u05dd \u05d0\u05d7\u05ea"
+    },
+    "rating_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d3\u05d9\u05e8\u05d2"
+    },
+    "last_reset_date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d0\u05d9\u05e4\u05d5\u05e1 \u05d0\u05d7\u05e8\u05d5\u05df"
+    }
+  },
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "required": []
+}

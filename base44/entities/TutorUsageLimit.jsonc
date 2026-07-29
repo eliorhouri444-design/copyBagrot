@@ -1,0 +1,85 @@
+{
+  "name": "TutorUsageLimit",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da (YYYY-MM-DD)"
+    },
+    "questions_asked": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e9\u05d0\u05dc\u05d5\u05ea \u05e0\u05e9\u05d0\u05dc\u05d5 \u05d4\u05d9\u05d5\u05dd"
+    },
+    "free_questions_limit": {
+      "type": "integer",
+      "default": 3,
+      "description": "\u05de\u05db\u05e1\u05ea \u05e9\u05d0\u05dc\u05d5\u05ea \u05d7\u05d9\u05e0\u05dd \u05dc\u05d9\u05d5\u05dd"
+    },
+    "premium_questions_limit": {
+      "type": "integer",
+      "default": 50,
+      "description": "\u05de\u05db\u05e1\u05ea \u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05e8\u05d9\u05de\u05d9\u05d5\u05dd \u05dc\u05d9\u05d5\u05dd"
+    },
+    "ads_watched": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e8\u05e1\u05d5\u05de\u05d5\u05ea \u05e0\u05e6\u05e4\u05d5 \u05d4\u05d9\u05d5\u05dd"
+    },
+    "bonus_questions": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e9\u05d0\u05dc\u05d5\u05ea \u05d1\u05d5\u05e0\u05d5\u05e1 \u05de\u05e4\u05e8\u05e1\u05d5\u05de\u05d5\u05ea"
+    },
+    "total_tokens_used": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e1\u05da Tokens \u05e9\u05e0\u05d5\u05e6\u05dc\u05d5 \u05d4\u05d9\u05d5\u05dd"
+    },
+    "total_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05e1\u05da \u05e2\u05dc\u05d5\u05ea \u05d1\u05d3\u05d5\u05dc\u05e8\u05d9\u05dd \u05d4\u05d9\u05d5\u05dd"
+    },
+    "cache_hits": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05e9\u05dc\u05e4\u05e0\u05d5 \u05de-Cache"
+    },
+    "cache_saves": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 $ \u05d7\u05e1\u05db\u05e0\u05d5 \u05e2\u05dd Cache \u05d4\u05d9\u05d5\u05dd"
+    }
+  },
+  "required": [
+    "date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

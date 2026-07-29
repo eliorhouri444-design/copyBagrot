@@ -1,0 +1,116 @@
+{
+  "name": "QuestionAnalysis",
+  "type": "object",
+  "properties": {
+    "original_text": {
+      "type": "string",
+      "description": "\u05d4\u05d8\u05e7\u05e1\u05d8 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9 \u05e9\u05dc \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05ea\u05de\u05d5\u05e0\u05ea \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "subject": {
+      "type": "string",
+      "enum": [
+        "\u05de\u05ea\u05de\u05d8\u05d9\u05e7\u05d4",
+        "\u05e4\u05d9\u05d6\u05d9\u05e7\u05d4",
+        "\u05db\u05d9\u05de\u05d9\u05d4",
+        "\u05d1\u05d9\u05d5\u05dc\u05d5\u05d2\u05d9\u05d4"
+      ],
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05e8\u05d0\u05e9\u05d9"
+    },
+    "subtopics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05ea\u05d9 \u05e0\u05d5\u05e9\u05d0\u05d9\u05dd"
+    },
+    "question_type": {
+      "type": "string",
+      "enum": [
+        "calculation",
+        "proof",
+        "explanation",
+        "diagram_analysis",
+        "experiment"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+      ],
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9"
+    },
+    "ocr_data": {
+      "type": "object",
+      "description": "\u05e0\u05ea\u05d5\u05e0\u05d9 OCR \u05de\u05dc\u05d0\u05d9\u05dd"
+    },
+    "latex_formulas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e0\u05d5\u05e1\u05d7\u05d0\u05d5\u05ea \u05d1\u05e4\u05d5\u05e8\u05de\u05d8 LaTeX"
+    },
+    "diagram_data": {
+      "type": "object",
+      "description": "\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d0\u05d9\u05d5\u05e8"
+    },
+    "solution_provided": {
+      "type": "object",
+      "description": "\u05d4\u05e4\u05ea\u05e8\u05d5\u05df \u05e9\u05e1\u05d5\u05e4\u05e7"
+    },
+    "estimated_time": {
+      "type": "integer",
+      "description": "\u05d6\u05de\u05df \u05de\u05e9\u05d5\u05e2\u05e8 \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "key_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05d5\u05e9\u05d2\u05d9 \u05de\u05e4\u05ea\u05d7"
+    }
+  },
+  "required": [
+    "original_text",
+    "subject"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

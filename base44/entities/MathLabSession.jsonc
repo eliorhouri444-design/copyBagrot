@@ -1,0 +1,93 @@
+{
+  "name": "MathLabSession",
+  "type": "object",
+  "properties": {
+    "question_text": {
+      "type": "string",
+      "description": "\u05d8\u05e7\u05e1\u05d8 \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05ea"
+    },
+    "question_image_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05ea\u05de\u05d5\u05e0\u05ea \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+      ],
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9"
+    },
+    "ocr_analysis": {
+      "type": "object",
+      "description": "\u05ea\u05d5\u05e6\u05d0\u05d5\u05ea OCR \u05d5\u05d4\u05e0\u05d9\u05ea\u05d5\u05d7"
+    },
+    "solution": {
+      "type": "object",
+      "description": "\u05d4\u05e4\u05ea\u05e8\u05d5\u05df \u05d4\u05de\u05e4\u05d5\u05e8\u05d8"
+    },
+    "student_answer": {
+      "type": "string",
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05ea \u05d4\u05ea\u05dc\u05de\u05d9\u05d3"
+    },
+    "checking_result": {
+      "type": "object",
+      "description": "\u05ea\u05d5\u05e6\u05d0\u05d5\u05ea \u05d1\u05d3\u05d9\u05e7\u05ea \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4"
+    },
+    "similar_questions_generated": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "\u05e9\u05d0\u05dc\u05d5\u05ea \u05d3\u05d5\u05de\u05d5\u05ea \u05e9\u05e0\u05d5\u05e6\u05e8\u05d5"
+    },
+    "session_duration": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05e9\u05d9\u05de\u05d5\u05e9 \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05d0\u05dd \u05e0\u05d1\u05d3\u05e7\u05d4 \u05ea\u05e9\u05d5\u05d1\u05d4"
+    }
+  },
+  "required": [
+    "question_text",
+    "subject"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

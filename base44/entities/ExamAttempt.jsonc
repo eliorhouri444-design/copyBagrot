@@ -1,0 +1,122 @@
+{
+  "name": "ExamAttempt",
+  "type": "object",
+  "properties": {
+    "exam_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "exam_type": {
+      "type": "string",
+      "enum": [
+        "module_a",
+        "module_b",
+        "module_c",
+        "generic"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d5\u05d3\u05d5\u05dc (A, B, C, 801 \u05d5\u05db\u05d5')"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05d6\u05de\u05df \u05d4\u05ea\u05d7\u05dc\u05d4"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05d6\u05de\u05df \u05d4\u05d2\u05e9\u05d4"
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "user_answer": {
+            "type": "string"
+          },
+          "is_correct": {
+            "type": "boolean"
+          },
+          "points_earned": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "score_percent": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05d1\u05d0\u05d7\u05d5\u05d6\u05d9\u05dd"
+    },
+    "passed": {
+      "type": "boolean",
+      "description": "\u05d4\u05d0\u05dd \u05e2\u05d1\u05e8 (\u05de\u05e2\u05dc 56)"
+    },
+    "total_points": {
+      "type": "integer",
+      "description": "\u05e1\u05da \u05d4\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea"
+    },
+    "earned_points": {
+      "type": "integer",
+      "description": "\u05e0\u05e7\u05d5\u05d3\u05d5\u05ea \u05e9\u05d4\u05e8\u05d5\u05d5\u05d9\u05d7"
+    },
+    "archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d1\u05d0\u05e8\u05db\u05d9\u05d5\u05df"
+    }
+  },
+  "required": [
+    "exam_id",
+    "subject",
+    "unit_level",
+    "score_percent",
+    "passed"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

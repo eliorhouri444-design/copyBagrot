@@ -1,0 +1,73 @@
+{
+  "name": "AudioText",
+  "type": "object",
+  "properties": {
+    "text_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9 \u05dc\u05d8\u05e7\u05e1\u05d8 \u05d4\u05e9\u05de\u05e2"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "audio_text": {
+      "type": "string",
+      "description": "\u05d4\u05d8\u05e7\u05e1\u05d8 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9 \u05dc\u05e7\u05d8\u05e2 \u05d4\u05e9\u05de\u05d9\u05e2\u05d4"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 \u05d4\u05d0\u05d5\u05d3\u05d9\u05d5 \u05e9\u05e0\u05d5\u05e6\u05e8"
+    },
+    "voice_type": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ],
+      "default": "female",
+      "description": "\u05e1\u05d5\u05d2 \u05e7\u05d5\u05dc"
+    },
+    "speed": {
+      "type": "number",
+      "default": 1.0,
+      "description": "\u05de\u05d4\u05d9\u05e8\u05d5\u05ea \u05d3\u05d9\u05d1\u05d5\u05e8 (0.5-2.0)"
+    },
+    "language": {
+      "type": "string",
+      "default": "en-US",
+      "description": "\u05e9\u05e4\u05d4"
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05e7\u05d8\u05e2 \u05d1\u05e9\u05e0\u05d9\u05d5\u05ea"
+    },
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05e7\u05d8\u05e2"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "audio_text",
+    "subject_id"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

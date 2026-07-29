@@ -1,0 +1,93 @@
+{
+  "name": "ModuleCExam",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "reading_text": {
+      "type": "string",
+      "description": "\u05d4\u05d8\u05e7\u05e1\u05d8 \u05dc\u05d4\u05d1\u05e0\u05ea \u05d4\u05e0\u05e7\u05e8\u05d0"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_number": {
+            "type": "integer"
+          },
+          "question_text": {
+            "type": "string"
+          },
+          "question_type": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "two_answers",
+              "short_answer",
+              "open"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correct_answers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "points": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "7 \u05e9\u05d0\u05dc\u05d5\u05ea \u05d4\u05d1\u05e0\u05ea \u05d4\u05e0\u05e7\u05e8\u05d0"
+    },
+    "writing_prompt": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05d4\u05db\u05ea\u05d9\u05d1\u05d4"
+    },
+    "writing_min_words": {
+      "type": "integer",
+      "default": 70
+    },
+    "writing_max_words": {
+      "type": "integer",
+      "default": 90
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "units": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "default": 90
+    }
+  },
+  "required": [
+    "title",
+    "reading_text",
+    "questions",
+    "writing_prompt",
+    "subject",
+    "units"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

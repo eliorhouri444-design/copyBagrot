@@ -1,0 +1,103 @@
+{
+  "name": "SubjectCurriculum",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "curriculum_topics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "topic_key": {
+            "type": "string"
+          },
+          "topic_name": {
+            "type": "string"
+          },
+          "topic_description": {
+            "type": "string"
+          },
+          "importance": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "weight_in_exam": {
+            "type": "number"
+          },
+          "subtopics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "difficulty_progression": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9 \u05d4\u05dc\u05d9\u05de\u05d5\u05d3 \u05d4\u05de\u05dc\u05d0\u05d9\u05dd"
+    },
+    "learning_objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05d9\u05e2\u05d3\u05d9 \u05d4\u05dc\u05d9\u05de\u05d5\u05d3"
+    },
+    "exam_format": {
+      "type": "string",
+      "description": "\u05e4\u05d5\u05e8\u05de\u05d8 \u05d4\u05de\u05d1\u05d7\u05df \u05d4\u05e8\u05e9\u05de\u05d9"
+    },
+    "reference_materials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "\u05d7\u05d5\u05de\u05e8\u05d9 \u05e2\u05d6\u05e8"
+    }
+  },
+  "required": [
+    "subject",
+    "unit_level",
+    "curriculum_topics"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "name": "VocabularyQuestion",
+  "type": "object",
+  "properties": {
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2 (\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea)"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0 (\u05de\u05e7\u05d5\u05e9\u05e8 \u05dc-TopicNew)"
+    },
+    "category": {
+      "type": "string",
+      "description": "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 (Basic Verbs, Academic Vocabulary, Connectors, \u05d5\u05db\u05d5')"
+    },
+    "hebrew_word": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05d9\u05dc\u05d4 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea"
+    },
+    "english_answer": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05e0\u05db\u05d5\u05e0\u05d4 \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "acceptable_answers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05de\u05e7\u05d5\u05d1\u05dc\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea"
+    },
+    "example_sentence": {
+      "type": "string",
+      "description": "\u05de\u05e9\u05e4\u05d8 \u05dc\u05d3\u05d5\u05d2\u05de\u05d4 \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "example_sentence_he": {
+      "type": "string",
+      "description": "\u05de\u05e9\u05e4\u05d8 \u05dc\u05d3\u05d5\u05d2\u05de\u05d4 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea"
+    },
+    "difficulty": {
+      "type": "integer",
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "default": 1,
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9 1-5"
+    },
+    "cefr_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9 \u05dc\u05e4\u05d9 CEFR"
+    },
+    "synonyms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05d9\u05dc\u05d9\u05dd \u05e0\u05e8\u05d3\u05e4\u05d5\u05ea \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "antonyms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05d9\u05dc\u05d9\u05dd \u05d4\u05e4\u05d5\u05db\u05d5\u05ea \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "part_of_speech": {
+      "type": "string",
+      "enum": [
+        "noun",
+        "verb",
+        "adjective",
+        "adverb",
+        "preposition",
+        "conjunction",
+        "pronoun",
+        "interjection",
+        "determiner",
+        "phrasal_verb",
+        "idiom"
+      ],
+      "description": "\u05d7\u05dc\u05e7 \u05d4\u05d3\u05d9\u05d1\u05e8"
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "english_audio_url": {
+          "type": "string",
+          "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05d0\u05d5\u05d3\u05d9\u05d5 \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+        },
+        "hebrew_audio_url": {
+          "type": "string",
+          "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05d0\u05d5\u05d3\u05d9\u05d5 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea"
+        }
+      },
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8\u05d9 \u05d0\u05d5\u05d3\u05d9\u05d5"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05ea\u05de\u05d5\u05e0\u05d4 \u05d4\u05de\u05de\u05d7\u05d9\u05e9\u05d4 \u05d0\u05ea \u05d4\u05de\u05d9\u05dc\u05d4"
+    },
+    "phonetic": {
+      "type": "string",
+      "description": "\u05ea\u05e2\u05ea\u05d9\u05e7 \u05e4\u05d5\u05e0\u05d8\u05d9 (IPA)"
+    },
+    "collocations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e6\u05d9\u05e8\u05d5\u05e4\u05d9\u05dd \u05e0\u05e4\u05d5\u05e6\u05d9\u05dd \u05e2\u05dd \u05d4\u05de\u05d9\u05dc\u05d4"
+    },
+    "context_sentences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05e9\u05e4\u05d8\u05d9 \u05d4\u05e7\u05e9\u05e8 \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd"
+    },
+    "flashcard_settings": {
+      "type": "object",
+      "properties": {
+        "front_content": {
+          "type": "string",
+          "enum": [
+            "english",
+            "hebrew",
+            "image",
+            "audio"
+          ],
+          "default": "english"
+        },
+        "back_content": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "\u05de\u05d4 \u05dc\u05d4\u05e6\u05d9\u05d2 \u05d1\u05e6\u05d3 \u05d4\u05d0\u05d7\u05d5\u05e8\u05d9: hebrew, example, synonyms, image, audio"
+        },
+        "show_phonetic": {
+          "type": "boolean",
+          "default": true
+        },
+        "auto_play_audio": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "description": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05ea\u05e6\u05d5\u05d2\u05ea Flashcard"
+    },
+    "advanced_quiz": {
+      "type": "object",
+      "properties": {
+        "question_types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "multiple_choice",
+              "fill_blank",
+              "context",
+              "listening",
+              "matching",
+              "spelling"
+            ]
+          },
+          "description": "\u05e1\u05d5\u05d2\u05d9 \u05e9\u05d0\u05dc\u05d5\u05ea \u05de\u05d5\u05ea\u05e8\u05d9\u05dd"
+        },
+        "custom_distractors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "\u05de\u05e1\u05d9\u05d7\u05d9\u05dd \u05de\u05d5\u05ea\u05d0\u05de\u05d9\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea"
+        },
+        "context_question": {
+          "type": "string",
+          "description": "\u05e9\u05d0\u05dc\u05ea \u05d4\u05e7\u05e9\u05e8 \u05de\u05d5\u05ea\u05d0\u05de\u05ea"
+        },
+        "fill_blank_sentence": {
+          "type": "string",
+          "description": "\u05de\u05e9\u05e4\u05d8 \u05dc\u05d4\u05e9\u05dc\u05de\u05ea \u05de\u05d9\u05dc\u05d4 \u05e2\u05dd ___ \u05d1\u05de\u05e7\u05d5\u05dd \u05d4\u05de\u05d9\u05dc\u05d4"
+        }
+      },
+      "description": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d1\u05d5\u05d7\u05df \u05de\u05ea\u05e7\u05d3\u05dd"
+    },
+    "ai_generation": {
+      "type": "object",
+      "properties": {
+        "auto_generate_distractors": {
+          "type": "boolean",
+          "default": true,
+          "description": "\u05d4\u05d0\u05dd \u05dc\u05d9\u05d9\u05e6\u05e8 \u05de\u05e1\u05d9\u05d7\u05d9\u05dd \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea"
+        },
+        "auto_generate_sentences": {
+          "type": "boolean",
+          "default": true,
+          "description": "\u05d4\u05d0\u05dd \u05dc\u05d9\u05d9\u05e6\u05e8 \u05de\u05e9\u05e4\u05d8\u05d9 \u05d3\u05d5\u05d2\u05de\u05d4 \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea"
+        },
+        "auto_generate_synonyms": {
+          "type": "boolean",
+          "default": false,
+          "description": "\u05d4\u05d0\u05dd \u05dc\u05d9\u05d9\u05e6\u05e8 \u05e0\u05e8\u05d3\u05e4\u05d5\u05ea \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "\u05de\u05ea\u05d9 \u05e0\u05d5\u05e6\u05e8 \u05ea\u05d5\u05db\u05df AI \u05dc\u05d0\u05d7\u05e8\u05d5\u05e0\u05d4"
+        },
+        "generation_model": {
+          "type": "string",
+          "description": "\u05d0\u05d9\u05d6\u05d4 \u05de\u05d5\u05d3\u05dc AI \u05e9\u05d9\u05de\u05e9"
+        }
+      },
+      "description": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d9\u05e6\u05d9\u05e8\u05ea \u05ea\u05d5\u05db\u05df AI"
+    },
+    "usage_stats": {
+      "type": "object",
+      "properties": {
+        "times_shown": {
+          "type": "integer",
+          "default": 0
+        },
+        "times_correct": {
+          "type": "integer",
+          "default": 0
+        },
+        "avg_response_time_ms": {
+          "type": "integer"
+        },
+        "difficulty_rating": {
+          "type": "number",
+          "description": "\u05d3\u05d9\u05e8\u05d5\u05d2 \u05e7\u05d5\u05e9\u05d9 \u05de\u05d7\u05d5\u05e9\u05d1 0-1"
+        }
+      },
+      "description": "\u05e1\u05d8\u05d8\u05d9\u05e1\u05d8\u05d9\u05e7\u05d5\u05ea \u05e9\u05d9\u05de\u05d5\u05e9 \u05d2\u05dc\u05d5\u05d1\u05dc\u05d9\u05d5\u05ea"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d2\u05d9\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea (bagrut, academic, daily, etc.)"
+    }
+  },
+  "required": [
+    "subject_id",
+    "unit_level",
+    "hebrew_word",
+    "english_answer"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

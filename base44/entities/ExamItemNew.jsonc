@@ -1,0 +1,36 @@
+{
+  "name": "ExamItemNew",
+  "type": "object",
+  "properties": {
+    "exam_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d1\u05d7\u05df (FK)"
+    },
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4 (FK)"
+    },
+    "order_index": {
+      "type": "integer",
+      "description": "\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d1\u05de\u05d1\u05d7\u05df"
+    },
+    "weight": {
+      "type": "number",
+      "default": 1.0,
+      "description": "\u05de\u05e9\u05e7\u05dc \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d1\u05e6\u05d9\u05d5\u05df"
+    }
+  },
+  "required": [
+    "exam_id",
+    "question_id",
+    "order_index"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

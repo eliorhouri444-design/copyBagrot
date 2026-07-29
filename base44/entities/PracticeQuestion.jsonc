@@ -1,0 +1,165 @@
+{
+  "name": "PracticeQuestion",
+  "type": "object",
+  "properties": {
+    "question_text": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e1\u05d7 \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d1\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea"
+    },
+    "question_type": {
+      "type": "string",
+      "enum": [
+        "multiple_choice",
+        "fill_in_blank",
+        "true_false",
+        "matching",
+        "open_question",
+        "listening",
+        "short_answer",
+        "writing",
+        "speaking"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "vocabulary",
+        "grammar",
+        "writing",
+        "listening"
+      ],
+      "description": "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05e8\u05d0\u05e9\u05d9\u05ea"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05ea\u05e9\u05d5\u05d1\u05d4 (\u05dc\u05e9\u05d0\u05dc\u05d5\u05ea \u05d1\u05d7\u05d9\u05e8\u05d4)"
+    },
+    "correct_answers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05e0\u05db\u05d5\u05e0\u05d5\u05ea"
+    },
+    "explanation": {
+      "type": "string",
+      "description": "\u05d4\u05e1\u05d1\u05e8 \u05dc\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea"
+    },
+    "explanation_image": {
+      "type": "string",
+      "description": "\u05ea\u05de\u05d5\u05e0\u05ea \u05d4\u05e1\u05d1\u05e8"
+    },
+    "example_text": {
+      "type": "string",
+      "description": "\u05d3\u05d5\u05d2\u05de\u05d4 \u05e0\u05d5\u05e1\u05e4\u05ea"
+    },
+    "points": {
+      "type": "integer",
+      "default": 10,
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05dc\u05e9\u05d0\u05dc\u05d4"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "module": {
+      "type": "string",
+      "description": "\u05de\u05d5\u05d3\u05d5\u05dc (A, B, C, D, E, F, G, H)"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "intermediate",
+        "advanced"
+      ],
+      "default": "intermediate"
+    },
+    "auto_difficulty": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05ea\u05d0\u05de\u05d4 \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea \u05dc\u05e8\u05de\u05ea \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "units": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "word_limit": {
+      "type": "integer",
+      "description": "\u05de\u05d2\u05d1\u05dc\u05ea \u05de\u05d9\u05dc\u05d9\u05dd (\u05dc\u05e9\u05d0\u05dc\u05d5\u05ea \u05db\u05ea\u05d9\u05d1\u05d4)"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 \u05e9\u05de\u05e2 (\u05dc\u05e9\u05d0\u05dc\u05d5\u05ea listening)"
+    },
+    "caption_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05db\u05ea\u05d5\u05d1\u05d9\u05d5\u05ea VTT/SRT"
+    },
+    "audio_play_limit": {
+      "type": "integer",
+      "default": 2,
+      "description": "\u05de\u05d2\u05d1\u05dc\u05ea \u05d4\u05d0\u05d6\u05e0\u05d5\u05ea"
+    },
+    "audio_transcript": {
+      "type": "string",
+      "description": "\u05ea\u05de\u05dc\u05d5\u05dc \u05d4\u05e9\u05de\u05e2"
+    },
+    "matching_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "string"
+          },
+          "right": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "\u05d6\u05d5\u05d2\u05d5\u05ea \u05dc\u05d4\u05ea\u05d0\u05de\u05d4 (\u05dc\u05e9\u05d0\u05dc\u05d5\u05ea matching)"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d3\u05d5\u05e8\u05e9 \u05de\u05e0\u05d5\u05d9 \u05e4\u05e8\u05d9\u05de\u05d9\u05d5\u05dd"
+    },
+    "tts_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05e4\u05e2\u05dc\u05ea \u05d4\u05e1\u05d1\u05e8 \u05e7\u05d5\u05dc\u05d9 (\u05e4\u05e8\u05d9\u05de\u05d9\u05d5\u05dd)"
+    }
+  },
+  "required": [
+    "question_text",
+    "question_type",
+    "category",
+    "correct_answers",
+    "subject",
+    "units",
+    "topic"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

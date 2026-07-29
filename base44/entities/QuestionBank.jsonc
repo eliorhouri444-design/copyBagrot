@@ -1,0 +1,177 @@
+{
+  "name": "QuestionBank",
+  "type": "object",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9 \u05dc\u05e9\u05d0\u05dc\u05d4"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "origin_type": {
+      "type": "string",
+      "enum": [
+        "bagrut",
+        "practice",
+        "teacher_custom",
+        "ai_generated"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05de\u05e7\u05d5\u05e8 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "origin_details": {
+      "type": "string",
+      "description": "\u05e4\u05e8\u05d8\u05d9 \u05de\u05e7\u05d5\u05e8 (\u05e7\u05d9\u05e5 2022, \u05de\u05d5\u05e2\u05d3 \u05d0', \u05e9\u05d0\u05dc\u05d5\u05df 806)"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05e8\u05d0\u05e9\u05d9"
+    },
+    "subtopic_id": {
+      "type": "string",
+      "description": "\u05ea\u05ea-\u05e0\u05d5\u05e9\u05d0"
+    },
+    "module_id": {
+      "type": "string",
+      "description": "\u05de\u05d5\u05d3\u05d5\u05dc \u05dc\u05de\u05d1\u05d7\u05df (A, B, C, \u05d5\u05db\u05d5')"
+    },
+    "question_text": {
+      "type": "string",
+      "description": "\u05d8\u05e7\u05e1\u05d8 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "question_image_url": {
+      "type": "string",
+      "description": "\u05ea\u05de\u05d5\u05e0\u05ea \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "reading_text": {
+      "type": "string",
+      "description": "\u05d8\u05e7\u05e1\u05d8 \u05e7\u05e8\u05d9\u05d0\u05d4/\u05e1\u05d9\u05e4\u05d5\u05e8 \u05e2\u05d1\u05d5\u05e8 \u05e9\u05d0\u05dc\u05d5\u05ea \u05d4\u05d1\u05e0\u05ea \u05d4\u05e0\u05e7\u05e8\u05d0"
+    },
+    "question_type": {
+      "type": "string",
+      "enum": [
+        "open",
+        "multi_choice",
+        "fill_in_blank",
+        "writing",
+        "calculation",
+        "proof"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "max_score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9"
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+      ],
+      "default": "medium"
+    },
+    "parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "max_score": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "\u05e1\u05e2\u05d9\u05e4\u05d9\u05dd \u05e4\u05e0\u05d9\u05de\u05d9\u05d9\u05dd (\u05d0, \u05d1, \u05d2)"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05ea\u05e9\u05d5\u05d1\u05d4 (\u05e8\u05d1-\u05d1\u05e8\u05d9\u05e8\u05d4)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d2\u05d9\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05d5\u05ea"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "usage_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05e0\u05e4\u05ea\u05e8\u05d4"
+    },
+    "avg_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05de\u05de\u05d5\u05e6\u05e2"
+    },
+    "ai_solution_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e9\u05dc\u05d1\u05d9 \u05d4\u05e4\u05ea\u05e8\u05d5\u05df \u05d4\u05e8\u05e9\u05de\u05d9 \u05e2\u05d1\u05d5\u05e8 \u05d4-AI (Gold Standard)"
+    },
+    "ai_rubric": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "criteria": {
+            "type": "string",
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05e7\u05e8\u05d9\u05d8\u05e8\u05d9\u05d5\u05df \u05dc\u05e0\u05d9\u05e7\u05d5\u05d3"
+          },
+          "percentage": {
+            "type": "number",
+            "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e0\u05d9\u05e7\u05d5\u05d3 \u05de\u05d4\u05e1\u05da \u05d4\u05db\u05dc"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "\u05de\u05d9\u05dc\u05d5\u05ea \u05de\u05e4\u05ea\u05d7 \u05e0\u05d3\u05e8\u05e9\u05d5\u05ea"
+          }
+        }
+      },
+      "description": "\u05de\u05d7\u05d5\u05d5\u05df \u05d1\u05d3\u05d9\u05e7\u05d4 \u05dc-AI"
+    },
+    "final_answer_format": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05e1\u05d5\u05e4\u05d9\u05ea \u05d4\u05de\u05e6\u05d5\u05e4\u05d4 (\u05de\u05e1\u05e4\u05e8, \u05d1\u05d9\u05d8\u05d5\u05d9, \u05d8\u05e7\u05e1\u05d8)"
+    }
+  },
+  "required": [
+    "question_id",
+    "subject_id",
+    "question_text",
+    "question_type",
+    "max_score"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

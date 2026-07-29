@@ -1,0 +1,70 @@
+{
+  "name": "BagrutExam",
+  "type": "object",
+  "properties": {
+    "subject_id": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05e7\u05e6\u05d5\u05e2 (\u05de\u05ea\u05de\u05d8\u05d9\u05e7\u05d4, \u05d0\u05e0\u05d2\u05dc\u05d9\u05ea \u05d5\u05db\u05d5')"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea \u05dc\u05d9\u05de\u05d5\u05d3"
+    },
+    "year": {
+      "type": "integer",
+      "description": "\u05e9\u05e0\u05ea \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4"
+    },
+    "season": {
+      "type": "string",
+      "enum": [
+        "winter",
+        "summer",
+        "special"
+      ],
+      "description": "\u05de\u05d5\u05e2\u05d3 (\u05d7\u05d5\u05e8\u05e3/\u05e7\u05d9\u05e5)"
+    },
+    "term": {
+      "type": "string",
+      "enum": [
+        "a",
+        "b"
+      ],
+      "description": "\u05de\u05d5\u05e2\u05d3 \u05d0/\u05d1"
+    },
+    "module_symbol": {
+      "type": "string",
+      "description": "\u05e1\u05de\u05dc \u05e9\u05d0\u05dc\u05d5\u05df (\u05dc\u05de\u05e9\u05dc 581, E, G)"
+    },
+    "exam_file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4 (PDF)"
+    },
+    "solution_file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 \u05d4\u05e4\u05ea\u05e8\u05d5\u05e0\u05d5\u05ea (PDF)"
+    },
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05dc\u05ea\u05e6\u05d5\u05d2\u05d4 (\u05dc\u05de\u05e9\u05dc: \u05e7\u05d9\u05e5 2024 \u05de\u05d5\u05e2\u05d3 \u05d0')"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "subject_id",
+    "unit_level",
+    "year",
+    "season",
+    "exam_file_url"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "name": "SmartTutorReport",
+  "type": "object",
+  "properties": {
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "error",
+        "incorrect_answer",
+        "slow_response",
+        "other"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d3\u05d9\u05d5\u05d5\u05d7"
+    },
+    "description": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05d1\u05e2\u05d9\u05d4"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "\u05d4\u05d5\u05d3\u05e2\u05ea \u05d4\u05e9\u05d2\u05d9\u05d0\u05d4 \u05d4\u05de\u05d3\u05d5\u05d9\u05e7\u05ea"
+    },
+    "screenshot_url": {
+      "type": "string",
+      "description": "\u05e6\u05d9\u05dc\u05d5\u05dd \u05de\u05e1\u05da \u05e9\u05dc \u05d4\u05d1\u05e2\u05d9\u05d4"
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d9\u05d7\u05d4 \u05d1\u05d4 \u05d4\u05d9\u05d9\u05ea\u05d4 \u05d4\u05d1\u05e2\u05d9\u05d4"
+    },
+    "user_message": {
+      "type": "string",
+      "description": "\u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05e9\u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e9\u05dc\u05d7"
+    },
+    "ai_response": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05e9\u05d4-AI \u05e0\u05ea\u05df (\u05d0\u05dd \u05d9\u05e9)"
+    },
+    "had_images": {
+      "type": "boolean",
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05d9\u05d5 \u05ea\u05de\u05d5\u05e0\u05d5\u05ea \u05d1\u05e9\u05d0\u05dc\u05d4"
+    },
+    "prompt_used": {
+      "type": "string",
+      "description": "\u05d4\u05e4\u05e8\u05d5\u05de\u05e4\u05d8 \u05e9\u05e0\u05e9\u05dc\u05d7 \u05dc-AI"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "resolved",
+        "wont_fix"
+      ],
+      "default": "new",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05d8\u05d9\u05e4\u05d5\u05dc"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea \u05de\u05e0\u05d4\u05dc"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05e0\u05e4\u05ea\u05e8"
+    }
+  },
+  "required": [
+    "report_type",
+    "description"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {}
+  }
+}

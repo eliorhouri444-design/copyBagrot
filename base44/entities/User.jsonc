@@ -1,0 +1,241 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "selected_subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2 \u05e9\u05e0\u05d1\u05d7\u05e8"
+    },
+    "selected_units": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea (3, 4 \u05d0\u05d5 5)"
+    },
+    "subject_goals": {
+      "type": "object",
+      "description": "\u05e6\u05d9\u05d5\u05e0\u05d9 \u05de\u05d8\u05e8\u05d4 \u05dc\u05db\u05dc \u05de\u05e7\u05e6\u05d5\u05e2 \u05d5\u05d9\u05d7\u05d9\u05d3\u05d4",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "target_score": {
+            "type": "integer"
+          },
+          "shield_score": {
+            "type": "integer"
+          },
+          "exam_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "module_order": {
+      "type": "object",
+      "description": "\u05e1\u05d3\u05e8 \u05de\u05d5\u05d3\u05d5\u05dc\u05d9\u05dd \u05de\u05d5\u05ea\u05d0\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea \u05dc\u05e4\u05d9 \u05de\u05e7\u05e6\u05d5\u05e2 \u05d5\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "topic_order": {
+      "type": "object",
+      "description": "\u05e1\u05d3\u05e8 \u05e0\u05d5\u05e9\u05d0\u05d9 \u05ea\u05e8\u05d2\u05d5\u05dc \u05de\u05d5\u05ea\u05d0\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea \u05dc\u05e4\u05d9 \u05de\u05e7\u05e6\u05d5\u05e2 \u05d5\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "weekly_goal": {
+      "type": "integer",
+      "default": 5,
+      "description": "\u05d9\u05e2\u05d3 \u05e9\u05d1\u05d5\u05e2\u05d9 \u05e9\u05dc \u05e9\u05e2\u05d5\u05ea \u05dc\u05de\u05d9\u05d3\u05d4"
+    },
+    "current_streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05d9\u05de\u05d9\u05dd \u05e8\u05e6\u05d5\u05e4\u05d9\u05dd \u05e9\u05dc \u05dc\u05de\u05d9\u05d3\u05d4"
+    },
+    "total_study_time": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05d6\u05de\u05df \u05dc\u05de\u05d9\u05d3\u05d4 \u05db\u05d5\u05dc\u05dc \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "topics_completed": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5"
+    },
+    "exams_completed": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05de\u05d1\u05d7\u05e0\u05d9\u05dd \u05e9\u05d4\u05d5\u05e9\u05dc\u05de\u05d5"
+    },
+    "average_score": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05e6\u05d9\u05d5\u05df \u05de\u05de\u05d5\u05e6\u05e2 \u05d1\u05de\u05d1\u05d7\u05e0\u05d9\u05dd"
+    },
+    "incomplete_practices": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05ea\u05e8\u05d2\u05d5\u05dc\u05d9\u05dd \u05e9\u05d8\u05e8\u05dd \u05d4\u05d5\u05e9\u05dc\u05de\u05d5"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05de\u05e9\u05ea\u05de\u05e9 \u05d9\u05e9 \u05d7\u05e9\u05d1\u05d5\u05df \u05e4\u05e8\u05d9\u05de\u05d9\u05d5\u05dd"
+    },
+    "subscription_type": {
+      "type": "string",
+      "enum": [
+        "free",
+        "monthly",
+        "yearly"
+      ],
+      "default": "free",
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05de\u05e0\u05d5\u05d9 \u05e9\u05dc \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "premium_trial_used": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1\u05e0\u05e1\u05d9\u05d5\u05df \u05d4\u05d7\u05d9\u05e0\u05de\u05d9"
+    },
+    "premium_trial_end": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e1\u05d9\u05d5\u05dd \u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05d7\u05d9\u05e0\u05de\u05d9"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d4\u05e9\u05dc\u05d9\u05dd \u05d0\u05ea \u05d4\u05d4\u05e6\u05d2\u05d4 \u05d4\u05e8\u05d0\u05e9\u05d5\u05e0\u05d9\u05ea"
+    },
+    "subject_selected": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d1\u05d7\u05e8 \u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "profile_image_url": {
+      "type": "string",
+      "description": "\u05db\u05ea\u05d5\u05d1\u05ea \u05ea\u05de\u05d5\u05e0\u05ea \u05e4\u05e8\u05d5\u05e4\u05d9\u05dc"
+    },
+    "avatar_color": {
+      "type": "string",
+      "description": "\u05e6\u05d1\u05e2 \u05d0\u05d5\u05d5\u05d8\u05e8"
+    },
+    "last_daily_practice_date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05ea\u05e8\u05d2\u05d5\u05dc \u05d9\u05d5\u05de\u05d9 \u05d0\u05d7\u05e8\u05d5\u05df"
+    },
+    "accessibility_settings": {
+      "type": "object",
+      "description": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05e0\u05d2\u05d9\u05e9\u05d5\u05ea",
+      "properties": {
+        "extra_time": {
+          "type": "integer",
+          "description": "\u05d6\u05de\u05df \u05e0\u05d5\u05e1\u05e3 \u05d1\u05d3\u05e7\u05d5\u05ea"
+        },
+        "font_size": {
+          "type": "string",
+          "description": "\u05d2\u05d5\u05d3\u05dc \u05d2\u05d5\u05e4\u05df"
+        },
+        "high_contrast": {
+          "type": "boolean",
+          "description": "\u05e0\u05d2\u05d5\u05d3\u05d9\u05d5\u05ea \u05d2\u05d1\u05d5\u05d4\u05d4"
+        }
+      }
+    },
+    "preferred_display_mode": {
+      "type": "string",
+      "enum": [
+        "exam",
+        "interactive"
+      ],
+      "description": "\u05de\u05e6\u05d1 \u05ea\u05e6\u05d5\u05d2\u05d4 \u05de\u05d5\u05e2\u05d3\u05e3 \u05dc\u05de\u05d1\u05d7\u05e0\u05d9\u05dd \u05d5\u05ea\u05e8\u05d2\u05d5\u05dc\u05d9\u05dd"
+    },
+    "skip_exam_intro": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d3\u05dc\u05d2 \u05e2\u05dc \u05d4\u05e1\u05d1\u05e8 \u05de\u05d1\u05d7\u05df"
+    },
+    "skip_practice_intro": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d3\u05dc\u05d2 \u05e2\u05dc \u05d4\u05e1\u05d1\u05e8 \u05ea\u05e8\u05d2\u05d5\u05dc"
+    },
+    "tutor_knowledge_base": {
+      "type": "string",
+      "description": "\u05d1\u05e1\u05d9\u05e1 \u05d9\u05d3\u05e2 \u05de\u05d5\u05ea\u05d0\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea \u05dc\u05de\u05d5\u05e8\u05d4 \u05d4\u05d7\u05db\u05dd"
+    },
+    "tutor_custom_instructions": {
+      "type": "string",
+      "description": "\u05d4\u05d5\u05e8\u05d0\u05d5\u05ea \u05de\u05d5\u05ea\u05d0\u05de\u05d5\u05ea \u05d0\u05d9\u05e9\u05d9\u05ea \u05dc\u05de\u05d5\u05e8\u05d4 \u05d4\u05d7\u05db\u05dd - \u05d0\u05d9\u05da \u05dc\u05e2\u05e0\u05d5\u05ea, \u05d0\u05d9\u05da \u05dc\u05d4\u05e1\u05d1\u05d9\u05e8, \u05e1\u05d2\u05e0\u05d5\u05df \u05ea\u05e7\u05e9\u05d5\u05e8\u05ea \u05d5\u05db\u05d5'"
+    },
+    "tutor_preferences": {
+      "type": "object",
+      "description": "\u05d4\u05e2\u05d3\u05e4\u05d5\u05ea \u05d4\u05ea\u05e0\u05d4\u05d2\u05d5\u05ea \u05d4\u05de\u05d5\u05e8\u05d4 \u05d4\u05d7\u05db\u05dd",
+      "properties": {
+        "explanation_style": {
+          "type": "string",
+          "enum": [
+            "detailed",
+            "concise",
+            "step_by_step",
+            "visual"
+          ],
+          "description": "\u05e1\u05d2\u05e0\u05d5\u05df \u05d4\u05e1\u05d1\u05e8"
+        },
+        "use_examples": {
+          "type": "boolean",
+          "default": true,
+          "description": "\u05dc\u05d4\u05e9\u05ea\u05de\u05e9 \u05d1\u05d3\u05d5\u05d2\u05de\u05d0\u05d5\u05ea"
+        },
+        "encouragement_level": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "default": "medium",
+          "description": "\u05e8\u05de\u05ea \u05e2\u05d9\u05d3\u05d5\u05d3"
+        },
+        "response_length": {
+          "type": "string",
+          "enum": [
+            "short",
+            "medium",
+            "long"
+          ],
+          "default": "medium",
+          "description": "\u05d0\u05d5\u05e8\u05da \u05ea\u05e9\u05d5\u05d1\u05d4 \u05de\u05d5\u05e2\u05d3\u05e3"
+        }
+      }
+    },
+    "last_vocabulary_position": {
+      "type": "object",
+      "description": "\u05de\u05d9\u05e7\u05d5\u05dd \u05d0\u05d7\u05e8\u05d5\u05df \u05d1\u05ea\u05e8\u05d2\u05d5\u05dc \u05d0\u05d5\u05e6\u05e8 \u05de\u05d9\u05dc\u05d9\u05dd",
+      "properties": {
+        "set_id": {
+          "type": "integer"
+        },
+        "question_index": {
+          "type": "integer"
+        },
+        "word_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "required": []
+}

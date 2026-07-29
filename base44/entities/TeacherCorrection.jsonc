@@ -1,0 +1,108 @@
+{
+  "name": "TeacherCorrection",
+  "type": "object",
+  "properties": {
+    "original_question": {
+      "type": "string",
+      "description": "\u05d4\u05e9\u05d0\u05dc\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05ea"
+    },
+    "original_answer": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05ea \u05e9\u05dc \u05d4\u05de\u05d5\u05e8\u05d4"
+    },
+    "corrected_answer": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05de\u05ea\u05d5\u05e7\u05e0\u05ea"
+    },
+    "correction_reason": {
+      "type": "string",
+      "enum": [
+        "wrong_calculation",
+        "wrong_explanation",
+        "missing_info",
+        "wrong_diagram",
+        "wrong_graph",
+        "language_issue",
+        "formatting_issue",
+        "other"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d8\u05e2\u05d5\u05ea"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "units": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "major",
+        "minor"
+      ],
+      "description": "\u05d7\u05d5\u05de\u05e8\u05ea \u05d4\u05d8\u05e2\u05d5\u05ea"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea \u05d4\u05d0\u05d3\u05de\u05d9\u05df"
+    },
+    "message_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05ea"
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d9\u05d7\u05d4"
+    },
+    "was_applied": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05d9\u05e7\u05d5\u05df \u05d4\u05d5\u05d7\u05dc \u05dc\u05de\u05e2\u05e8\u05db\u05ea"
+    },
+    "learning_impact": {
+      "type": "object",
+      "description": "\u05d4\u05e9\u05e4\u05e2\u05ea \u05d4\u05dc\u05de\u05d9\u05d3\u05d4 \u05e2\u05dc \u05d4\u05de\u05e2\u05e8\u05db\u05ea",
+      "properties": {
+        "prompt_updated": {
+          "type": "boolean"
+        },
+        "knowledge_added": {
+          "type": "boolean"
+        },
+        "similar_corrections": {
+          "type": "integer"
+        }
+      }
+    },
+    "image_url": {
+      "type": "string",
+      "description": "\u05ea\u05de\u05d5\u05e0\u05d4 \u05e9\u05d4\u05d5\u05e2\u05dc\u05ea\u05d4 \u05e2\u05dd \u05d4\u05e9\u05d0\u05dc\u05d4"
+    }
+  },
+  "required": [
+    "original_question",
+    "original_answer",
+    "corrected_answer",
+    "correction_reason",
+    "subject"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

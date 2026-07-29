@@ -1,0 +1,125 @@
+{
+  "name": "KnowledgeBase",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "enum": [
+        "\u05de\u05ea\u05de\u05d8\u05d9\u05e7\u05d4",
+        "\u05e4\u05d9\u05d6\u05d9\u05e7\u05d4",
+        "\u05d1\u05d9\u05d5\u05dc\u05d5\u05d2\u05d9\u05d4",
+        "\u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05d4",
+        "\u05d0\u05d6\u05e8\u05d7\u05d5\u05ea",
+        "\u05e1\u05e4\u05e8\u05d5\u05ea",
+        "\u05dc\u05e9\u05d5\u05df",
+        "\u05d0\u05e0\u05d2\u05dc\u05d9\u05ea",
+        "\u05e2\u05e8\u05d1\u05d9\u05ea"
+      ],
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "knowledge_type": {
+      "type": "string",
+      "enum": [
+        "\u05d1\u05d2\u05e8\u05d5\u05ea",
+        "\u05ea\u05d9\u05d0\u05d5\u05e8\u05d9\u05d4",
+        "\u05d3\u05d5\u05d2\u05de\u05d4",
+        "\u05d1\u05d5\u05d7\u05df",
+        "\u05e4\u05ea\u05e8\u05d5\u05df",
+        "\u05e0\u05d5\u05e1\u05d7\u05d4",
+        "\u05d4\u05e1\u05d1\u05e8"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d9\u05d3\u05e2"
+    },
+    "content": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d9\u05d3\u05e2 (Markdown + LaTeX)"
+    },
+    "content_latex": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e1\u05d7\u05d0\u05d5\u05ea LaTeX \u05e0\u05e4\u05e8\u05d3\u05d5\u05ea"
+    },
+    "unit_level": {
+      "type": "string",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea (3/4/5 \u05d0\u05d5 \u05db\u05d9\u05ea\u05d4)"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05e8\u05d0\u05e9\u05d9"
+    },
+    "sub_topic": {
+      "type": "string",
+      "description": "\u05ea\u05ea-\u05e0\u05d5\u05e9\u05d0"
+    },
+    "priority": {
+      "type": "number",
+      "default": 0.5,
+      "description": "\u05e2\u05d3\u05d9\u05e4\u05d5\u05ea (0-1)"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05e4\u05e2\u05d9\u05dc"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05d5\u05e8 \u05d4\u05de\u05d9\u05d3\u05e2"
+    },
+    "year": {
+      "type": "integer",
+      "description": "\u05e9\u05e0\u05d4"
+    },
+    "lang": {
+      "type": "string",
+      "enum": [
+        "he",
+        "en",
+        "ar"
+      ],
+      "default": "he",
+      "description": "\u05e9\u05e4\u05d4"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d2\u05d9\u05d5\u05ea"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "\u05e7\u05dc",
+        "\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9",
+        "\u05e7\u05e9\u05d4",
+        "\u05de\u05ea\u05e7\u05d3\u05dd"
+      ],
+      "default": "\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9",
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9"
+    },
+    "embedding": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "\u05d5\u05e7\u05d8\u05d5\u05e8 \u05d0\u05de\u05d1\u05d3\u05d9\u05e0\u05d2"
+    },
+    "chunk_text": {
+      "type": "string",
+      "description": "\u05d8\u05e7\u05e1\u05d8 \u05de\u05e7\u05d5\u05d8\u05e2 \u05dc\u05d7\u05d9\u05e4\u05d5\u05e9"
+    }
+  },
+  "required": [
+    "subject",
+    "knowledge_type",
+    "content",
+    "topic"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

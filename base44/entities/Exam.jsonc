@@ -1,0 +1,71 @@
+{
+  "name": "Exam",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05d5\u05d3\u05d5\u05dc\u05d9\u05dd (A, B, C \u05d5\u05db\u05d5')"
+    },
+    "duration": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05d1\u05d7\u05d9\u05e0\u05d4 \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "description": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "exam_type": {
+      "type": "string",
+      "enum": [
+        "full_exam",
+        "partial",
+        "custom"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "color": {
+      "type": "string",
+      "description": "\u05e6\u05d1\u05e2 \u05d4\u05db\u05e8\u05d8\u05d9\u05e1"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d3\u05d5\u05e8\u05e9 \u05de\u05e0\u05d5\u05d9 \u05e4\u05e8\u05d9\u05de\u05d9\u05d5\u05dd"
+    }
+  },
+  "required": [
+    "title",
+    "subject",
+    "unit_level",
+    "duration",
+    "exam_type"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

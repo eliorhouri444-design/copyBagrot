@@ -1,0 +1,155 @@
+{
+  "name": "AttemptNew",
+  "type": "object",
+  "properties": {
+    "attempt_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9 \u05dc\u05e0\u05d9\u05e1\u05d9\u05d5\u05df"
+    },
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "topic_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05e1\u05e9\u05df (\u05ea\u05e8\u05d2\u05d5\u05dc/\u05d1\u05d7\u05d9\u05e0\u05d4)"
+    },
+    "user_answer_text": {
+      "type": "string",
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05ea \u05d4\u05ea\u05dc\u05de\u05d9\u05d3"
+    },
+    "user_answer_structure": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d4 \u05de\u05d5\u05d1\u05e0\u05d9\u05ea \u05dc\u05e4\u05d9 \u05e1\u05e2\u05d9\u05e4\u05d9\u05dd"
+    },
+    "score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05e9\u05d4\u05ea\u05e7\u05d1\u05dc"
+    },
+    "max_score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05de\u05e7\u05e1\u05d9\u05de\u05dc\u05d9"
+    },
+    "percentage": {
+      "type": "number",
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e6\u05dc\u05d7\u05d4"
+    },
+    "detailed_feedback": {
+      "type": "string",
+      "description": "\u05de\u05e9\u05d5\u05d1 \u05de\u05e4\u05d5\u05e8\u05d8"
+    },
+    "scoring_breakdown": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "max_score": {
+            "type": "number"
+          },
+          "feedback": {
+            "type": "string"
+          },
+          "criteria_met": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "criteria_missed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "\u05e4\u05d9\u05e8\u05d5\u05d8 \u05e0\u05d9\u05e7\u05d5\u05d3 \u05dc\u05db\u05dc \u05e1\u05e2\u05d9\u05e3"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "correct",
+        "partial",
+        "incorrect",
+        "unanswered"
+      ],
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4"
+    },
+    "time_spent_seconds": {
+      "type": "integer",
+      "description": "\u05d6\u05de\u05df \u05e9\u05d4\u05d5\u05e9\u05e7\u05e2"
+    },
+    "attempt_number": {
+      "type": "integer",
+      "default": 1,
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05e1\u05d9\u05d5\u05df"
+    },
+    "ai_model_used": {
+      "type": "string",
+      "description": "\u05de\u05d5\u05d3\u05dc AI \u05e9\u05e9\u05d9\u05de\u05e9 \u05dc\u05d1\u05d3\u05d9\u05e7\u05d4"
+    }
+  },
+  "required": [
+    "question_id",
+    "user_answer_text",
+    "score",
+    "max_score"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

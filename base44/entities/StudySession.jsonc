@@ -1,0 +1,79 @@
+{
+  "name": "StudySession",
+  "type": "object",
+  "properties": {
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "practice",
+        "exam",
+        "daily_quiz"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e4\u05e2\u05d9\u05dc\u05d5\u05ea"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05d4\u05ea\u05d7\u05dc\u05d4"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05e1\u05d9\u05d5\u05dd"
+    }
+  },
+  "required": [
+    "session_type",
+    "subject",
+    "unit_level",
+    "duration_minutes",
+    "started_at"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

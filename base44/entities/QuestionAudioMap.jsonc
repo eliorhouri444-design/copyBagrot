@@ -1,0 +1,36 @@
+{
+  "name": "QuestionAudioMap",
+  "type": "object",
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "audio_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05d0\u05d5\u05d3\u05d9\u05d5"
+    },
+    "play_limit": {
+      "type": "integer",
+      "default": 2,
+      "description": "\u05de\u05d2\u05d1\u05dc\u05ea \u05d4\u05e9\u05de\u05e2\u05d5\u05ea"
+    },
+    "auto_play": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05d4\u05e4\u05e2\u05d9\u05dc \u05d0\u05d5\u05d8\u05d5\u05de\u05d8\u05d9\u05ea"
+    }
+  },
+  "required": [
+    "question_id",
+    "audio_id"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

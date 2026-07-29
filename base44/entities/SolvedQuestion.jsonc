@@ -1,0 +1,171 @@
+{
+  "name": "SolvedQuestion",
+  "type": "object",
+  "properties": {
+    "question_text": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e1\u05d7 \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d4\u05de\u05dc\u05d0"
+    },
+    "question_image_url": {
+      "type": "string",
+      "description": "\u05ea\u05de\u05d5\u05e0\u05ea \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05ea"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "topic": {
+      "type": "string",
+      "description": "\u05d4\u05e0\u05d5\u05e9\u05d0 \u05d4\u05e8\u05d0\u05e9\u05d9"
+    },
+    "subtopics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05ea\u05d9-\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd"
+    },
+    "units": {
+      "type": "integer",
+      "enum": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+      ],
+      "default": "medium",
+      "description": "\u05e8\u05de\u05ea \u05e7\u05d5\u05e9\u05d9"
+    },
+    "solution_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_number": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "calculation": {
+            "type": "string"
+          },
+          "diagram_data": {
+            "type": "object"
+          }
+        }
+      },
+      "description": "\u05e9\u05dc\u05d1\u05d9 \u05d4\u05e4\u05ea\u05e8\u05d5\u05df \u05d4\u05de\u05e4\u05d5\u05e8\u05d8\u05d9\u05dd"
+    },
+    "final_answer": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05d4\u05e1\u05d5\u05e4\u05d9\u05ea"
+    },
+    "diagrams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "geometry",
+              "graph",
+              "physics",
+              "chemistry",
+              "biology"
+            ]
+          },
+          "data": {
+            "type": "object"
+          },
+          "generated_image_url": {
+            "type": "string"
+          },
+          "step_number": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "\u05d0\u05d9\u05d5\u05e8\u05d9\u05dd \u05d5\u05e9\u05e8\u05d8\u05d5\u05d8\u05d9\u05dd"
+    },
+    "graph_data": {
+      "type": "object",
+      "description": "\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d2\u05e8\u05e3 JSON"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d2\u05d9\u05d5\u05ea \u05dc\u05d7\u05d9\u05e4\u05d5\u05e9"
+    },
+    "similar_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05de\u05d6\u05d4\u05d9 \u05e9\u05d0\u05dc\u05d5\u05ea \u05d3\u05d5\u05de\u05d5\u05ea"
+    },
+    "question_hash": {
+      "type": "string",
+      "description": "hash \u05e9\u05dc \u05d4\u05e9\u05d0\u05dc\u05d4 \u05dc\u05d6\u05d9\u05d4\u05d5\u05d9 \u05db\u05e4\u05d9\u05dc\u05d5\u05d9\u05d5\u05ea"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "user_upload",
+        "exam_scan",
+        "ai_generated",
+        "manual_entry",
+        "student_question"
+      ],
+      "description": "\u05de\u05e7\u05d5\u05e8 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d0\u05d5\u05de\u05ea \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d0\u05d3\u05de\u05d9\u05df"
+    },
+    "times_used": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05d4\u05e9\u05ea\u05de\u05e9\u05d5 \u05d1\u05e4\u05ea\u05e8\u05d5\u05df"
+    },
+    "success_rate": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e6\u05dc\u05d7\u05d4 \u05e9\u05dc \u05d4\u05ea\u05dc\u05de\u05d9\u05d3\u05d9\u05dd"
+    },
+    "avg_rating": {
+      "type": "number",
+      "default": 0,
+      "description": "\u05d3\u05d9\u05e8\u05d5\u05d2 \u05de\u05de\u05d5\u05e6\u05e2"
+    }
+  },
+  "required": [
+    "question_text",
+    "subject",
+    "topic",
+    "solution_steps",
+    "final_answer"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

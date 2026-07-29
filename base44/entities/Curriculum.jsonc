@@ -1,0 +1,108 @@
+{
+  "name": "Curriculum",
+  "type": "object",
+  "properties": {
+    "subject_id": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "chapter_number": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e4\u05e8\u05e7 \u05d1\u05e1\u05d9\u05dc\u05d1\u05d5\u05e1"
+    },
+    "chapter_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e4\u05e8\u05e7"
+    },
+    "parent_chapter": {
+      "type": "integer",
+      "description": "\u05e4\u05e8\u05e7 \u05d0\u05d1 (\u05d0\u05dd \u05d6\u05d4 \u05ea\u05ea-\u05e4\u05e8\u05e7)"
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "topic_id": {
+            "type": "string"
+          },
+          "topic_name": {
+            "type": "string"
+          },
+          "subtopics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estimated_hours": {
+            "type": "number",
+            "description": "\u05e9\u05e2\u05d5\u05ea \u05dc\u05d9\u05de\u05d5\u05d3 \u05de\u05e9\u05d5\u05e2\u05e8\u05d5\u05ea"
+          },
+          "question_count_target": {
+            "type": "integer",
+            "description": "\u05db\u05de\u05d4 \u05e9\u05d0\u05dc\u05d5\u05ea \u05de\u05d5\u05de\u05dc\u05e5 \u05dc\u05ea\u05e8\u05d2\u05dc \u05d1\u05e0\u05d5\u05e9\u05d0"
+          },
+          "is_core": {
+            "type": "boolean",
+            "description": "\u05d4\u05d0\u05dd \u05d6\u05d4 \u05e0\u05d5\u05e9\u05d0 \u05dc\u05d9\u05d1\u05d4 \u05d7\u05d5\u05d1\u05d4"
+          }
+        }
+      },
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05d1\u05e4\u05e8\u05e7"
+    },
+    "order": {
+      "type": "integer",
+      "description": "\u05e1\u05d3\u05e8 \u05d4\u05dc\u05d9\u05de\u05d5\u05d3 \u05d4\u05de\u05d5\u05de\u05dc\u05e5"
+    },
+    "is_mandatory": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05e4\u05e8\u05e7 \u05d7\u05d5\u05d1\u05d4"
+    },
+    "difficulty_weight": {
+      "type": "number",
+      "default": 1.0,
+      "description": "\u05de\u05e9\u05e7\u05dc \u05e7\u05d5\u05e9\u05d9 (1.0 = \u05e0\u05d5\u05e8\u05de\u05dc\u05d9, 1.5 = \u05e7\u05e9\u05d4)"
+    },
+    "exam_weight": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05e7\u05dc \u05d1\u05d1\u05d2\u05e8\u05d5\u05ea (\u05d0\u05d7\u05d5\u05d6\u05d9\u05dd)"
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "\u05e4\u05e8\u05e7\u05d9\u05dd \u05e9\u05e6\u05e8\u05d9\u05da \u05dc\u05dc\u05de\u05d5\u05d3 \u05dc\u05e4\u05e0\u05d9"
+    },
+    "ministry_reference": {
+      "type": "string",
+      "description": "\u05e7\u05d5\u05d3 \u05e8\u05e9\u05de\u05d9 \u05e9\u05dc \u05de\u05e9\u05e8\u05d3 \u05d4\u05d7\u05d9\u05e0\u05d5\u05da"
+    }
+  },
+  "required": [
+    "subject_id",
+    "unit_level",
+    "chapter_number",
+    "chapter_name",
+    "order"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

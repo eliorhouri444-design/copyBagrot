@@ -1,0 +1,87 @@
+{
+  "name": "ExamResult",
+  "type": "object",
+  "properties": {
+    "exam_type": {
+      "type": "string",
+      "enum": [
+        "full_mock",
+        "section_a",
+        "section_b",
+        "listening",
+        "writing"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05db\u05d5\u05dc\u05dc \u05d1\u05d0\u05d7\u05d5\u05d6\u05d9\u05dd"
+    },
+    "duration": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05de\u05d1\u05d7\u05df \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "sections": {
+      "type": "object",
+      "properties": {
+        "reading": {
+          "type": "number"
+        },
+        "vocabulary": {
+          "type": "number"
+        },
+        "grammar": {
+          "type": "number"
+        }
+      }
+    },
+    "weak_areas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05ea\u05d7\u05d5\u05de\u05d9\u05dd \u05e9\u05e6\u05e8\u05d9\u05db\u05d9\u05dd \u05d7\u05d9\u05d6\u05d5\u05e7"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2 \u05e9\u05dc \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "units": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "exam_type",
+    "score",
+    "duration",
+    "subject",
+    "units"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

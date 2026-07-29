@@ -1,0 +1,125 @@
+{
+  "name": "ExamNew",
+  "type": "object",
+  "properties": {
+    "exam_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9 \u05dc\u05de\u05d1\u05d7\u05df"
+    },
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "practice",
+        "mock",
+        "adaptive",
+        "custom"
+      ],
+      "description": "\u05de\u05e6\u05d1 \u05d4\u05de\u05d1\u05d7\u05df"
+    },
+    "duration_sec": {
+      "type": "integer",
+      "description": "\u05de\u05e9\u05da \u05d4\u05de\u05d1\u05d7\u05df (\u05e9\u05e0\u05d9\u05d5\u05ea)"
+    },
+    "policy": {
+      "type": "object",
+      "description": "\u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea \u05d4\u05de\u05d1\u05d7\u05df",
+      "properties": {
+        "navigation": {
+          "type": "string",
+          "enum": [
+            "free",
+            "linear",
+            "linear_lock"
+          ],
+          "description": "\u05e1\u05d5\u05d2 \u05e0\u05d9\u05d5\u05d5\u05d8"
+        },
+        "hints_allowed": {
+          "type": "boolean",
+          "description": "\u05d4\u05d0\u05dd \u05e8\u05de\u05d6\u05d9\u05dd \u05de\u05d5\u05ea\u05e8\u05d9\u05dd"
+        },
+        "show_solutions": {
+          "type": "string",
+          "enum": [
+            "never",
+            "after_submit",
+            "immediate"
+          ],
+          "description": "\u05de\u05ea\u05d9 \u05dc\u05d4\u05e6\u05d9\u05d2 \u05e4\u05ea\u05e8\u05d5\u05e0\u05d5\u05ea"
+        },
+        "shuffle_items": {
+          "type": "boolean",
+          "description": "\u05e2\u05e8\u05d1\u05d1 \u05e9\u05d0\u05dc\u05d5\u05ea"
+        },
+        "shuffle_mcq_options": {
+          "type": "boolean",
+          "description": "\u05e2\u05e8\u05d1\u05d1 \u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05d1\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05e8\u05d5\u05d1\u05d4"
+        }
+      }
+    },
+    "grading": {
+      "type": "object",
+      "properties": {
+        "scale": {
+          "type": "string",
+          "enum": [
+            "percentage",
+            "points",
+            "grade"
+          ],
+          "description": "\u05e1\u05d5\u05dc\u05dd \u05e6\u05d9\u05d5\u05e0\u05d9\u05dd"
+        },
+        "partial_credit": {
+          "type": "boolean",
+          "description": "\u05d0\u05e4\u05e9\u05e8 \u05e6\u05d9\u05d5\u05df \u05d7\u05dc\u05e7\u05d9"
+        },
+        "passing_grade": {
+          "type": "number",
+          "description": "\u05e6\u05d9\u05d5\u05df \u05e2\u05d5\u05d1\u05e8"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "exam_id",
+    "title",
+    "subject_id",
+    "mode",
+    "duration_sec"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

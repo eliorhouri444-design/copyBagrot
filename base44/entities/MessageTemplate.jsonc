@@ -1,0 +1,49 @@
+{
+  "name": "MessageTemplate",
+  "type": "object",
+  "properties": {
+    "template_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9 \u05dc\u05ea\u05d1\u05e0\u05d9\u05ea (not_active_1d, not_active_3d, completed_simulation)"
+    },
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05ea\u05d1\u05e0\u05d9\u05ea"
+    },
+    "message_text": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d4\u05d5\u05d3\u05e2\u05d4"
+    },
+    "whatsapp_text": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d5\u05d3\u05e2\u05ea WhatsApp (\u05d0\u05dd \u05e9\u05d5\u05e0\u05d4)"
+    },
+    "send_push": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05e9\u05dc\u05d5\u05d7 \u05d4\u05d5\u05d3\u05e2\u05ea Push"
+    },
+    "send_whatsapp": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05e9\u05dc\u05d5\u05d7 WhatsApp"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05d1\u05e0\u05d9\u05ea \u05e4\u05e2\u05d9\u05dc\u05d4"
+    }
+  },
+  "required": [
+    "template_id",
+    "message_text"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

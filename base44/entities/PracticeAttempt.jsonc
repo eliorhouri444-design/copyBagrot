@@ -1,0 +1,83 @@
+{
+  "name": "PracticeAttempt",
+  "type": "object",
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e9\u05d0\u05dc\u05d4"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "topic_key": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "is_correct": {
+      "type": "boolean",
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05e0\u05db\u05d5\u05e0\u05d4"
+    },
+    "user_answer": {
+      "type": "string",
+      "description": "\u05d4\u05ea\u05e9\u05d5\u05d1\u05d4 \u05e9\u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e0\u05ea\u05df"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d4\u05ea\u05d7\u05d9\u05dc"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05e9\u05dc\u05d7"
+    },
+    "archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d1\u05d0\u05e8\u05db\u05d9\u05d5\u05df"
+    }
+  },
+  "required": [
+    "item_id",
+    "subject",
+    "unit_level",
+    "topic_key",
+    "is_correct"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

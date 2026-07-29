@@ -1,0 +1,42 @@
+{
+  "name": "GeneratedExam",
+  "type": "object",
+  "properties": {
+    "original_exam_id": {
+      "type": "string",
+      "description": "ID of the original BagrutExam"
+    },
+    "title": {
+      "type": "string",
+      "description": "A short, descriptive title for the generated exam"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "integer"
+    },
+    "exam_json": {
+      "type": "object",
+      "description": "The full JSON returned by GPT"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "processing"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "subject",
+    "unit",
+    "exam_json"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "SolverFeedback",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The text query or extracted text from image"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Original image URL if applicable"
+    },
+    "generated_result": {
+      "type": "object",
+      "description": "The full JSON result returned by the solver"
+    },
+    "is_correct": {
+      "type": "boolean",
+      "description": "Did the user mark this as correct?"
+    },
+    "user_correction": {
+      "type": "string",
+      "description": "The correct answer provided by the user"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "math",
+        "physics",
+        "engineering",
+        "code",
+        "other"
+      ],
+      "default": "other"
+    }
+  },
+  "required": [
+    "query",
+    "is_correct"
+  ]
+}

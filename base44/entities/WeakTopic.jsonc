@@ -1,0 +1,85 @@
+{
+  "name": "WeakTopic",
+  "type": "object",
+  "properties": {
+    "topic_key": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "topic_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e0\u05d5\u05e9\u05d0"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "weakness_score": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05d5\u05df \u05d7\u05d5\u05dc\u05e9\u05d4 (0-100, \u05d2\u05d1\u05d5\u05d4 = \u05d7\u05dc\u05e9 \u05d9\u05d5\u05ea\u05e8)"
+    },
+    "recent_accuracy": {
+      "type": "number",
+      "description": "\u05d3\u05d9\u05d5\u05e7 \u05d0\u05d7\u05e8\u05d5\u05df \u05d1\u05d0\u05d7\u05d5\u05d6\u05d9\u05dd"
+    },
+    "attempts_count": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea"
+    },
+    "last_attempt_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df"
+    },
+    "improvement_trend": {
+      "type": "string",
+      "enum": [
+        "improving",
+        "stable",
+        "declining"
+      ],
+      "description": "\u05de\u05d2\u05de\u05ea \u05e9\u05d9\u05e4\u05d5\u05e8"
+    }
+  },
+  "required": [
+    "topic_key",
+    "subject",
+    "unit_level",
+    "weakness_score"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

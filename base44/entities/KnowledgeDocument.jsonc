@@ -1,0 +1,169 @@
+{
+  "name": "KnowledgeDocument",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05e1\u05de\u05da"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "pdf",
+        "word",
+        "text",
+        "exam",
+        "quiz",
+        "study_guide",
+        "other"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e7\u05d5\u05d1\u05e5"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05d1\u05e5 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9"
+    },
+    "content_chunks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chunk_index": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "tokens": {
+            "type": "integer"
+          }
+        }
+      },
+      "description": "\u05d4\u05ea\u05d5\u05db\u05df \u05de\u05d7\u05d5\u05dc\u05e7 \u05dc\u05d7\u05ea\u05d9\u05db\u05d5\u05ea"
+    },
+    "total_chars": {
+      "type": "integer",
+      "description": "\u05e1\u05d4\"\u05db \u05ea\u05d5\u05d5\u05d9\u05dd \u05d1\u05de\u05e1\u05de\u05da"
+    },
+    "total_words": {
+      "type": "integer",
+      "description": "\u05e1\u05d4\"\u05db \u05de\u05d9\u05dc\u05d9\u05dd \u05d1\u05de\u05e1\u05de\u05da"
+    },
+    "processing_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05e2\u05d9\u05d1\u05d5\u05d3"
+    },
+    "processing_progress": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea 0-100"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05d4\u05de\u05e7\u05e6\u05d5\u05e2 \u05d4\u05e8\u05dc\u05d5\u05d5\u05e0\u05d8\u05d9"
+    },
+    "unit_level": {
+      "type": "integer",
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e0\u05d5\u05e9\u05d0\u05d9\u05dd \u05e9\u05d6\u05d5\u05d4\u05d5 \u05d1\u05de\u05e1\u05de\u05da"
+    },
+    "key_concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "concept": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "\u05de\u05d5\u05e9\u05d2\u05d9 \u05de\u05e4\u05ea\u05d7 \u05e9\u05d7\u05d5\u05dc\u05e6\u05d5"
+    },
+    "summary": {
+      "type": "string",
+      "description": "\u05e1\u05d9\u05db\u05d5\u05dd \u05d4\u05de\u05e1\u05de\u05da"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "year": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u05d4\u05d0\u05dd \u05dc\u05d4\u05e9\u05ea\u05de\u05e9 \u05d1\u05de\u05e1\u05de\u05da \u05d6\u05d4"
+    },
+    "usage_count": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05db\u05de\u05d4 \u05e4\u05e2\u05de\u05d9\u05dd \u05d4\u05de\u05e1\u05de\u05da \u05e9\u05d9\u05de\u05e9 \u05d1\u05e9\u05d9\u05d7\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "title",
+    "file_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

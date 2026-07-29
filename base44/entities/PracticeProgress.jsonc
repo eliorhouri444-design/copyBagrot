@@ -1,0 +1,98 @@
+{
+  "name": "PracticeProgress",
+  "type": "object",
+  "properties": {
+    "topic": {
+      "type": "string",
+      "description": "\u05e0\u05d5\u05e9\u05d0 \u05d4\u05ea\u05e8\u05d2\u05d5\u05dc"
+    },
+    "subject": {
+      "type": "string",
+      "description": "\u05de\u05e7\u05e6\u05d5\u05e2"
+    },
+    "unit_level": {
+      "type": "integer",
+      "enum": [
+        3,
+        4,
+        5
+      ],
+      "description": "\u05e8\u05de\u05ea \u05d9\u05d7\u05d9\u05d3\u05d5\u05ea"
+    },
+    "current_question": {
+      "type": "integer",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e9\u05d0\u05dc\u05d4 \u05d4\u05e0\u05d5\u05db\u05d7\u05d9\u05ea"
+    },
+    "answers": {
+      "type": "object",
+      "description": "\u05ea\u05e9\u05d5\u05d1\u05d5\u05ea \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "time_left": {
+      "type": "integer",
+      "description": "\u05d6\u05de\u05df \u05e9\u05e0\u05d5\u05ea\u05e8 \u05d1\u05e9\u05e0\u05d9\u05d5\u05ea"
+    },
+    "marked_for_review": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "\u05e9\u05d0\u05dc\u05d5\u05ea \u05e9\u05e1\u05d5\u05de\u05e0\u05d5 \u05dc\u05e1\u05e7\u05d9\u05e8\u05d4"
+    },
+    "answered_questions": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "\u05e9\u05d0\u05dc\u05d5\u05ea \u05e9\u05e0\u05e2\u05e0\u05d5"
+    },
+    "score": {
+      "type": "integer",
+      "default": 0,
+      "description": "\u05e6\u05d9\u05d5\u05df \u05e0\u05d5\u05db\u05d7\u05d9"
+    },
+    "display_mode": {
+      "type": "string",
+      "enum": [
+        "exam",
+        "interactive"
+      ],
+      "description": "\u05de\u05e6\u05d1 \u05ea\u05e6\u05d5\u05d2\u05d4"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05ea\u05e8\u05d2\u05d5\u05dc \u05d4\u05d5\u05e9\u05dc\u05dd"
+    }
+  },
+  "required": [
+    "topic",
+    "subject",
+    "unit_level"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

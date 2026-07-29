@@ -1,0 +1,78 @@
+{
+  "name": "ReadingProgress",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "User email"
+    },
+    "text_id": {
+      "type": "string",
+      "description": "ID of the text"
+    },
+    "question_id": {
+      "type": "string",
+      "description": "ID of the specific question within the text"
+    },
+    "times_seen": {
+      "type": "integer",
+      "default": 0
+    },
+    "times_correct": {
+      "type": "integer",
+      "default": 0
+    },
+    "times_incorrect": {
+      "type": "integer",
+      "default": 0
+    },
+    "streak": {
+      "type": "integer",
+      "default": 0,
+      "description": "Consecutive correct answers"
+    },
+    "is_weak": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_mastered": {
+      "type": "boolean",
+      "default": false
+    },
+    "last_practiced": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_email",
+    "text_id",
+    "question_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
